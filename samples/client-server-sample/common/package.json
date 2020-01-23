@@ -1,0 +1,17 @@
+{
+  "name": "@microframework/client-server-sample-common",
+  "version": "1.0.0",
+  "private": true,
+  "main": "_/index.js",
+  "dependencies": {
+    "@microframework/core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^13.1.7",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.7.4"
+  },
+  "scripts": {
+    "start": "ts-node ../server/src/index.ts"
+  }
+}

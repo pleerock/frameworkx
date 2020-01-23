@@ -1,0 +1,27 @@
+{
+  "name": "@microframework/tests",
+  "version": "0.0.54",
+  "description": "Microframework core",
+  "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
+  "license": "MIT",
+  "main": "_/index.js",
+  "dependencies": {
+    "@microframework/core": "*",
+    "@microframework/parser": "*",
+    "@microframework/node": "*",
+    "@microframework/logger": "*",
+    "@microframework/validator": "*",
+    "@types/node": "^13.1.7",
+    "@types/jest": "^24.0.25",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.3.0",
+    "prettier": "^1.19.1",
+    "typeorm": "0.3.0-rc.1",
+    "typescript": "^3.7.3"
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/jest"
+  }
+}

@@ -1,0 +1,5 @@
+- test models: [...A, ...B, ...C] or just models: X, same with all others including objects, queries: {} & {}
+- make sure there are no duplicates in model names
+- make sure reserved names like Float, number, string aren't used
+- check scenarios when String is used instead of string, etc.
+- we can call place where all apps are connected as "Hub" or "AppHub"

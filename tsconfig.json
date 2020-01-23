@@ -1,0 +1,21 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./framework/core" },
+    { "path": "./framework/parser" },
+    { "path": "./framework/node" },
+    { "path": "./framework/logger" },
+    { "path": "./framework/validator" },
+//    { "path": "./framework/web" },
+//    { "path": "./framework/react-tools" },
+    { "path": "./samples/basic-sample" },
+    { "path": "./samples/client-server-sample/common" },
+    { "path": "./samples/client-server-sample/client" },
+    { "path": "./samples/client-server-sample/server" },
+    { "path": "./tests" }
+  ],
+  "exclude": [
+    "__old",
+    "tests"
+  ]
+}

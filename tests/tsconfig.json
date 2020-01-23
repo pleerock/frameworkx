@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.settings.json",
+  "compilerOptions": {
+    "outDir": "_",
+    "rootDir": "src"
+  },
+  "references": [
+    { "path": "../framework/core" },
+    { "path": "../framework/parser" },
+    { "path": "../framework/node" },
+    { "path": "../framework/logger" },
+    { "path": "../framework/validator" }
+  ]
+}

@@ -1,0 +1,10 @@
+query {
+    posts(limit: 1, offset: 0) {
+        id
+        title
+        author {
+            id
+            firstName
+        }
+    }
+}

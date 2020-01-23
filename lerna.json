@@ -1,0 +1,16 @@
+{
+  "packages": [
+    "./framework/core",
+    "./framework/parser",
+    "./framework/node",
+    "./framework/logger",
+    "./framework/server",
+    "./framework/validator",
+    "./samples/basic-sample",
+    "./samples/client-server-sample/client",
+    "./samples/client-server-sample/common",
+    "./samples/client-server-sample/server",
+    "./tests"
+  ],
+  "version": "0.0.0"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@microframework-sample/client-server-app-server",
+  "version": "1.0.0",
+  "private": true,
+  "main": "_/index.js",
+  "dependencies": {
+    "@microframework/core": "*",
+    "@microframework/logger": "*",
+    "@microframework/server": "*",
+    "@microframework/validator": "*",
+    "@microframework-sample/client-server-app-shared": "*",
+    "typeorm": "0.3.0-rc.1",
+    "multer": "^1.4.2",
+    "sqlite3": "^4.1.0",
+    "graphql-subscriptions": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^11.13.6",
+    "@types/multer": "^1.3.10",
+    "dotenv": "^8.1.0",
+    "typescript": "^3.7.1-rc",
+    "ts-node": "^8.3.0"
+  },
+  "scripts": {
+    "start": "ts-node ./src/index.ts"
+  }
+}

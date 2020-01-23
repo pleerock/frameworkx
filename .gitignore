@@ -1,0 +1,7 @@
+.idea/
+.vscode/
+_/
+__old/
+node_modules/
+samples/client-server-sample/server/database.sqlite
+tsconfig.tsbuildinfo
