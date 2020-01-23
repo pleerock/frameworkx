@@ -1,16 +1,25 @@
+export type TypeMetadataKind =
+    | "number"
+    | "string"
+    | "boolean"
+    | "enum"
+    | "union"
+    | "model"
+    | "object"
+    | "property"
 
 export type TypeMetadata = {
-    modelName?: string
-    typeName: string // includes "number" | "string" | "boolean"
-    propertyName?: string
-    value?: any
-    description?: string
+    kind: TypeMetadataKind
     array: boolean
     nullable: boolean
-    enum: boolean
-    union: boolean
+    // name?: string
+    modelName?: string
+    typeName?: string
+    propertyName?: string
+    description?: string
     properties: TypeMetadata[]
     args?: TypeMetadata
+    value?: any
 }
 
 export type DeclarationMetadata = {

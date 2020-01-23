@@ -15,7 +15,7 @@ import {ApplicationProperties} from "./ApplicationProperties";
 import {ApplicationServer} from "./ApplicationServer";
 import {ActionMethod, CastedModel, Model} from "./ApplicationTypes";
 import {DefaultNamingStrategy} from "./DefaultNamingStrategy";
-import {ApplicationMetadata} from "./types";
+import {ApplicationMetadata} from "../metadata/types";
 
 /**
  * Represents any application type.

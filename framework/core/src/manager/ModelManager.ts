@@ -1,7 +1,8 @@
 import {Repository} from "typeorm";
-import {ApplicationMetadata, ApplicationProperties, ContextList, Model} from "../app";
+import {ApplicationProperties, ContextList, Model} from "../app";
 import {ModelEntity} from "../entity";
 import {Errors} from "../errors";
+import {ApplicationMetadata} from "../metadata";
 import {CustomRepositoryFactory} from "../repository";
 import {ModelSelector} from "../selection";
 import {

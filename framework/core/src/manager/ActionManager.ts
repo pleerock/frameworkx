@@ -1,4 +1,5 @@
-import {Action, ActionMetadata, ActionType, ApplicationMetadata, ApplicationProperties, ContextList} from "../app";
+import {Action, ActionType, ApplicationProperties, ContextList} from "../app";
+import {ActionMetadata, ApplicationMetadata} from "../metadata";
 import {ActionResolverFn, executeAction, Resolver} from "../types";
 
 /**

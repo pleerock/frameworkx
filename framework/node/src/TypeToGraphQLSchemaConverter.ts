@@ -48,13 +48,13 @@ export class TypeToGraphQLSchemaConverter {
         this.pubSub = options.pubSub
 
         this.app.metadata.models
-            .filter(model => model.enum)
+            .filter(model => model.kind === "enum")
             .forEach(model => this.takeGraphQLEnum(model))
         this.app.metadata.models
-            .filter(model => model.union)
+            .filter(model => model.kind === "union")
             .forEach(model => this.takeGraphQLUnion(model))
         this.app.metadata.models
-            .filter(model => !model.enum && !model.union)
+            .filter(model => model.kind === "object" || model.kind === "model")
             .forEach(model => this.takeGraphQLType(model))
 
         this.app.metadata.inputs.forEach(input => this.typeMetadataToGraphQLInputType(input))
@@ -72,22 +72,22 @@ export class TypeToGraphQLSchemaConverter {
             const subConverted = this.resolveGraphQLType(mode, { ...type, array: false })
             return GraphQLList(subConverted)
 
-        } else if (type.typeName === "string") {
+        } else if (type.kind === "boolean") {
+            return GraphQLBoolean
+
+        } else if (type.kind === "string") {
             return GraphQLString
 
-        } else if (type.typeName === "number") {
+        } else if (type.kind === "number") {
             return GraphQLInt
 
         } else if (type.typeName === "Float") {
             return GraphQLFloat
 
-        } else if (type.typeName === "boolean") {
-            return GraphQLBoolean
-
-        } else if (type.enum === true) {
+        } else if (type.kind === "enum") {
             return this.takeGraphQLEnum(type)
 
-        } else if (type.union === true) {
+        } else if (type.kind === "union") {
             return this.takeGraphQLUnion(type)
 
         } else {
@@ -532,11 +532,14 @@ export class TypeToGraphQLSchemaConverter {
             if (property.propertyName) {
                 values[property.propertyName] = {
                     description: property.description,
-                    value: property.value
+                    value: property.propertyName
                 }
             }
             return values
         }, {} as GraphQLEnumValueConfigMap)
+
+        if (!metadata.typeName)
+            throw new Error("Metadata doesn't have a name, cannot create enum")
 
         // create a new type and return it back
         const newEnum = new GraphQLEnumType({
@@ -545,7 +548,6 @@ export class TypeToGraphQLSchemaConverter {
             values: values
         })
 
-        console.log("newEnum", newEnum, values);
         this.enums.push(newEnum)
         return newEnum
     }
@@ -556,6 +558,9 @@ export class TypeToGraphQLSchemaConverter {
         const existUnion = this.unions.find(type => type.name === metadata.typeName)
         if (existUnion)
             return existUnion
+
+        if (!metadata.typeName)
+            throw new Error("Metadata doesn't have a name, cannot create union")
 
         // create a new type and return it back
         const newUnion = new GraphQLUnionType({
@@ -576,7 +581,6 @@ export class TypeToGraphQLSchemaConverter {
             // }
         })
 
-        console.log("newUnion", newUnion);
         this.unions.push(newUnion)
         return newUnion
     }
@@ -592,6 +596,9 @@ export class TypeToGraphQLSchemaConverter {
         if (existType)
             return existType
 
+        if (!metadata.typeName)
+            throw new Error("Metadata doesn't have a name, cannot create object")
+
         // create a new type and return it back
         const newType = new GraphQLObjectType({
             name: metadata.typeName,
@@ -602,7 +609,7 @@ export class TypeToGraphQLSchemaConverter {
                 const fields: GraphQLFieldConfigMap<any, any> = {}
                 for (const property of metadata.properties) {
                     if (property.propertyName) { // todo: throw error instead?
-                        const resolve = this.findTypeMetadataResolverFn(metadata.typeName, property)
+                        const resolve = this.findTypeMetadataResolverFn(metadata.typeName!!, property)
                         fields[property.propertyName] = {
                             type: this.resolveGraphQLType("object", property),
                             description: property.description,

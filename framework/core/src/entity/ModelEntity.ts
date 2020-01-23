@@ -1,5 +1,6 @@
-import {ApplicationMetadata, ApplicationProperties, Model} from "../app";
+import {ApplicationProperties, Model} from "../app";
 import {Errors} from "../errors";
+import {ApplicationMetadata} from "../metadata";
 import {EntityResolveSchema, EntitySchema} from "./types";
 
 /**

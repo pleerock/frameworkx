@@ -1,3 +1,4 @@
+import {MetadataUtils} from "@microframework/core/_";
 import * as ts from "typescript";
 import {TypeMetadata} from "@microframework/core";
 import {ParserOptions} from "./options";
@@ -26,45 +27,24 @@ export class ModelParser {
     parse(node: ts.Node, parentName: string = "", fromIntersection: boolean = false): TypeMetadata {
 
         if (node.kind === ts.SyntaxKind.NumberKeyword) {
-            return {
-                typeName: "number",
-                array: false,
-                enum: false,
-                union: false,
-                nullable: false,
-                properties: []
-            }
+            return MetadataUtils.createType("number")
 
         } else if (node.kind === ts.SyntaxKind.StringKeyword) {
-            return {
-                typeName: "string",
-                array: false,
-                enum: false,
-                union: false,
-                nullable: false,
-                properties: []
-            }
+            return MetadataUtils.createType("string")
 
         } else if (node.kind === ts.SyntaxKind.BooleanKeyword) {
-            return {
-                typeName: "boolean",
-                array: false,
-                enum: false,
-                union: false,
-                nullable: false,
-                properties: []
-            }
+            return MetadataUtils.createType("boolean")
 
-        } else if (ts.isStringLiteral(node)) {
-            return {
-                typeName: "string-literal",
-                value: [],
-                array: false,
-                enum: false,
-                union: false,
-                nullable: false,
-                properties: []
-            }
+        // } else if (ts.isStringLiteral(node)) {
+        //     return {
+        //         typeName: "string-literal",
+        //         value: [],
+        //         array: false,
+        //         enum: false,
+        //         union: false,
+        //         nullable: false,
+        //         properties: []
+        //     }
 
         } else if (ts.isTypeAliasDeclaration(node)) {
             return this.parse(node.type, parentName)
@@ -85,6 +65,7 @@ export class ModelParser {
                 throw new Error(`Type was not found.`)
             }
             const originalType = typesWithoutNullAndUndefined[0]
+            const nullable = nullType !== undefined
 
             if (typesWithoutNullAndUndefined.length === 1) {
                 return { ...this.parse(originalType, parentName), nullable: nullType !== undefined }
@@ -97,64 +78,39 @@ export class ModelParser {
                     if (!typeName)
                         throw new Error("Cannot generate union name")
 
-                    return {
-                        typeName: typeName,
-                        array: false,
-                        enum: true,
-                        union: false,
-                        nullable: nullType !== undefined,
-                        properties: typesWithoutNullAndUndefined.map(type => {
-                            if (!ts.isLiteralTypeNode(type) || !ts.isStringLiteral(type.literal))
-                                throw new Error("not supported type in union type")
-                            if (!type.literal.text.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/))
-                                throw new Error(`Provided value "${type.literal.text}" in a string literal type isn't valid. Value must match /^[_a-zA-Z][_a-zA-Z0-9]*$/`)
+                    const properties = typesWithoutNullAndUndefined.map(type => {
+                        if (!ts.isLiteralTypeNode(type) || !ts.isStringLiteral(type.literal))
+                            throw new Error("not supported type in union type")
+                        if (!type.literal.text.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/))
+                            throw new Error(`Provided value "${type.literal.text}" in a string literal type isn't valid. Value must match /^[_a-zA-Z][_a-zA-Z0-9]*$/`)
 
-                            return {
-                                typeName: "",
-                                array: false,
-                                enum: false,
-                                union: false,
-                                nullable: false,
-                                properties: [],
-                                propertyName: type.literal.text,
-                                value: type.literal.text,
-                                description: "",
-                            }
-                        }),
-                    }
+                        const propertyName = type.literal.text
+                        return MetadataUtils.createType("property", { propertyName })
+                    })
+
+                    return MetadataUtils.createType("enum", { typeName, nullable, properties })
                 }
 
-                const generatedUnionName = this.options.namingStrategy?.unionNameFromStringLiteralUnion(parentName) || ""
+                const typeName = this.options.namingStrategy?.unionNameFromStringLiteralUnion(parentName) || ""
                 const properties = typesWithoutNullAndUndefined.map(type => this.parse(type, parentName))
-                return {
-                    typeName: generatedUnionName,
-                    array: false,
-                    enum: false,
-                    union: true,
-                    nullable: nullType !== undefined,
-                    properties: properties,
-                }
+                return MetadataUtils.createType("union", { typeName, nullable, properties })
             }
 
 
         } else if (ts.isTypeLiteralNode(node)) {
 
             let description = undefined
+
+            // todo: it feels like documentation should be loaded from above?
             if ((node as any).symbol) { // todo: need to find a way to properly check if member has a documentation
                 const memberSymbol: ts.Symbol = (node as any).symbol
                 description = ts.displayPartsToString(memberSymbol.getDocumentationComment(this.typeChecker))
             }
-            // console.log("node", node);
 
-            return {
-                typeName: "",
+            return MetadataUtils.createType("object", {
                 description,
                 properties: this.parseMembers(node.members, parentName),
-                array: false,
-                enum: false,
-                union: false,
-                nullable: false,
-            }
+            })
 
         } else if (ts.isTypeReferenceNode(node)) {
             const referencedType = this.typeChecker.getTypeAtLocation(node)
@@ -176,15 +132,11 @@ export class ModelParser {
                 // if this is a nested call (this case we'll have a parent name) -
                 // we don't go deeper to prevent recursion for named symbols
                 if (parentName && !fromIntersection) {
-                    return {
-                        typeName: "",
-                        properties: [],
-                        array: false,
+                    // todo: we can remove modelName by introducing a new kind - model
+                    return MetadataUtils.createType("model", {
                         modelName,
-                        nullable: false,
-                        enum: false,
-                        union: false
-                    }
+                        description,
+                    })
                 }
 
                 const model = this.parse(modelType, this.joinStrings(parentName/*, typeName*/))
@@ -200,15 +152,12 @@ export class ModelParser {
                         if (!modelProperty)
                             throw new Error(`No property "${property.propertyName}" was found in the "${model.typeName}" model.`)
 
-                        modelProperty.args = {
+                        // todo: not sure about kind here
+                        modelProperty.args = MetadataUtils.createType(argsModel.kind, {
                             typeName: argsModel.typeName,
                             propertyName: argsModel.propertyName,
                             properties: property.properties,
-                            array: false,
-                            enum: false,
-                            union: false,
-                            nullable: false,
-                        }
+                        })
                     })
                 }
 
@@ -233,15 +182,27 @@ export class ModelParser {
             if (parentName && !fromIntersection) {
                 if (resolvedType && ts.isEnumDeclaration(resolvedType)) {
                     const properties = this.parseMembers(resolvedType.members, typeName)
-                    return { typeName, properties: properties, array: false, nullable: false, enum: true, union: false, description }
+                    return MetadataUtils.createType("enum", {
+                        typeName,
+                        description,
+                        properties,
+                    })
                 }
-                return { typeName, properties: [], array: false, nullable: false, enum: false, union: false, description }
+
+                return MetadataUtils.createType("object", {
+                    typeName,
+                    description,
+                })
             }
 
             if (!resolvedType)
                 throw new Error("Cannot resolve a type reference")
 
-            return { ...this.parse(resolvedType, this.joinStrings(parentName, typeName)), typeName, array: false, nullable: false, description }
+            return {
+                ...this.parse(resolvedType, this.joinStrings(parentName, typeName)),
+                typeName,
+                description,
+            }
 
         } else if (ts.isIntersectionTypeNode(node)) {
             let properties: TypeMetadata[] = []
@@ -249,7 +210,10 @@ export class ModelParser {
                 const parsed = this.parse(type, this.joinStrings(parentName), true)
                 properties.push(...parsed.properties)
             })
-            return { typeName: "", properties: properties, array: false, nullable: false, enum: false, union: false }
+
+            return MetadataUtils.createType("object", {
+                properties,
+            })
 
         } else if (ts.isClassDeclaration(node)) {
             if (!node.name)
@@ -258,14 +222,12 @@ export class ModelParser {
             const typeName = node.name.text
             const properties = parentName && !fromIntersection ? [] : this.parseMembers(node.members, typeName)
 
-            return {
+            // todo: what about class literal signature, e.g. class { ... }
+            // todo: can we send a class reference to be able to create classes furthermore
+            return MetadataUtils.createType("object", {
                 typeName,
                 properties,
-                array: false,
-                enum: false,
-                union: false,
-                nullable: false,
-            }
+            })
 
         } else if (ts.isInterfaceDeclaration(node)) {
             if (!node.name)
@@ -274,14 +236,10 @@ export class ModelParser {
             const typeName = node.name.text
             const properties = parentName && !fromIntersection ? [] : this.parseMembers(node.members, typeName)
 
-            return {
+            return MetadataUtils.createType("object", {
                 typeName,
                 properties,
-                array: false,
-                enum: false,
-                union: false,
-                nullable: false,
-            }
+            })
 
         } else if (ts.isImportTypeNode(node)) {
 
@@ -306,15 +264,12 @@ export class ModelParser {
                         if (!modelProperty)
                             throw new Error(`No property "${property.propertyName}" was found in the "${model.typeName}" model.`)
 
-                        modelProperty.args = {
+                        // todo: not sure about kind here
+                        modelProperty.args = MetadataUtils.createType(argsModel.kind, {
                             typeName: argsModel.typeName,
                             propertyName: argsModel.propertyName,
                             properties: property.properties,
-                            array: false,
-                            enum: false,
-                            union: false,
-                            nullable: false,
-                        }
+                        })
                     })
                 }
             }
@@ -420,17 +375,10 @@ export class ModelParser {
                     }
 
                     // console.log("value", member.initializer!!.getFullText(), value)
-                    properties.push({
-                        typeName: "",
-                        array: false,
-                        enum: false,
-                        union: false,
-                        nullable: false,
-                        properties: [],
+                    properties.push(MetadataUtils.createType("object", {
                         propertyName: propertyName,
-                        value: propertyName,
                         description: description,
-                    })
+                    }))
                 }
             }
         })

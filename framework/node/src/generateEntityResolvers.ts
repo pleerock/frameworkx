@@ -107,48 +107,28 @@ export function generateEntityResolvers(app: AnyApplication) {
       for (const key in model.properties) {
         const property = model.properties[key]
         if (MetadataUtils.isTypePrimitive(property)) { // todo: yeah make it more complex like with where
-          orderArgs.push({
-            typeName: "string",
+          orderArgs.push(MetadataUtils.createType("string", {
             propertyName: property.propertyName,
-            array: false,
-            enum: false,
-            union: false,
             nullable: true,
-            properties: []
-          }) // we need to do enum and specify DESC and ASC
+          })) // we need to do enum and specify DESC and ASC
         }
       }
 
-      const queryArgs = {
-        typeName: "",
+      const queryArgs = MetadataUtils.createType("object", {
         nullable: true,
-        array: false,
-        enum: false,
-        union: false,
-        model: false,
         properties: [
-          {
-            typeName: "",
+          MetadataUtils.createType("object", {
             propertyName: "where",
             nullable: true,
-            array: false,
-            enum: false,
-            union: false,
-            model: false,
-            properties: whereArgs
-          },
-          {
-            typeName: "",
+            properties: whereArgs,
+          }),
+          MetadataUtils.createType("object", {
             propertyName: "order",
             nullable: true,
-            array: false,
-            enum: false,
-            union: false,
-            model: false,
-            properties: orderArgs
-          },
+            properties: orderArgs,
+          }),
         ]
-      }
+      })
 
       queryDeclarations.push({
         name: app.properties.namingStrategy.generatedModelDeclarations.one(entity.name),
@@ -167,53 +147,18 @@ export function generateEntityResolvers(app: AnyApplication) {
       })
       queryDeclarations.push({
         name: app.properties.namingStrategy.generatedModelDeclarations.count(entity.name),
-        returnModel: {
-          typeName: "number",
-          nullable: false,
-          enum: false,
-          array: false,
-          union: false,
-          properties: []
-        },
-        args: {
-          typeName: "",
-          nullable: true,
-          enum: false,
-          array: false,
-          union: false,
-          properties: whereArgs
-        }
+        returnModel: MetadataUtils.createType("number"),
+        args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
       })
       mutationDeclarations.push({
         name: app.properties.namingStrategy.generatedModelDeclarations.save(entity.name),
         returnModel: model,
-        args: {
-          typeName: "",
-          nullable: true,
-          enum: false,
-          array: false,
-          union: false,
-          properties: whereArgs
-        }
+        args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
       })
       mutationDeclarations.push({
         name: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
-        returnModel: {
-          typeName: "boolean",
-          nullable: false,
-          enum: false,
-          array: false,
-          union: false,
-          properties: []
-        },
-        args: {
-          typeName: "",
-          nullable: true,
-          array: false,
-          enum: false,
-          union: false,
-          properties: whereArgs
-        }
+        returnModel: MetadataUtils.createType("boolean"),
+        args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
       })
 
       // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name)] = args(entity.model, {
@@ -280,15 +225,10 @@ const createModelFromBlueprint = (entityMetadata: EntityMetadata, type: TypeMeta
       if (MetadataUtils.isTypePrimitive(property) /* or enum? */) {
         const columnWithSuchProperty = entityMetadata.findColumnsWithPropertyPath(property.propertyName!)
         if (columnWithSuchProperty) {
-          whereArgs.push({
-            typeName: property.typeName,
-            propertyName: property.propertyName,
+          whereArgs.push(MetadataUtils.createType(property.kind, {
             nullable: true,
-            enum: false,
-            union: false,
-            array: false,
-            properties: []
-          })
+            propertyName: property.propertyName,
+          }))
         }
       } else {
         const relationWithSuchProperty = entityMetadata.findRelationWithPropertyPath(property.propertyName!)
@@ -297,15 +237,11 @@ const createModelFromBlueprint = (entityMetadata: EntityMetadata, type: TypeMeta
             if (!reference)
               throw new Error(`cannot find a type ${property.typeName}`)
 
-            whereArgs.push({
-              typeName: "",
-              propertyName: property.propertyName,
+            whereArgs.push(MetadataUtils.createType("object", {
               nullable: true,
-              enum: false,
-              union: false,
-              array: false,
+              propertyName: property.propertyName,
               properties: createModelFromBlueprint(relationWithSuchProperty.inverseEntityMetadata, reference, app, deepness + 1)
-            })
+            }))
           }
       }
     }

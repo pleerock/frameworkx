@@ -1,4 +1,5 @@
-import {AnyApplicationOptions, ApplicationMetadata, ApplicationProperties} from "../app";
+import {AnyApplicationOptions, ApplicationProperties} from "../app";
+import {ApplicationMetadata} from "../metadata";
 
 export type GraphQLVariables = {
   [key: string]: any
