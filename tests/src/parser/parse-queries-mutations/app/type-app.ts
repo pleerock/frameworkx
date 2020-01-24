@@ -1,20 +1,20 @@
-import {ApplicationOptionsOf} from "@microframework/core";
+import {createApp} from "@microframework/core";
 import {PostFilterInput} from "../input/PostFilterInput";
 import {PostInput} from "../input/PostInput";
 import {CategoryInput} from "../input/CategoryInput";
 import {CategoryType} from "../model/Category";
 import {PostModel} from "../model/PostModel";
 
-export type App = ApplicationOptionsOf<{
-    models: [
-        PostModel,
-        CategoryType,
-    ],
-    inputs: [
-        PostInput,
-        PostFilterInput,
-        CategoryInput,
-    ],
+export const App = createApp<{
+    models: {
+        PostType: PostModel,
+        CategoryType: CategoryType,
+    },
+    inputs: {
+        PostInput: PostInput,
+        PostFilterInput: PostFilterInput,
+        CategoryInput: CategoryInput,
+    },
     queries: {
         posts(args: PostFilterInput): PostModel[],
         post(args: { id: number }): PostModel,
@@ -26,4 +26,4 @@ export type App = ApplicationOptionsOf<{
         postRemove(args: { id: number }): boolean,
         categoriesSave(args: CategoryInput[]): { id: number }[]
     },
-}>
+}>()

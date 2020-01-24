@@ -58,6 +58,7 @@ export class Application<Options extends AnyApplicationOptions> {
     models: [],
     mutations: [],
     queries: [],
+    subscriptions: [],
     selections: []
   }
 

@@ -16,5 +16,10 @@ export const MetadataUtils = {
         return  metadata.kind === "string" ||
                 metadata.kind === "number" ||
                 metadata.kind === "boolean"
-    }
+    },
+
+    isNameValid(name: string) {
+        return name.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/)
+    },
+
 }

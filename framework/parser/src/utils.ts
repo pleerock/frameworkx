@@ -34,3 +34,23 @@ export function camelize(str: string) {
 export function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export const ParserUtils = {
+
+    normalizeTextSymbol(symbol: string): string {
+        if (symbol.substr(0, 1) === `"`) {
+            symbol = symbol.substr(1)
+        }
+        if (symbol.substr(-1) === `"`) {
+            symbol = symbol.substr(0, symbol.length - 1)
+        }
+        return symbol
+    },
+
+    joinStrings(...args: string[]): string {
+        return args
+            .filter(str => str !== "")
+            .join(".")
+    }
+
+}

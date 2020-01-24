@@ -104,6 +104,7 @@ export function parse(appFileName: string, options?: ParserOptions): Application
         inputs: parseInputs(program, appDefOptions, options),
         queries: parseQueries(program, appDefOptions, options),
         mutations: parseMutations(program, appDefOptions, options),
+        subscriptions: [], // parseMutations(program, appDefOptions, options),
         selections: parseSelections(program, appDefOptions, options),
     }
 }
@@ -114,8 +115,11 @@ function parseActions(program: ts.Program, appDefOptions: ts.TypeLiteralNode, op
     if (!actionsMember)
         return []
 
-    if (!actionsMember.type || !ts.isTypeLiteralNode(actionsMember.type))
-        throw Errors.appModelsInvalidSignature()
+    if (!actionsMember.type)
+        throw new Error("no type")
+
+    if (!ts.isTypeLiteralNode(actionsMember.type))
+        throw Errors.appModelsInvalidSignature(actionsMember.type)
 
     if (!actionsMember.type.members.length)
         throw Errors.appModelsEmptyObject()
@@ -152,10 +156,13 @@ function parseModels(program: ts.Program, appDefOptions: ts.TypeLiteralNode, opt
     const modelsMember = findTypeLiteralProperty(appDefOptions, "models")
 
     if (!modelsMember)
-        throw Errors.appModelsInvalidSignature()
+        throw new Error("no member")
+
+    if (!modelsMember.type)
+        throw new Error("no type")
 
     if (!modelsMember.type || !ts.isTypeLiteralNode(modelsMember.type))
-        throw Errors.appModelsInvalidSignature()
+        throw Errors.appModelsInvalidSignature(modelsMember.type)
 
     if (!modelsMember.type.members.length)
         throw Errors.appModelsEmptyObject()
@@ -171,8 +178,11 @@ function parseInputs(program: ts.Program, appDefOptions: ts.TypeLiteralNode, opt
         return []
         // throw Errors.appModelsInvalidSignature()
 
-    if (!modelsMember.type || !ts.isTypeLiteralNode(modelsMember.type))
-        throw Errors.appModelsInvalidSignature()
+    if (!modelsMember.type)
+        throw new Error("no type")
+
+    if (!ts.isTypeLiteralNode(modelsMember.type))
+        throw Errors.appModelsInvalidSignature(modelsMember.type)
 
     if (!modelsMember.type.members.length)
         throw Errors.appModelsEmptyObject()
@@ -189,13 +199,30 @@ function parseQueries(program: ts.Program, appDefOptions: ts.TypeLiteralNode, op
         return []
         // throw Errors.appModelsInvalidSignature()
 
-    if (!modelsMember.type || !ts.isTypeLiteralNode(modelsMember.type))
-        throw Errors.appModelsInvalidSignature()
+    if (!modelsMember.type)
+        throw new Error("no type")
 
-    if (!modelsMember.type.members.length)
-        throw Errors.appModelsEmptyObject()
+    if (ts.isTypeLiteralNode(modelsMember.type)) {
+        if (!modelsMember.type.members.length)
+            throw Errors.appModelsEmptyObject()
 
-    return modelsMember.type.members.map(member => parseQuery(program, member, options))
+        return modelsMember.type.members.map(member => parseQuery(program, member, options))
+
+    } else if (ts.isIntersectionTypeNode(modelsMember.type)) {
+        const metadatas: DeclarationMetadata[] = []
+        modelsMember.type.types.forEach(type => {
+
+            if (!ts.isTypeLiteralNode(type))
+                throw Errors.appModelsInvalidSignature(type)
+
+            if (!type.members.length)
+                throw Errors.appModelsEmptyObject()
+
+            metadatas.push(...type.members.map(member => parseQuery(program, member, options)))
+        })
+        return metadatas
+    }
+    throw Errors.appModelsInvalidSignature(modelsMember.type)
 }
 
 function parseMutations(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): DeclarationMetadata[] {
@@ -205,13 +232,28 @@ function parseMutations(program: ts.Program, appDefOptions: ts.TypeLiteralNode, 
         return []
         // throw Errors.appModelsInvalidSignature()
 
-    if (!modelsMember.type || !ts.isTypeLiteralNode(modelsMember.type))
-        throw Errors.appModelsInvalidSignature()
+    if (!modelsMember.type)
+        throw new Error("no type")
 
-    if (!modelsMember.type.members.length)
-        throw Errors.appModelsEmptyObject()
+    if (ts.isTypeLiteralNode(modelsMember.type)) {
+        if (!modelsMember.type.members.length)
+            throw Errors.appModelsEmptyObject()
 
-    return modelsMember.type.members.map(member => parseQuery(program, member, options))
+        return modelsMember.type.members.map(member => parseQuery(program, member, options))
+
+    } else if (ts.isIntersectionTypeNode(modelsMember.type)) {
+        modelsMember.type.types.forEach(type => {
+
+            if (!ts.isTypeLiteralNode(type))
+                throw Errors.appModelsInvalidSignature(type)
+
+            if (!type.members.length)
+                throw Errors.appModelsEmptyObject()
+
+            return type.members.map(member => parseQuery(program, member, options))
+        })
+    }
+    throw Errors.appModelsInvalidSignature(modelsMember.type)
 }
 
 function parseSelections(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions) {
@@ -221,8 +263,11 @@ function parseSelections(program: ts.Program, appDefOptions: ts.TypeLiteralNode,
         return []
         // throw Errors.appModelsInvalidSignature()
 
-    if (!modelsMember.type || !ts.isTypeLiteralNode(modelsMember.type))
-        throw Errors.appModelsInvalidSignature()
+    if (!modelsMember.type)
+        throw new Error("no type")
+
+    if (!ts.isTypeLiteralNode(modelsMember.type))
+        throw Errors.appModelsInvalidSignature(modelsMember.type)
 
     if (!modelsMember.type.members.length)
         throw Errors.appModelsEmptyObject()

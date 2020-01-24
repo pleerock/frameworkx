@@ -12,14 +12,12 @@ export type TypeMetadata = {
     kind: TypeMetadataKind
     array: boolean
     nullable: boolean
-    // name?: string
     modelName?: string
     typeName?: string
     propertyName?: string
     description?: string
     properties: TypeMetadata[]
     args?: TypeMetadata
-    value?: any
 }
 
 export type DeclarationMetadata = {
@@ -51,5 +49,6 @@ export type ApplicationMetadata = {
     inputs: TypeMetadata[]
     queries: DeclarationMetadata[]
     mutations: DeclarationMetadata[]
+    subscriptions: DeclarationMetadata[] // todo
     selections: SelectionMetadata[]
 }
