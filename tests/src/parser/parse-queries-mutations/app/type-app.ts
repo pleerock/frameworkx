@@ -20,6 +20,7 @@ export const App = createApp<{
         post(args: { id: number }): PostModel,
         category(): CategoryType,
         categories(): CategoryType[],
+        categoryCount(): number
     },
     mutations: {
         postSave(args: PostInput): PostModel,

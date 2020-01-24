@@ -1,7 +1,5 @@
 import {
     AnyApplication,
-    ApplicationMetadata,
-    DeclarationMetadata,
     SubscriptionResolverFn,
     TypeMetadata
 } from "@microframework/core";
@@ -125,18 +123,40 @@ export class TypeToGraphQLSchemaConverter {
     /**
      * Converts a given declarations (query, mutation or subscription) into GraphQLObjectType.
      */
-    declarationToGraphQLObjectType(type: "query" | "mutation" | "subscription", metadatas: DeclarationMetadata[]): GraphQLObjectType {
+    declarationToGraphQLObjectType(type: "query" | "mutation" | "subscription", metadatas: TypeMetadata[]): GraphQLObjectType {
         const fields: GraphQLFieldConfigMap<any, any> = {}
         for (let metadata of metadatas) {
-            fields[metadata.name] = {
-                type: this.resolveGraphQLType("object", metadata.returnModel),
+            if (!metadata.propertyName) continue
+
+            let resolveType: any
+            if (!metadata.typeName && metadata.modelName) {
+                const metadataModel = this.app.metadata.models.find(model => {
+                    return model.modelName === metadata.modelName
+                })
+                if (metadataModel) {
+                    resolveType = this.resolveGraphQLType("object", { ...metadata, typeName: metadataModel.typeName })
+                }
+            } else if (metadata.typeName) {
+                const metadataModel = this.app.metadata.models.find(model => model.typeName === metadata.typeName)
+                if (metadataModel) {
+                    // console.log(metadataModel);
+                    resolveType = this.resolveGraphQLType("object", { ...metadata, kind: metadataModel.kind })
+                }
+            } else {
+                resolveType = this.resolveGraphQLType("object", metadata)
+            }
+
+            // console.log(metadata);
+
+            fields[metadata.propertyName] = {
+                type: resolveType,
                 description: metadata.description,
             }
             if (type === "query" || type === "mutation") {
-                fields[metadata.name].resolve = this.findDeclarationMetadataResolverFn(type, metadata)
+                fields[metadata.propertyName].resolve = this.findDeclarationMetadataResolverFn(type, metadata)
             }
             if (metadata.args) {
-                fields[metadata.name].args = this.destructGraphQLType(this.resolveGraphQLType("input", metadata.args))
+                fields[metadata.propertyName].args = this.destructGraphQLType(this.resolveGraphQLType("input", metadata.args))
             }
 
             if (type === "subscription") {
@@ -144,17 +164,17 @@ export class TypeToGraphQLSchemaConverter {
                     throw new Error("PubSub isn't registered!")
 
                 const resolver = this.app.properties.resolvers.find(resolver => {
-                    return resolver.type === "subscription" && resolver.name === metadata.name
+                    return resolver.type === "subscription" && resolver.name === metadata.propertyName
                 })
                 if (resolver && resolver.resolverFn) {
                     const subscriptionResolverFn = resolver.resolverFn as SubscriptionResolverFn<any, any>
                     if (subscriptionResolverFn.filter) {
-                        fields[metadata.name].subscribe = withFilter(
+                        fields[metadata.propertyName].subscribe = withFilter(
                             () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers),
                             subscriptionResolverFn.filter
                         )
                     } else {
-                        fields[metadata.name].subscribe = () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers)
+                        fields[metadata.propertyName].subscribe = () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers)
                     }
                 }
             }
@@ -220,11 +240,11 @@ export class TypeToGraphQLSchemaConverter {
 
     private findDeclarationMetadataResolverFn(
         mode: "query" | "mutation",
-        metadata: DeclarationMetadata
+        metadata: TypeMetadata
     ) {
         const loggerHelper = new LoggerHelper(this.app)
         const resolver = this.app.properties.resolvers.find(resolver => {
-            return resolver.type === mode && resolver.name === metadata.name
+            return resolver.type === mode && resolver.name === metadata.propertyName
         })
         if (!resolver)
             return undefined
@@ -233,7 +253,7 @@ export class TypeToGraphQLSchemaConverter {
 
         return async (parent: any, args: any, context: any, info: any) => {
             try {
-                loggerHelper.logBeforeResolve({ mode, typeName: "", propertyName: metadata.name, args, context, info, parent })
+                loggerHelper.logBeforeResolve({ mode, typeName: "", propertyName: metadata.propertyName!, args, context, info, parent })
                 const userContext = await this.resolveContextOptions({ request: context.request, response: context.response })
 
                 // perform args validation
@@ -255,13 +275,13 @@ export class TypeToGraphQLSchemaConverter {
 
                 // perform returning value model validation
                 // console.log("validating model", returnedValue, blueprint)
-                await validate("model", this.app, metadata.returnModel, returnedValue, userContext)
+                await validate("model", this.app, metadata, returnedValue, userContext)
 
                 // after-logging
                 this.app.properties.logger.logGraphQLResponse({
                     app: this.app,
-                    name: metadata.name,
-                    propertyName: metadata.name,
+                    name: metadata.propertyName!,
+                    propertyName: metadata.propertyName!,
                     content: returnedValue,
                     parent,
                     args,
@@ -273,8 +293,8 @@ export class TypeToGraphQLSchemaConverter {
 
             } catch (error) {
                 this.handlerError({
-                    name: metadata.name,
-                    propertyName: metadata.name,
+                    name: metadata.propertyName!,
+                    propertyName: metadata.propertyName!,
                     error,
                     parent,
                     args,
@@ -591,17 +611,20 @@ export class TypeToGraphQLSchemaConverter {
      */
     takeGraphQLType(metadata: TypeMetadata): GraphQLObjectType {
 
+        let typeName = metadata.typeName
+        if (!typeName) {
+            // console.log(metadata);
+            throw new Error("Metadata doesn't have a name, cannot create object")
+        }
+
         // check if we already have a type with such name
-        const existType = this.types.find(type => type.name === metadata.typeName)
+        const existType = this.types.find(type => type.name === typeName)
         if (existType)
             return existType
 
-        if (!metadata.typeName)
-            throw new Error("Metadata doesn't have a name, cannot create object")
-
         // create a new type and return it back
         const newType = new GraphQLObjectType({
-            name: metadata.typeName,
+            name: typeName,
             description: metadata.description,
             fields: () => {
                 // if we don't have such type yet, create a new one
@@ -609,7 +632,7 @@ export class TypeToGraphQLSchemaConverter {
                 const fields: GraphQLFieldConfigMap<any, any> = {}
                 for (const property of metadata.properties) {
                     if (property.propertyName) { // todo: throw error instead?
-                        const resolve = this.findTypeMetadataResolverFn(metadata.typeName!!, property)
+                        const resolve = this.findTypeMetadataResolverFn(typeName!!, property)
                         fields[property.propertyName] = {
                             type: this.resolveGraphQLType("object", property),
                             description: property.description,

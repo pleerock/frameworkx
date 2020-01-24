@@ -1,8 +1,8 @@
 import {AnyApplicationOptions, Application, ModelResolverSchema} from "@microframework/core";
 import {AnyApplication} from "@microframework/core";
 import {ActionResolverFn, SubscriptionResolverFn} from "@microframework/core";
+import {TypeMetadata} from "@microframework/core/_";
 import {parse} from "@microframework/parser";
-import {DeclarationMetadata} from "@microframework/core";
 import {Request, Response} from "express";
 import {GraphQLError, GraphQLSchema, GraphQLSchemaConfig} from "graphql";
 import {withFilter} from "graphql-subscriptions";
@@ -51,18 +51,18 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       mutationDeclarations: [],
     }*/
 
-    const queries: DeclarationMetadata[] = [
+    const queries: TypeMetadata[] = [
       ...(app.metadata.queries || []),
       ...entityResolvers.queryDeclarations,
       // ...result.queryDeclarations,
     ]
 
-    const mutations: DeclarationMetadata[] = [
+    const mutations: TypeMetadata[] = [
       ...(app.metadata.mutations || []),
       ...entityResolvers.mutationDeclarations,
     ]
 
-    const subscriptions: DeclarationMetadata[] = [
+    const subscriptions: TypeMetadata[] = [
       // ...(options.subscriptions || []),
     ]
 

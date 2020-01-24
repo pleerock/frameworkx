@@ -299,7 +299,8 @@ export class ModelParser {
             // skip what we don't support
             if (!ts.isPropertySignature(member) &&
                 !ts.isPropertyDeclaration(member) &&
-                !ts.isEnumMember(member))
+                !ts.isEnumMember(member) &&
+                !ts.isMethodSignature(member))
                 continue
             if (!member.name)
                 continue
@@ -319,7 +320,6 @@ export class ModelParser {
                     const result = {
                         ...this.parse(member.type, ParserUtils.joinStrings(parentName, propertyName)),
                         propertyName: propertyName,
-                        // description: description,
                     }
                     if (description) {
                         result.description = description
@@ -341,6 +341,28 @@ export class ModelParser {
                     propertyName: propertyName,
                     description: description,
                 }))
+
+            } else if (ts.isMethodSignature(member)) {
+
+                if (!member.type)
+                    throw new Error("Method must return a value")
+
+                let args: TypeMetadata | undefined = undefined
+                if (member.parameters.length > 0) {
+                    if (ts.isParameter(member.parameters[0]) && member.parameters[0].type) {
+                        args = this.parse(member.parameters[0].type)
+                    }
+                }
+
+                properties.push({
+                    ...this.parse(member.type, ParserUtils.joinStrings(parentName, propertyName)),
+                    propertyName: propertyName,
+                    description: description,
+                    args: args,
+                })
+
+            // } else {
+            //     console.log(member);
             }
         }
         return properties

@@ -1,6 +1,5 @@
 import {
   AnyApplication,
-  DeclarationMetadata,
   MetadataUtils,
   TypeMetadata,
 } from "@microframework/core";
@@ -14,8 +13,8 @@ import {EntityMetadata} from "typeorm";
 export function generateEntityResolvers(app: AnyApplication) {
   const queryResolverSchema: Resolver[] = [] // ModelResolverSchema<any, any> = {}
   const mutationResolverSchema: Resolver[] = []
-  const queryDeclarations: DeclarationMetadata[] = []
-  const mutationDeclarations: DeclarationMetadata[] = []
+  const queryDeclarations: TypeMetadata[] = []
+  const mutationDeclarations: TypeMetadata[] = []
 
   // if db connection was established - auto-generate endpoints for models
   if (app.properties.dataSource && app.properties.generateModelRootQueries === true) {
@@ -131,33 +130,36 @@ export function generateEntityResolvers(app: AnyApplication) {
       })
 
       queryDeclarations.push({
-        name: app.properties.namingStrategy.generatedModelDeclarations.one(entity.name),
-        returnModel: { ...model, nullable: true },
+        ...model,
+        nullable: true,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.one(entity.name),
         args: queryArgs
       })
       queryDeclarations.push({
-        name: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name),
-        returnModel: model,
+        ...model,
+        nullable: false,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name),
         args: queryArgs
       })
       queryDeclarations.push({
-        name: app.properties.namingStrategy.generatedModelDeclarations.many(entity.name),
-        returnModel: { ...model, array: true },
+        ...model,
+        array: true,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.many(entity.name),
         args: queryArgs
       })
       queryDeclarations.push({
-        name: app.properties.namingStrategy.generatedModelDeclarations.count(entity.name),
-        returnModel: MetadataUtils.createType("number"),
+        ...MetadataUtils.createType("number"),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.count(entity.name),
         args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
       })
       mutationDeclarations.push({
-        name: app.properties.namingStrategy.generatedModelDeclarations.save(entity.name),
-        returnModel: model,
+        ...model,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.save(entity.name),
         args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
       })
       mutationDeclarations.push({
-        name: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
-        returnModel: MetadataUtils.createType("boolean"),
+        ...MetadataUtils.createType("boolean"),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
         args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
       })
 

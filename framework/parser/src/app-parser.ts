@@ -1,7 +1,6 @@
 import {
     ActionMetadata,
     ApplicationMetadata,
-    DeclarationMetadata,
     SelectionMetadata,
     TypeMetadata
 } from "@microframework/core";
@@ -192,68 +191,27 @@ function parseInputs(program: ts.Program, appDefOptions: ts.TypeLiteralNode, opt
 }
 
 // todo: use same approach as in "actions"
-function parseQueries(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): DeclarationMetadata[] {
+function parseQueries(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): TypeMetadata[] {
     const modelsMember = findTypeLiteralProperty(appDefOptions, "queries")
 
     if (!modelsMember)
         return []
-        // throw Errors.appModelsInvalidSignature()
 
-    if (!modelsMember.type)
-        throw new Error("no type")
-
-    if (ts.isTypeLiteralNode(modelsMember.type)) {
-        if (!modelsMember.type.members.length)
-            throw Errors.appModelsEmptyObject()
-
-        return modelsMember.type.members.map(member => parseQuery(program, member, options))
-
-    } else if (ts.isIntersectionTypeNode(modelsMember.type)) {
-        const metadatas: DeclarationMetadata[] = []
-        modelsMember.type.types.forEach(type => {
-
-            if (!ts.isTypeLiteralNode(type))
-                throw Errors.appModelsInvalidSignature(type)
-
-            if (!type.members.length)
-                throw Errors.appModelsEmptyObject()
-
-            metadatas.push(...type.members.map(member => parseQuery(program, member, options)))
-        })
-        return metadatas
-    }
-    throw Errors.appModelsInvalidSignature(modelsMember.type)
+    const modelParser = new ModelParser(program, options)
+    const type = modelParser.parse(modelsMember)
+    console.log(JSON.stringify(type, undefined, 2));
+    return type.properties
 }
 
-function parseMutations(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): DeclarationMetadata[] {
+function parseMutations(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): TypeMetadata[] {
     const modelsMember = findTypeLiteralProperty(appDefOptions, "mutations")
 
     if (!modelsMember)
         return []
         // throw Errors.appModelsInvalidSignature()
 
-    if (!modelsMember.type)
-        throw new Error("no type")
-
-    if (ts.isTypeLiteralNode(modelsMember.type)) {
-        if (!modelsMember.type.members.length)
-            throw Errors.appModelsEmptyObject()
-
-        return modelsMember.type.members.map(member => parseQuery(program, member, options))
-
-    } else if (ts.isIntersectionTypeNode(modelsMember.type)) {
-        modelsMember.type.types.forEach(type => {
-
-            if (!ts.isTypeLiteralNode(type))
-                throw Errors.appModelsInvalidSignature(type)
-
-            if (!type.members.length)
-                throw Errors.appModelsEmptyObject()
-
-            return type.members.map(member => parseQuery(program, member, options))
-        })
-    }
-    throw Errors.appModelsInvalidSignature(modelsMember.type)
+    const modelParser = new ModelParser(program, options)
+    return modelParser.parse(modelsMember).properties
 }
 
 function parseSelections(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions) {
@@ -273,38 +231,6 @@ function parseSelections(program: ts.Program, appDefOptions: ts.TypeLiteralNode,
         throw Errors.appModelsEmptyObject()
 
     return modelsMember.type.members.map(member => parseSelection(program, member, options))
-}
-
-export function parseQuery(program: ts.Program, member: ts.TypeElement, options: ParserOptions): DeclarationMetadata {
-
-    if (!ts.isMethodSignature(member))
-        throw new Error(`query must be a method declaration.`)
-    if (!ts.isPropertyName(member.name))
-        throw new Error(`must be a property name.`)
-    if (!member.type)
-        throw new Error(`query must return a model`)
-
-    const modelParser = new ModelParser(program, options)
-    const typeChecker = program.getTypeChecker()
-
-    let args: TypeMetadata | undefined = undefined
-    if (member.parameters.length > 0) {
-        if (ts.isParameter(member.parameters[0]) && member.parameters[0].type) {
-            args = modelParser.parse(member.parameters[0].type)
-        }
-    }
-
-    // get method description
-    const referencedType = typeChecker.getTypeAtLocation(member)
-    const symbol = referencedType.aliasSymbol || referencedType.symbol
-    const description = ts.displayPartsToString(symbol.getDocumentationComment(typeChecker))
-
-    return {
-        name: member.name.getText(),
-        description,
-        returnModel: modelParser.parse(member.type),
-        args,
-    }
 }
 
 export function parseSelection(program: ts.Program, member: ts.TypeElement, options: ParserOptions): SelectionMetadata {

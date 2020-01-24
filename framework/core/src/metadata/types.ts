@@ -7,6 +7,7 @@ export type TypeMetadataKind =
     | "model"
     | "object"
     | "property"
+    | "declaration"
 
 export type TypeMetadata = {
     kind: TypeMetadataKind
@@ -17,13 +18,6 @@ export type TypeMetadata = {
     propertyName?: string
     description?: string
     properties: TypeMetadata[]
-    args?: TypeMetadata
-}
-
-export type DeclarationMetadata = {
-    name: string
-    description?: string
-    returnModel: TypeMetadata
     args?: TypeMetadata
 }
 
@@ -47,8 +41,8 @@ export type ApplicationMetadata = {
     actions: ActionMetadata[]
     models: TypeMetadata[]
     inputs: TypeMetadata[]
-    queries: DeclarationMetadata[]
-    mutations: DeclarationMetadata[]
-    subscriptions: DeclarationMetadata[] // todo
+    queries: TypeMetadata[]
+    mutations: TypeMetadata[]
+    subscriptions: TypeMetadata[] // todo
     selections: SelectionMetadata[]
 }
