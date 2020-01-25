@@ -8,8 +8,10 @@ import {PostEntity} from "./entity/PostEntity";
 import {UserEntity} from "./entity/UserEntity";
 import {UserType} from "./model/User";
 import {CategoryQueryResolver} from "./resolver/CategoryQueryResolver";
+import {PostAddedSubscriptionResolver} from "./resolver/PostAddedSubscriptionResolver";
+import {PostRemovedSubscriptionResolver} from "./resolver/PostRemovedSubscriptionResolver";
 import {PostsActionResolver} from "./resolver/PostsActionResolver";
-import {PostSaveQueryResolver} from "./resolver/PostSaveQueryResolver";
+import {PostSaveMutationResolver} from "./resolver/PostSaveMutationResolver";
 import {PostByIdActionResolver} from "./resolver/PostByIdActionResolver";
 import {PostsQueryResolver} from "./resolver/PostsQueryResolver";
 import {PostTypeResolver} from "./resolver/PostTypeResolver";
@@ -17,6 +19,9 @@ import {SearchTypeResolver} from "./resolver/SearchTypeResolver";
 import {UsersQueryResolver} from "./resolver/UsersQueryResolver";
 import {UserTypeResolver} from "./resolver/UserTypeResolver";
 import {PostValidator} from "./validator/PostValidator";
+import {PubSub} from "graphql-subscriptions";
+
+export const PubSubImpl = new PubSub()
 
 app
     .setEntities([
@@ -28,12 +33,14 @@ app
         PostsQueryResolver,
         PostTypeResolver,
         CategoryQueryResolver,
-        PostSaveQueryResolver,
+        PostSaveMutationResolver,
         PostsActionResolver,
         PostByIdActionResolver,
         UserTypeResolver,
         UsersQueryResolver,
         SearchTypeResolver,
+        PostAddedSubscriptionResolver,
+        PostRemovedSubscriptionResolver,
     ])
     .setValidationRules([
         PostValidator,
@@ -69,6 +76,7 @@ app
             cors: true,
             graphiql: true,
             playground: true,
+            pubSub: PubSubImpl,
         })
     )
     .then(() => {

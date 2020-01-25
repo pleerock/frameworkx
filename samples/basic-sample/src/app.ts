@@ -86,6 +86,24 @@ export const app = createApp<{
          */
         postRemove(args: { id: number }): boolean
 
+        /**
+         * Saves a post.
+         */
+        category(args: PostInput): PostModel
+
+    },
+    subscriptions: {
+
+        /**
+         * Fires when a new post added.
+         */
+        postAdded(): PostModel
+
+        /**
+         * Fires when post was removed.
+         */
+        postRemoved(): boolean
+
     }
     context: {
         currentUser: {
