@@ -13,6 +13,20 @@ export type NamingStrategy = {
     count(modelName: string): string
     save(modelName: string): string
     remove(modelName: string): string
+    observeOne(modelName: string): string
+    observeMany(modelName: string): string
+    observeCount(modelName: string): string
+    observeInsert(modelName: string): string
+    observeUpdate(modelName: string): string
+    observeSave(modelName: string): string
+    observeRemove(modelName: string): string
+    observeOneTriggerName(modelName: string): string
+    observeManyTriggerName(modelName: string): string
+    observeCountTriggerName(modelName: string): string
+    observeInsertTriggerName(modelName: string): string
+    observeUpdateTriggerName(modelName: string): string
+    observeSaveTriggerName(modelName: string): string
+    observeRemoveTriggerName(modelName: string): string
   }
 
   generatedModelInputs: {

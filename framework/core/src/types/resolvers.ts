@@ -88,6 +88,8 @@ export type SubscriptionResolverFn<
   > = {
   triggers: string | string[]
   filter?: (payload: any, args: any, context: any) => boolean | Promise<boolean>
+  onSubscribe?: (args: any, context: any) => any
+  onUnsubscribe?: (args: any, context: any) => any
 }
 
 /**

@@ -109,4 +109,9 @@ export type ApplicationProperties = {
    * Maximal deepness for nested conditions of automatically generated queries.
    */
   maxGeneratedConditionsDeepness: number
+
+  /**
+   * PubSub used to publish events.
+   */
+  pubsub?: any
 }

@@ -28,6 +28,17 @@ export type GraphQLResolver = {
     dataLoaderSchema: { [key: string]: any }
 }
 
+const withCancel = (asyncIterator: any, onCancel: () => any) => {
+    const asyncReturn = asyncIterator.return;
+
+    asyncIterator.return = () => {
+        onCancel();
+        return asyncReturn ? asyncReturn.call(asyncIterator) : Promise.resolve({ value: undefined, done: true });
+    };
+
+    return asyncIterator;
+};
+
 export class TypeToGraphQLSchemaConverter {
 
     app: AnyApplication
@@ -154,6 +165,8 @@ export class TypeToGraphQLSchemaConverter {
             }
             if (type === "query" || type === "mutation") {
                 fields[metadata.propertyName].resolve = this.findDeclarationMetadataResolverFn(type, metadata)
+            } else {
+                fields[metadata.propertyName].resolve = (val: any) => val
             }
             if (metadata.args) {
                 fields[metadata.propertyName].args = this.destructGraphQLType(this.resolveGraphQLType("input", metadata.args))
@@ -169,12 +182,25 @@ export class TypeToGraphQLSchemaConverter {
                 if (resolver && resolver.resolverFn) {
                     const subscriptionResolverFn = resolver.resolverFn as SubscriptionResolverFn<any, any>
                     if (subscriptionResolverFn.filter) {
-                        fields[metadata.propertyName].subscribe = withFilter(
-                            () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers),
-                            subscriptionResolverFn.filter
-                        )
+                        console.log('with filter"')
+                        fields[metadata.propertyName].subscribe = (_, args) => {
+                            return withFilter(
+                                () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers),
+                                subscriptionResolverFn.filter!
+                            )
+                        }
                     } else {
-                        fields[metadata.propertyName].subscribe = () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers)
+                        fields[metadata.propertyName].subscribe = (_, args, context) => {
+                            if (subscriptionResolverFn.onSubscribe) {
+                                subscriptionResolverFn.onSubscribe(args, context)
+                            }
+                            if (subscriptionResolverFn.onUnsubscribe) {
+                                return withCancel(this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers), () => {
+                                    subscriptionResolverFn.onUnsubscribe!!(args, context)
+                                })
+                            }
+                            return this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers)
+                        }
                     }
                 }
             }

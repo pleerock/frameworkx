@@ -26,6 +26,8 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
 ) => {
   return async (/*options: AnyApplicationOptions*/) => {
 
+    app.properties.pubsub = serverOptions.pubSub
+
     const tsFilePath = path.normalize(serverOptions.appPath + ".ts")
     const dtsFilePath = path.normalize(serverOptions.appPath + ".d.ts")
 
@@ -62,12 +64,16 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       ...entityResolvers.mutationDeclarations,
     ]
 
+    // console.log("app.metadata.subscriptions", app.metadata.subscriptions);
+
     const subscriptions: TypeMetadata[] = [
-      // ...(options.subscriptions || []),
+      ...(app.metadata.subscriptions || []),
+      ...entityResolvers.subscriptionDeclarations,
     ]
 
     app.properties.resolvers.push(...entityResolvers.queryResolverSchema)
     app.properties.resolvers.push(...entityResolvers.mutationResolverSchema)
+    app.properties.resolvers.push(...entityResolvers.subscriptionResolverSchema)
 
     // create and setup express server
     const expressApp = serverOptions.express || express()
@@ -96,7 +102,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
         config.mutation = typeRegistry.declarationToGraphQLObjectType("mutation", mutations)
       }
       if (Object.keys(subscriptions).length > 0) {
-        config.mutation = typeRegistry.declarationToGraphQLObjectType("subscription", subscriptions)
+        config.subscription = typeRegistry.declarationToGraphQLObjectType("subscription", subscriptions)
       }
 
       const schema = new GraphQLSchema(config)

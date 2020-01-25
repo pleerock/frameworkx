@@ -24,6 +24,48 @@ export const DefaultNamingStrategy: NamingStrategy = {
     remove(modelName: string) {
       return lowercaseFirstLetter(`${modelName}Remove`)
     },
+    observeOne(modelName: string) {
+      return lowercaseFirstLetter(modelName + "ObserveOne")
+    },
+    observeMany(modelName: string) {
+      return lowercaseFirstLetter(modelName + "ObserveMany")
+    },
+    observeCount(modelName: string) {
+      return lowercaseFirstLetter(modelName + "ObserveCount")
+    },
+    observeInsert(modelName: string) {
+      return lowercaseFirstLetter(modelName + "ObserveInsert")
+    },
+    observeUpdate(modelName: string) {
+      return lowercaseFirstLetter(modelName + "ObserveUpdate")
+    },
+    observeSave(modelName: string) {
+      return lowercaseFirstLetter(modelName + "ObserveSave")
+    },
+    observeRemove(modelName: string) {
+      return lowercaseFirstLetter(modelName + "ObserveRemove")
+    },
+    observeOneTriggerName(modelName: string) {
+      return modelName + "ObserveOne"
+    },
+    observeManyTriggerName(modelName: string) {
+      return modelName + "ObserveMany"
+    },
+    observeCountTriggerName(modelName: string) {
+      return modelName + "ObserveCount"
+    },
+    observeInsertTriggerName(modelName: string) {
+      return modelName + "ObserveInsert"
+    },
+    observeUpdateTriggerName(modelName: string) {
+      return modelName + "ObserveUpdate"
+    },
+    observeSaveTriggerName(modelName: string) {
+      return modelName + "ObserveSave"
+    },
+    observeRemoveTriggerName(modelName: string) {
+      return modelName + "ObserveRemove"
+    },
   },
   generatedModelInputs: {
     where(typeName: string) {

@@ -45,7 +45,7 @@ export class Application<Options extends AnyApplicationOptions> {
     resolvers: [],
     validationRules: [],
     actionMiddlewares: {},
-    maxGeneratedConditionsDeepness: 5
+    maxGeneratedConditionsDeepness: 5,
   }
 
   /**
@@ -77,6 +77,7 @@ export class Application<Options extends AnyApplicationOptions> {
     this.metadata.actions = metadata.actions
     this.metadata.queries = metadata.queries
     this.metadata.mutations = metadata.mutations
+    this.metadata.subscriptions = metadata.subscriptions
     this.metadata.inputs = metadata.inputs
     this.metadata.models = metadata.models
     this.metadata.selections = metadata.selections

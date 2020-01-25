@@ -8,7 +8,7 @@ npm version patch
 npm publish
 cd ../../
 
-cd ./framework/server
+cd ./framework/node
 npm version patch
 npm publish
 cd ../../

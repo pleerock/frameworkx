@@ -103,7 +103,7 @@ export function parse(appFileName: string, options?: ParserOptions): Application
         inputs: parseInputs(program, appDefOptions, options),
         queries: parseQueries(program, appDefOptions, options),
         mutations: parseMutations(program, appDefOptions, options),
-        subscriptions: [], // parseMutations(program, appDefOptions, options),
+        subscriptions: parseSubscriptions(program, appDefOptions, options),
         selections: parseSelections(program, appDefOptions, options),
     }
 }
@@ -199,12 +199,23 @@ function parseQueries(program: ts.Program, appDefOptions: ts.TypeLiteralNode, op
 
     const modelParser = new ModelParser(program, options)
     const type = modelParser.parse(modelsMember)
-    console.log(JSON.stringify(type, undefined, 2));
+    // console.log(JSON.stringify(type, undefined, 2));
     return type.properties
 }
 
 function parseMutations(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): TypeMetadata[] {
     const modelsMember = findTypeLiteralProperty(appDefOptions, "mutations")
+
+    if (!modelsMember)
+        return []
+        // throw Errors.appModelsInvalidSignature()
+
+    const modelParser = new ModelParser(program, options)
+    return modelParser.parse(modelsMember).properties
+}
+
+function parseSubscriptions(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): TypeMetadata[] {
+    const modelsMember = findTypeLiteralProperty(appDefOptions, "subscriptions")
 
     if (!modelsMember)
         return []

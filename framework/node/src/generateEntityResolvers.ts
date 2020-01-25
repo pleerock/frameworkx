@@ -4,7 +4,7 @@ import {
   TypeMetadata,
 } from "@microframework/core";
 import {Resolver} from "@microframework/core";
-import {EntityMetadata} from "typeorm";
+import {EntityMetadata, InsertEvent} from "typeorm";
 
 /**
  * Transforms entities defined in the app to TypeORM entity format.
@@ -13,8 +13,10 @@ import {EntityMetadata} from "typeorm";
 export function generateEntityResolvers(app: AnyApplication) {
   const queryResolverSchema: Resolver[] = [] // ModelResolverSchema<any, any> = {}
   const mutationResolverSchema: Resolver[] = []
+  const subscriptionResolverSchema: Resolver[] = []
   const queryDeclarations: TypeMetadata[] = []
   const mutationDeclarations: TypeMetadata[] = []
+  const subscriptionDeclarations: TypeMetadata[] = []
 
   // if db connection was established - auto-generate endpoints for models
   if (app.properties.dataSource && app.properties.generateModelRootQueries === true) {
@@ -96,6 +98,146 @@ export function generateEntityResolvers(app: AnyApplication) {
         }
       }))
 
+      const manyTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeManyTriggerName(entityMetadata.name)
+      const oneTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeOneTriggerName(entityMetadata.name)
+      const countTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeCountTriggerName(entityMetadata.name)
+      const insertTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
+      const saveTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeSaveTriggerName(entityMetadata.name)
+      const updateTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
+      const removeTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeRemoveTriggerName(entityMetadata.name)
+
+      app
+          .properties
+          .dataSource!
+          .subscribers
+          .push({
+            listenTo: () => {
+              return entityMetadata.target;
+            },
+            afterInsert: (event: InsertEvent<any>) => {
+              app.properties.pubsub.publish(insertTriggerName, event.entity)
+              app.properties.pubsub.publish(saveTriggerName, event.entity)
+            },
+            afterUpdate: event => {
+              app.properties.pubsub.publish(updateTriggerName, event.entity)
+              app.properties.pubsub.publish(saveTriggerName, event.entity)
+            },
+            afterRemove: event => {
+              app.properties.pubsub.publish(removeTriggerName, event.entity)
+            }
+          })
+
+      subscriptionResolverSchema.push(new Resolver({
+        type: "subscription",
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(entity.name),
+        resolverFn: {
+          triggers: [insertTriggerName]
+        }
+      }))
+      subscriptionResolverSchema.push(new Resolver({
+        type: "subscription",
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(entity.name),
+        resolverFn: {
+          triggers: [updateTriggerName]
+        }
+      }))
+      subscriptionResolverSchema.push(new Resolver({
+        type: "subscription",
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeSave(entity.name),
+        resolverFn: {
+          triggers: [saveTriggerName]
+        }
+      }))
+      subscriptionResolverSchema.push(new Resolver({
+        type: "subscription",
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(entity.name),
+        resolverFn: {
+          triggers: [removeTriggerName]
+        }
+      }))
+
+      subscriptionResolverSchema.push(new Resolver({
+        type: "subscription",
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeOne(entity.name),
+        resolverFn: {
+          triggers: [oneTriggerName],
+          onSubscribe: (args: any, context: any) => {
+            // console.log("subscribed", args)
+            context.observeOneEntitySubscription = app
+                .properties
+                .dataSource!
+                .manager
+                .getRepository(entityMetadata.name)
+                .observeOne(args)
+                .subscribe(entity => {
+                  // console.log("trigger", oneTriggerName)
+                  args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+                  app.properties.pubsub.publish(oneTriggerName, entity)
+                })
+          },
+          onUnsubscribe: (args: any, context: any) => {
+            if (context.observeOneEntitySubscription) {
+              // console.log("unsubscribed", args)
+              context.observeOneEntitySubscription.unsubscribe()
+            }
+          }
+        }
+      }))
+      subscriptionResolverSchema.push(new Resolver({
+        type: "subscription",
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeMany(entity.name),
+        resolverFn: {
+          triggers: [manyTriggerName],
+          onSubscribe: (args: any, context: any) => {
+            // console.log("subscribed", args)
+            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            context.observeOneEntitySubscription = app
+                .properties
+                .dataSource!
+                .manager
+                .getRepository(entityMetadata.name)
+                .observe(args)
+                .subscribe(entities => {
+                  // console.log("trigger", manyTriggerName, entities)
+                  app.properties.pubsub.publish(manyTriggerName, entities)
+                })
+          },
+          onUnsubscribe: (args: any, context: any) => {
+            if (context.observeOneEntitySubscription) {
+              // console.log("unsubscribed", args)
+              context.observeOneEntitySubscription.unsubscribe()
+            }
+          }
+        }
+      }))
+      subscriptionResolverSchema.push(new Resolver({
+        type: "subscription",
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeCount(entity.name),
+        resolverFn: {
+          triggers: [countTriggerName],
+          onSubscribe: (args: any, context: any) => {
+            // console.log("subscribed", args)
+            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            context.observeOneEntitySubscription = app
+                .properties
+                .dataSource!
+                .manager
+                .getRepository(entityMetadata.name)
+                .observeCount(args)
+                .subscribe(entity => {
+                  // console.log("trigger", countTriggerName)
+                  app.properties.pubsub.publish(countTriggerName, entity)
+                })
+          },
+          onUnsubscribe: (args: any, context: any) => {
+            if (context.observeOneEntitySubscription) {
+              // console.log("unsubscribed", args)
+              context.observeOneEntitySubscription.unsubscribe()
+            }
+          }
+        }
+      }))
+
       const model = app.metadata.models.find(model => model.typeName === entity.name) // todo: move method to the model itself
       if (!model)
         throw new Error("Model was not found")
@@ -165,6 +307,42 @@ export function generateEntityResolvers(app: AnyApplication) {
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
         args: whereArgs,
       })
+      subscriptionDeclarations.push({
+        ...model,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(entity.name),
+        // args: whereArgs,
+      })
+      subscriptionDeclarations.push({
+        ...model,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(entity.name),
+        // args: whereArgs,
+      })
+      subscriptionDeclarations.push({
+        ...model,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeSave(entity.name),
+        // args: whereArgs,
+      })
+      subscriptionDeclarations.push({
+        ...model,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(entity.name),
+        // args: whereArgs,
+      })
+      subscriptionDeclarations.push({
+        ...model,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeOne(entity.name),
+        args: whereArgs,
+      })
+      subscriptionDeclarations.push({
+        ...model,
+        array: true,
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeMany(entity.name),
+        args: queryArgs,
+      })
+      subscriptionDeclarations.push({
+        ...MetadataUtils.createType("number"),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeCount(entity.name),
+        args: whereArgs,
+      })
 
       // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name)] = args(entity.model, {
       //   where: nullable(whereArgs),
@@ -188,8 +366,10 @@ export function generateEntityResolvers(app: AnyApplication) {
   return {
     queryResolverSchema,
     mutationResolverSchema,
+    subscriptionResolverSchema,
     queryDeclarations,
     mutationDeclarations,
+    subscriptionDeclarations,
   }
 }
 
