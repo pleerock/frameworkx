@@ -1,3 +1,4 @@
+import {Repository} from "typeorm";
 import {ApplicationProperties, Model} from "../app";
 import {Errors} from "../errors";
 import {ApplicationMetadata} from "../metadata";
@@ -94,7 +95,7 @@ export class ModelEntity<
   /**
    * Get's entity repository.
    */
-  get repository() {
+  get repository(): Repository<GivenModel["blueprint"]> {
     if (!this.appProperties.dataSource)
       throw Errors.noDataSourceInApp()
 

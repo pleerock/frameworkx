@@ -1,5 +1,5 @@
 /**
- * Simple input for testing purposes.
+ * This input is used to filter loaded posts.
  */
 export type PostFilterInput = {
 
@@ -12,4 +12,5 @@ export type PostFilterInput = {
      * Offset where from to start a posts loading.
      */
     offset: number
+
 }

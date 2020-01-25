@@ -14,7 +14,6 @@ import {PostsActionResolver} from "./resolver/PostsActionResolver";
 import {PostSaveMutationResolver} from "./resolver/PostSaveMutationResolver";
 import {PostByIdActionResolver} from "./resolver/PostByIdActionResolver";
 import {PostsQueryResolver} from "./resolver/PostsQueryResolver";
-import {PostTypeResolver} from "./resolver/PostTypeResolver";
 import {SearchTypeResolver} from "./resolver/SearchTypeResolver";
 import {UsersQueryResolver} from "./resolver/UsersQueryResolver";
 import {UserTypeResolver} from "./resolver/UserTypeResolver";
@@ -31,7 +30,6 @@ app
     ])
     .setResolvers([
         PostsQueryResolver,
-        PostTypeResolver,
         CategoryQueryResolver,
         PostSaveMutationResolver,
         PostsActionResolver,

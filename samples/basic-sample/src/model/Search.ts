@@ -3,6 +3,6 @@ import {PostType} from "./Post";
 import {UserType} from "./User";
 
 /**
- * Dummy Search type.
+ * Allows to search everything we have - users, posts and categories.
  */
 export type SearchType = UserType | PostType | CategoryType

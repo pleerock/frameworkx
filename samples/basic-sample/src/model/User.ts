@@ -1,12 +1,10 @@
-import {Status} from "../enum/Status";
-
 /**
  * Dummy User type.
  */
 export type UserType = {
 
     /**
-     * Category id.
+     * User id.
      */
     id: number
 
@@ -26,12 +24,8 @@ export type UserType = {
     fullName: string
 
     /**
-     * User status.
+     * User's activity status.
      */
-    status: Status
+    status: "inactive" | "active"
 
-    /**
-     * User activation status.
-     */
-    activation: "activated" | "inProgress"
 }

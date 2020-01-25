@@ -1,8 +1,21 @@
 /**
- * Simple input for testing purposes.
+ * This input is used to create a new post or update exist post.
  */
 export type PostInput = {
-    id: number
+
+    /**
+     * Updating post id.
+     */
+    id?: number | null
+
+    /**
+     * Post title.
+     */
     title: string
-    text: string
+
+    /**
+     * Post text.
+     */
+    text?: string | null
+
 }

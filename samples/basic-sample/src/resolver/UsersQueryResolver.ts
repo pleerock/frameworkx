@@ -1,8 +1,8 @@
 import {app} from "../app";
-import {Status} from "../enum/Status";
+import {UserRepository} from "../repository/UserRepository";
 
 export const UsersQueryResolver = app
     .query("users")
-    .resolve(({ status }) => {
-        return []
+    .resolve(() => {
+        return UserRepository.find()
     })

@@ -1,15 +1,27 @@
-import {getRepository} from "typeorm";
+import {getRepository, Like} from "typeorm";
 import {app} from "../app";
 import {CategoryType} from "../model/Category";
 import {PostType} from "../model/Post";
 import {UserType} from "../model/User";
+import {CategoryRepository} from "../repository/CategoryRepository";
+import {PostRepository} from "../repository/PostRepository";
+import {UserRepository} from "../repository/UserRepository";
 
 export const SearchTypeResolver = app
     .query("search")
-    .resolve(async () => {
+    .resolve(async ({ keyword }) => {
+        const categories = await CategoryRepository.find({
+            name: Like(`%${keyword}%`)
+        })
+        const users = await UserRepository.find({
+            firstName: Like(`%${keyword}%`)
+        })
+        const posts = await PostRepository.find({
+            title: Like(`%${keyword}%`)
+        })
         return [
-            ...(await getRepository<CategoryType>("CategoryType").find()).map(obj => ({ __typename: "CategoryType", ...obj })),
-            ...(await getRepository<UserType>("UserType").find()).map(obj => ({ __typename: "UserType", ...obj })),
-            ...(await getRepository<PostType>("PostType").find()).map(obj => ({ __typename: "PostType", ...obj })),
+            ...categories.map(obj => ({ __typename: "CategoryType", ...obj })),
+            ...users.map(obj => ({ __typename: "UserType", ...obj })),
+            ...posts.map(obj => ({ __typename: "PostType", ...obj })),
         ]
     })

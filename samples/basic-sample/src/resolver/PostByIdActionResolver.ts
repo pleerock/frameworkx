@@ -1,5 +1,5 @@
 import {app} from "../app";
-import {Status} from "../enum/Status";
+import {PostStatus} from "../enum/PostStatus";
 
 export const PostByIdActionResolver = app
     .action("GET /posts/:id")
@@ -8,14 +8,13 @@ export const PostByIdActionResolver = app
             id: params.id,
             title: "Post #" + params.id,
             text: "About post #" + params.id,
-            active: false,
+            status: PostStatus.moderated,
             author: {
                 id: 1,
-                firstName: "Dima",
-                lastName: "Zotov",
-                fullName: "Dima Zotov",
-                status: Status.active,
-                activation: "activated",
+                firstName: "Timber",
+                lastName: "Saw",
+                fullName: "Timber Saw",
+                status: "active",
             },
             categories: []
         }

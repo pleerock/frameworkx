@@ -1,5 +1,5 @@
 import {createApp} from "@microframework/core";
-import {Status} from "./enum/Status";
+import {PostStatus} from "./enum/PostStatus";
 import {PostFilterInput} from "./input/PostFilterInput";
 import {CategoryInput} from "./input/CategoryInput";
 import {PostInput} from "./input/PostInput";
@@ -56,22 +56,22 @@ export const app = createApp<{
         /**
          * Loads all posts.
          */
-        posts(args: PostFilterInput): PostModel[] // todo: need to check if we can make selections to work with PostType instead of Model
+        posts(args: PostFilterInput): PostModel[]
 
         /**
-         * Loads a single category.
+         * Loads a single category by its id.
          */
-        category(): CategoryType
+        category(args: { id: number }): CategoryType
 
         /**
          * Loads users.
          */
-        users(args: { status: Status }): UserType[]
+        users(): UserType[]
 
         /**
-         * Searching any data we have.
+         * Searches in anything we have.
          */
-        search(): SearchType[]
+        search(args: { keyword: string }): SearchType[]
 
     },
     mutations: {

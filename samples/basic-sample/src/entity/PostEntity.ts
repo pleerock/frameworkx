@@ -14,13 +14,14 @@ export const PostEntity = app
       type: "varchar"
     },
     text: {
-      type: "varchar"
+      type: "varchar",
+      nullable: true
     },
     author: {
       relation: "many-to-one",
     },
     categories: {
-      relation: "many-to-many" as const,
+      relation: "many-to-many",
       joinTable: true,
       inverseSide: "posts"
     },

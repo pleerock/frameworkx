@@ -71,7 +71,7 @@ export class ModelManager<
   /**
    * Returns entity repository for a given defined model together with defined custom repository functions.
    */
-  repository<CustomRepositoryDefinition>(customRepository?: CustomRepositoryFactory<Repository<M["blueprint"]>, CustomRepositoryDefinition>): Repository<M> & CustomRepositoryDefinition {
+  repository<CustomRepositoryDefinition>(customRepository?: CustomRepositoryFactory<Repository<M["blueprint"]>, CustomRepositoryDefinition>): Repository<M["blueprint"]> & CustomRepositoryDefinition {
     return new Proxy({} as any, {
       get: (obj, prop) => {
         if (!obj.repository) {

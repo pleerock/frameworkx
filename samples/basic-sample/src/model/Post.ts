@@ -1,4 +1,5 @@
 import {Model} from "@microframework/core";
+import {PostStatus} from "../enum/PostStatus";
 import {CategoryType} from "./Category";
 import {UserType} from "./User";
 
@@ -23,14 +24,14 @@ export interface PostType {
     title: string
 
     /**
-     * Post content.
+     * Post content. Can be empty.
      */
-    text: string
+    text: string | null
 
     /**
-     * Indicates if post is active.
+     * Indicates if post is moderated or not.
      */
-    active: boolean
+    status: PostStatus
 
     /**
      * Post categories.
@@ -42,10 +43,6 @@ export interface PostType {
      */
     author: UserType
 
-    /**
-     * User or category.
-     */
-    userOrCategory?: UserType | CategoryType
 }
 
 /**

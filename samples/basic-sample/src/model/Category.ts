@@ -11,9 +11,9 @@ export type CategoryType = {
     id: number
 
     /**
-     * Category name. Can be empty.
+     * Category name.
      */
-    name: string | null
+    name: string
 
     /**
      * All posts attached to this category.
