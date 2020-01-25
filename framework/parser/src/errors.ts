@@ -85,5 +85,20 @@ export const Errors = {
     enumPropertyMustMatchValue(parent: string, propertyName: string) {
         return new Error(`Invalid enum value ${propertyName} at ${parent}. Enum value must match its property name. Try to set it to ${propertyName} = "${propertyName}".`)
     },
+    methodNoReturningType(parent: string, propertyName: string) {
+        return new Error(`Method ${propertyName} at ${parent} must return some type.`)
+    },
+    importedNodeNameInvalid(parent: string) {
+        return new Error(`Imported node's name is invalid${parent ? ` at "${parent}"` : ""}.`)
+    },
+    importedNodeIsNotModel(parent: string) {
+        return new Error(`Only "Model" is supported for imported names${parent ? ` at "${parent}"` : ""}.`)
+    },
+    importedNodeModelInvalid(parent: string) {
+        return new Error(`Imported Model doesn't have a valid type arguments${parent ? ` at "${parent}"` : ""}.`)
+    },
+    modelArgPropertyInvalid(typeName: string, argPropertyName: string) {
+        return new Error(`Model Arg "${argPropertyName}" is invalid, because property with such name is missing in "${typeName}".`)
+    },
 
 }

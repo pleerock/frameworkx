@@ -176,6 +176,7 @@ export class ModelParser {
 
         } else if (ts.isTypeReferenceNode(node)) {
             const referencedType = this.typeChecker.getTypeAtLocation(node)
+
             if (!ts.isIdentifier(node.typeName) || !node.typeName.text)
                 throw Errors.typeReferenceInvalidName(parentName)
 
@@ -199,29 +200,8 @@ export class ModelParser {
                     })
                 }
 
-                // create a model with a type
-                const model = this.parse(modelType, ParserUtils.joinStrings(parentName/*, typeName*/))
+                const model = this.parseModel(parentName, modelName, modelType, argsType)
                 model.description = ts.displayPartsToString(modelSymbol.getDocumentationComment(this.typeChecker))
-                model.modelName = modelName
-
-                // create args if model with args
-                if (argsType) {
-                    const argsModel = this.parse(argsType, ParserUtils.joinStrings(parentName, /*typeName, */"Args"))
-
-                    argsModel.properties.forEach(property => {
-                        const modelProperty = model.properties.find(modelProperty => modelProperty.propertyName === property.propertyName)
-                        if (!modelProperty)
-                            throw new Error(`No property "${property.propertyName}" was found in the "${model.typeName}" model.`)
-
-                        // todo: not sure about kind here
-                        modelProperty.args = MetadataUtils.createType(argsModel.kind, {
-                            typeName: argsModel.typeName,
-                            propertyName: argsModel.propertyName,
-                            properties: property.properties,
-                        })
-                    })
-                }
-
                 return model
             }
 
@@ -256,40 +236,64 @@ export class ModelParser {
 
         } else if (ts.isImportTypeNode(node)) {
 
-            // const referencedType = this.typeChecker.getTypeAtLocation(node)
+            // check if we can handle this import
             if (!node.qualifier || !ts.isIdentifier(node.qualifier))
-                throw new Error(`Name is invalid`)
+                throw Errors.importedNodeNameInvalid(parentName)
             if (node.qualifier.text !== "Model")
-                throw new Error(`Not a Model`)
+                throw Errors.importedNodeIsNotModel(parentName)
             if (!node.typeArguments || !node.typeArguments.length)
-                throw new Error(`Invalid number of arguments`)
+                throw Errors.importedNodeModelInvalid(parentName)
 
-            const model = this.parse(node.typeArguments[0], parentName)
+            // find model
+            let modelType: ts.Node | undefined = undefined
+            const modelSymbol = this.typeChecker.getTypeAtLocation(node.typeArguments[0])
+            if (modelSymbol.symbol) {
+                modelType = modelSymbol.symbol.declarations[0]
+            }
+            if (!modelType)
+                throw Errors.importedNodeModelInvalid(parentName)
+
+            // find args
+            let argsType: ts.Node | undefined = undefined
             if (node.typeArguments[1]) {
-                // console.log(model);
-                const referencedType = this.typeChecker.getTypeAtLocation(node.typeArguments[1])
-                if (referencedType && referencedType.aliasSymbol) {
-                    const declaration = referencedType.aliasSymbol!.declarations[0]
-                    const argsModel = this.parse(declaration, ParserUtils.joinStrings(parentName, /*typeName, */"Args"))
-
-                    argsModel.properties.forEach(property => {
-                        const modelProperty = model.properties.find(modelProperty => modelProperty.propertyName === property.propertyName)
-                        if (!modelProperty)
-                            throw new Error(`No property "${property.propertyName}" was found in the "${model.typeName}" model.`)
-
-                        // todo: not sure about kind here
-                        modelProperty.args = MetadataUtils.createType(argsModel.kind, {
-                            typeName: argsModel.typeName,
-                            propertyName: argsModel.propertyName,
-                            properties: property.properties,
-                        })
-                    })
+                const symbol = this.typeChecker.getTypeAtLocation(node.typeArguments[1])
+                if (symbol.aliasSymbol) {
+                    argsType = symbol.aliasSymbol.declarations[0]
                 }
             }
+
+            const model = this.parseModel("", "", modelType, argsType)
+            model.description = ts.displayPartsToString(modelSymbol.symbol.getDocumentationComment(this.typeChecker))
             return model
         }
 
         throw Errors.signatureNotSupported(node)
+    }
+
+    private parseModel(parentName: string, modelName: string, modelType: ts.Node, argsType?: ts.Node) {
+
+        // create a model with a type
+        const model = this.parse(modelType, ParserUtils.joinStrings(parentName/*, typeName*/))
+        model.modelName = modelName
+
+        // create args if model with args
+        if (argsType) {
+            const argsModel = this.parse(argsType, ParserUtils.joinStrings(parentName, /*typeName, */"Args"))
+
+            argsModel.properties.forEach(property => {
+                const modelProperty = model.properties.find(modelProperty => modelProperty.propertyName === property.propertyName)
+                if (!modelProperty)
+                    throw Errors.modelArgPropertyInvalid(model.typeName!, property.propertyName!)
+
+                modelProperty.args = MetadataUtils.createType(argsModel.kind, {
+                    typeName: argsModel.typeName,
+                    propertyName: argsModel.propertyName,
+                    properties: property.properties,
+                })
+            })
+        }
+
+        return model
     }
 
     private parseMembers(members: ts.NodeArray<ts.Node>, parentName: string): TypeMetadata[] {
@@ -300,8 +304,10 @@ export class ModelParser {
             if (!ts.isPropertySignature(member) &&
                 !ts.isPropertyDeclaration(member) &&
                 !ts.isEnumMember(member) &&
-                !ts.isMethodSignature(member))
+                !ts.isMethodSignature(member)) {
+                // console.log(member.kind)
                 continue
+            }
             if (!member.name)
                 continue
 
@@ -345,7 +351,7 @@ export class ModelParser {
             } else if (ts.isMethodSignature(member)) {
 
                 if (!member.type)
-                    throw new Error("Method must return a value")
+                    throw Errors.methodNoReturningType(parentName, propertyName)
 
                 let args: TypeMetadata | undefined = undefined
                 if (member.parameters.length > 0) {

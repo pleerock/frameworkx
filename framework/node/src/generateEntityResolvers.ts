@@ -100,33 +100,36 @@ export function generateEntityResolvers(app: AnyApplication) {
       if (!model)
         throw new Error("Model was not found")
 
-      const whereArgs = createModelFromBlueprint(entityMetadata, model, app, 0)
+      const whereArgsProperties = createModelFromBlueprint(entityMetadata, model, app, 0)
 
-      const orderArgs: TypeMetadata[] = []
+      const orderArgsProperties: TypeMetadata[] = []
       for (const key in model.properties) {
         const property = model.properties[key]
         if (MetadataUtils.isTypePrimitive(property)) { // todo: yeah make it more complex like with where
-          orderArgs.push(MetadataUtils.createType("string", {
+          orderArgsProperties.push(MetadataUtils.createType("string", {
             propertyName: property.propertyName,
             nullable: true,
           })) // we need to do enum and specify DESC and ASC
         }
       }
 
+      const whereArgs = MetadataUtils.createType("object", {
+        typeName: app.properties.namingStrategy.generatedModelInputs.where(model.typeName!!),
+        propertyName: "where",
+        nullable: true,
+        properties: whereArgsProperties,
+      })
+
+      const orderByArgs = MetadataUtils.createType("object", {
+        typeName: app.properties.namingStrategy.generatedModelInputs.order(model.typeName!!),
+        propertyName: "order",
+        nullable: true,
+        properties: orderArgsProperties,
+      })
+
       const queryArgs = MetadataUtils.createType("object", {
         nullable: true,
-        properties: [
-          MetadataUtils.createType("object", {
-            propertyName: "where",
-            nullable: true,
-            properties: whereArgs,
-          }),
-          MetadataUtils.createType("object", {
-            propertyName: "order",
-            nullable: true,
-            properties: orderArgs,
-          }),
-        ]
+        properties: [whereArgs, orderByArgs]
       })
 
       queryDeclarations.push({
@@ -150,17 +153,17 @@ export function generateEntityResolvers(app: AnyApplication) {
       queryDeclarations.push({
         ...MetadataUtils.createType("number"),
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.count(entity.name),
-        args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
+        args: whereArgs,
       })
       mutationDeclarations.push({
         ...model,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.save(entity.name),
-        args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
+        args: whereArgs,
       })
       mutationDeclarations.push({
         ...MetadataUtils.createType("boolean"),
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
-        args: MetadataUtils.createType("object", { nullable: true, properties: whereArgs }),
+        args: whereArgs,
       })
 
       // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name)] = args(entity.model, {
@@ -240,6 +243,7 @@ const createModelFromBlueprint = (entityMetadata: EntityMetadata, type: TypeMeta
               throw new Error(`cannot find a type ${property.typeName}`)
 
             whereArgs.push(MetadataUtils.createType("object", {
+              typeName: app.properties.namingStrategy.generatedModelInputs.whereRelation(type.typeName!!, property.propertyName!!),
               nullable: true,
               propertyName: property.propertyName,
               properties: createModelFromBlueprint(relationWithSuchProperty.inverseEntityMetadata, reference, app, deepness + 1)

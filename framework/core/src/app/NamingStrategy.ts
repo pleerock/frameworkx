@@ -14,4 +14,12 @@ export type NamingStrategy = {
     save(modelName: string): string
     remove(modelName: string): string
   }
+
+  generatedModelInputs: {
+    where(typeName: string): string
+    order(typeName: string): string
+    whereRelation(typeName: string, relationName: string): string
+  }
+
+
 }
