@@ -8,6 +8,14 @@ import {
   Resolver
 } from "../types";
 
+// export function declaration(name: string, resolver: () => ) {
+//
+// }
+//
+// declaration<CategoryDeclaration>("category", args => {
+//
+// })
+
 /**
  * Declarations (root queries and mutations) manager -
  * allows to define a resolver for them or select data from the client.

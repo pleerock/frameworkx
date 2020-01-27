@@ -21,6 +21,7 @@
     "prettier": "^1.19.1"
   },
   "scripts": {
-    "start": "ts-node ./src/index.ts"
+    "start": "ts-node ./src/index.ts",
+    "format": "prettier --write \"src/**/*.ts\""
   }
 }

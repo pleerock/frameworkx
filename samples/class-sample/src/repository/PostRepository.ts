@@ -1,11 +1,11 @@
-import {repository} from "typeorm";
+import { repository } from "typeorm"
 import * as typeorm from "typeorm"
-import {PostType} from "../model/Post";
+import { PostType } from "../model/Post"
 
-export const PostRepository = repository<PostType>("PostType").extend(repository => ({
-
+export const PostRepository = repository<PostType>("PostType").extend(
+  repository => ({
     findAllPosts() {
-        return repository.find()
-    }
-
-}))
+      return repository.find()
+    },
+  }),
+)
