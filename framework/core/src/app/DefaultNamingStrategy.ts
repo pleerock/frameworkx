@@ -67,6 +67,47 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return modelName + "ObserveRemove"
     },
   },
+  generatedModelDeclarationDescriptions: {
+    one(modelName: string) {
+      return `Loads a single instance of the "${modelName}" model. Returns null if model not found.`
+    },
+    oneNotNull(modelName: string) {
+      return `Loads a single instance of the "${modelName}" model. Returns error if model not found. `
+    },
+    many(modelName: string) {
+      return `Loads multiple instances of the "${modelName}" model.`
+    },
+    count(modelName: string) {
+      return `Counts number of "${modelName}" model instances.`
+    },
+    save(modelName: string) {
+      return `Saves a provided "${modelName}" model.`
+    },
+    remove(modelName: string) {
+      return `Removes a provided "${modelName}" model.`
+    },
+    observeOne(modelName: string) {
+      return `Observes changes of the "${modelName}" model.`
+    },
+    observeMany(modelName: string) {
+      return `Observes changes of the "${modelName}" models.`
+    },
+    observeCount(modelName: string) {
+      return `Observes number of the "${modelName}" model instances.`
+    },
+    observeInsert(modelName: string) {
+      return `Observes inserts of the "${modelName}" model.`
+    },
+    observeUpdate(modelName: string) {
+      return `Observes updates of the "${modelName}" model.`
+    },
+    observeSave(modelName: string) {
+      return `Observes changes of the "${modelName}" model.`
+    },
+    observeRemove(modelName: string) {
+      return `Observes removals of the "${modelName}" model.`
+    },
+  },
   generatedModelInputs: {
     where(typeName: string) {
       return capitalize(camelize(typeName + " Where"))

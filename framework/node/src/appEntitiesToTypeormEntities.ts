@@ -1,4 +1,5 @@
 import {
+  AnyApplication,
   EntitySchemaRelationArrayOptions,
   EntitySchemaRelationOneOptions,
   ModelEntity,
@@ -9,7 +10,7 @@ import {EntitySchema as TypeormEntitySchema, EntitySchemaColumnOptions} from "ty
  * Transforms entities defined in the app to TypeORM entity format.
  * Should be used to pass app entities to TypeORM connection object.
  */
-export function appEntitiesToTypeormEntities(entitiesOrMap: ModelEntity<any>[] | { [key: string]: ModelEntity<any> }) {
+export function appEntitiesToTypeormEntities(app: AnyApplication, entitiesOrMap: ModelEntity<any>[] | { [key: string]: ModelEntity<any> }) {
   const entities = entitiesOrMap instanceof Array ? entitiesOrMap : Object.keys(entitiesOrMap).map(key => entitiesOrMap[key])
   return entities.map(entity => {
 
@@ -29,7 +30,10 @@ export function appEntitiesToTypeormEntities(entitiesOrMap: ModelEntity<any>[] |
       if (isRelationInEntitySchema(options)) {
         let relationType = options.relation
 
-        const modelProperty = entity.modelMetadata.properties.find(property => property.propertyName === key)
+        const modelMetadata = app.metadata.models.find(model => model.typeName === entity.name)
+        if (!modelMetadata)
+          throw new Error("Model was not found")
+        const modelProperty = modelMetadata.properties.find(property => property.propertyName === key)
         if (!modelProperty)
           throw new Error("Property was not found")
 

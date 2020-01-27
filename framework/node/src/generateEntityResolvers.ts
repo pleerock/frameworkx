@@ -278,69 +278,82 @@ export function generateEntityResolvers(app: AnyApplication) {
         ...model,
         nullable: true,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.one(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.one(entity.name),
         args: queryArgs
       })
       queryDeclarations.push({
         ...model,
         nullable: false,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.oneNotNull(entity.name),
         args: queryArgs
       })
       queryDeclarations.push({
         ...model,
         array: true,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.many(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.many(entity.name),
         args: queryArgs
       })
       queryDeclarations.push({
         ...MetadataUtils.createType("number"),
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.count(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.count(entity.name),
         args: whereArgs,
       })
       mutationDeclarations.push({
         ...model,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.save(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.save(entity.name),
         args: whereArgs,
       })
       mutationDeclarations.push({
         ...MetadataUtils.createType("boolean"),
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.remove(entity.name),
         args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeInsert(entity.name),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeUpdate(entity.name),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeSave(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeSave(entity.name),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeRemove(entity.name),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeOne(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeOne(entity.name),
         args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         array: true,
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeMany(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeMany(entity.name),
         args: queryArgs,
       })
       subscriptionDeclarations.push({
         ...MetadataUtils.createType("number"),
         propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeCount(entity.name),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeCount(entity.name),
         args: whereArgs,
       })
 

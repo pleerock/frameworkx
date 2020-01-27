@@ -90,21 +90,97 @@ export function parse(appFileName: string, options?: ParserOptions): Application
         appDefOptions = declaration.type.typeArguments[0]
     }
 
-    if (!ts.isTypeLiteralNode(appDefOptions))
-        throw Errors.appTypeInvalidArguments()
+    if (!ts.isIdentifier(declaration.name))
+        throw new Error("Invalid declaration.name")
+
+    const result: ApplicationMetadata = {
+        name: declaration.name.text,
+        actions: [],
+        models: [],
+        inputs: [],
+        queries: [],
+        mutations: [],
+        subscriptions: [],
+        selections: [],
+    }
+
+    if (ts.isIntersectionTypeNode(appDefOptions)) {
+        appDefOptions.types.forEach(type => {
+            if (ts.isTypeLiteralNode(type)) {
+                const r = parseAppDefinition(program, type, options!)
+                result.actions.push(...r.actions)
+                result.models.push(...r.models)
+                result.inputs.push(...r.inputs)
+                result.queries.push(...r.queries)
+                result.mutations.push(...r.mutations)
+                result.subscriptions.push(...r.subscriptions)
+                result.selections.push(...r.selections)
+                return
+
+            } else if (ts.isTypeReferenceNode(type)) {
+                const referencedType = program.getTypeChecker().getTypeAtLocation(type)
+                const symbol = referencedType.aliasSymbol || referencedType.symbol
+
+                if (symbol && symbol.declarations[0]) {
+                    const declaration = symbol.declarations[0]
+                    if (ts.isTypeLiteralNode(declaration)) {
+                        const r = parseAppDefinition(program, declaration, options!)
+                        result.actions.push(...r.actions)
+                        result.models.push(...r.models)
+                        result.inputs.push(...r.inputs)
+                        result.queries.push(...r.queries)
+                        result.mutations.push(...r.mutations)
+                        result.subscriptions.push(...r.subscriptions)
+                        result.selections.push(...r.selections)
+                        return
+
+                    } else if (ts.isTypeAliasDeclaration(declaration) && ts.isTypeLiteralNode(declaration.type)) {
+                        const r = parseAppDefinition(program, declaration.type, options!)
+                        result.actions.push(...r.actions)
+                        result.models.push(...r.models)
+                        result.inputs.push(...r.inputs)
+                        result.queries.push(...r.queries)
+                        result.mutations.push(...r.mutations)
+                        result.subscriptions.push(...r.subscriptions)
+                        result.selections.push(...r.selections)
+                        return
+                    }
+                }
+            }
+
+            // console.log(type.kind)
+            throw Errors.appTypeInvalidArguments()
+
+        })
+    } else {
+        if (!ts.isTypeLiteralNode(appDefOptions))
+            throw Errors.appTypeInvalidArguments()
+
+        const r = parseAppDefinition(program, appDefOptions, options!)
+        result.actions.push(...r.actions)
+        result.models.push(...r.models)
+        result.inputs.push(...r.inputs)
+        result.queries.push(...r.queries)
+        result.mutations.push(...r.mutations)
+        result.subscriptions.push(...r.subscriptions)
+        result.selections.push(...r.selections)
+    }
 
     if (!ts.isIdentifier(declaration.name))
         throw new Error("Invalid declaration.name")
 
+    return result
+}
+
+function parseAppDefinition(program: ts.Program, type: ts.TypeLiteralNode, options: ParserOptions) {
     return {
-        name: declaration.name.text,
-        actions: parseActions(program, appDefOptions, options),
-        models: parseModels(program, appDefOptions, options),
-        inputs: parseInputs(program, appDefOptions, options),
-        queries: parseQueries(program, appDefOptions, options),
-        mutations: parseMutations(program, appDefOptions, options),
-        subscriptions: parseSubscriptions(program, appDefOptions, options),
-        selections: parseSelections(program, appDefOptions, options),
+        actions: parseActions(program, type, options),
+        models: parseModels(program, type, options),
+        inputs: parseInputs(program, type, options),
+        queries: parseQueries(program, type, options),
+        mutations: parseMutations(program, type, options),
+        subscriptions: parseSubscriptions(program, type, options),
+        selections: parseSelections(program, type, options),
     }
 }
 
@@ -155,7 +231,7 @@ function parseModels(program: ts.Program, appDefOptions: ts.TypeLiteralNode, opt
     const modelsMember = findTypeLiteralProperty(appDefOptions, "models")
 
     if (!modelsMember)
-        throw new Error("no member")
+        return []
 
     if (!modelsMember.type)
         throw new Error("no type")

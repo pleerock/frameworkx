@@ -41,3 +41,6 @@ export class InputManager<
 
 }
 
+export function validator<T>(name: string, schema: ValidationSchema<T, any>) {
+  return new InputValidator(name, schema)
+}

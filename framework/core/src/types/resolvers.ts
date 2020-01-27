@@ -1,4 +1,4 @@
-import {Action, ContextList, DeclarationItem, Model} from "../app";
+import {Action, ContextList, DeclarationItem, DeclarationList, Model} from "../app";
 
 /**
  * Default framework properties applied to the user context.
@@ -18,7 +18,35 @@ export type DeepPartial<T> = {
 export type ResolverReturnValue<T> =
   T extends Model<infer Blueprint, any> ? DeepPartial<Blueprint> | Promise<DeepPartial<Blueprint>> :
   T extends Array<Model<infer Blueprint, any>> ? DeepPartial<Blueprint[]> | Promise<DeepPartial<Blueprint[]>> :
-  T extends object ? DeepPartial<T> | Promise<DeepPartial<T>> : T | Promise<T>
+  T extends object ? DeepPartial<T> | Promise<DeepPartial<T>> :
+  T extends boolean ? boolean | Promise<boolean> :
+  T extends number ? number | Promise<number> :
+  T extends string ? string | Promise<string> :
+  T | Promise<T>
+
+
+export type Declaration<
+    Queries extends DeclarationList,
+    Mutations extends DeclarationList,
+    Subscriptions extends DeclarationList,
+    > = {
+  queries?: Queries
+  mutations?: Mutations
+  subscriptions?: Subscriptions
+}
+
+export type ContextType = { [key: string]: any }
+
+export type DeclarationResolver<
+    D extends Declaration<any, any, any>,
+    Context = ContextType
+    > = {
+  [P in keyof D["queries"]]: DeclarationResolverFn<D["queries"][P], Context>
+} & {
+  [P in keyof D["mutations"]]: DeclarationResolverFn<D["mutations"][P], Context>
+} & {
+  [P in keyof D["subscriptions"]]: DeclarationResolverFn<D["subscriptions"][P], Context>
+}
 
 /**
  * Defines a resolver schema for the model (based on blueprint) properties.

@@ -41,7 +41,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
 
 
     if (app.properties.dataSourceFactory) {
-      const connection = await app.properties.dataSourceFactory(appEntitiesToTypeormEntities(app.properties.entities))
+      const connection = await app.properties.dataSourceFactory(appEntitiesToTypeormEntities(app, app.properties.entities))
       app.properties.dataSource = connection
     }
 

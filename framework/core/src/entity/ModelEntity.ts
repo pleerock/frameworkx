@@ -1,8 +1,9 @@
-import {Repository} from "typeorm";
-import {ApplicationProperties, Model} from "../app";
-import {Errors} from "../errors";
-import {ApplicationMetadata} from "../metadata";
+import {Model} from "../app";
 import {EntityResolveSchema, EntitySchema} from "./types";
+
+export function entity<T>(name: string) {
+  return new ModelEntity<Model<T>>(name)
+}
 
 /**
  * Entity specification.
@@ -15,16 +16,6 @@ export class ModelEntity<
    * Model for which we define an entity.
    */
   readonly _model!: GivenModel
-
-  /**
-   * Application's properties.
-   */
-  readonly appProperties: ApplicationProperties
-
-  /**
-   * Application's metadata.
-   */
-  readonly appMetadata: ApplicationMetadata
 
   /**
    * Model name.
@@ -47,26 +38,10 @@ export class ModelEntity<
   tableName?: string
 
   constructor(
-    appProperties: ApplicationProperties,
-    appMetadata: ApplicationMetadata,
     name: string,
   ) {
-    this.appProperties = appProperties
-    this.appMetadata = appMetadata
     this.name = name
   }
-
-  // static copy(
-  //     appProperties: ApplicationProperties,
-  //     appMetadata: ApplicationMetadata,
-  //     model: ModelEntity<any>
-  // ) {
-  //   const copy = new ModelEntity(appProperties, appMetadata, model.name)
-  //   copy.tableName = model.tableName
-  //   copy.entitySchema = model.entitySchema
-  //   copy.entityResolveSchema = model.entityResolveSchema
-  //   return copy
-  // }
 
   /**
    * Sets entity table name.
@@ -90,29 +65,6 @@ export class ModelEntity<
   schema(schema: EntitySchema<GivenModel["blueprint"]>): ModelEntity<GivenModel> {
     this.entitySchema = schema
     return this
-  }
-
-  /**
-   * Get's entity repository.
-   */
-  get repository(): Repository<GivenModel["blueprint"]> {
-    if (!this.appProperties.dataSource)
-      throw Errors.noDataSourceInApp()
-
-    return this.appProperties.dataSource.getRepository(this.name)
-  }
-
-  /**
-   * Get's entity model metadata.
-   */
-  get modelMetadata() {
-    const model = this.appMetadata.models.find(model => model.typeName === this.name)
-
-    if (!model) {
-      throw new Error(`Model "${this.name}" was not found`)
-    }
-
-    return model
   }
 
 }

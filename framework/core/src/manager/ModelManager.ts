@@ -65,7 +65,7 @@ export class ModelManager<
    * Returns an entity builder for a given defined model.
    */
   entity(): ModelEntity<M> {
-    return new ModelEntity(this.appProperties, this.appMetadata, this.name)
+    return new ModelEntity(this.name)
   }
 
   /**

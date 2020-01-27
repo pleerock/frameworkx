@@ -29,6 +29,22 @@ export type NamingStrategy = {
     observeRemoveTriggerName(modelName: string): string
   }
 
+  generatedModelDeclarationDescriptions: {
+    one(modelName: string): string
+    oneNotNull(modelName: string): string
+    many(modelName: string): string
+    count(modelName: string): string
+    save(modelName: string): string
+    remove(modelName: string): string
+    observeOne(modelName: string): string
+    observeMany(modelName: string): string
+    observeCount(modelName: string): string
+    observeInsert(modelName: string): string
+    observeUpdate(modelName: string): string
+    observeSave(modelName: string): string
+    observeRemove(modelName: string): string
+  }
+
   generatedModelInputs: {
     where(typeName: string): string
     order(typeName: string): string
