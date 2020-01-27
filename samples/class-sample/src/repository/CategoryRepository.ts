@@ -1,5 +1,7 @@
-import { repository } from "typeorm"
-import { CategoryType } from "../model/Category"
 import * as typeorm from "typeorm"
+import { AppConnection } from "../AppConnection"
+import { CategoryType } from "../model/Category"
 
-export const CategoryRepository = repository<CategoryType>("CategoryType")
+export const CategoryRepository = AppConnection.getRepository<CategoryType>(
+  "CategoryType",
+)

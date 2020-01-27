@@ -5,8 +5,5 @@ import { SearchDeclaration } from "./declaration/SearchDeclaration"
 import { UserDeclaration } from "./declaration/UserDeclaration"
 
 export const App = createApp<
-    CategoryDeclaration &
-    UserDeclaration &
-    PostDeclaration &
-    SearchDeclaration
-    >()
+  CategoryDeclaration & UserDeclaration & PostDeclaration & SearchDeclaration
+>()

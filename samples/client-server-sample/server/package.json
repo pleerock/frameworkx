@@ -10,7 +10,7 @@
     "@microframework/server": "*",
     "@microframework/validator": "*",
     "@microframework/client-server-sample-common": "*",
-    "typeorm": "0.3.0-rc.10",
+    "typeorm": "0.3.0-rc.11",
     "sqlite3": "^4.1.0"
   },
   "devDependencies": {

@@ -1,12 +1,10 @@
-import { defaultServer } from "@microframework/node"
 import { debugLogger } from "@microframework/logger"
+import { defaultServer } from "@microframework/node"
 import { defaultValidator } from "@microframework/validator"
-import { createConnection } from "typeorm"
-import { App } from "./App"
-import { Context } from "./Context"
 import { PubSub } from "graphql-subscriptions"
-
-import * as resolvers from "./resolver"
+import { App } from "./App"
+import { AppConnection } from "./AppConnection"
+import { Context } from "./Context"
 import * as entities from "./entity"
 import * as validators from "./validator"
 
@@ -16,13 +14,7 @@ App.setEntities(entities)
   // .setResolvers(resolvers)
   .setValidationRules(validators)
   .setDataSource(entities => {
-    return createConnection({
-      type: "sqlite",
-      database: __dirname + "/../database.sqlite",
-      entities: entities,
-      synchronize: true,
-      logging: false,
-    })
+    return AppConnection.setOptions({ entities }).connect()
   })
   .setContext(Context)
   .setValidator(defaultValidator)
@@ -30,7 +22,7 @@ App.setEntities(entities)
   .setGenerateModelRootQueries(true)
   .bootstrap(
     defaultServer(App, {
-      appPath: __dirname + "/app",
+      appPath: __dirname + "/App",
       port: 3000,
       websocketPort: 3001,
       cors: true,

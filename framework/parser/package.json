@@ -13,7 +13,7 @@
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "reconnectingwebsocket": "^1.0.0",
-    "typeorm": "0.3.0-rc.10",
+    "typeorm": "0.3.0-rc.11",
     "zen-observable": "^0.8.14"
   },
   "devDependencies": {
