@@ -2,7 +2,7 @@ import { debugLogger } from "@microframework/logger"
 import { defaultValidator } from "@microframework/validator"
 import { App } from "./app/App"
 import { AppConnection } from "./app/AppConnection"
-import { AppServer } from "./app/AppServer";
+import { AppServer } from "./app/AppServer"
 import { Context } from "./app/Context"
 import * as entities from "./entity"
 import * as validators from "./validator"

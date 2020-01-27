@@ -1,7 +1,7 @@
 import { entity } from "@microframework/core"
-import { Post } from "../model/Post"
+import { Post } from "../model"
 
-export const PostEntity = entity<Post>("PostType").schema({
+export const PostEntity = entity<Post>("Post").schema({
   id: {
     type: "int",
     primary: true,

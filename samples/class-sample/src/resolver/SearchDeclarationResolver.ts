@@ -1,13 +1,12 @@
-import { DeclarationResolver } from "@microframework/core/_"
+import { DeclarationResolver } from "@microframework/core"
 import { Like } from "typeorm"
-import { SearchDeclaration } from "../declaration/SearchDeclaration"
-import { Category } from "../model/Category"
-import { Post } from "../model/Post"
-import { SearchType } from "../model/Search"
-import { User } from "../model/User"
-import { CategoryRepository } from "../repository/CategoryRepository"
-import { PostRepository } from "../repository/PostRepository"
-import { UserRepository } from "../repository/UserRepository"
+import { SearchDeclaration } from "../declaration"
+import { Category, Post, SearchType, User } from "../model"
+import {
+  CategoryRepository,
+  PostRepository,
+  UserRepository,
+} from "../repository"
 
 export class SearchDeclarationResolver
   implements DeclarationResolver<SearchDeclaration> {
@@ -22,9 +21,9 @@ export class SearchDeclarationResolver
       title: Like(`%${keyword}%`),
     })
     return [
-      ...categories.map(obj => ({ __typename: "CategoryType", ...obj })),
-      ...users.map(obj => ({ __typename: "UserType", ...obj })),
-      ...posts.map(obj => ({ __typename: "PostType", ...obj })),
+      ...categories.map(obj => ({ __typename: "Category", ...obj })),
+      ...users.map(obj => ({ __typename: "User", ...obj })),
+      ...posts.map(obj => ({ __typename: "Post", ...obj })),
     ]
   }
 }

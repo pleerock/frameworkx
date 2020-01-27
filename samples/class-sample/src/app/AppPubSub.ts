@@ -1,3 +1,3 @@
-import { PubSub } from "graphql-subscriptions";
+import { PubSub } from "graphql-subscriptions"
 
 export const AppPubSub = new PubSub()
