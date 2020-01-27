@@ -1,16 +1,16 @@
 import { DeclarationResolver } from "@microframework/core"
 import { CategoryDeclaration } from "../declaration/CategoryDeclaration"
 import { CategoryInput } from "../input/CategoryInput"
-import { CategoryType } from "../model/Category"
+import { Category } from "../model/Category"
 import { CategoryRepository } from "../repository/CategoryRepository"
 
 export class CategoryDeclarationResolver
   implements DeclarationResolver<CategoryDeclaration> {
-  async category(args: { id: number }): Promise<CategoryType> {
+  async category(args: { id: number }): Promise<Category> {
     return CategoryRepository.findOneOrFail(args.id)
   }
 
-  async categorySave(args: CategoryInput): Promise<CategoryType> {
+  async categorySave(args: CategoryInput): Promise<Category> {
     return await CategoryRepository.save({
       id: args.id,
       name: args.name,

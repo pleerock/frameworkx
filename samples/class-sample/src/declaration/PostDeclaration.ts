@@ -1,13 +1,13 @@
 import { PostFilterInput } from "../input/PostFilterInput"
 import { PostInput } from "../input/PostInput"
-import { PostModel, PostType } from "../model/Post"
+import { PostModel, Post } from "../model/Post"
 
 /**
  * Declarations for Post.
  */
 export type PostDeclaration = {
   models: {
-    PostType: PostModel
+    Post: PostModel
   }
 
   inputs: {
@@ -19,14 +19,14 @@ export type PostDeclaration = {
     /**
      * Loads all posts.
      */
-    posts(args: PostFilterInput): PostType[]
+    posts(args: PostFilterInput): Post[]
   }
 
   mutations: {
     /**
      * Saves a post.
      */
-    postSave(args: PostInput): PostType
+    postSave(args: PostInput): Post
 
     /**
      * Removes a post with a given id.

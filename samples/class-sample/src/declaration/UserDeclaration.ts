@@ -1,10 +1,10 @@
-import { UserType } from "../model/User"
+import { User } from "../model/User"
 
 /**
  * Declarations for User.
  */
 export type UserDeclaration = {
   models: {
-    UserType: UserType
+    User: User
   }
 }

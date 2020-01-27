@@ -1,17 +1,12 @@
 import { Model } from "@microframework/core"
-import { PostStatus } from "../enum/PostStatus"
-import { CategoryType } from "./Category"
-import { UserType } from "./User"
+import { PostStatus } from "../enum"
+import { Category } from "./Category"
+import { User } from "./User"
 
 /**
- * Simple model for testing purposes.
+ * Dummy type for Post.
  */
-export type PostModel = Model<PostType, PostArgs>
-
-/**
- * Type for a PostModel.
- */
-export interface PostType {
+export interface Post {
   /**
    * Unique post id.
    */
@@ -35,12 +30,12 @@ export interface PostType {
   /**
    * Post categories.
    */
-  categories: CategoryType[]
+  categories: Category[]
 
   /**
    * Post creator.
    */
-  author: UserType
+  author: User
 }
 
 /**
@@ -54,3 +49,8 @@ export type PostArgs = {
     keyword: string | null
   }
 }
+
+/**
+ * Model for Post, used to apply args.
+ */
+export type PostModel = Model<Post, PostArgs>

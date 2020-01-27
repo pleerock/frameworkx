@@ -1,8 +1,8 @@
 import * as typeorm from "typeorm"
 import { AppConnection } from "../app/AppConnection"
-import { PostType } from "../model/Post"
+import { Post } from "../model/Post"
 
-export const PostRepository = AppConnection.getRepository<PostType>(
+export const PostRepository = AppConnection.getRepository<Post>(
   "PostType",
 ).extend({
   findAllPosts() {

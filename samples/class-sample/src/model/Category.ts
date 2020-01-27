@@ -1,9 +1,9 @@
-import { PostType } from "./Post"
+import { Post } from "./Post"
 
 /**
- * Dummy type.
+ * Dummy Category Type.
  */
-export type CategoryType = {
+export type Category = {
   /**
    * Category id.
    */
@@ -17,5 +17,5 @@ export type CategoryType = {
   /**
    * All posts attached to this category.
    */
-  posts: PostType[]
+  posts: Post[]
 }

@@ -1,7 +1,7 @@
 /**
  * Dummy User type.
  */
-export type UserType = {
+export type User = {
   /**
    * User id.
    */

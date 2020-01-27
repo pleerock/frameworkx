@@ -1,12 +1,12 @@
 import { CategoryInput } from "../input/CategoryInput"
-import { CategoryType } from "../model/Category"
+import { Category } from "../model/Category"
 
 /**
  * Declarations for Category.
  */
 export type CategoryDeclaration = {
   models: {
-    CategoryType: CategoryType
+    Category: Category
   }
 
   inputs: {
@@ -17,14 +17,14 @@ export type CategoryDeclaration = {
     /**
      * Loads a single category by its id.
      */
-    category(args: { id: number }): CategoryType
+    category(args: { id: number }): Category
   }
 
   mutations: {
     /**
      * Saves a category.
      */
-    categorySave(args: CategoryInput): CategoryType
+    categorySave(args: CategoryInput): Category
 
     /**
      * Removes a category.

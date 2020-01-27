@@ -1,5 +1,5 @@
 import * as typeorm from "typeorm"
 import { AppConnection } from "../app/AppConnection"
-import { UserType } from "../model/User"
+import { User } from "../model/User"
 
-export const UserRepository = AppConnection.getRepository<UserType>("UserType")
+export const UserRepository = AppConnection.getRepository<User>("UserType")

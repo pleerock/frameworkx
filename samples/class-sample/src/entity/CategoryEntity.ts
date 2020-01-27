@@ -1,7 +1,7 @@
 import { entity } from "@microframework/core"
-import { CategoryType } from "../model/Category"
+import { Category } from "../model/Category"
 
-export const CategoryEntity = entity<CategoryType>("CategoryType").schema({
+export const CategoryEntity = entity<Category>("CategoryType").schema({
   id: {
     type: "int",
     primary: true,

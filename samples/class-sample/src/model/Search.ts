@@ -1,8 +1,8 @@
-import { CategoryType } from "./Category"
-import { PostType } from "./Post"
-import { UserType } from "./User"
+import { Category } from "./Category"
+import { Post } from "./Post"
+import { User } from "./User"
 
 /**
  * Allows to search everything we have - users, posts and categories.
  */
-export type SearchType = UserType | PostType | CategoryType
+export type SearchType = User | Post | Category

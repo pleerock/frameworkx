@@ -2,12 +2,12 @@ import { DeclarationResolver } from "@microframework/core"
 import { PostDeclaration } from "../declaration/PostDeclaration"
 import { PostFilterInput } from "../input/PostFilterInput"
 import { PostInput } from "../input/PostInput"
-import { PostType } from "../model/Post"
+import { Post } from "../model/Post"
 import { PostRepository } from "../repository/PostRepository"
 
 export class PostDeclarationResolver
   implements DeclarationResolver<PostDeclaration> {
-  async posts(args: PostFilterInput): Promise<PostType[]> {
+  async posts(args: PostFilterInput): Promise<Post[]> {
     return PostRepository.findAllPosts()
   }
 
@@ -17,7 +17,7 @@ export class PostDeclarationResolver
     return true
   }
 
-  postSave(args: PostInput): Promise<PostType> {
+  postSave(args: PostInput): Promise<Post> {
     return PostRepository.findOneOrFail(args.id!)
   }
 }

@@ -1,7 +1,7 @@
 import { validator } from "@microframework/core"
-import { PostType } from "../model/Post"
+import { Post } from "../model/Post"
 
-export const PostValidator = validator<PostType>("PostInput", {
+export const PostValidator = validator<Post>("PostInput", {
   // title(value, post, context) {
   //
   //   // only current post's author can change post name
