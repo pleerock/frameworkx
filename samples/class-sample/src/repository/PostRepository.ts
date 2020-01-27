@@ -1,5 +1,5 @@
 import * as typeorm from "typeorm"
-import { AppConnection } from "../AppConnection"
+import { AppConnection } from "../app/AppConnection"
 import { PostType } from "../model/Post"
 
 export const PostRepository = AppConnection.getRepository<PostType>(
