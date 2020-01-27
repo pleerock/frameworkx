@@ -87,9 +87,9 @@ export const app = createApp<{
         postRemove(args: { id: number }): boolean
 
         /**
-         * Saves a post.
+         * Saves a category.
          */
-        category(args: PostInput): PostModel
+        categorySave(args: CategoryInput): CategoryType
 
     },
     subscriptions: {

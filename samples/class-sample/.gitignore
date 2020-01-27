@@ -1,4 +1,4 @@
 _
 node_modules
-./database.sqlite
-./tsconfig.tsbuildinfo
+database.sqlite
+tsconfig.tsbuildinfo
