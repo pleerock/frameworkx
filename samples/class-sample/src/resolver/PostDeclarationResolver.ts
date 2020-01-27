@@ -1,9 +1,8 @@
 import { DeclarationResolver } from "@microframework/core"
-import { PostDeclaration } from "../declaration/PostDeclaration"
-import { PostFilterInput } from "../input/PostFilterInput"
-import { PostInput } from "../input/PostInput"
-import { Post } from "../model/Post"
-import { PostRepository } from "../repository/PostRepository"
+import { PostDeclaration } from "../declaration"
+import { PostFilterInput, PostInput } from "../input"
+import { Post } from "../model"
+import { PostRepository } from "../repository"
 
 export class PostDeclarationResolver
   implements DeclarationResolver<PostDeclaration> {

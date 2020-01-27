@@ -1,8 +1,8 @@
 import { DeclarationResolver } from "@microframework/core"
-import { CategoryDeclaration } from "../declaration/CategoryDeclaration"
-import { CategoryInput } from "../input/CategoryInput"
-import { Category } from "../model/Category"
-import { CategoryRepository } from "../repository/CategoryRepository"
+import { CategoryDeclaration } from "../declaration"
+import { CategoryInput } from "../input"
+import { Category } from "../model"
+import { CategoryRepository } from "../repository"
 
 export class CategoryDeclarationResolver
   implements DeclarationResolver<CategoryDeclaration> {
