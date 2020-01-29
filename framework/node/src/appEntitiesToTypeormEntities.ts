@@ -5,6 +5,7 @@ import {
   ModelEntity,
 } from "@microframework/core";
 import {EntitySchema as TypeormEntitySchema, EntitySchemaColumnOptions} from "typeorm";
+import { isModel } from "../../model/src";
 
 /**
  * Transforms entities defined in the app to TypeORM entity format.
@@ -53,7 +54,7 @@ export function appEntitiesToTypeormEntities(app: AnyApplication, entitiesOrMap:
     }, {})
 
     return new TypeormEntitySchema({
-      name: entity.name,
+      name: isModel(entity.name) ? entity.name.name : entity.name,
       tableName: entity.tableName,
       columns,
       relations,

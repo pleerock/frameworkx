@@ -3,6 +3,7 @@
   "references": [
     { "path": "./framework/core" },
     { "path": "./framework/parser" },
+    { "path": "./framework/model" },
     { "path": "./framework/node" },
     { "path": "./framework/logger" },
     { "path": "./framework/validator" },
@@ -10,9 +11,9 @@
 //    { "path": "./framework/react-tools" },
     { "path": "./samples/basic-sample" },
     { "path": "./samples/class-sample" },
-    { "path": "./samples/client-server-sample/common" },
-    { "path": "./samples/client-server-sample/client" },
-    { "path": "./samples/client-server-sample/server" },
+//    { "path": "./samples/client-server-sample/common" },
+//    { "path": "./samples/client-server-sample/client" },
+//    { "path": "./samples/client-server-sample/server" },
     { "path": "./tests" }
   ],
   "exclude": [

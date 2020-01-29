@@ -1,6 +1,4 @@
-import {AnyApplication, InputValidator, MetadataUtils, ModelValidator, TypeMetadata} from "@microframework/core"
-
-// todo: I don't think we need separate InputValidator and ModelValidator and this type flag in this function
+import {AnyApplication, ValidationRule, MetadataUtils, TypeMetadata} from "@microframework/core"
 
 /**
  * Validates given input or model.
@@ -29,29 +27,16 @@ export async function validate(
   } else {
 
     // find given input/model validators
-    let validators: (InputValidator<any, any> | ModelValidator<any, any>)[] = []
-    if (type === "input") {
-      validators = app
-        .properties
-        .validationRules
-        .filter(validator => {
-          if (validator instanceof InputValidator && validator.inputName === metadata.typeName) {
-            return true
-          }
-          return false
-        })
+    let validators: ValidationRule<any, any>[] = app
+      .properties
+      .validationRules
+      .filter(validator => {
+        if (validator instanceof ValidationRule && validator.modelName === metadata.typeName) {
+          return true
+        }
+        return false
+      })
 
-    } else if (type === "model") {
-      validators = app
-        .properties
-        .validationRules
-        .filter(validator => {
-          if (validator instanceof ModelValidator && validator.modelName === metadata.typeName) {
-            return true
-          }
-          return false
-        })
-    }
 
     // if validator has validate function specified, use it
     for (const validator of validators) {

@@ -1,6 +1,7 @@
 {
   "packages": [
     "./framework/core",
+    "./framework/model",
     "./framework/parser",
     "./framework/node",
     "./framework/logger",

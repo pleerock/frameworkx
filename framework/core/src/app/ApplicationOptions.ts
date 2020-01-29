@@ -1,16 +1,9 @@
-import {ActionList, ContextList, DeclarationList, InputList, ModelList, SelectionList} from "./ApplicationTypes";
-
-// todo: for App add support of classes and interfaces as well
+import { ActionList, ContextList, DeclarationList, InputTypeList, ModelList } from "./ApplicationTypes";
 
 /**
  * Handy way of using ApplicationOptions when its generics don't matter.
  */
-export type AnyApplicationOptions = ApplicationOptions<any, any, any, any, any, any, any, any>
-
-/**
- * Handy way to create ApplicationOptions with type suggestions.
- */
-export type ApplicationOptionsOf<T extends AnyApplicationOptions> = T
+export type AnyApplicationOptions = ApplicationOptions<any, any, any, any, any, any, any>
 
 /**
  * Application options passed to the main application entry point.
@@ -20,9 +13,8 @@ export type ApplicationOptions<
   Queries extends DeclarationList,
   Mutations extends DeclarationList,
   Subscriptions extends DeclarationList,
-  Selections extends SelectionList,
   Models extends ModelList,
-  Inputs extends InputList,
+  Inputs extends InputTypeList,
   Context extends ContextList,
 > = {
 
@@ -40,11 +32,6 @@ export type ApplicationOptions<
    * List of GraphQL mutations defined in the app.
    */
   mutations?: Mutations
-
-  /**
-   * List of selections to be used.
-   */
-  selections?: Selections
 
   /**
    * List of GraphQL subscriptions defined in the app.
@@ -65,17 +52,5 @@ export type ApplicationOptions<
    * List of context variables used in the resolvers.
    */
   context?: Context
-
-  /**
-   * List of allowed queries.
-   * If provided, backend will only allow those queries.
-
-  allowedQueries?: (
-    | ModelSelector<any, any, any, any>
-    | ((...args: any[]) => ModelSelector<any, any, any, any>)
-    | DeclarationSelector<any, any>
-    | ((...args: any[]) => DeclarationSelector<any, any>)
-    | string
-  )[]*/
 
 }

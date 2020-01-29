@@ -1,10 +1,9 @@
 import * as typeorm from "typeorm"
-import {app} from "@microframework/client-server-sample-common";
+import { PostType } from "@microframework/client-server-sample-common";
+import { AppConnection } from "../connection";
 
-export const PostRepository = app
-    .model("PostType")
-    .repository(repository => ({
-        findAllPosts() {
-            return repository.find()
-        }
-    }))
+export const PostRepository = AppConnection.getRepository<PostType>("PostType").extend({
+    findAllPosts() {
+        return this.find()
+    },
+})

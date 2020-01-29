@@ -1,6 +1,5 @@
-import { PostFilterInput } from "../input/PostFilterInput"
-import { PostInput } from "../input/PostInput"
-import { PostModel, Post } from "../model/Post"
+import { PostFilterInput, PostInput } from "../input"
+import { Post, PostModel } from "../model"
 
 /**
  * Declarations for Post.

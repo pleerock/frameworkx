@@ -1,13 +1,10 @@
 import {createApp} from "@microframework/core";
-import {SelectionOf} from "@microframework/core";
 import {PostFilterInput} from "./input/PostFilterInput";
 import {CategoryInput} from "./input/CategoryInput";
 import {PostInput} from "./input/PostInput";
 import {CategoryType} from "./model/Category";
 import {PostModel, PostType} from "./model/Post";
 import {UserType} from "./model/User";
-import {PostFromList} from "./selection/PostFromList";
-import {UserFromList} from "./selection/UserFromList";
 
 export const app = createApp<{
     models: {
@@ -76,10 +73,6 @@ export const app = createApp<{
          */
         postRemove(args: { id: number }): boolean
 
-    }
-    selections: {
-        postFromList: SelectionOf<PostModel, PostFromList>
-        userFromList: SelectionOf<UserType, UserFromList>
     }
     context: {
         currentUser: {

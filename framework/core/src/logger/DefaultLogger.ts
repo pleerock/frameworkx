@@ -1,4 +1,3 @@
-import {AnyApplication} from "../app";
 import {Logger} from "./Logger";
 
 /**

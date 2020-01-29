@@ -7,6 +7,7 @@
   "references": [
     { "path": "../../framework/core" },
     { "path": "../../framework/parser" },
+    { "path": "../../framework/model" },
     { "path": "../../framework/node" },
     { "path": "../../framework/logger" },
     { "path": "../../framework/validator" }

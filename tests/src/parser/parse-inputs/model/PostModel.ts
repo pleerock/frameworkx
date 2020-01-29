@@ -1,9 +1,9 @@
-import {Model} from "@microframework/core";
+import {ModelWithArgs} from "@microframework/core";
 
 /**
  * Simple model for testing purposes.
  */
-export type PostModel = Model<PostType>
+export type PostModel = ModelWithArgs<PostType, any>
 
 /**
  * Type for a PostModel.

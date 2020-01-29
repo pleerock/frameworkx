@@ -1,21 +1,22 @@
-import {AnyApplicationOptions, Application, ModelResolverSchema} from "@microframework/core";
-import {AnyApplication} from "@microframework/core";
-import {ActionResolverFn, SubscriptionResolverFn} from "@microframework/core";
-import {TypeMetadata} from "@microframework/core/_";
-import {parse} from "@microframework/parser";
-import {Request, Response} from "express";
-import {GraphQLError, GraphQLSchema, GraphQLSchemaConfig} from "graphql";
-import {withFilter} from "graphql-subscriptions";
-import {SubscriptionServer} from "subscriptions-transport-ws";
-import { execute, subscribe } from 'graphql';
-import { createServer } from 'http';
-import {appEntitiesToTypeormEntities} from "./appEntitiesToTypeormEntities";
-import {DefaultServerOptions} from "./DefaultServerOptions";
-import {generateEntityResolvers} from "./generateEntityResolvers";
-import {GraphQLResolver, TypeToGraphQLSchemaConverter} from "./TypeToGraphQLSchemaConverter";
-import cors = require("cors");
-import * as path from "path"
+import {
+  ActionResolverFn,
+  AnyApplication,
+  AnyApplicationOptions,
+  Application,
+  TypeMetadata
+} from "@microframework/core";
+import { parse } from "@microframework/parser";
+import { Request, Response } from "express";
 import * as fs from "fs"
+import { execute, GraphQLError, GraphQLSchema, GraphQLSchemaConfig, subscribe } from "graphql";
+import { createServer } from 'http';
+import * as path from "path"
+import { SubscriptionServer } from "subscriptions-transport-ws";
+import { appEntitiesToTypeormEntities } from "./appEntitiesToTypeormEntities";
+import { DefaultServerOptions } from "./DefaultServerOptions";
+import { generateEntityResolvers } from "./generateEntityResolvers";
+import { TypeToGraphQLSchemaConverter } from "./TypeToGraphQLSchemaConverter";
+import cors = require("cors");
 
 const express = require("express")
 const graphqlHTTP = require("express-graphql")
@@ -158,17 +159,21 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
 
     // register actions in the express
     for (let action of app.metadata.actions) {
-      const manager = app.action(action.name)
-      const middlewares = app.properties.actionMiddlewares[manager.name] ? app.properties.actionMiddlewares[manager.name]() : []
-      expressApp[manager.type](manager.route, ...middlewares, async (request: Request, response: Response, next: any) => {
+      const name = action.name
+      const type = name.substr(0, name.indexOf(" ")).toLowerCase()// todo: make sure to validate this before
+      const route = name.substr(name.indexOf(" ") + 1).toLowerCase()
+      // const metadata -
+
+      const middlewares = app.properties.actionMiddlewares[name] ? app.properties.actionMiddlewares[name]() : []
+      expressApp[type](route, ...middlewares, async (request: Request, response: Response, next: any) => {
         app.properties.logger.resolveAction({
           app,
-          route: manager.route,
-          method: manager.type,
+          route: route,
+          method: type,
           request
         })
         try {
-          const resolver = app.properties.resolvers.find(resolver => resolver.type === "action" && resolver.name === manager.name)
+          const resolver = app.properties.resolvers.find(resolver => resolver.type === "action" && resolver.name === name)
           const context = await resolveContextOptions(app, { request, response })
           const result = (resolver!.resolverFn as ActionResolverFn<any, any>)({
             params: request.params,
@@ -183,29 +188,29 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
               .then(result => {
                 app.properties.logger.logActionResponse({
                   app,
-                  route: manager.route,
-                  method: manager.type,
+                  route: route,
+                  method: type,
                   content: result,
                   request
                 })
                 return result
               })
               .then(result => {
-                if (manager.metadata.return !== undefined)
+                if (action.return !== undefined)
                   response.json(result)
               })
               .catch(error => {
                 app.properties.logger.resolveActionError({
                   app,
-                  route: manager.route,
-                  method: manager.type,
+                  route: route,
+                  method: type,
                   error,
                   request
                 })
                 return app.properties.errorHandler.actionError({
                   app,
-                  route: manager.route,
-                  method: manager.type,
+                  route: route,
+                  method: type,
                   error,
                   request,
                   response
@@ -214,12 +219,12 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           } else {
             app.properties.logger.logActionResponse({
               app,
-              route: manager.route,
-              method: manager.type,
+              route: route,
+              method: type,
               content: result,
               request
             })
-            if (manager.metadata.return !== undefined) {
+            if (action.return !== undefined) {
               response.json(result)
             }
           } // think about text responses, status, etc.
@@ -227,15 +232,15 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
         } catch (error) {
           app.properties.logger.resolveActionError({
             app,
-            route: manager.route,
-            method: manager.type,
+            route: route,
+            method: type,
             error,
             request
           })
           return app.properties.errorHandler.actionError({
             app,
-            route: manager.route,
-            method: manager.type,
+            route: route,
+            method: type,
             error,
             request,
             response

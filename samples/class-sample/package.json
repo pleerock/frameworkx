@@ -6,13 +6,14 @@
   "dependencies": {
     "@microframework/core": "*",
     "@microframework/logger": "*",
+    "@microframework/model": "*",
     "@microframework/node": "*",
     "@microframework/server": "*",
     "@microframework/validator": "*",
     "graphql-subscriptions": "^1.1.0",
     "sqlite": "^3.0.3",
     "sqlite3": "^4.1.1",
-    "typeorm": "0.3.0-rc.11"
+    "typeorm": "0.3.0-rc.13"
   },
   "devDependencies": {
     "@types/node": "^13.1.7",

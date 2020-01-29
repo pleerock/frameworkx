@@ -5,6 +5,7 @@ import {
 } from "@microframework/core";
 import {Resolver} from "@microframework/core";
 import {EntityMetadata, InsertEvent} from "typeorm";
+import { isModel } from "../../model/src";
 
 /**
  * Transforms entities defined in the app to TypeORM entity format.
@@ -21,11 +22,12 @@ export function generateEntityResolvers(app: AnyApplication) {
   // if db connection was established - auto-generate endpoints for models
   if (app.properties.dataSource && app.properties.generateModelRootQueries === true) {
     for (const entity of app.properties.entities) {
-      const entityMetadata = app.properties.dataSource.getMetadata(entity.name)
+      const modelName = isModel(entity.name) ? entity.name.name : entity.name
+      const entityMetadata = app.properties.dataSource.getMetadata(modelName)
 
       queryResolverSchema.push(new Resolver({
         type: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.one(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.one(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
           return await app
@@ -37,7 +39,7 @@ export function generateEntityResolvers(app: AnyApplication) {
       }))
       queryResolverSchema.push(new Resolver({
         type: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
           return await app
@@ -49,7 +51,7 @@ export function generateEntityResolvers(app: AnyApplication) {
       }))
       queryResolverSchema.push(new Resolver({
         type: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.many(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.many(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
           return await app
@@ -62,7 +64,7 @@ export function generateEntityResolvers(app: AnyApplication) {
 
       queryResolverSchema.push(new Resolver({
         type: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.count(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.count(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
           return await app
@@ -75,7 +77,7 @@ export function generateEntityResolvers(app: AnyApplication) {
 
       mutationResolverSchema.push(new Resolver({
         type: "mutation",
-        name: app.properties.namingStrategy.generatedModelDeclarations.save(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.save(modelName),
         resolverFn: async (input: any) => {
           return await app
               .properties
@@ -87,7 +89,7 @@ export function generateEntityResolvers(app: AnyApplication) {
 
       mutationResolverSchema.push(new Resolver({
         type: "mutation",
-        name: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.remove(modelName),
         resolverFn: async (args: any) => {
           await app
               .properties
@@ -129,28 +131,28 @@ export function generateEntityResolvers(app: AnyApplication) {
 
       subscriptionResolverSchema.push(new Resolver({
         type: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(modelName),
         resolverFn: {
           triggers: [insertTriggerName]
         }
       }))
       subscriptionResolverSchema.push(new Resolver({
         type: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
         resolverFn: {
           triggers: [updateTriggerName]
         }
       }))
       subscriptionResolverSchema.push(new Resolver({
         type: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeSave(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeSave(modelName),
         resolverFn: {
           triggers: [saveTriggerName]
         }
       }))
       subscriptionResolverSchema.push(new Resolver({
         type: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(modelName),
         resolverFn: {
           triggers: [removeTriggerName]
         }
@@ -158,7 +160,7 @@ export function generateEntityResolvers(app: AnyApplication) {
 
       subscriptionResolverSchema.push(new Resolver({
         type: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeOne(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeOne(modelName),
         resolverFn: {
           triggers: [oneTriggerName],
           onSubscribe: (args: any, context: any) => {
@@ -185,7 +187,7 @@ export function generateEntityResolvers(app: AnyApplication) {
       }))
       subscriptionResolverSchema.push(new Resolver({
         type: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeMany(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeMany(modelName),
         resolverFn: {
           triggers: [manyTriggerName],
           onSubscribe: (args: any, context: any) => {
@@ -212,7 +214,7 @@ export function generateEntityResolvers(app: AnyApplication) {
       }))
       subscriptionResolverSchema.push(new Resolver({
         type: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeCount(entity.name),
+        name: app.properties.namingStrategy.generatedModelDeclarations.observeCount(modelName),
         resolverFn: {
           triggers: [countTriggerName],
           onSubscribe: (args: any, context: any) => {
@@ -238,7 +240,7 @@ export function generateEntityResolvers(app: AnyApplication) {
         }
       }))
 
-      const model = app.metadata.models.find(model => model.typeName === entity.name) // todo: move method to the model itself
+      const model = app.metadata.models.find(model => model.typeName === modelName) // todo: move method to the model itself
       if (!model)
         throw new Error("Model was not found")
 
@@ -277,100 +279,100 @@ export function generateEntityResolvers(app: AnyApplication) {
       queryDeclarations.push({
         ...model,
         nullable: true,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.one(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.one(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.one(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.one(modelName),
         args: queryArgs
       })
       queryDeclarations.push({
         ...model,
         nullable: false,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.oneNotNull(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.oneNotNull(modelName),
         args: queryArgs
       })
       queryDeclarations.push({
         ...model,
         array: true,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.many(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.many(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.many(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.many(modelName),
         args: queryArgs
       })
       queryDeclarations.push({
         ...MetadataUtils.createType("number"),
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.count(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.count(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.count(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.count(modelName),
         args: whereArgs,
       })
       mutationDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.save(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.save(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.save(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.save(modelName),
         args: whereArgs,
       })
       mutationDeclarations.push({
         ...MetadataUtils.createType("boolean"),
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.remove(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.remove(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.remove(modelName),
         args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeInsert(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeInsert(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeUpdate(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeUpdate(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeSave(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeSave(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeSave(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeSave(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeRemove(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeRemove(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeOne(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeOne(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeOne(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeOne(modelName),
         args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         array: true,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeMany(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeMany(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeMany(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeMany(modelName),
         args: queryArgs,
       })
       subscriptionDeclarations.push({
         ...MetadataUtils.createType("number"),
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeCount(entity.name),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeCount(entity.name),
+        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeCount(modelName),
+        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeCount(modelName),
         args: whereArgs,
       })
 
-      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(entity.name)] = args(entity.model, {
+      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(modelName)] = args(entity.model, {
       //   where: nullable(whereArgs),
       //   order: nullable(orderArgs),
       // })
-      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.many(entity.name)] = args(array(entity.model), {
+      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.many(modelName)] = args(array(entity.model), {
       //   where: nullable(whereArgs),
       //   order: nullable(orderArgs),
       //   offset: nullable(Number),
       //   limit: nullable(Number),
       // })
-      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.count(entity.name)] = args({ count: Number }, whereArgs)
+      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.count(modelName)] = args({ count: Number }, whereArgs)
       //
-      // mutationDeclarations[app.properties.namingStrategy.generatedModelDeclarations.save(entity.name)] = args(entity.model, whereArgs)
-      // mutationDeclarations[app.properties.namingStrategy.generatedModelDeclarations.remove(entity.name)] = args({ status: String }, whereArgs)
+      // mutationDeclarations[app.properties.namingStrategy.generatedModelDeclarations.save(modelName)] = args(entity.model, whereArgs)
+      // mutationDeclarations[app.properties.namingStrategy.generatedModelDeclarations.remove(modelName)] = args({ status: String }, whereArgs)
     }
   }
 

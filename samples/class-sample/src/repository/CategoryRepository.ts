@@ -1,7 +1,9 @@
+import { Model } from "@microframework/model";
+import { EntityTarget } from "typeorm";
 import * as typeorm from "typeorm"
 import { AppConnection } from "../app/AppConnection"
-import { Category } from "../model"
+import { AppModels } from "../app/AppModels";
+import { Category } from "../model";
 
-export const CategoryRepository = AppConnection.getRepository<Category>(
-  "Category",
-)
+const target: EntityTarget<Category> = new Model<Category>("Category")
+export const CategoryRepository = AppConnection.getRepository(target)

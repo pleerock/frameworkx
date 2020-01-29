@@ -1,17 +1,16 @@
-import {ValidateModelFn, ValidationSchema} from "..";
-import {ContextList, Model} from "../../app";
+import { AnyModel } from "@microframework/model";
+import { ValidateModelFn, ValidationSchema } from "..";
+import { ContextList } from "../../app";
 
 /**
- * Model validation definition.
- *
- * todo: please merge me with InputValidator and call me ValidationRule
+ * Model validation rule.
  */
-export class ModelValidator<Blueprint, Context extends ContextList> {
-  modelName: string
+export class ValidationRule<Blueprint, Context extends ContextList> {
+  modelName: string | AnyModel
   validationSchema?: ValidationSchema<Blueprint, Context>
   modelValidator?: ValidateModelFn<Blueprint, Context>
 
-  constructor(modelName: string, schema?: ValidationSchema<Blueprint, Context>) {
+  constructor(modelName: string | AnyModel, schema?: ValidationSchema<Blueprint, Context>) {
     this.modelName = modelName
     this.validationSchema = schema
   }

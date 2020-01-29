@@ -1,5 +1,5 @@
-import { CategoryInput } from "../input/CategoryInput"
-import { Category } from "../model/Category"
+import { CategoryInput } from "../input"
+import { Category } from "../model"
 
 /**
  * Declarations for Category.
@@ -17,7 +17,7 @@ export type CategoryDeclaration = {
     /**
      * Loads a single category by its id.
      */
-    category(args: { id: number }): Category
+    category(args: { id: number }): Category | null
   }
 
   mutations: {

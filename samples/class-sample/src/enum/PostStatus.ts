@@ -3,12 +3,12 @@
  */
 export enum PostStatus {
   /**
-   * Indicates if user was moderated.
+   * Indicates if post was moderated.
    */
   moderated = "moderated",
 
   /**
-   * Indicates if user is under moderation.
+   * Indicates if post is under moderation.
    */
   under_moderation = "under_moderation",
 }

@@ -4,6 +4,7 @@ declare -a projectDirs=(
   "./framework/parser"
   "./framework/node"
   "./framework/logger"
+  "./framework/model"
   "./samples/basic-sample"
   "./samples/class-sample"
   "./samples/client-server-sample/client"
@@ -12,7 +13,6 @@ declare -a projectDirs=(
   "./samples/microservices-sample/post-module"
   "./tests"
 )
-
 
 if [ "$1" = "--hard" ] || [ "$1" = "hard" ]; then
   echo "Removing root node_modules..."

@@ -1,4 +1,4 @@
-import { Model } from "@microframework/core"
+import { ModelWithArgs } from "@microframework/core";
 import { PostStatus } from "../enum"
 import { Category } from "./Category"
 import { User } from "./User"
@@ -53,4 +53,4 @@ export type PostArgs = {
 /**
  * Model for Post, used to apply args.
  */
-export type PostModel = Model<Post, PostArgs>
+export type PostModel = ModelWithArgs<Post, PostArgs>

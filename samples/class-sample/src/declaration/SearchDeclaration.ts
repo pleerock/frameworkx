@@ -1,4 +1,4 @@
-import { SearchType } from "../model/Search"
+import { SearchType } from "../model"
 
 /**
  * Declarations for Search.

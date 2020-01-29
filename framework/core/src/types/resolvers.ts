@@ -1,4 +1,4 @@
-import {Action, ContextList, DeclarationItem, DeclarationList, Model} from "../app";
+import { Action, ContextList, DeclarationItem, DeclarationList, ArgsOfModel, ModelWithArgs, ModelType } from "../app";
 
 /**
  * Default framework properties applied to the user context.
@@ -16,12 +16,22 @@ export type DeepPartial<T> = {
 }
 
 export type ResolverReturnValue<T> =
-  T extends Model<infer Blueprint, any> ? DeepPartial<Blueprint> | Promise<DeepPartial<Blueprint>> :
-  T extends Array<Model<infer Blueprint, any>> ? DeepPartial<Blueprint[]> | Promise<DeepPartial<Blueprint[]>> :
-  T extends object ? DeepPartial<T> | Promise<DeepPartial<T>> :
+  // T extends ModelWithArgs<infer Type, any> ? DeepPartial<Type> | Promise<DeepPartial<Type>> :
+  // T extends Array<ModelWithArgs<infer Type, any>> ? DeepPartial<Type[]> | Promise<DeepPartial<Type[]>> :
+  T extends Array<infer I> ? (
+    I extends boolean ? boolean[] | Promise<boolean[]> :
+    I extends number ? number[] | Promise<number[]> :
+    I extends string ? string[] | Promise<string[]> :
+    // I extends object | null ? DeepPartial<I | null>[] | Promise<DeepPartial<I> | null>[] :
+    I extends Object ? DeepPartial<I>[] | Promise<DeepPartial<I>[]> :
+    I[] | Promise<I[]>
+  ) :
   T extends boolean ? boolean | Promise<boolean> :
   T extends number ? number | Promise<number> :
   T extends string ? string | Promise<string> :
+  null extends T ? null | Promise<null> :
+  // T extends object | null ? DeepPartial<T | null> | Promise<DeepPartial<T> | null> :
+  T extends Object ? DeepPartial<T> | Promise<DeepPartial<T>> :
   T | Promise<T>
 
 
@@ -37,10 +47,12 @@ export type Declaration<
 
 export type ContextType = { [key: string]: any }
 
+export type DeclarationResolverConstructor = { new(): DeclarationResolver<any> }
+
 export type DeclarationResolver<
     D extends Declaration<any, any, any>,
     Context = ContextType
-    > = {
+> = {
   [P in keyof D["queries"]]: DeclarationResolverFn<D["queries"][P], Context>
 } & {
   [P in keyof D["mutations"]]: DeclarationResolverFn<D["mutations"][P], Context>
@@ -48,53 +60,111 @@ export type DeclarationResolver<
   [P in keyof D["subscriptions"]]: DeclarationResolverFn<D["subscriptions"][P], Context>
 }
 
+//
+// this.type = name.substr(0, name.indexOf(" ")).toLowerCase()// todo: make sure to validate this before
+// this.route = name.substr(name.indexOf(" ") + 1).toLowerCase()
+
+//
+// return new Resolver({
+//   type: "model",
+//   name: this.name,
+//   schema: schema,
+//   dataLoaderSchema: dataLoaderSchema,
+// })
+
+// resolve(resolver: SubscriptionResolverFn<Declaration, Context>): Resolver {
+// return new Resolver({
+//   type: "subscription",
+//   name: this.name,
+//   resolverFn: resolver
+// })
+
 /**
- * Defines a resolver schema for the model (based on blueprint) properties.
+ * Defines a resolver for the current declaration.
  */
-export type ModelResolverSchema<
-  M extends Model<any, any>,
+// resolve(resolver: ActionResolverFn<A, Context>): Resolver {
+//   return new Resolver({
+//     type: "action",
+//     name: this.name,
+//     resolverFn: resolver as any
+//   })
+// }
+//
+// /**
+//  * Fetches the selected data.
+//  *
+//  * todo: instead of undefined make param optional (remove class!)
+//  */
+// async fetch(values: ActionType<A> extends never ? undefined : ActionType<A>): Promise<A["return"]> {
+//   return executeAction(this.appProperties.client, this.route, this.type, values)
+// }
+
+
+// export function declaration(name: string, resolver: () => ) {
+//
+// }
+//
+// declaration<CategoryDeclaration>("category", args => {
+//
+// })
+
+/**
+ * Defines a resolver for the current declaration.
+ */
+// resolve(resolver: DeclarationResolverFn<Declaration, AppOptions["context"]>): Resolver {
+//   return new Resolver({
+//     type: this.type,
+//     name: this.name,
+//     resolverFn: resolver as any
+//   })
+// }
+
+/**
+ * Defines resolving strategy for mixed model (either model type either model type with args).
+ */
+export type MixedModelResolver<
+  T extends ModelWithArgs<ModelType, ArgsOfModel<ModelType>> | ModelType,
+  Context extends ContextList = any
+> =
+  T extends ModelWithArgs<infer Type, infer Args> ?
+    ModelResolver<Type, Args, Context> // | ModelDLResolver<Type, Args, Context>
+  :
+    ModelResolver<T, unknown, Context> // | ModelDLResolver<T, never, Context>
+
+/**
+ * Defines model resolving strategy.
+ */
+export type ModelResolver<
+  Type extends ModelType,
+  Args extends ArgsOfModel<Type> | unknown,
   Context extends ContextList
 > = {
-  [P in keyof M["blueprint"]]?:
-    M extends { blueprint: infer Blueprint, args: infer Args } ? (
-      Args[P] extends object ? (
-        | ((parent: Blueprint, args: Args[P], context: Context & DefaultContext) => ResolverReturnValue<Blueprint[P]>)
-        | ResolverReturnValue<Blueprint[P]>
-      ) : (
-        | ((parent: Blueprint, context: Context & DefaultContext) => ResolverReturnValue<Blueprint[P]>)
-        | ResolverReturnValue<Blueprint[P]>
-        )
-      ) :
-    M extends { blueprint: infer Blueprint } ? (
-      | ((parent: Blueprint, context: Context & DefaultContext) => ResolverReturnValue<Blueprint[P]>)
-      | ResolverReturnValue<Blueprint[P]>
-    ) :
-    unknown
+  [P in keyof Type]?:
+    Args extends ArgsOfModel<Type> ? (
+      | ((parent: Type, args: Args[P], context: Context & DefaultContext) => ResolverReturnValue<Type[P]>)
+      | ResolverReturnValue<Type[P]>
+    ) : (
+      | ((parent: Type, context: Context & DefaultContext) => ResolverReturnValue<Type[P]>)
+      | ResolverReturnValue<Type[P]>
+    )
 }
 
 /**
- * Defines a resolver schema for the model (based on blueprint) properties that uses data loader.
- *
- * todo: returned value properties must be optional
+ * Defines model resolving data-loader strategy.
  */
-export type ModelDataLoaderResolverSchema<
-  M extends Model<any, any>,
+export type ModelDLResolver<
+  Type extends ModelType,
+  Args extends ArgsOfModel<Type> | never,
   Context extends ContextList
 > = {
-  [P in keyof M["blueprint"]]?:
-    M extends { blueprint: infer Blueprint, args: infer Args } ? (
-      Args[P] extends object ? (
-        | ((parent: Blueprint[], args: Args[P], context: Context & DefaultContext) => ResolverReturnValue<Blueprint[P][]>)
-        | ResolverReturnValue<Blueprint[P][]>
-      ) : (
-        | ((parent: Blueprint[], context: Context & DefaultContext) => ResolverReturnValue<Blueprint[P][]>)
-        | ResolverReturnValue<Blueprint[P][]>
-      )
-      ) :
-      M extends { blueprint: infer Blueprint } ? (
-        | ((parent: Blueprint[], context: Context & DefaultContext) => ResolverReturnValue<Blueprint[P][]>)
-        | ResolverReturnValue<Blueprint[P][]>
-      ) : unknown
+  [P in keyof Type]?:
+    Args extends ArgsOfModel<Type> ? (
+      | ((parent: Type[], args: Args[P], context: Context & DefaultContext) => ResolverReturnValue<Type[P][]>)
+      | ResolverReturnValue<Type[P][]>
+    ) : (
+      | ((parent: Type[], context: Context & DefaultContext) => ResolverReturnValue<Type[P][]>)
+      | ResolverReturnValue<Type[P][]>
+    )
 }
 
 export type ActionResolverFn<
@@ -156,14 +226,14 @@ export class Resolver {
    * For model resolvers,
    * defines a blueprint resolver schema.
    */
-  schema?: ModelResolverSchema<any, any>
+  schema?: any
 
   /**
    * For model resolvers,
    * defines a blueprint resolver schema
    * (data loader version of schema).
    */
-  dataLoaderSchema?: ModelDataLoaderResolverSchema<any, any>
+  dataLoaderSchema?: any // ModelDataLoaderResolverSchema<any, any>
 
   /**
    * For model root queries and mutations,

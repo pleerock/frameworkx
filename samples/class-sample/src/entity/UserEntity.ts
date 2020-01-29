@@ -1,7 +1,7 @@
 import { entity } from "@microframework/core"
-import { User } from "../model"
+import { AppModels } from "../app/AppModels";
 
-export const UserEntity = entity<User>("User").schema({
+export const UserEntity = entity(AppModels.User).schema({
   id: {
     type: "int",
     primary: true,

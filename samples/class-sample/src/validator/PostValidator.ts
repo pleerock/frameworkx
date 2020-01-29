@@ -1,7 +1,7 @@
 import { validator } from "@microframework/core"
-import { Post } from "../model"
+import { AppModels } from "../app/AppModels";
 
-export const PostValidator = validator<Post>("PostInput", {
+export const PostValidator = validator(AppModels.Post, {
   text: {
     minLength: 10,
     maxLength: 10000,

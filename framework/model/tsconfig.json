@@ -3,8 +3,5 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "_"
-  },
-  "references": [
-    { "path": "../model" }
-  ]
+  }
 }

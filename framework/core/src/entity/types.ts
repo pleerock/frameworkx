@@ -1,5 +1,7 @@
 import {EntitySchemaColumnOptions} from "typeorm";
 
+// make all this functionality of TypeORM...
+
 // todo: we can also automatically show ManyToMany and OneToMany options for arrays and OneToOne and ManyToOne options for non arrays
 export type EntitySchemaRelationOneOptions = {
   relation: "one-to-one"

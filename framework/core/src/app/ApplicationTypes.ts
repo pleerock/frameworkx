@@ -1,11 +1,3 @@
-import {SelectionOf} from "../types";
-
-/**
- * Collection of selections used for data query.
- */
-export type SelectionList = {
-  [name: string]: SelectionOf<any, any>
-}
 
 /**
  * Collection of root query or mutation declarations.
@@ -27,13 +19,6 @@ export type DeclarationItemReturnType =
   // | number[]
   // | boolean[]
   // | Model<any, any>[]
-
-/**
- * Declaration item arguments type.
- */
-export type DeclarationItemArgs<Blueprint> = { // todo: should be renamed to ModelArgs ?
-  [P in keyof Blueprint]?: ObjectLiteral
-}
 
 /**
  * A single root query or mutation declaration.
@@ -104,56 +89,50 @@ export type Action = {
 }
 
 /**
- * List of models defined in the application.
+ *
  */
 export type ModelList = {
-  [name: string]: Model<any, any>
+  [name: string]: ModelWithArgs<ModelType, ArgsOfModel<ModelType>> | ModelType
 }
 
 /**
- * A single model list item.
- * Model list item can be either model type itself,
- * either model type + its args declarations.
- *
- * Examples:
- *   Post: Post
- *   Post: [Post, PostArgs]
+ * Signature for Model Args.
  */
-// export type ModelListItem = any | [any, any]
+export type ArgsOfModel<Type extends ModelType> = {
+  [P in keyof Type]?: ObjectLiteral
+}
 
 /**
- * Model is a type used in return of root declarations or model sub-types.
- * It can be a type itself, or a type plus its arguments (advanced).
+ * Used to create a model with Args.
  */
-// export type Model<M extends ModelListItem> =
-//   M extends [infer Blueprint, infer Args]
-//     ? { blueprint: Blueprint, args: Args }
-//     : { blueprint: M }
-
-export type CastedModel<T> = T extends Model<any, any> ? T : Model<T>
-
-export type Model<Blueprint, Args extends DeclarationItemArgs<Blueprint> = never> = {
-  blueprint: Blueprint
+export type ModelWithArgs<Type extends ModelType, Args extends ArgsOfModel<Type>> = {
+  instanceof: "ModelWithArgs",
+  type: Type
   args: Args
 }
 
 /**
  * Input is a model that will be used as input for application declarations.
  */
-export type Input = any
+export type ModelType = any
+
+/**
+ * Input is a model that will be used as input for application declarations.
+ */
+export type InputType = any
 
 /**
  * List of inputs defined in the application.
  */
-export type InputList = {
-  [name: string]: Input
+export type InputTypeList = {
+  [name: string]: InputType
 }
 
 /**
  * List of context variables.
  */
 export type ContextList = {
-  [name: string]: any // string | number | boolean | object
+  [name: string]: any
 }
 
 export type ObjectLiteral = {

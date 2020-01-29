@@ -1,10 +1,7 @@
-import {app} from "@microframework/client-server-sample-common";
+import { PostType } from "@microframework/client-server-sample-common";
+import { entity } from "@microframework/core";
 
-export const PostEntity = app
-  .model("PostType")
-  .entity()
-  .resolvable(true)
-  .schema({
+export const PostEntity = entity<PostType>("PostType").schema({
     id: {
       type: "int",
       primary: true,

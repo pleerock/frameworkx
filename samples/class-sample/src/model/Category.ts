@@ -12,7 +12,7 @@ export type Category = {
   /**
    * Category name.
    */
-  name: string
+  name: string | null
 
   /**
    * All posts attached to this category.

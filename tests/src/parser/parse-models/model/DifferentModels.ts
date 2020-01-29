@@ -1,24 +1,24 @@
-import {Model} from "@microframework/core";
+import {ModelWithArgs} from "@microframework/core";
 
 /**
  * This way we are testing "Model" support with a regular type.
  */
-export type PostTypeModel = Model<PostType, PostTypeArgs>
+export type PostTypeModel = ModelWithArgs<PostType, PostTypeArgs>
 
 /**
  * This way we are testing "Model" support with a regular type.
  */
-export type PostClassModel = Model<PostClass, PostClassArgs>
+export type PostClassModel = ModelWithArgs<PostClass, PostClassArgs>
 
 /**
  * This way we are testing "Model" support with a regular type.
  */
-export type PostInterfaceModel = Model<PostInterface, PostInterfaceArgs>
+export type PostInterfaceModel = ModelWithArgs<PostInterface, PostInterfaceArgs>
 
 /**
  * This way we are testing "Model" support with a literal type.
  */
-export type PostLiteralModel = Model<
+export type PostLiteralModel = ModelWithArgs<
     { id: number, name: string },
     { name: { keyword: string } }
 >

@@ -20,42 +20,42 @@ export const App = () => {
   const [posts, setPosts] = useState<PostFromList[]>([])
 
   const loadPostsUsingGraphQLFile = async () => {
-      app
-          .graphql
-          .fetch<{ posts: PostFromList[] }>(loader("../query/PostsListQuery.graphql"))
-          .then(({data}) => {
-              console.log(data.posts.map(p => p.id))
-              setPosts(posts)
-          })
+      // app
+      //     .graphql
+      //     .fetch<{ posts: PostFromList[] }>(loader("../query/PostsListQuery.graphql"))
+      //     .then(({data}) => {
+      //         console.log(data.posts.map(p => p.id))
+      //         setPosts(posts)
+      //     })
   }
 
   const loadPostsUsingQuery = async () => {
-      const limit = 1
-      app
-          .graphql
-          .fetch<{ posts: PostFromList[] }>(gql`
-              query LoadPosts($limit: Int!) {
-                  posts(limit: $limit, offset: 0) {
-                      id
-                      title
-                  }
-              }
-          `, { limit })
-          .then(({ data }) => {
-              console.log(data.posts.map(p => p.id))
-              setPosts(posts)
-          })
+      // const limit = 1
+      // app
+      //     .graphql
+      //     .fetch<{ posts: PostFromList[] }>(gql`
+      //         query LoadPosts($limit: Int!) {
+      //             posts(limit: $limit, offset: 0) {
+      //                 id
+      //                 title
+      //             }
+      //         }
+      //     `, { limit })
+      //     .then(({ data }) => {
+      //         console.log(data.posts.map(p => p.id))
+      //         setPosts(posts)
+      //     })
   }
 
     const loadPosts = async () => {
-        const filter: PostFilterInput = { limit: 5, offset: 0 }
-        app
-          .query("posts")
-          .select("postFromList", filter, undefined)
-          .then(posts => {
-            // console.log(posts.map(p => p.))
-            setPosts(posts)
-          })
+        // const filter: PostFilterInput = { limit: 5, offset: 0 }
+        // app
+        //   .query("posts")
+        //   .select("postFromList", filter, undefined)
+        //   .then(posts => {
+        //     // console.log(posts.map(p => p.))
+        //     setPosts(posts)
+        //   })
 
     // postsCountQuery({ name: "a" })
     //   .fetch()

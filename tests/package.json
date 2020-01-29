@@ -16,7 +16,7 @@
     "jest": "^24.9.0",
     "ts-jest": "^24.3.0",
     "prettier": "^1.19.1",
-    "typeorm": "0.3.0-rc.11",
+    "typeorm": "0.3.0-rc.13",
     "typescript": "^3.7.3"
   },
   "devDependencies": {

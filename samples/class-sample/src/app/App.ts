@@ -7,5 +7,8 @@ import {
 } from "../declaration"
 
 export const App = createApp<
-  CategoryDeclaration & UserDeclaration & PostDeclaration & SearchDeclaration
+    CategoryDeclaration &
+    UserDeclaration &
+    PostDeclaration &
+    SearchDeclaration
 >()

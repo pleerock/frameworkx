@@ -1,11 +1,8 @@
 import "@microframework/core";
-import { app } from "@microframework/client-server-sample-common";
+import { CategoryType } from "@microframework/client-server-sample-common";
+import { entity } from "@microframework/core";
 
-export const CategoryEntity = app
-  .model("CategoryType")
-  .entity()
-  .resolvable(true)
-  .schema({
+export const CategoryEntity = entity<CategoryType>("CategoryType").schema({
     id: {
       type: "int",
       primary: true,
