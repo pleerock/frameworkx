@@ -1,4 +1,4 @@
-import { AnyApplication, DeclarationResolverFn, SubscriptionResolverFn, TypeMetadata } from "@microframework/core";
+import { AnyApplication, QueryMutationItemResolver, SubscriptionItemResolver, TypeMetadata } from "@microframework/core";
 import { isModel } from "@microframework/model";
 import {
     GraphQLBoolean,
@@ -175,7 +175,7 @@ export class TypeToGraphQLSchemaConverter {
                 if (!this.pubSub)
                     throw new Error("PubSub isn't registered!")
 
-                let subscriptionResolverFn: any /*SubscriptionResolverFn<any, any>*/ | undefined = undefined
+                let subscriptionResolverFn: any /*SubscriptionItemResolver<any, any>*/ | undefined = undefined
                 for (let resolver of this.app.properties.resolvers) {
                     if (resolver.type === "declaration-resolver") {
                         if (resolver.declarationType === "any" || resolver.declarationType === "subscription") {
@@ -186,7 +186,7 @@ export class TypeToGraphQLSchemaConverter {
                     } else if (resolver.type === "declaration-item-resolver") {
                         if (resolver.declarationType === "any" || resolver.declarationType === "subscription") {
                             if (resolver.name === metadata.propertyName) {
-                                subscriptionResolverFn = resolver.resolverFn as SubscriptionResolverFn<any, any>
+                                subscriptionResolverFn = resolver.resolverFn as SubscriptionItemResolver<any, any>
                             }
                         }
                     }
@@ -297,7 +297,7 @@ export class TypeToGraphQLSchemaConverter {
         if (!metadata.propertyName)
             throw new Error("No name in metadata")
 
-        let resolverFn: DeclarationResolverFn<any, any> | undefined = undefined
+        let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
         for (let resolver of this.app.properties.resolvers) {
             if (resolver.type === "declaration-resolver") {
                 if (resolver.declarationType === "any" || resolver.declarationType === mode) {
@@ -308,7 +308,7 @@ export class TypeToGraphQLSchemaConverter {
             } else if (resolver.type === "declaration-item-resolver") {
                 if (resolver.declarationType === "any" || resolver.declarationType === mode) {
                     if (resolver.name === metadata.propertyName) {
-                        resolverFn = resolver.resolverFn as SubscriptionResolverFn<any, any>
+                        resolverFn = resolver.resolverFn as SubscriptionItemResolver<any, any>
                     }
                 }
             }
@@ -382,7 +382,7 @@ export class TypeToGraphQLSchemaConverter {
         if (!metadata.propertyName)
             throw new Error("No property name in metadata")
 
-        let resolverFn: DeclarationResolverFn<any, any> | undefined = undefined
+        let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
         for (let resolver of this.app.properties.resolvers) {
             if (resolver.type === "model-resolver" && resolver.dataLoader === false) {
                 if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
@@ -464,7 +464,7 @@ export class TypeToGraphQLSchemaConverter {
             }
         }
 
-        let dataLoaderResolverFn: DeclarationResolverFn<any, any> | undefined = undefined
+        let dataLoaderResolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
         for (let resolver of this.app.properties.resolvers) {
             if (resolver.type === "model-resolver" && resolver.dataLoader === true) {
                 if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {

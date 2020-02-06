@@ -1,10 +1,15 @@
 import { Connection } from "typeorm";
-import { ContextResolver } from "../context";
 import { ModelEntity } from "../entity";
 import { DefaultErrorHandler, ErrorHandler } from "../error-handler";
 import { DefaultLogger, Logger } from "../logger";
 import { ApplicationMetadata } from "../metadata";
-import { DeclarationResolver, DeclarationResolverConstructor, isResolver, Resolver } from "../types";
+import {
+  ContextResolver,
+  DeclarationResolver,
+  DeclarationResolverConstructor,
+  isResolverMetadata,
+  ResolverMetadata
+} from "../resolver";
 import { ValidationRule, Validator } from "../validation";
 import { AnyApplicationOptions } from "./ApplicationOptions";
 import { ApplicationProperties } from "./ApplicationProperties";
@@ -102,12 +107,12 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Sets resolvers used to resolve queries, mutations, subscriptions, actions and models.
    */
-  setResolvers(resolvers: (Resolver | DeclarationResolverConstructor | DeclarationResolver<any>)[] | { [key: string]: Resolver | DeclarationResolverConstructor | DeclarationResolver<any> }) {
+  setResolvers(resolvers: (ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any>)[] | { [key: string]: ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any> }) {
     if (resolvers instanceof Array) {
       this.properties.resolvers = resolvers.map(resolver => {
         if (resolver instanceof Function) {
           return resolver.prototype.resolver
-        } else if (resolver instanceof Object && !isResolver(resolver)) {
+        } else if (resolver instanceof Object && !isResolverMetadata(resolver)) {
           return {
             instanceof: "Resolver",
             type: "declaration-resolver",
@@ -124,7 +129,7 @@ export class Application<Options extends AnyApplicationOptions> {
         const resolver = resolvers[key]
         if (resolver instanceof Function) {
           return resolver.prototype.resolver
-        } else if (resolver instanceof Object && !isResolver(resolver)) {
+        } else if (resolver instanceof Object && !isResolverMetadata(resolver)) {
           return {
             instanceof: "Resolver",
             type: "declaration-resolver",

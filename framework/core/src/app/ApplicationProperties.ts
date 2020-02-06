@@ -1,9 +1,8 @@
 import {Connection} from "typeorm";
-import {ContextResolver} from "../context";
 import {ModelEntity} from "../entity";
 import {ErrorHandler} from "../error-handler";
 import {Logger} from "../logger";
-import {Resolver} from "../types";
+import { ContextResolver, ResolverMetadata } from "../resolver";
 import {ValidationRule, Validator} from "../validation";
 import {NamingStrategy} from "./NamingStrategy";
 
@@ -55,7 +54,7 @@ export type ApplicationProperties = {
   /**
    * List of registered resolvers.
    */
-  resolvers: Resolver[]
+  resolvers: ResolverMetadata[]
 
   /**
    * List of registered validation rules.

@@ -1,5 +1,5 @@
 import {
-  ActionResolverFn,
+  ActionItemResolver,
   AnyApplication,
   AnyApplicationOptions,
   Application,
@@ -174,7 +174,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           request
         })
         try {
-          let actionResolverFn: ActionResolverFn<any, any> | undefined = undefined
+          let actionResolverFn: ActionItemResolver<any, any> | undefined = undefined
           for (let resolver of app.properties.resolvers) {
             if (resolver.type === "declaration-resolver") {
               if (resolver.declarationType === "any" || resolver.declarationType === "action") {
@@ -185,7 +185,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
             } else if (resolver.type === "declaration-item-resolver") {
               if (resolver.declarationType === "any" || resolver.declarationType === "action") {
                 if (resolver.name === name) {
-                  actionResolverFn = resolver.resolverFn as ActionResolverFn<any, any>
+                  actionResolverFn = resolver.resolverFn as ActionItemResolver<any, any>
                 }
               }
             }

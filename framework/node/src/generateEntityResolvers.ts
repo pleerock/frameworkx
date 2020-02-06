@@ -3,7 +3,7 @@ import {
   MetadataUtils,
   TypeMetadata,
 } from "@microframework/core";
-import {Resolver} from "@microframework/core";
+import {ResolverMetadata} from "@microframework/core";
 import {isModel} from "@microframework/model";
 import {EntityMetadata, InsertEvent} from "typeorm";
 
@@ -12,9 +12,9 @@ import {EntityMetadata, InsertEvent} from "typeorm";
  * Should be used to pass app entities to TypeORM connection object.
  */
 export function generateEntityResolvers(app: AnyApplication) {
-  const queryResolverSchema: Resolver[] = [] // ModelResolverSchema<any, any> = {}
-  const mutationResolverSchema: Resolver[] = []
-  const subscriptionResolverSchema: Resolver[] = []
+  const queryResolverSchema: ResolverMetadata[] = [] // ModelResolverSchema<any, any> = {}
+  const mutationResolverSchema: ResolverMetadata[] = []
+  const subscriptionResolverSchema: ResolverMetadata[] = []
   const queryDeclarations: TypeMetadata[] = []
   const mutationDeclarations: TypeMetadata[] = []
   const subscriptionDeclarations: TypeMetadata[] = []
