@@ -14,6 +14,7 @@ import { createServer } from 'http';
 import * as path from "path"
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { appEntitiesToTypeormEntities } from "./appEntitiesToTypeormEntities";
+import { buildContext } from "./ContextBuilder";
 import { DefaultServerOptions } from "./DefaultServerOptions";
 import { generateEntityResolvers } from "./generateEntityResolvers";
 import { TypeToGraphQLSchemaConverter } from "./TypeToGraphQLSchemaConverter";
@@ -174,6 +175,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           request
         })
         try {
+          // TODO: FIX TYPES OF PARAMS/QUERIES,ETC NOT BEING NORMALIZED BASED ON TYPE METADATA
           let actionResolverFn: ActionItemResolver<any, any> | undefined = undefined
           for (let resolver of app.properties.resolvers) {
             if (resolver.type === "declaration-resolver") {
@@ -193,7 +195,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           if (!actionResolverFn)
             throw new Error(`Action resolver ${name} was not found`)
 
-          const context = await resolveContextOptions(app, { request, response })
+          const context = await buildContext(app, { request, response })
           const result = actionResolverFn({
             params: request.params,
             query: request.query,
@@ -274,24 +276,4 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       server.close((err: any) => err ? fail(err) : ok())
     })
   }
-}
-
-/**
- * Resolves context value.
- */
-async function resolveContextOptions(app: AnyApplication, options: { request: Request, response: Response }) {
-  let resolvedContext: any = {
-    // we can define default framework context variables here
-    request: options.request,
-    response: options.response,
-  }
-  for (const key in app.properties.context) {
-    const contextResolverItem = app.properties.context[key]
-    let result = contextResolverItem instanceof Function ? contextResolverItem(options) : contextResolverItem
-    if (result instanceof Promise) {
-      result = await result
-    }
-    resolvedContext[key] = result
-  }
-  return resolvedContext
 }

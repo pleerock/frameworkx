@@ -2,17 +2,17 @@ import { debugLogger } from "@microframework/logger"
 import { defaultValidator } from "@microframework/validator"
 import { App } from "./app/App"
 import { AppConnection } from "./app/AppConnection"
+import { AppContext } from "./app/AppContext";
 import { AppServer } from "./app/AppServer"
-import { Context } from "./app/Context"
 import * as resolvers from "./resolver"
 import * as entities from "./entity"
 import * as validators from "./validator"
 
 App.setEntities(entities)
   .setResolvers(resolvers)
+  .addResolvers([AppContext])
   .setValidationRules(validators)
   .setDataSource(entities => AppConnection.setOptions({ entities }).connect())
-  .setContext(Context)
   .setValidator(defaultValidator)
   .setLogger(debugLogger)
   .setGenerateModelRootQueries(true)

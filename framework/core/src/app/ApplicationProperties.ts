@@ -42,11 +42,6 @@ export type ApplicationProperties = {
   namingStrategy: NamingStrategy
 
   /**
-   * Context data.
-   */
-  context: ContextResolver<any>
-
-  /**
    * List of registered entities.
    */
   entities: ModelEntity<any>[]

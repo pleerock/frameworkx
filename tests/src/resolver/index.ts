@@ -1,12 +1,14 @@
 import gql from 'graphql-tag';
-import { GraphqlFetcher } from "../../util/graphql-fetcher";
-import { obtainPort } from "../../util/port-generator";
+import { GraphqlFetcher } from "../util/graphql-fetcher";
+import { obtainPort } from "../util/port-generator";
 import { App } from "./app";
 import { PostClassActionResolver } from "./resolver/PostClassActionResolver";
+import { PostContextResolver } from "./resolver/PostContextResolver";
 import {
     PostItemFnDeclarationResolver,
     PostsItemFnDeclarationResolver
 } from "./resolver/PostDeclarationItemsResolver";
+import { PostDeclarationWithContextResolver } from "./resolver/PostDeclarationWithContextResolver";
 import { PostDLDecoratorModelResolver } from "./resolver/PostDLDecoratorModelResolver";
 import { PostObjectActionDeclarationResolver } from "./resolver/PostObjectActionDeclarationResolver";
 import { PostObjectDLModelResolver } from "./resolver/PostObjectDLModelResolver";
@@ -19,8 +21,7 @@ import { AppServer } from "./server";
 
 const fetch = require('node-fetch');
 
-describe("apps > resolvers", () => {
-    const fetcher = new GraphqlFetcher("http://localhost:3000/graphql")
+describe("resolvers", () => {
 
     test("simple decorator resolvers for declarations and models", async () => {
         const port = await obtainPort()
@@ -399,10 +400,42 @@ describe("apps > resolvers", () => {
         })
         const result2 = await response2.json()
         expect(result2).toEqual({
-            "id": "777",
+            "id": "777", // todo: this should be a number!
             "title": "Post #777",
             "status": "draft",
         })
+
+        await App.stop()
+    })
+
+    test("context resolver", async () => {
+        const port = await obtainPort()
+        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+
+        await App.setResolvers([
+            PostDeclarationWithContextResolver,
+            PostContextResolver,
+        ]).bootstrap(AppServer(port))
+
+        const result2 = await fetcher.fetch(gql`
+            query {
+                postFromSession {
+                    id
+                    title
+                    status
+                }
+            }
+        `)
+        expect(result2).toEqual({
+            "data": {
+                "postFromSession": {
+                    "id": 0,
+                    "title": "I am Session Post resolved by a context",
+                    "status": "published" as const
+                }
+            }
+        })
+
 
         await App.stop()
     })

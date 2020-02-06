@@ -1,4 +1,5 @@
 import { AnyApplication, QueryMutationItemResolver, SubscriptionItemResolver, TypeMetadata } from "@microframework/core";
+import { DefaultContext } from "@microframework/core/_";
 import { isModel } from "@microframework/model";
 import {
     GraphQLBoolean,
@@ -16,6 +17,7 @@ import {
 } from "graphql";
 import { PubSub, withFilter } from "graphql-subscriptions";
 import { GraphQLUnionType } from "graphql/type/definition";
+import { buildContext } from "./ContextBuilder";
 import { LoggerHelper } from "./LoggerHelper";
 import { Utils } from "./utils";
 import { validate } from "./validator";
@@ -320,7 +322,7 @@ export class TypeToGraphQLSchemaConverter {
         return async (parent: any, args: any, context: any, info: any) => {
             try {
                 loggerHelper.logBeforeResolve({ mode, typeName: "", propertyName: metadata.propertyName!, args, context, info, parent })
-                const userContext = await this.resolveContextOptions({ request: context.request, response: context.response })
+                const userContext = await buildContext(this.app, { request: context.request, response: context.response })
 
                 // perform args validation
                 if (metadata.args) {
@@ -411,7 +413,7 @@ export class TypeToGraphQLSchemaConverter {
             return async (parent: any, args: any, context: any, info: any) => {
                 try {
                     loggerHelper.logBeforeResolve({ mode: "model", typeName: modelName, propertyName: metadata.propertyName!!, args, context, info, parent })
-                    const userContext = await this.resolveContextOptions({ request: context.request, response: context.response })
+                    const userContext = await buildContext(this.app, { request: context.request, response: context.response })
 
                     // perform args validation
                     if (metadata.args) {
@@ -498,8 +500,7 @@ export class TypeToGraphQLSchemaConverter {
                         if (!(dataLoaderResolverFn instanceof Function))
                             return dataLoaderResolverFn as any
 
-                        return this
-                            .resolveContextOptions({ request: context.request, response: context.response })
+                        return buildContext(this.app, { request: context.request, response: context.response })
                             .then(context => {
                                 if (metadata.args) {
                                     return (dataLoaderResolverFn as any)(entities, keys[0].args, context) // keys[0].info
@@ -801,25 +802,6 @@ export class TypeToGraphQLSchemaConverter {
             info,
             request
         })
-    }
-    /**
-     * Resolves context value.
-     */
-    private async resolveContextOptions(options: { request: Request, response: Response }) {
-        let resolvedContext: { [key: string]: any } = {
-            // we can define default framework context variables here
-            request: options.request,
-            response: options.response
-        }
-        for (const key in this.app.properties.context) {
-            const contextResolverItem = this.app.properties.context[key]
-            let result = contextResolverItem instanceof Function ? contextResolverItem(options) : contextResolverItem
-            if (result instanceof Promise) {
-                result = await result
-            }
-            resolvedContext[key] = result
-        }
-        return resolvedContext
     }
 
 }

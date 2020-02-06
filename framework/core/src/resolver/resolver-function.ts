@@ -1,5 +1,6 @@
 import { AnyApplication } from "../app"
 import {
+  ContextResolver,
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
@@ -282,4 +283,26 @@ export function resolver<
   }
 
   throw new Error(`Invalid "resolver" function usage.`)
+}
+
+/**
+ * Creates a context resolver.
+ *
+ * Example:
+ *
+ *    export const AppContext = contextResolver(App, {
+ *        async currentUser({ request, response }) {
+ *          return loadUserFromDb(request.headers.authorizationToken)
+ *        }
+ *    })
+ */
+export function contextResolver<App extends AnyApplication>(
+    app: App,
+    resolver: ContextResolver<App["_options"]["context"]>
+) {
+  return {
+    instanceof: "Resolver",
+    type: "context",
+    resolverFn: resolver
+  }
 }

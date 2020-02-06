@@ -34,7 +34,6 @@ export class Application<Options extends AnyApplicationOptions> {
     namingStrategy: DefaultNamingStrategy,
     errorHandler: DefaultErrorHandler,
     logger: DefaultLogger,
-    context: {},
     entities: [],
     resolvers: [],
     validationRules: [],
@@ -105,13 +104,23 @@ export class Application<Options extends AnyApplicationOptions> {
   }
 
   /**
-   * Sets resolvers used to resolve queries, mutations, subscriptions, actions and models.
+   * Sets resolvers used to resolve queries, mutations, subscriptions, actions, models and context.
    */
   setResolvers(resolvers: (ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any>)[] | { [key: string]: ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any> }) {
+    this.properties.resolvers = []
+    this.addResolvers(resolvers)
+    return this
+  }
+
+  /**
+   * Adds resolvers used to resolve queries, mutations, subscriptions, actions, models and context.
+   */
+  addResolvers(resolvers: (ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any>)[] | { [key: string]: ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any> }) {
     if (resolvers instanceof Array) {
-      this.properties.resolvers = resolvers.map(resolver => {
+      this.properties.resolvers.push(...resolvers.map(resolver => {
         if (resolver instanceof Function) {
           return resolver.prototype.resolver
+
         } else if (resolver instanceof Object && !isResolverMetadata(resolver)) {
           return {
             instanceof: "Resolver",
@@ -119,16 +128,18 @@ export class Application<Options extends AnyApplicationOptions> {
             declarationType: "any",
             resolverFn: resolver,
           }
+
         } else {
           return resolver
         }
-      })
+      }))
 
     } else {
       this.properties.resolvers = Object.keys(resolvers).map(key => {
         const resolver = resolvers[key]
         if (resolver instanceof Function) {
           return resolver.prototype.resolver
+
         } else if (resolver instanceof Object && !isResolverMetadata(resolver)) {
           return {
             instanceof: "Resolver",
@@ -136,6 +147,7 @@ export class Application<Options extends AnyApplicationOptions> {
             declarationType: "any",
             resolverFn: resolver,
           }
+
         } else {
           return resolver
         }
@@ -146,6 +158,8 @@ export class Application<Options extends AnyApplicationOptions> {
 
   /**
    * Sets a database entities.
+   *
+   * todo: add "addMethods"
    */
   setEntities(entities: ModelEntity<any>[] | { [key: string]: ModelEntity<any> }) {
     if (entities instanceof Array) {
@@ -172,14 +186,6 @@ export class Application<Options extends AnyApplicationOptions> {
     } else {
       this.properties.validationRules = Object.keys(validationRules).map(key => validationRules[key])
     }
-    return this
-  }
-
-  /**
-   * Sets a context.
-   */
-  setContext(context: ContextResolver<Options["context"]>) {
-    this.properties.context = context
     return this
   }
 

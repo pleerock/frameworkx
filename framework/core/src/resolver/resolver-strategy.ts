@@ -30,7 +30,7 @@ export type ModelDLResolver<Type extends ModelType, Context extends ContextList 
  * Defines a context resolving strategy.
  */
 export type ContextResolver<Context extends ContextList> = {
-    [P in keyof Context]: (options: { request: any }) => Context[P] | Promise<Context[P]>
+    [P in keyof Context]: (options: DefaultContext) => Context[P] | Promise<Context[P]>
 }
 
 /**
@@ -92,11 +92,11 @@ export type QueryMutationItemResolver<
   Declaration extends DeclarationItem,
   Context extends ContextList
 > =
+  Parameters<Declaration> extends [] ? (
+    ((context: Context & DefaultContext) => ResolverReturnValue<ReturnType<Declaration>>) | ResolverReturnValue<ReturnType<Declaration>>
+   ) :
   Declaration extends (args: infer Args) => infer Return ? (
-      ((args: Args, context?: Context & DefaultContext) => ResolverReturnValue<Return>) | ResolverReturnValue<Return>
-  ) :
-  Declaration extends () => infer Return ? (
-      ((context: Context & DefaultContext) => ResolverReturnValue<Return>) | ResolverReturnValue<Return>
+      ((args: Args, context: Context & DefaultContext) => ResolverReturnValue<Return>) | ResolverReturnValue<Return>
   ) :
   unknown
 

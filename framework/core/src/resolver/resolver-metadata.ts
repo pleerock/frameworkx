@@ -1,10 +1,8 @@
-import { DeclarationResolver, ModelResolver, SubscriptionItemResolver } from "./resolver-strategy"
+import { ContextResolver, DeclarationResolver, ModelResolver, SubscriptionItemResolver } from "./resolver-strategy"
 
 /**
  * Resolver metadata - represents what resolver resolves,
  * how its named and what function should be executed on resolve.
- *
- * todo: shall we add context?
  */
 export type ResolverMetadata = {
     instanceof: "Resolver"
@@ -23,6 +21,10 @@ export type ResolverMetadata = {
     name: string
     dataLoader: boolean
     resolverFn: ModelResolver<any>
+  } | {
+    instanceof: "Resolver"
+    type: "context"
+    resolverFn: ContextResolver<any>
   }
 
 /**

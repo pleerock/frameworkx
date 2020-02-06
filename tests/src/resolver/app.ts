@@ -19,5 +19,9 @@ export const App = createApp<{
     queries: {
         posts(): PostType[]
         post(args: { id: number }): PostType
+        postFromSession(): PostType
+    },
+    context: {
+        sessionPost: PostType
     }
 }>()
