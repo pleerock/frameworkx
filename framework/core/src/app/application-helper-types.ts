@@ -1,0 +1,1 @@
+export type ListOfType<T> = T[] | { [key: string]: T }

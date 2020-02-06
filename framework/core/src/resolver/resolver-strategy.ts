@@ -2,13 +2,6 @@ import { Action, AnyApplication, AnyApplicationOptions, ContextList, Declaration
 import { ActionArgs, DefaultContext, ResolveKey, ResolverReturnValue } from "./index"
 
 /**
- * Type for class-based declaration resolvers.
- */
-export type DeclarationResolverConstructor = {
-  new(...args: any[]): DeclarationResolver<any> // todo: shoudn't ModelResolver<any> be here?
-}
-
-/**
  * Defines a model resolving strategy.
  */
 export type ModelResolver<Type extends ModelType, Context extends ContextList = {}> = {
@@ -122,7 +115,7 @@ export type SubscriptionItemResolver<
   unknown
 
 /**
- * Defines an action resolving strategy.
+ * Defines action resolving strategy.
  */
 export type ActionItemResolver<A extends Action, Context extends ContextList> =
     (args: ActionArgs<A>, context: Context & DefaultContext) => A["return"] | Promise<A["return"]>

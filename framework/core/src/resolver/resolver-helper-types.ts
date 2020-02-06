@@ -1,4 +1,6 @@
 import { Action, AnyApplicationOptions } from "../app"
+import { ResolverMetadata } from "./resolver-metadata";
+import { DeclarationResolver } from "./resolver-strategy";
 
 /**
  * What type of things we can create resolver for.
@@ -65,3 +67,11 @@ export type DeepPartial<T> = {
         T[P] extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> :
         DeepPartial<T[P]>
 }
+
+/**
+ * Types or resolvers that can registered in the application.
+ */
+export type AppResolverType =
+    | ResolverMetadata
+    | DeclarationResolver<any>
+    | { new(...args: any[]): DeclarationResolver<any> }

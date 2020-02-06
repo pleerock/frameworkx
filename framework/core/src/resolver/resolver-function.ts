@@ -177,7 +177,7 @@ export function resolver<
  */
 export function resolver<
   App extends AnyApplication,
-  Key extends ResolveKey<App>,
+  Key extends ResolveKey<App["_options"]>,
 >(
   arg0?: App | { name: string, dataLoader?: boolean },
   arg1?: Key | DeclarationResolver<App>,
@@ -306,3 +306,7 @@ export function contextResolver<App extends AnyApplication>(
     resolverFn: resolver
   }
 }
+
+// todo: here we can add queryResolver(), mutationResolver(), subscriptionResolver() to support specific resolvers
+// todo: we also need to think how we can elegantly made it in decorator
+// todo: also probably need to add class support for context resolvers

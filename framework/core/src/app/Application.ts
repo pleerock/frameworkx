@@ -3,14 +3,9 @@ import { ModelEntity } from "../entity";
 import { DefaultErrorHandler, ErrorHandler } from "../error-handler";
 import { DefaultLogger, Logger } from "../logger";
 import { ApplicationMetadata } from "../metadata";
-import {
-  ContextResolver,
-  DeclarationResolver,
-  DeclarationResolverConstructor,
-  isResolverMetadata,
-  ResolverMetadata
-} from "../resolver";
+import { AppResolverType, ContextResolver, isResolverMetadata } from "../resolver";
 import { ValidationRule, Validator } from "../validation";
+import { ListOfType } from "./application-helper-types";
 import { AnyApplicationOptions } from "./ApplicationOptions";
 import { ApplicationProperties } from "./ApplicationProperties";
 import { ApplicationServer } from "./ApplicationServer";
@@ -106,7 +101,7 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Sets resolvers used to resolve queries, mutations, subscriptions, actions, models and context.
    */
-  setResolvers(resolvers: (ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any>)[] | { [key: string]: ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any> }) {
+  setResolvers(resolvers: AppResolverType[] | { [key: string]: AppResolverType }) {
     this.properties.resolvers = []
     this.addResolvers(resolvers)
     return this
@@ -115,7 +110,7 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Adds resolvers used to resolve queries, mutations, subscriptions, actions, models and context.
    */
-  addResolvers(resolvers: (ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any>)[] | { [key: string]: ResolverMetadata | DeclarationResolverConstructor | DeclarationResolver<any> }) {
+  addResolvers(resolvers: AppResolverType[] | { [key: string]: AppResolverType }) {
     if (resolvers instanceof Array) {
       this.properties.resolvers.push(...resolvers.map(resolver => {
         if (resolver instanceof Function) {
@@ -158,29 +153,38 @@ export class Application<Options extends AnyApplicationOptions> {
 
   /**
    * Sets a database entities.
-   *
-   * todo: add "addMethods"
    */
-  setEntities(entities: ModelEntity<any>[] | { [key: string]: ModelEntity<any> }) {
+  setEntities(entities: ListOfType<ModelEntity<any>>) {
+    this.properties.entities = []
+    this.addEntities(entities)
+    return this
+  }
+
+  /**
+   * Adds a database entities.
+   */
+  addEntities(entities: ListOfType<ModelEntity<any>>) {
     if (entities instanceof Array) {
       this.properties.entities = entities
     } else {
       this.properties.entities = Object.keys(entities).map(key => entities[key])
     }
-    // if (entities instanceof Array) {
-    //   this.properties.entities = entities.map(entity => ModelEntity.copy(this.properties, this.metadata, entity))
-    // } else {
-    //   this.properties.entities = Object.keys(entities).map(key => {
-    //     return ModelEntity.copy(this.properties, this.metadata, entities[key])
-    //   })
-    // }
     return this
   }
 
   /**
    * Sets validation rules.
    */
-  setValidationRules(validationRules: (ValidationRule<any, any> | ValidationRule<any, any>)[] | { [key: string]: (ValidationRule<any, any> | ValidationRule<any, any>) }) {
+  setValidationRules(validationRules: ListOfType<ValidationRule<any, any>>) {
+    this.properties.validationRules = []
+    this.addValidationRules(validationRules)
+    return this
+  }
+  
+  /**
+   * Adds validation rules.
+   */
+  addValidationRules(validationRules: ListOfType<ValidationRule<any, any>>) {
     if (validationRules instanceof Array) {
       this.properties.validationRules = validationRules
     } else {
@@ -209,7 +213,16 @@ export class Application<Options extends AnyApplicationOptions> {
    * Sets middlewares for given actions.
    */
   setActionMiddlewares(middlewares: { [key: string]: () => any[] }) {
-    this.properties.actionMiddlewares = middlewares
+    this.properties.actionMiddlewares = {}
+    this.addActionMiddlewares(middlewares)
+    return this
+  }
+
+  /**
+   * Adds middlewares for given actions.
+   */
+  addActionMiddlewares(middlewares: { [key: string]: () => any[] }) {
+    this.properties.actionMiddlewares = { ...this.properties.actionMiddlewares, ...middlewares }
     return this
   }
 
@@ -226,13 +239,6 @@ export class Application<Options extends AnyApplicationOptions> {
   async stop(): Promise<void> {
     if (this.serverStopFn !== undefined)
       await this.serverStopFn()
-  }
-
-  /**
-   * Creates a context object.
-   */
-  context(context: ContextResolver<Options["context"]>): ContextResolver<Options["context"]> {
-    return context
   }
 
   /**
