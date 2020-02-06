@@ -5,7 +5,7 @@ import {
   ModelEntity,
 } from "@microframework/core";
 import {EntitySchema as TypeormEntitySchema, EntitySchemaColumnOptions} from "typeorm";
-import { isModel } from "../../model/src";
+import {isModel} from "@microframework/model";
 
 /**
  * Transforms entities defined in the app to TypeORM entity format.
@@ -30,10 +30,12 @@ export function appEntitiesToTypeormEntities(app: AnyApplication, entitiesOrMap:
       const options = entity.entitySchema![key]!
       if (isRelationInEntitySchema(options)) {
         let relationType = options.relation
-
-        const modelMetadata = app.metadata.models.find(model => model.typeName === entity.name)
-        if (!modelMetadata)
-          throw new Error("Model was not found")
+        const entityName = isModel(entity.name) ? entity.name.name : entity.name
+        const modelMetadata = app.metadata.models.find(model => model.typeName === entityName)
+        if (!modelMetadata) {
+          // console.log(entity.name);
+          throw new Error(`Model ${entityName} was not found`)
+        }
         const modelProperty = modelMetadata.properties.find(property => property.propertyName === key)
         if (!modelProperty)
           throw new Error("Property was not found")

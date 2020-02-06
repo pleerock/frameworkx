@@ -31,20 +31,20 @@ export const App = () => {
 
   const loadPostsUsingQuery = async () => {
       // const limit = 1
-      // app
-      //     .graphql
-      //     .fetch<{ posts: PostFromList[] }>(gql`
-      //         query LoadPosts($limit: Int!) {
-      //             posts(limit: $limit, offset: 0) {
-      //                 id
-      //                 title
-      //             }
-      //         }
-      //     `, { limit })
-      //     .then(({ data }) => {
-      //         console.log(data.posts.map(p => p.id))
-      //         setPosts(posts)
-      //     })
+      app
+          .graphql
+          .fetch<{ posts: PostFromList[] }>(gql`
+              query LoadPosts($limit: Int!) {
+                  posts(limit: $limit, offset: 0) {
+                      id
+                      title
+                  }
+              }
+          `, { limit })
+          .then(({ data }) => {
+              console.log(data.posts.map(p => p.id))
+              setPosts(posts)
+          })
   }
 
     const loadPosts = async () => {

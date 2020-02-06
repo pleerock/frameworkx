@@ -1,4 +1,4 @@
-import {parse} from "@microframework/parser";
+import { parse } from "@microframework/parser";
 
 describe("parse models", () => {
 

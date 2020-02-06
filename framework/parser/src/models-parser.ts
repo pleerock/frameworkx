@@ -181,7 +181,7 @@ export class ModelParser {
                 throw Errors.typeReferenceInvalidName(parentName)
 
             // this is a special handling section for Model definitions
-            if (referencedType.aliasSymbol && referencedType.aliasSymbol.name === "Model" && referencedType.aliasTypeArguments) {
+            if (referencedType.aliasSymbol && referencedType.aliasSymbol.name === "ModelWithArgs" && referencedType.aliasTypeArguments) {
 
                 // extract model's type and args information
                 const modelName = node.typeName.text
@@ -239,7 +239,7 @@ export class ModelParser {
             // check if we can handle this import
             if (!node.qualifier || !ts.isIdentifier(node.qualifier))
                 throw Errors.importedNodeNameInvalid(parentName)
-            if (node.qualifier.text !== "Model")
+            if (node.qualifier.text !== "ModelWithArgs")
                 throw Errors.importedNodeIsNotModel(parentName)
             if (!node.typeArguments || !node.typeArguments.length)
                 throw Errors.importedNodeModelInvalid(parentName)

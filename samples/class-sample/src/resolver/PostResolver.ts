@@ -1,4 +1,4 @@
-import { MixedModelResolver, ModelResolver } from "@microframework/core"
+import { ModelResolver } from "@microframework/core"
 import { ResolverReturnValue } from "@microframework/core";
 import { Model } from "@microframework/model";
 import { AppModels } from "../app/AppModels";
@@ -6,7 +6,7 @@ import { Category } from "../model";
 
 export function modelResolver<T>(
     name: string | Model<T>,
-    resolver: MixedModelResolver<T>
+    resolver: ModelResolver<T>
 ) {
 
 }
@@ -29,7 +29,7 @@ export const PostTypeResolver = modelResolver(AppModels.Category, {
 //     }
 // }
 
-const PostTypeResolverCls: MixedModelResolver<Category> = {
+const PostTypeResolverCls: ModelResolver<Category> = {
 
 
 

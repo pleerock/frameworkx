@@ -1,12 +1,12 @@
-import {createApp} from "@microframework/core";
-import {PostInputType} from "../input/PostInputType";
-import {PostModel} from "../model/PostModel";
+import { createApp } from "@microframework/core";
+import { PostInputType } from "../input/PostInputType";
+import { PostModel } from "../model/PostModel";
 
 export const App = createApp<{
-    models: [
-        PostModel,
-    ],
-    inputs: [
-        PostInputType,
-    ],
+    models: {
+        PostModel: PostModel,
+    },
+    inputs: {
+        PostInputType: PostInputType,
+    },
 }>()

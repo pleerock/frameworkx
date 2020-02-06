@@ -1,4 +1,3 @@
-import {Model} from "@microframework/core";
 
 /**
  * Type for a PostModel.

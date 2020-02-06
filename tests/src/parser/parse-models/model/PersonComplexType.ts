@@ -1,7 +1,7 @@
-import {Float} from "@microframework/parser";
-import {PhotoInterface} from "./PhotoInterface";
-import {PostModel} from "./PostModel";
-import {StatusEnum} from "./StatusEnum";
+import { Float } from "@microframework/parser";
+import { PhotoInterface } from "./PhotoInterface";
+import { PostModel } from "./PostModel";
+import { StatusEnum } from "./StatusEnum";
 
 /**
  * Complex type support test.

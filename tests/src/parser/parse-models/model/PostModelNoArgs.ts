@@ -1,4 +1,4 @@
-import {ModelWithArgs} from "@microframework/core";
+import { ModelWithArgs } from "@microframework/core";
 
 /**
  * This way we are testing "Model" support.

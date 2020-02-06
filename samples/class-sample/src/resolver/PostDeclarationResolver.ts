@@ -3,8 +3,9 @@ import { PostDeclaration } from "../declaration"
 import { PostFilterInput, PostInput } from "../input"
 import { Post } from "../model"
 import { PostRepository } from "../repository"
+import { App } from "../app/App"
 
-export const PostDeclarationResolver: DeclarationResolver<PostDeclaration> = {
+export const PostDeclarationResolver: DeclarationResolver<typeof App> = {
   async posts(args: PostFilterInput): Promise<Post[]> {
     return PostRepository.findAllPosts()
   },

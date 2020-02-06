@@ -4,8 +4,8 @@ import {
   TypeMetadata,
 } from "@microframework/core";
 import {Resolver} from "@microframework/core";
+import {isModel} from "@microframework/model";
 import {EntityMetadata, InsertEvent} from "typeorm";
-import { isModel } from "../../model/src";
 
 /**
  * Transforms entities defined in the app to TypeORM entity format.
@@ -25,8 +25,10 @@ export function generateEntityResolvers(app: AnyApplication) {
       const modelName = isModel(entity.name) ? entity.name.name : entity.name
       const entityMetadata = app.properties.dataSource.getMetadata(modelName)
 
-      queryResolverSchema.push(new Resolver({
-        type: "query",
+      queryResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "query",
         name: app.properties.namingStrategy.generatedModelDeclarations.one(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
@@ -36,9 +38,11 @@ export function generateEntityResolvers(app: AnyApplication) {
               .getRepository(entityMetadata.name)
               .findOne({ where: args.where })
         }
-      }))
-      queryResolverSchema.push(new Resolver({
-        type: "query",
+      })
+      queryResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "query",
         name: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
@@ -48,9 +52,11 @@ export function generateEntityResolvers(app: AnyApplication) {
               .getRepository(entityMetadata.name)
               .findOne({ where: args.where })
         }
-      }))
-      queryResolverSchema.push(new Resolver({
-        type: "query",
+      })
+      queryResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "query",
         name: app.properties.namingStrategy.generatedModelDeclarations.many(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
@@ -60,10 +66,12 @@ export function generateEntityResolvers(app: AnyApplication) {
               .getRepository(entityMetadata.name)
               .find({ where: args.where, order: args.order, take: args.limit, skip: args.offset })
         }
-      }))
+      })
 
-      queryResolverSchema.push(new Resolver({
-        type: "query",
+      queryResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "query",
         name: app.properties.namingStrategy.generatedModelDeclarations.count(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
@@ -73,10 +81,12 @@ export function generateEntityResolvers(app: AnyApplication) {
               .getRepository(entityMetadata.name)
               .count(args)
         }
-      }))
+      })
 
-      mutationResolverSchema.push(new Resolver({
-        type: "mutation",
+      mutationResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "mutation",
         name: app.properties.namingStrategy.generatedModelDeclarations.save(modelName),
         resolverFn: async (input: any) => {
           return await app
@@ -85,10 +95,12 @@ export function generateEntityResolvers(app: AnyApplication) {
               .getRepository(entityMetadata.name)
               .save(input)
         }
-      }))
+      })
 
-      mutationResolverSchema.push(new Resolver({
-        type: "mutation",
+      mutationResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "mutation",
         name: app.properties.namingStrategy.generatedModelDeclarations.remove(modelName),
         resolverFn: async (args: any) => {
           await app
@@ -98,7 +110,7 @@ export function generateEntityResolvers(app: AnyApplication) {
               .remove(args)
           return true
         }
-      }))
+      })
 
       const manyTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeManyTriggerName(entityMetadata.name)
       const oneTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeOneTriggerName(entityMetadata.name)
@@ -129,37 +141,47 @@ export function generateEntityResolvers(app: AnyApplication) {
             }
           })
 
-      subscriptionResolverSchema.push(new Resolver({
-        type: "subscription",
+      subscriptionResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "subscription",
         name: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(modelName),
         resolverFn: {
           triggers: [insertTriggerName]
         }
-      }))
-      subscriptionResolverSchema.push(new Resolver({
-        type: "subscription",
+      })
+      subscriptionResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "subscription",
         name: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
         resolverFn: {
           triggers: [updateTriggerName]
         }
-      }))
-      subscriptionResolverSchema.push(new Resolver({
-        type: "subscription",
+      })
+      subscriptionResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "subscription",
         name: app.properties.namingStrategy.generatedModelDeclarations.observeSave(modelName),
         resolverFn: {
           triggers: [saveTriggerName]
         }
-      }))
-      subscriptionResolverSchema.push(new Resolver({
-        type: "subscription",
+      })
+      subscriptionResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "subscription",
         name: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(modelName),
         resolverFn: {
           triggers: [removeTriggerName]
         }
-      }))
+      })
 
-      subscriptionResolverSchema.push(new Resolver({
-        type: "subscription",
+      subscriptionResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "subscription",
         name: app.properties.namingStrategy.generatedModelDeclarations.observeOne(modelName),
         resolverFn: {
           triggers: [oneTriggerName],
@@ -184,9 +206,11 @@ export function generateEntityResolvers(app: AnyApplication) {
             }
           }
         }
-      }))
-      subscriptionResolverSchema.push(new Resolver({
-        type: "subscription",
+      })
+      subscriptionResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "subscription",
         name: app.properties.namingStrategy.generatedModelDeclarations.observeMany(modelName),
         resolverFn: {
           triggers: [manyTriggerName],
@@ -211,9 +235,11 @@ export function generateEntityResolvers(app: AnyApplication) {
             }
           }
         }
-      }))
-      subscriptionResolverSchema.push(new Resolver({
-        type: "subscription",
+      })
+      subscriptionResolverSchema.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: "subscription",
         name: app.properties.namingStrategy.generatedModelDeclarations.observeCount(modelName),
         resolverFn: {
           triggers: [countTriggerName],
@@ -238,7 +264,7 @@ export function generateEntityResolvers(app: AnyApplication) {
             }
           }
         }
-      }))
+      })
 
       const model = app.metadata.models.find(model => model.typeName === modelName) // todo: move method to the model itself
       if (!model)

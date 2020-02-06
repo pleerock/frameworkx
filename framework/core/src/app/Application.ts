@@ -4,7 +4,7 @@ import { ModelEntity } from "../entity";
 import { DefaultErrorHandler, ErrorHandler } from "../error-handler";
 import { DefaultLogger, Logger } from "../logger";
 import { ApplicationMetadata } from "../metadata";
-import { DeclarationResolverConstructor, Resolver } from "../types";
+import { DeclarationResolver, DeclarationResolverConstructor, isResolver, Resolver } from "../types";
 import { ValidationRule, Validator } from "../validation";
 import { AnyApplicationOptions } from "./ApplicationOptions";
 import { ApplicationProperties } from "./ApplicationProperties";
@@ -57,6 +57,11 @@ export class Application<Options extends AnyApplicationOptions> {
   readonly _options!: Options
 
   /**
+   * Stops the bootstrapped server.
+   */
+  private serverStopFn?: () => Promise<void>
+
+  /**
    * Sets app metadata.
    */
   setMetadata(metadata: ApplicationMetadata) {
@@ -97,13 +102,39 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Sets resolvers used to resolve queries, mutations, subscriptions, actions and models.
    */
-  setResolvers(resolvers: Resolver[] | { [key: string]: Resolver } | DeclarationResolverConstructor) {
+  setResolvers(resolvers: (Resolver | DeclarationResolverConstructor | DeclarationResolver<any>)[] | { [key: string]: Resolver | DeclarationResolverConstructor | DeclarationResolver<any> }) {
     if (resolvers instanceof Array) {
-      this.properties.resolvers = resolvers
-    } else if (resolvers instanceof Function) {
+      this.properties.resolvers = resolvers.map(resolver => {
+        if (resolver instanceof Function) {
+          return resolver.prototype.resolver
+        } else if (resolver instanceof Object && !isResolver(resolver)) {
+          return {
+            instanceof: "Resolver",
+            type: "declaration-resolver",
+            declarationType: "any",
+            resolverFn: resolver,
+          }
+        } else {
+          return resolver
+        }
+      })
 
     } else {
-      this.properties.resolvers = Object.keys(resolvers).map(key => resolvers[key])
+      this.properties.resolvers = Object.keys(resolvers).map(key => {
+        const resolver = resolvers[key]
+        if (resolver instanceof Function) {
+          return resolver.prototype.resolver
+        } else if (resolver instanceof Object && !isResolver(resolver)) {
+          return {
+            instanceof: "Resolver",
+            type: "declaration-resolver",
+            declarationType: "any",
+            resolverFn: resolver,
+          }
+        } else {
+          return resolver
+        }
+      })
     }
     return this
   }
@@ -175,7 +206,15 @@ export class Application<Options extends AnyApplicationOptions> {
    * Bootstraps a server.
    */
   async bootstrap(serverImpl: ApplicationServer): Promise<void> {
-    await serverImpl()
+    this.serverStopFn = await serverImpl()
+  }
+
+  /**
+   * Stops the running server.
+   */
+  async stop(): Promise<void> {
+    if (this.serverStopFn !== undefined)
+      await this.serverStopFn()
   }
 
   /**

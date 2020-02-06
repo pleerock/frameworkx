@@ -1,5 +1,5 @@
-import {createApp} from "@microframework/core";
-import {PersonIntersectionType} from "../model/PersonIntersectionType";
+import { createApp } from "@microframework/core";
+import { PersonIntersectionType } from "../model/PersonIntersectionType";
 
 export const App = createApp<{
     models: {

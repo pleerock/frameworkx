@@ -1,9 +1,9 @@
-import {createApp} from "@microframework/core";
-import {PostFilterInput} from "../input/PostFilterInput";
-import {PostInput} from "../input/PostInput";
-import {CategoryInput} from "../input/CategoryInput";
-import {CategoryType} from "../model/Category";
-import {PostModel} from "../model/PostModel";
+import { createApp } from "@microframework/core";
+import { CategoryInput } from "../input/CategoryInput";
+import { PostFilterInput } from "../input/PostFilterInput";
+import { PostInput } from "../input/PostInput";
+import { CategoryType } from "../model/Category";
+import { PostModel } from "../model/PostModel";
 
 export const App = createApp<{
     models: {

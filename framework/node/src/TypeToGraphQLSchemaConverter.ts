@@ -1,10 +1,9 @@
+import { AnyApplication, DeclarationResolverFn, SubscriptionResolverFn, TypeMetadata } from "@microframework/core";
+import { isModel } from "@microframework/model";
 import {
-    AnyApplication,
-    SubscriptionResolverFn,
-    TypeMetadata
-} from "@microframework/core";
-import {
-    GraphQLBoolean, GraphQLEnumType, GraphQLEnumValueConfigMap,
+    GraphQLBoolean,
+    GraphQLEnumType,
+    GraphQLEnumValueConfigMap,
     GraphQLFieldConfigMap,
     GraphQLFloat,
     GraphQLInputFieldConfigMap,
@@ -15,11 +14,11 @@ import {
     GraphQLObjectType,
     GraphQLString
 } from "graphql";
-import {PubSub, withFilter} from "graphql-subscriptions";
-import {GraphQLUnionType} from "graphql/type/definition";
-import {LoggerHelper} from "./LoggerHelper";
-import {Utils} from "./utils";
-import {validate} from "./validator";
+import { PubSub, withFilter } from "graphql-subscriptions";
+import { GraphQLUnionType } from "graphql/type/definition";
+import { LoggerHelper } from "./LoggerHelper";
+import { Utils } from "./utils";
+import { validate } from "./validator";
 import DataLoader = require("dataloader");
 
 export type GraphQLResolver = {
@@ -176,13 +175,29 @@ export class TypeToGraphQLSchemaConverter {
                 if (!this.pubSub)
                     throw new Error("PubSub isn't registered!")
 
-                const resolver = this.app.properties.resolvers.find(resolver => {
-                    return resolver.type === "subscription" && resolver.name === metadata.propertyName
-                })
-                if (resolver && resolver.resolverFn) {
-                    const subscriptionResolverFn = resolver.resolverFn as SubscriptionResolverFn<any, any>
+                let subscriptionResolverFn: any /*SubscriptionResolverFn<any, any>*/ | undefined = undefined
+                for (let resolver of this.app.properties.resolvers) {
+                    if (resolver.type === "declaration-resolver") {
+                        if (resolver.declarationType === "any" || resolver.declarationType === "subscription") {
+                            if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
+                                subscriptionResolverFn = (resolver.resolverFn as any)[metadata.propertyName].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                            }
+                        }
+                    } else if (resolver.type === "declaration-item-resolver") {
+                        if (resolver.declarationType === "any" || resolver.declarationType === "subscription") {
+                            if (resolver.name === metadata.propertyName) {
+                                subscriptionResolverFn = resolver.resolverFn as SubscriptionResolverFn<any, any>
+                            }
+                        }
+                    }
+                }
+                // todo: do we need this check?
+                // if (!subscriptionResolverFn)
+                //     throw new Error(`Subscription resolver ${metadata.propertyName} was not found`)
+
+                if (subscriptionResolverFn) {
                     if (subscriptionResolverFn.filter) {
-                        console.log('with filter"')
+                        // console.log('with filter"')
                         fields[metadata.propertyName].subscribe = (_, args) => {
                             return withFilter(
                                 () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers),
@@ -192,11 +207,20 @@ export class TypeToGraphQLSchemaConverter {
                     } else {
                         fields[metadata.propertyName].subscribe = (_, args, context) => {
                             if (subscriptionResolverFn.onSubscribe) {
-                                subscriptionResolverFn.onSubscribe(args, context)
+                                if (metadata.args !== undefined) {
+                                    subscriptionResolverFn.onSubscribe(args, context)
+                                }  else {
+                                    subscriptionResolverFn.onSubscribe(context)
+                                }
                             }
                             if (subscriptionResolverFn.onUnsubscribe) {
                                 return withCancel(this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers), () => {
-                                    subscriptionResolverFn.onUnsubscribe!!(args, context)
+                                    // todo: we need to send args if args were defined
+                                    if (metadata.args !== undefined) {
+                                        subscriptionResolverFn.onUnsubscribe!!(args, context)
+                                    }  else {
+                                        subscriptionResolverFn.onUnsubscribe!!(context)
+                                    }
                                 })
                             }
                             return this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers)
@@ -269,13 +293,29 @@ export class TypeToGraphQLSchemaConverter {
         metadata: TypeMetadata
     ) {
         const loggerHelper = new LoggerHelper(this.app)
-        const resolver = this.app.properties.resolvers.find(resolver => {
-            return resolver.type === mode && resolver.name === metadata.propertyName
-        })
-        if (!resolver)
-            return undefined
 
-        const propertyResolver = resolver.resolverFn
+        if (!metadata.propertyName)
+            throw new Error("No name in metadata")
+
+        let resolverFn: DeclarationResolverFn<any, any> | undefined = undefined
+        for (let resolver of this.app.properties.resolvers) {
+            if (resolver.type === "declaration-resolver") {
+                if (resolver.declarationType === "any" || resolver.declarationType === mode) {
+                    if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
+                        resolverFn = (resolver.resolverFn as any)[metadata.propertyName].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                    }
+                }
+            } else if (resolver.type === "declaration-item-resolver") {
+                if (resolver.declarationType === "any" || resolver.declarationType === mode) {
+                    if (resolver.name === metadata.propertyName) {
+                        resolverFn = resolver.resolverFn as SubscriptionResolverFn<any, any>
+                    }
+                }
+            }
+        }
+        // todo: do we need to throw error?
+        if (!resolverFn)
+            return undefined
 
         return async (parent: any, args: any, context: any, info: any) => {
             try {
@@ -289,14 +329,14 @@ export class TypeToGraphQLSchemaConverter {
 
                 // execute the resolver and get the value it returns
                 let returnedValue: any
-                if (propertyResolver instanceof Function) {
+                if (resolverFn instanceof Function) {
                     if (metadata.args) {
-                        returnedValue = await propertyResolver(args, userContext)
+                        returnedValue = await resolverFn(args, userContext)
                     } else {
-                        returnedValue = await propertyResolver(userContext)
+                        returnedValue = await resolverFn(userContext)
                     }
                 } else {
-                    returnedValue = propertyResolver
+                    returnedValue = resolverFn
                 }
 
                 // perform returning value model validation
@@ -339,19 +379,34 @@ export class TypeToGraphQLSchemaConverter {
     ) {
         const loggerHelper = new LoggerHelper(this.app)
 
+        if (!metadata.propertyName)
+            throw new Error("No property name in metadata")
+
+        let resolverFn: DeclarationResolverFn<any, any> | undefined = undefined
+        for (let resolver of this.app.properties.resolvers) {
+            if (resolver.type === "model-resolver" && resolver.dataLoader === false) {
+                if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
+                    resolverFn = (resolver.resolverFn as any)[metadata.propertyName].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                }
+            }
+        }
+        // todo: do we need to throw error?
+        // if (!resolverFn)
+        //     return undefined
+
         // check if we have a resolver defined for this model and property
-        const resolver = this.app.properties.resolvers.find(resolver => {
-            return (
-                resolver.type === "model" &&
-                resolver.name === modelName &&
-                resolver.schema !== undefined &&
-                resolver.schema[metadata.propertyName!!] !== undefined
-            )
-        })
+        // const resolver = this.app.properties.resolvers.find(resolver => {
+        //     return (
+        //         resolver.type === "model" &&
+        //         resolver.name === modelName &&
+        //         resolver.schema !== undefined &&
+        //         resolver.schema[metadata.propertyName!!] !== undefined
+        //     )
+        // })
         // console.log(modelName, resolver);
 
-        if (resolver) {
-            const propertyResolver = resolver.schema!![metadata.propertyName!!]
+        if (resolverFn) {
+            // const propertyResolver = resolver.schema!![metadata.propertyName!!]
 
             return async (parent: any, args: any, context: any, info: any) => {
                 try {
@@ -365,14 +420,14 @@ export class TypeToGraphQLSchemaConverter {
 
                     // execute the resolver and get the value it returns
                     let returnedValue: any
-                    if (propertyResolver instanceof Function) {
+                    if (resolverFn instanceof Function) {
                         if (metadata.args) {
-                            returnedValue = await propertyResolver(parent, args, userContext)
+                            returnedValue = await resolverFn(parent, args, userContext)
                         } else {
-                            returnedValue = await propertyResolver(parent, userContext)
+                            returnedValue = await resolverFn(parent, userContext)
                         }
                     } else {
-                        returnedValue = propertyResolver
+                        returnedValue = resolverFn
                     }
 
                     // perform returning value model validation
@@ -409,16 +464,15 @@ export class TypeToGraphQLSchemaConverter {
             }
         }
 
-        // check if we have a resolver defined for this model and property
-        const dataLoaderResolver = this.app.properties.resolvers.find(resolver => {
-            return (
-                resolver.name !== modelName &&
-                resolver.dataLoaderSchema !== undefined &&
-                resolver.dataLoaderSchema[metadata.propertyName!!] !== undefined
-            )
-        })
-        if (/*!resolve && */dataLoaderResolver) {
-            const propertyResolver = dataLoaderResolver.dataLoaderSchema!![metadata.propertyName!!]
+        let dataLoaderResolverFn: DeclarationResolverFn<any, any> | undefined = undefined
+        for (let resolver of this.app.properties.resolvers) {
+            if (resolver.type === "model-resolver" && resolver.dataLoader === true) {
+                if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
+                    dataLoaderResolverFn = (resolver.resolverFn as any)[metadata.propertyName].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                }
+            }
+        }
+        if (/*!resolve && */dataLoaderResolverFn) {
             return (parent: any, args: any, context: any, info: any) => {
                 this.app.properties.logger.resolveModel({
                     app: this.app,
@@ -441,16 +495,16 @@ export class TypeToGraphQLSchemaConverter {
                     context.dataLoaders[modelName][metadata.propertyName!!] = new DataLoader((keys: { parent: any, args: any, context: any, info: any }[]) => {
                         const entities = keys.map(key => key.parent)
 
-                        if (!(propertyResolver instanceof Function))
-                            return propertyResolver as any
+                        if (!(dataLoaderResolverFn instanceof Function))
+                            return dataLoaderResolverFn as any
 
                         return this
                             .resolveContextOptions({ request: context.request, response: context.response })
                             .then(context => {
                                 if (metadata.args) {
-                                    return propertyResolver(entities, keys[0].args, context) // keys[0].info
+                                    return (dataLoaderResolverFn as any)(entities, keys[0].args, context) // keys[0].info
                                 } else {
-                                    return propertyResolver(entities, context) // keys[0].info
+                                    return (dataLoaderResolverFn as any)(entities, context) // keys[0].info
                                 }
                             })
                             .then(result => {
@@ -494,7 +548,13 @@ export class TypeToGraphQLSchemaConverter {
                 .app
                 .properties
                 .entities
-                .find(entity => entity.name === modelName)
+                .find(entity => {
+                    if (isModel(entity.name)) {
+                        return entity.name.name === modelName
+                    }
+
+                    return entity.name === modelName
+                })
 
             if (entity) {
                 const entityMetadata = this.app.properties.dataSource.getMetadata(modelName)

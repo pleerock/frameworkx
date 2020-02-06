@@ -1,0 +1,23 @@
+import { createApp } from "@microframework/core";
+import { PostType } from "./model/PostType";
+
+export const App = createApp<{
+    actions: {
+        "get /posts": {
+            return: PostType[]
+        }
+        "get /post/:id": {
+            params: {
+                id: number
+            }
+            return: PostType
+        }
+    }
+    models: {
+        PostType: PostType
+    }
+    queries: {
+        posts(): PostType[]
+        post(args: { id: number }): PostType
+    }
+}>()

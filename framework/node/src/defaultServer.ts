@@ -5,6 +5,7 @@ import {
   Application,
   TypeMetadata
 } from "@microframework/core";
+import { ApplicationServer } from "@microframework/core";
 import { parse } from "@microframework/parser";
 import { Request, Response } from "express";
 import * as fs from "fs"
@@ -24,7 +25,7 @@ const graphqlHTTP = require("express-graphql")
 export const defaultServer = <Options extends AnyApplicationOptions>(
   app: Application<Options>,
   serverOptions: DefaultServerOptions<Options["context"]>
-) => {
+): ApplicationServer => {
   return async (/*options: AnyApplicationOptions*/) => {
 
     app.properties.pubsub = serverOptions.pubSub
@@ -173,9 +174,27 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           request
         })
         try {
-          const resolver = app.properties.resolvers.find(resolver => resolver.type === "action" && resolver.name === name)
+          let actionResolverFn: ActionResolverFn<any, any> | undefined = undefined
+          for (let resolver of app.properties.resolvers) {
+            if (resolver.type === "declaration-resolver") {
+              if (resolver.declarationType === "any" || resolver.declarationType === "action") {
+                if ((resolver.resolverFn as any)[name] !== undefined) {
+                  actionResolverFn = (resolver.resolverFn as any)[name].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                }
+              }
+            } else if (resolver.type === "declaration-item-resolver") {
+              if (resolver.declarationType === "any" || resolver.declarationType === "action") {
+                if (resolver.name === name) {
+                  actionResolverFn = resolver.resolverFn as ActionResolverFn<any, any>
+                }
+              }
+            }
+          }
+          if (!actionResolverFn)
+            throw new Error(`Action resolver ${name} was not found`)
+
           const context = await resolveContextOptions(app, { request, response })
-          const result = (resolver!.resolverFn as ActionResolverFn<any, any>)({
+          const result = actionResolverFn({
             params: request.params,
             query: request.query,
             header: request.header,
@@ -249,7 +268,11 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       })
     }
 
-    expressApp.listen(serverOptions.port)
+    const server = expressApp.listen(serverOptions.port)
+
+    return () => new Promise<void>((ok, fail) => {
+      server.close((err: any) => err ? fail(err) : ok())
+    })
   }
 }
 

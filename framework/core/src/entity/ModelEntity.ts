@@ -31,7 +31,7 @@ export class ModelEntity<
   /**
    * Entity's resolving strategy.
    */
-  entityResolveSchema?: boolean | EntityResolveSchema<GivenModel["type"]>
+  entityResolveSchema?: boolean | EntityResolveSchema<GivenModel["type"]> = true
 
   /**
    * Table name for this entity.

@@ -7,9 +7,9 @@ import {
   PostRepository,
   UserRepository,
 } from "../repository"
+import { App } from "../app/App"
 
-export class SearchDeclarationResolver
-  implements DeclarationResolver<SearchDeclaration> {
+export class SearchDeclarationResolver implements DeclarationResolver<typeof App> {
   async search({ keyword }: { keyword: string }): Promise<SearchType[]> {
     const categories = await CategoryRepository.find({
       name: Like(`%${keyword}%`),
