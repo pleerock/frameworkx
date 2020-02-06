@@ -1,5 +1,5 @@
 import {NumberValidationConstraints, StringValidationConstraints} from "..";
-import {ContextList} from "../../app";
+import {ContextList} from "../../application";
 
 /**
  * Validation schema for a Blueprint of the model or input.

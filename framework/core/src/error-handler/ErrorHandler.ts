@@ -1,4 +1,4 @@
-import {AnyApplication} from "../app";
+import {AnyApplication} from "../application";
 
 /**
  * Error handling interface.

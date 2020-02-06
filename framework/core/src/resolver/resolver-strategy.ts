@@ -1,4 +1,4 @@
-import { Action, AnyApplication, AnyApplicationOptions, ContextList, DeclarationItem, ModelType } from "../app"
+import { Action, AnyApplication, AnyApplicationOptions, ContextList, DeclarationItem, ModelType } from "../application"
 import { ActionArgs, DefaultContext, ResolveKey, ResolverReturnValue } from "./index"
 
 /**

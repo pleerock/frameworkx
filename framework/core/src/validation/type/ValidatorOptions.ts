@@ -1,4 +1,4 @@
-import {ContextList} from "../../app";
+import {ContextList} from "../../application";
 
 export type ValidateModelFn<Blueprint, Context extends ContextList> = (
     obj: Blueprint,

@@ -1,5 +1,7 @@
 /**
  * Strategy for naming special identifiers used in the framework.
+ *
+ * todo: looks like its server specific?
  */
 export type NamingStrategy = {
 

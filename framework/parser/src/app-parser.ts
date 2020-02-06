@@ -1,7 +1,6 @@
 import {
-    ActionMetadata,
-    ApplicationMetadata,
-    SelectionMetadata,
+    ActionTypeMetadata,
+    ApplicationTypeMetadata,
     TypeMetadata
 } from "@microframework/core";
 import * as ts from "typescript";
@@ -11,7 +10,7 @@ import {DefaultParserNamingStrategy} from "./naming-strategy";
 import {ParserOptions} from "./options";
 import {findTypeLiteralProperty, isNodeExported} from "./utils";
 
-export function parse(appFileName: string, options?: ParserOptions): ApplicationMetadata {
+export function parse(appFileName: string, options?: ParserOptions): ApplicationTypeMetadata {
 
     if (!options) {
         options = {}
@@ -93,7 +92,7 @@ export function parse(appFileName: string, options?: ParserOptions): Application
     if (!ts.isIdentifier(declaration.name))
         throw new Error("Invalid declaration.name")
 
-    const result: ApplicationMetadata = {
+    const result: ApplicationTypeMetadata = {
         name: declaration.name.text,
         actions: [],
         models: [],
@@ -101,7 +100,6 @@ export function parse(appFileName: string, options?: ParserOptions): Application
         queries: [],
         mutations: [],
         subscriptions: [],
-        selections: [],
     }
 
     if (ts.isIntersectionTypeNode(appDefOptions)) {
@@ -114,7 +112,6 @@ export function parse(appFileName: string, options?: ParserOptions): Application
                 result.queries.push(...r.queries)
                 result.mutations.push(...r.mutations)
                 result.subscriptions.push(...r.subscriptions)
-                result.selections.push(...r.selections)
                 return
 
             } else if (ts.isTypeReferenceNode(type)) {
@@ -131,7 +128,6 @@ export function parse(appFileName: string, options?: ParserOptions): Application
                         result.queries.push(...r.queries)
                         result.mutations.push(...r.mutations)
                         result.subscriptions.push(...r.subscriptions)
-                        result.selections.push(...r.selections)
                         return
 
                     } else if (ts.isTypeAliasDeclaration(declaration) && ts.isTypeLiteralNode(declaration.type)) {
@@ -142,7 +138,6 @@ export function parse(appFileName: string, options?: ParserOptions): Application
                         result.queries.push(...r.queries)
                         result.mutations.push(...r.mutations)
                         result.subscriptions.push(...r.subscriptions)
-                        result.selections.push(...r.selections)
                         return
                     }
                 }
@@ -163,7 +158,6 @@ export function parse(appFileName: string, options?: ParserOptions): Application
         result.queries.push(...r.queries)
         result.mutations.push(...r.mutations)
         result.subscriptions.push(...r.subscriptions)
-        result.selections.push(...r.selections)
     }
 
     if (!ts.isIdentifier(declaration.name))
@@ -180,11 +174,10 @@ function parseAppDefinition(program: ts.Program, type: ts.TypeLiteralNode, optio
         queries: parseQueries(program, type, options),
         mutations: parseMutations(program, type, options),
         subscriptions: parseSubscriptions(program, type, options),
-        selections: parseSelections(program, type, options),
     }
 }
 
-function parseActions(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): ActionMetadata[] {
+function parseActions(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions): ActionTypeMetadata[] {
     const actionsMember = findTypeLiteralProperty(appDefOptions, "actions")
 
     if (!actionsMember)
@@ -299,43 +292,4 @@ function parseSubscriptions(program: ts.Program, appDefOptions: ts.TypeLiteralNo
 
     const modelParser = new ModelParser(program, options)
     return modelParser.parse(modelsMember).properties
-}
-
-function parseSelections(program: ts.Program, appDefOptions: ts.TypeLiteralNode, options: ParserOptions) {
-    const modelsMember = findTypeLiteralProperty(appDefOptions, "selections")
-
-    if (!modelsMember)
-        return []
-        // throw Errors.appModelsInvalidSignature()
-
-    if (!modelsMember.type)
-        throw new Error("no type")
-
-    if (!ts.isTypeLiteralNode(modelsMember.type))
-        throw Errors.appModelsInvalidSignature(modelsMember.type)
-
-    if (!modelsMember.type.members.length)
-        throw Errors.appModelsEmptyObject()
-
-    return modelsMember.type.members.map(member => parseSelection(program, member, options))
-}
-
-export function parseSelection(program: ts.Program, member: ts.TypeElement, options: ParserOptions): SelectionMetadata {
-    if (!ts.isPropertySignature(member))
-        throw new Error(`Each model inside "models" must be a valid property referencing to a valid Model type, e.g. { user: UserModel, ... }.`)
-    if (!ts.isIdentifier(member.name))
-        throw new Error(`Each model inside "models" must be a valid name in it's definition, e.g. { user: UserModel, ... }.`)
-    if (!member.type || !ts.isTypeReferenceNode(member.type))
-        throw new Error(`Each model inside "models" must be a valid type in it's definition, e.g. { user: UserModel, ... }.`)
-    if (!ts.isIdentifier(member.type.typeName))
-        throw new Error(`Each model inside "models" must be a valid type name in it's definition, e.g. { user: UserModel, ... }.`)
-    if (!member.type.typeArguments || member.type.typeArguments.length !== 2)
-        throw new Error("SelectionOf must define 2 arguments")
-
-    const sourceModelParser = new ModelParser(program, options)
-    const selectionModelParser = new ModelParser(program, options)
-    return {
-        source: sourceModelParser.parse(member.type.typeArguments[0]),
-        selection: selectionModelParser.parse(member.type.typeArguments[1]),
-    }
 }

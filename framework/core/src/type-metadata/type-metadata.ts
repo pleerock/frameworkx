@@ -20,12 +20,7 @@ export type TypeMetadata = {
     args?: TypeMetadata
 }
 
-export type SelectionMetadata = {
-    source: TypeMetadata
-    selection: TypeMetadata
-}
-
-export type ActionMetadata = {
+export type ActionTypeMetadata = {
     name: string
     return: TypeMetadata
     query?: TypeMetadata
@@ -35,13 +30,12 @@ export type ActionMetadata = {
     body?: TypeMetadata
 }
 
-export type ApplicationMetadata = {
+export type ApplicationTypeMetadata = {
     name: string
-    actions: ActionMetadata[]
+    actions: ActionTypeMetadata[]
     models: TypeMetadata[]
     inputs: TypeMetadata[]
     queries: TypeMetadata[]
     mutations: TypeMetadata[]
     subscriptions: TypeMetadata[]
-    selections: SelectionMetadata[]
 }

@@ -2,8 +2,8 @@ import { Connection } from "typeorm";
 import { ModelEntity } from "../entity";
 import { DefaultErrorHandler, ErrorHandler } from "../error-handler";
 import { DefaultLogger, Logger } from "../logger";
-import { ApplicationMetadata } from "../metadata";
-import { AppResolverType, ContextResolver, isResolverMetadata } from "../resolver";
+import { ApplicationTypeMetadata } from "../type-metadata";
+import { AppResolverType, isResolverMetadata } from "../resolver";
 import { ValidationRule, Validator } from "../validation";
 import { ListOfType } from "./application-helper-types";
 import { AnyApplicationOptions } from "./ApplicationOptions";
@@ -29,17 +29,17 @@ export class Application<Options extends AnyApplicationOptions> {
     namingStrategy: DefaultNamingStrategy,
     errorHandler: DefaultErrorHandler,
     logger: DefaultLogger,
-    entities: [],
+    entities: [], // todo: server specific?
     resolvers: [],
-    validationRules: [],
-    actionMiddlewares: {},
-    maxGeneratedConditionsDeepness: 5,
+    validationRules: [], // todo: server specific or can be used on a client?
+    actionMiddlewares: {}, // todo: server specific?
+    maxGeneratedConditionsDeepness: 5, // todo: server specific?
   }
 
   /**
    * Application metadata.
    */
-  readonly metadata: ApplicationMetadata = {
+  readonly metadata: ApplicationTypeMetadata = {
     name: "",
     actions: [],
     inputs: [],
@@ -47,7 +47,6 @@ export class Application<Options extends AnyApplicationOptions> {
     mutations: [],
     queries: [],
     subscriptions: [],
-    selections: []
   }
 
   /**
@@ -63,7 +62,7 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Sets app metadata.
    */
-  setMetadata(metadata: ApplicationMetadata) {
+  setMetadata(metadata: ApplicationTypeMetadata) {
     this.metadata.name = metadata.name
     this.metadata.actions = metadata.actions
     this.metadata.queries = metadata.queries
@@ -71,11 +70,12 @@ export class Application<Options extends AnyApplicationOptions> {
     this.metadata.subscriptions = metadata.subscriptions
     this.metadata.inputs = metadata.inputs
     this.metadata.models = metadata.models
-    this.metadata.selections = metadata.selections
   }
 
   /**
    * Sets a data source (orm connection) to be used by application.
+   *
+   * todo: server specific? extend server API?
    */
   setDataSource(connectionFactory: (entities: any[]) => Promise<Connection>) {
     this.properties.dataSourceFactory = connectionFactory
@@ -84,6 +84,8 @@ export class Application<Options extends AnyApplicationOptions> {
 
   /**
    * Specifies if framework should automatically generate root queries and mutations for your models.
+   *
+   * todo: server specific? extend server API?
    */
   setGenerateModelRootQueries(enabled: boolean) {
     this.properties.generateModelRootQueries = enabled
@@ -92,6 +94,8 @@ export class Application<Options extends AnyApplicationOptions> {
 
   /**
    * Sets a validator to be used by application for model and input validation.
+   *
+   * todo: server specific? or can be used on a client?
    */
   setValidator(validator: Validator) {
     this.properties.validator = validator

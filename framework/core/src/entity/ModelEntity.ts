@@ -1,5 +1,5 @@
 import { AnyModel, Model } from "@microframework/model";
-import { ModelWithArgs } from "../app";
+import { ModelWithArgs } from "../application";
 import { EntityResolveSchema, EntitySchema } from "./types";
 
 export function entity<T>(name: string | Model<T>) {

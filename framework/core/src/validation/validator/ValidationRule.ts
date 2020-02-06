@@ -1,6 +1,6 @@
 import { AnyModel } from "@microframework/model";
 import { ValidateModelFn, ValidationSchema } from "..";
-import { ContextList } from "../../app";
+import { ContextList } from "../../application";
 
 /**
  * Model validation rule.
