@@ -9,7 +9,7 @@
   "devDependencies": {
     "@types/node": "^13.1.7",
     "ts-node": "^8.3.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "start": "ts-node ../server/src/index.ts"

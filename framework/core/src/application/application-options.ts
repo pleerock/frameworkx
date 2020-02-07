@@ -1,4 +1,4 @@
-import { ActionList, ContextList, DeclarationList, InputTypeList, ModelList } from "./ApplicationTypes";
+import { ActionList, ContextList, DeclarationList, InputTypeList, ModelList } from "./application-core-types";
 
 /**
  * Handy way of using ApplicationOptions when its generics don't matter.

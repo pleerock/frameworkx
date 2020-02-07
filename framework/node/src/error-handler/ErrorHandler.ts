@@ -1,4 +1,4 @@
-import {AnyApplication} from "../application";
+import {AnyApplication} from "@microframework/core/_/application";
 
 /**
  * Error handling interface.

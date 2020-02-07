@@ -10,13 +10,13 @@
     "@microframework/server": "*",
     "@microframework/validator": "*",
     "@microframework/client-server-sample-common": "*",
-    "typeorm": "0.3.0-rc.13",
+    "typeorm": "0.3.0-rc.16",
     "sqlite3": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^13.1.7",
     "ts-node": "^8.3.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "start": "ts-node ./src/index.ts"

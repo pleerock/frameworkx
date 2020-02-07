@@ -1,7 +1,5 @@
 export * from "./application"
-export * from "./entity"
 export * from "./resolver"
 export * from "./logger"
 export * from "./validation"
 export * from "./type-metadata"
-export * from "./util"

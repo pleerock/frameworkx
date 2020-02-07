@@ -1,39 +1,35 @@
-import {
-  AnyApplication,
-  MetadataUtils,
-  TypeMetadata,
-} from "@microframework/core";
-import {ResolverMetadata} from "@microframework/core";
-import {isModel} from "@microframework/model";
-import {EntityMetadata, InsertEvent} from "typeorm";
+import { AnyApplication, ResolverMetadata, TypeMetadata, TypeMetadataUtils, } from "@microframework/core";
+import { EntityMetadata, InsertEvent } from "typeorm";
+import { ServerProperties } from "./ServerProperties";
 
 /**
  * Transforms entities defined in the app to TypeORM entity format.
  * Should be used to pass app entities to TypeORM connection object.
  */
-export function generateEntityResolvers(app: AnyApplication) {
+export function generateEntityResolvers(app: AnyApplication, properties: ServerProperties) {
   const queryResolverSchema: ResolverMetadata[] = [] // ModelResolverSchema<any, any> = {}
   const mutationResolverSchema: ResolverMetadata[] = []
   const subscriptionResolverSchema: ResolverMetadata[] = []
   const queryDeclarations: TypeMetadata[] = []
   const mutationDeclarations: TypeMetadata[] = []
   const subscriptionDeclarations: TypeMetadata[] = []
+  const namingStrategy = properties.namingStrategy!! // todo
 
   // if db connection was established - auto-generate endpoints for models
-  if (app.properties.dataSource && app.properties.generateModelRootQueries === true) {
-    for (const entity of app.properties.entities) {
-      const modelName = isModel(entity.name) ? entity.name.name : entity.name
-      const entityMetadata = app.properties.dataSource.getMetadata(modelName)
+  if (properties.dataSource && properties.generateModelRootQueries === true) {
+    for (const model of app.metadata.models) {
+      const modelName = model.typeName!!
+      if (!properties.dataSource.hasMetadata(modelName)) continue
+      const entityMetadata = properties.dataSource.getMetadata(modelName)
 
       queryResolverSchema.push({
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.one(modelName),
+        name: namingStrategy.generatedModelDeclarations.one(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await app
-              .properties
+          return await properties
               .dataSource!
               .getRepository(entityMetadata.name)
               .findOne({ where: args.where })
@@ -43,11 +39,10 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
+        name: namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await app
-              .properties
+          return await properties
               .dataSource!
               .getRepository(entityMetadata.name)
               .findOne({ where: args.where })
@@ -57,11 +52,10 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.many(modelName),
+        name: namingStrategy.generatedModelDeclarations.many(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await app
-              .properties
+          return await properties
               .dataSource!
               .getRepository(entityMetadata.name)
               .find({ where: args.where, order: args.order, take: args.limit, skip: args.offset })
@@ -72,11 +66,10 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "query",
-        name: app.properties.namingStrategy.generatedModelDeclarations.count(modelName),
+        name: namingStrategy.generatedModelDeclarations.count(modelName),
         resolverFn: async (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await app
-              .properties
+          return await properties
               .dataSource!
               .getRepository(entityMetadata.name)
               .count(args)
@@ -87,10 +80,9 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "mutation",
-        name: app.properties.namingStrategy.generatedModelDeclarations.save(modelName),
+        name: namingStrategy.generatedModelDeclarations.save(modelName),
         resolverFn: async (input: any) => {
-          return await app
-              .properties
+          return await properties
               .dataSource!
               .getRepository(entityMetadata.name)
               .save(input)
@@ -101,10 +93,9 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "mutation",
-        name: app.properties.namingStrategy.generatedModelDeclarations.remove(modelName),
+        name: namingStrategy.generatedModelDeclarations.remove(modelName),
         resolverFn: async (args: any) => {
-          await app
-              .properties
+          await properties
               .dataSource!
               .getRepository(entityMetadata.name)
               .remove(args)
@@ -112,16 +103,15 @@ export function generateEntityResolvers(app: AnyApplication) {
         }
       })
 
-      const manyTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeManyTriggerName(entityMetadata.name)
-      const oneTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeOneTriggerName(entityMetadata.name)
-      const countTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeCountTriggerName(entityMetadata.name)
-      const insertTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
-      const saveTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeSaveTriggerName(entityMetadata.name)
-      const updateTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
-      const removeTriggerName = app.properties.namingStrategy.generatedModelDeclarations.observeRemoveTriggerName(entityMetadata.name)
+      const manyTriggerName = namingStrategy.generatedModelDeclarations.observeManyTriggerName(entityMetadata.name)
+      const oneTriggerName = namingStrategy.generatedModelDeclarations.observeOneTriggerName(entityMetadata.name)
+      const countTriggerName = namingStrategy.generatedModelDeclarations.observeCountTriggerName(entityMetadata.name)
+      const insertTriggerName = namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
+      const saveTriggerName = namingStrategy.generatedModelDeclarations.observeSaveTriggerName(entityMetadata.name)
+      const updateTriggerName = namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
+      const removeTriggerName = namingStrategy.generatedModelDeclarations.observeRemoveTriggerName(entityMetadata.name)
 
-      app
-          .properties
+      properties
           .dataSource!
           .subscribers
           .push({
@@ -129,15 +119,15 @@ export function generateEntityResolvers(app: AnyApplication) {
               return entityMetadata.target;
             },
             afterInsert: (event: InsertEvent<any>) => {
-              app.properties.pubsub.publish(insertTriggerName, event.entity)
-              app.properties.pubsub.publish(saveTriggerName, event.entity)
+              properties.pubSub!.publish(insertTriggerName, event.entity)
+              properties.pubSub!.publish(saveTriggerName, event.entity)
             },
             afterUpdate: event => {
-              app.properties.pubsub.publish(updateTriggerName, event.entity)
-              app.properties.pubsub.publish(saveTriggerName, event.entity)
+              properties.pubSub!.publish(updateTriggerName, event.entity)
+              properties.pubSub!.publish(saveTriggerName, event.entity)
             },
             afterRemove: event => {
-              app.properties.pubsub.publish(removeTriggerName, event.entity)
+              properties.pubSub!.publish(removeTriggerName, event.entity)
             }
           })
 
@@ -145,7 +135,7 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(modelName),
+        name: namingStrategy.generatedModelDeclarations.observeInsert(modelName),
         resolverFn: {
           triggers: [insertTriggerName]
         }
@@ -154,7 +144,7 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
+        name: namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
         resolverFn: {
           triggers: [updateTriggerName]
         }
@@ -163,7 +153,7 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeSave(modelName),
+        name: namingStrategy.generatedModelDeclarations.observeSave(modelName),
         resolverFn: {
           triggers: [saveTriggerName]
         }
@@ -172,7 +162,7 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(modelName),
+        name: namingStrategy.generatedModelDeclarations.observeRemove(modelName),
         resolverFn: {
           triggers: [removeTriggerName]
         }
@@ -182,13 +172,12 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeOne(modelName),
+        name: namingStrategy.generatedModelDeclarations.observeOne(modelName),
         resolverFn: {
           triggers: [oneTriggerName],
           onSubscribe: (args: any, context: any) => {
             // console.log("subscribed", args)
-            context.observeOneEntitySubscription = app
-                .properties
+            context.observeOneEntitySubscription = properties
                 .dataSource!
                 .manager
                 .getRepository(entityMetadata.name)
@@ -196,7 +185,7 @@ export function generateEntityResolvers(app: AnyApplication) {
                 .subscribe(entity => {
                   // console.log("trigger", oneTriggerName)
                   args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-                  app.properties.pubsub.publish(oneTriggerName, entity)
+                  properties.pubSub!.publish(oneTriggerName, entity)
                 })
           },
           onUnsubscribe: (args: any, context: any) => {
@@ -211,21 +200,20 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeMany(modelName),
+        name: namingStrategy.generatedModelDeclarations.observeMany(modelName),
         resolverFn: {
           triggers: [manyTriggerName],
           onSubscribe: (args: any, context: any) => {
             // console.log("subscribed", args)
             args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-            context.observeOneEntitySubscription = app
-                .properties
+            context.observeOneEntitySubscription = properties
                 .dataSource!
                 .manager
                 .getRepository(entityMetadata.name)
                 .observe(args)
                 .subscribe(entities => {
                   // console.log("trigger", manyTriggerName, entities)
-                  app.properties.pubsub.publish(manyTriggerName, entities)
+                  properties.pubSub!.publish(manyTriggerName, entities)
                 })
           },
           onUnsubscribe: (args: any, context: any) => {
@@ -240,21 +228,20 @@ export function generateEntityResolvers(app: AnyApplication) {
         instanceof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: "subscription",
-        name: app.properties.namingStrategy.generatedModelDeclarations.observeCount(modelName),
+        name: namingStrategy.generatedModelDeclarations.observeCount(modelName),
         resolverFn: {
           triggers: [countTriggerName],
           onSubscribe: (args: any, context: any) => {
             // console.log("subscribed", args)
             args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-            context.observeOneEntitySubscription = app
-                .properties
+            context.observeOneEntitySubscription = properties
                 .dataSource!
                 .manager
                 .getRepository(entityMetadata.name)
                 .observeCount(args)
                 .subscribe(entity => {
                   // console.log("trigger", countTriggerName)
-                  app.properties.pubsub.publish(countTriggerName, entity)
+                  properties.pubSub!.publish(countTriggerName, entity)
                 })
           },
           onUnsubscribe: (args: any, context: any) => {
@@ -266,38 +253,40 @@ export function generateEntityResolvers(app: AnyApplication) {
         }
       })
 
-      const model = app.metadata.models.find(model => model.typeName === modelName) // todo: move method to the model itself
-      if (!model)
-        throw new Error("Model was not found")
-
-      const whereArgsProperties = createModelFromBlueprint(entityMetadata, model, app, 0)
+      const whereArgsProperties = createWhereArgs(entityMetadata, model, app, properties, 0)
+      const saveArgsProperties = createSaveArgs(entityMetadata, model, app, properties, 0)
 
       const orderArgsProperties: TypeMetadata[] = []
       for (const key in model.properties) {
         const property = model.properties[key]
-        if (MetadataUtils.isTypePrimitive(property)) { // todo: yeah make it more complex like with where
-          orderArgsProperties.push(MetadataUtils.createType("string", {
+        if (TypeMetadataUtils.isTypePrimitive(property)) { // todo: yeah make it more complex like with where
+          orderArgsProperties.push(TypeMetadataUtils.createType("string", {
             propertyName: property.propertyName,
             nullable: true,
           })) // we need to do enum and specify DESC and ASC
         }
       }
 
-      const whereArgs = MetadataUtils.createType("object", {
-        typeName: app.properties.namingStrategy.generatedModelInputs.where(model.typeName!!),
+      const whereArgs = TypeMetadataUtils.createType("object", {
+        typeName: namingStrategy.generatedModelInputs.where(model.typeName!!),
         propertyName: "where",
         nullable: true,
         properties: whereArgsProperties,
       })
 
-      const orderByArgs = MetadataUtils.createType("object", {
-        typeName: app.properties.namingStrategy.generatedModelInputs.order(model.typeName!!),
+      const saveArgs = TypeMetadataUtils.createType("object", {
+        typeName: namingStrategy.generatedModelInputs.save(model.typeName!!),
+        properties: saveArgsProperties,
+      })
+
+      const orderByArgs = TypeMetadataUtils.createType("object", {
+        typeName: namingStrategy.generatedModelInputs.order(model.typeName!!),
         propertyName: "order",
         nullable: true,
         properties: orderArgsProperties,
       })
 
-      const queryArgs = MetadataUtils.createType("object", {
+      const queryArgs = TypeMetadataUtils.createType("object", {
         nullable: true,
         properties: [whereArgs, orderByArgs]
       })
@@ -305,100 +294,100 @@ export function generateEntityResolvers(app: AnyApplication) {
       queryDeclarations.push({
         ...model,
         nullable: true,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.one(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.one(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.one(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.one(modelName),
         args: queryArgs
       })
       queryDeclarations.push({
         ...model,
         nullable: false,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.oneNotNull(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.oneNotNull(modelName),
         args: queryArgs
       })
       queryDeclarations.push({
         ...model,
         array: true,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.many(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.many(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.many(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.many(modelName),
         args: queryArgs
       })
       queryDeclarations.push({
-        ...MetadataUtils.createType("number"),
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.count(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.count(modelName),
+        ...TypeMetadataUtils.createType("number"),
+        propertyName: namingStrategy.generatedModelDeclarations.count(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.count(modelName),
         args: whereArgs,
       })
       mutationDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.save(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.save(modelName),
-        args: whereArgs,
+        propertyName: namingStrategy.generatedModelDeclarations.save(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.save(modelName),
+        args: saveArgs,
       })
       mutationDeclarations.push({
-        ...MetadataUtils.createType("boolean"),
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.remove(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.remove(modelName),
+        ...TypeMetadataUtils.createType("boolean"),
+        propertyName: namingStrategy.generatedModelDeclarations.remove(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.remove(modelName),
         args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeInsert(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeInsert(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.observeInsert(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.observeInsert(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeUpdate(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.observeUpdate(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeSave(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeSave(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.observeSave(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.observeSave(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeRemove(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeRemove(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.observeRemove(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.observeRemove(modelName),
         // args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeOne(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeOne(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.observeOne(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.observeOne(modelName),
         args: whereArgs,
       })
       subscriptionDeclarations.push({
         ...model,
         array: true,
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeMany(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeMany(modelName),
+        propertyName: namingStrategy.generatedModelDeclarations.observeMany(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.observeMany(modelName),
         args: queryArgs,
       })
       subscriptionDeclarations.push({
-        ...MetadataUtils.createType("number"),
-        propertyName: app.properties.namingStrategy.generatedModelDeclarations.observeCount(modelName),
-        description: app.properties.namingStrategy.generatedModelDeclarationDescriptions.observeCount(modelName),
+        ...TypeMetadataUtils.createType("number"),
+        propertyName: namingStrategy.generatedModelDeclarations.observeCount(modelName),
+        description: namingStrategy.generatedModelDeclarationDescriptions.observeCount(modelName),
         args: whereArgs,
       })
 
-      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.oneNotNull(modelName)] = args(entity.model, {
+      // queryDeclarations[namingStrategy.generatedModelDeclarations.oneNotNull(modelName)] = args(entity.model, {
       //   where: nullable(whereArgs),
       //   order: nullable(orderArgs),
       // })
-      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.many(modelName)] = args(array(entity.model), {
+      // queryDeclarations[namingStrategy.generatedModelDeclarations.many(modelName)] = args(array(entity.model), {
       //   where: nullable(whereArgs),
       //   order: nullable(orderArgs),
       //   offset: nullable(Number),
       //   limit: nullable(Number),
       // })
-      // queryDeclarations[app.properties.namingStrategy.generatedModelDeclarations.count(modelName)] = args({ count: Number }, whereArgs)
+      // queryDeclarations[namingStrategy.generatedModelDeclarations.count(modelName)] = args({ count: Number }, whereArgs)
       //
-      // mutationDeclarations[app.properties.namingStrategy.generatedModelDeclarations.save(modelName)] = args(entity.model, whereArgs)
-      // mutationDeclarations[app.properties.namingStrategy.generatedModelDeclarations.remove(modelName)] = args({ status: String }, whereArgs)
+      // mutationDeclarations[namingStrategy.generatedModelDeclarations.save(modelName)] = args(entity.model, whereArgs)
+      // mutationDeclarations[namingStrategy.generatedModelDeclarations.remove(modelName)] = args({ status: String }, whereArgs)
     }
   }
 
@@ -415,63 +404,83 @@ export function generateEntityResolvers(app: AnyApplication) {
 }
 
 
-const createModelFromBlueprint = (entityMetadata: EntityMetadata, type: TypeMetadata, app: AnyApplication, deepness: number): TypeMetadata[] => {
+const createWhereArgs = (
+    entityMetadata: EntityMetadata,
+    type: TypeMetadata,
+    app: AnyApplication,
+    properties: ServerProperties,
+    deepness: number
+): TypeMetadata[] => {
 
-  // if (MetadataUtils.isTypePrimitive(type)) {
-  //   return { ...type, nullable: true }
-
-    // } else if (TypeCheckers.isModel(type)) {
-    //   if (deepness < app.properties.maxGeneratedConditionsDeepness) {
-    //     return createModelFromBlueprint(type.blueprint, app, deepness + 1)
-    //   }
-    //
-    // } else if (TypeCheckers.isModelReference(type)) {
-    //   if (deepness < app.properties.maxGeneratedConditionsDeepness) {
-    //     const modelManager = app.properties.modelManagers.find(manager => manager.name === type.name)
-    //     if (!modelManager)
-    //       throw new Error(`Cannot find model ${type.name}`)
-    //
-    //     return createModelFromBlueprint(modelManager.model.blueprint, app, deepness + 1)
-    //   }
-
-    // } else if (TypeCheckers.isBlueprintArgs(type)) {
-    //   return createModelFromBlueprint(type.valueType, app, deepness)
-    //
-    // } else if (TypeCheckers.isBlueprintArray(type)) {
-    //   return createModelFromBlueprint(type.option, app, deepness)
-    //
-    // } else if (TypeCheckers.isBlueprintNullable(type)) {
-    //   return createModelFromBlueprint(type.option, app, deepness)
-
-    // } else if (TypeCheckers.isBlueprint(type)) {
-  // } else {
-    const whereArgs: TypeMetadata[] = []
+    const allTypes: TypeMetadata[] = []
     for (const key in type.properties) {
       const property = type.properties[key]
-      if (MetadataUtils.isTypePrimitive(property) /* or enum? */) {
+      if (TypeMetadataUtils.isTypePrimitive(property) /* or enum? */) {
         const columnWithSuchProperty = entityMetadata.findColumnsWithPropertyPath(property.propertyName!)
         if (columnWithSuchProperty) {
-          whereArgs.push(MetadataUtils.createType(property.kind, {
+          allTypes.push(TypeMetadataUtils.createType(property.kind, {
             nullable: true,
             propertyName: property.propertyName,
           }))
         }
       } else {
         const relationWithSuchProperty = entityMetadata.findRelationWithPropertyPath(property.propertyName!)
-          if (relationWithSuchProperty && deepness < app.properties.maxGeneratedConditionsDeepness) {
+          if (relationWithSuchProperty && deepness < properties.maxGeneratedConditionsDeepness!!) {
             const reference = app.metadata.models.find(type => type.typeName === property.typeName)
             if (!reference)
               throw new Error(`cannot find a type ${property.typeName}`)
 
-            whereArgs.push(MetadataUtils.createType("object", {
-              typeName: app.properties.namingStrategy.generatedModelInputs.whereRelation(type.typeName!!, property.propertyName!!),
+            allTypes.push(TypeMetadataUtils.createType("object", {
+              typeName: properties.namingStrategy!!.generatedModelInputs.whereRelation(type.typeName!!, property.propertyName!!),
               nullable: true,
               propertyName: property.propertyName,
-              properties: createModelFromBlueprint(relationWithSuchProperty.inverseEntityMetadata, reference, app, deepness + 1)
+              properties: createWhereArgs(relationWithSuchProperty.inverseEntityMetadata, reference, app, properties,deepness + 1)
             }))
           }
       }
     }
   // }
-  return whereArgs
+  return allTypes
+}
+
+const createSaveArgs = (
+    entityMetadata: EntityMetadata,
+    type: TypeMetadata,
+    app: AnyApplication,
+    properties: ServerProperties,
+    deepness: number
+): TypeMetadata[] => {
+
+    const allTypes: TypeMetadata[] = []
+    for (const key in type.properties) {
+      const property = type.properties[key]
+      if (TypeMetadataUtils.isTypePrimitive(property) /* or enum? */) {
+        const columnWithSuchProperty = entityMetadata.findColumnsWithPropertyPath(property.propertyName!)
+        if (columnWithSuchProperty) {
+          allTypes.push(TypeMetadataUtils.createType(property.kind, {
+            nullable: true,
+            propertyName: property.propertyName,
+          }))
+        }
+      } else {
+        const relationWithSuchProperty = entityMetadata.findRelationWithPropertyPath(property.propertyName!)
+          if (relationWithSuchProperty && deepness < properties.maxGeneratedConditionsDeepness!!) {
+            const reference = app.metadata.models.find(type => type.typeName === property.typeName)
+            if (!reference)
+              throw new Error(`cannot find a type ${property.typeName}`)
+
+            const isArray = relationWithSuchProperty.relationType === "many-to-many" || relationWithSuchProperty.relationType === "one-to-many"
+
+            allTypes.push(TypeMetadataUtils.createType("object", {
+              typeName: properties.namingStrategy!!.generatedModelInputs.saveRelation(type.typeName!!, property.propertyName!!),
+              nullable: true,
+              array: isArray,
+              propertyName: property.propertyName,
+              properties: createSaveArgs(relationWithSuchProperty.inverseEntityMetadata, reference, app, properties,deepness + 1)
+            }))
+          }
+      }
+    }
+  // }
+  return allTypes
 }

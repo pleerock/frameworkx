@@ -1,6 +1,6 @@
 {
   "name": "@microframework/tests",
-  "version": "0.0.54",
+  "version": "0.1.0",
   "description": "Microframework core",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "jest": "^24.9.0",
     "ts-jest": "^24.3.0",
     "prettier": "^1.19.1",
-    "typeorm": "0.3.0-rc.13",
+    "typeorm": "0.3.0-rc.16",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.2",
     "find-free-port": "^2.0.0",

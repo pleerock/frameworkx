@@ -10,4 +10,5 @@ export const AppServer = defaultServer(App, {
   graphiql: true,
   playground: true,
   pubSub: AppPubSub,
+  resolvers: [] // todo
 })

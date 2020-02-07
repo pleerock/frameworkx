@@ -1,4 +1,4 @@
-import {AnyApplication, ValidationRule, MetadataUtils, TypeMetadata} from "@microframework/core"
+import {AnyApplication, ValidationRule, TypeMetadataUtils, TypeMetadata} from "@microframework/core"
 
 /**
  * Validates given input or model.
@@ -16,7 +16,7 @@ export async function validate(
     return
   if (value === undefined || value === null)
     return
-  if (MetadataUtils.isTypePrimitive(metadata))
+  if (TypeMetadataUtils.isTypePrimitive(metadata))
     return
 
   if (metadata.array === true) {
@@ -72,7 +72,7 @@ export async function validate(
       }
 
       // if its a sub-object validate nested properties
-      if (MetadataUtils.isTypePrimitive(property) === false) {
+      if (TypeMetadataUtils.isTypePrimitive(property) === false) {
         await validate(type, app, property, value[property.propertyName!!], context)
       }
     }

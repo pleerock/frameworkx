@@ -1,6 +1,6 @@
 {
   "name": "@microframework/validator",
-  "version": "0.0.54",
+  "version": "0.1.0",
   "main": "_/index.js",
   "dependencies": {
     "@microframework/core": "*",
@@ -14,7 +14,7 @@
     "express-graphql": "^0.9.0",
     "graphql": "^14.4.2",
     "ts-node": "^8.3.0",
-    "typeorm": "0.3.0-rc.13",
+    "typeorm": "0.3.0-rc.16",
     "validator": "^11.1.0"
   },
   "devDependencies": {
@@ -29,7 +29,7 @@
     "prettier": "^1.18.2",
     "sqlite3": "^4.1.0",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "test": "../../node_modules/.bin/jest"

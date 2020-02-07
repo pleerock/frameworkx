@@ -1,5 +1,5 @@
 import { AnyApplication, QueryMutationItemResolver, SubscriptionItemResolver, TypeMetadata } from "@microframework/core";
-import { DefaultContext } from "@microframework/core/_";
+import { DefaultContext, ResolverMetadata } from "@microframework/core/_";
 import { isModel } from "@microframework/model";
 import {
     GraphQLBoolean,
@@ -17,17 +17,11 @@ import {
 } from "graphql";
 import { PubSub, withFilter } from "graphql-subscriptions";
 import { GraphQLUnionType } from "graphql/type/definition";
-import { buildContext } from "./ContextBuilder";
 import { LoggerHelper } from "./LoggerHelper";
+import { ServerProperties } from "./ServerProperties";
 import { Utils } from "./utils";
 import { validate } from "./validator";
 import DataLoader = require("dataloader");
-
-export type GraphQLResolver = {
-    name: string
-    schema: { [key: string]: any }
-    dataLoaderSchema: { [key: string]: any }
-}
 
 const withCancel = (asyncIterator: any, onCancel: () => any) => {
     const asyncReturn = asyncIterator.return;
@@ -47,15 +41,18 @@ export class TypeToGraphQLSchemaConverter {
     unions: GraphQLUnionType[] = []
     types: GraphQLObjectType[] = [] // todo: rename to objectTypes
     inputTypes: GraphQLInputObjectType[] = []
-    pubSub?: PubSub
+    properties: ServerProperties
+    resolvers: ResolverMetadata[]
     // const result =  todo: generateEntityResolvers(app)
 
     constructor(options: {
-        app: AnyApplication
-        pubSub: PubSub | undefined
+        app: AnyApplication,
+        properties: ServerProperties,
+        resolvers: ResolverMetadata[]
     }) {
         this.app = options.app
-        this.pubSub = options.pubSub
+        this.properties = options.properties
+        this.resolvers = options.resolvers
 
         this.app.metadata.models
             .filter(model => model.kind === "enum")
@@ -174,11 +171,11 @@ export class TypeToGraphQLSchemaConverter {
             }
 
             if (type === "subscription") {
-                if (!this.pubSub)
+                if (!this.properties.pubSub)
                     throw new Error("PubSub isn't registered!")
 
                 let subscriptionResolverFn: any /*SubscriptionItemResolver<any, any>*/ | undefined = undefined
-                for (let resolver of this.app.properties.resolvers) {
+                for (let resolver of this.resolvers) {
                     if (resolver.type === "declaration-resolver") {
                         if (resolver.declarationType === "any" || resolver.declarationType === "subscription") {
                             if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
@@ -202,7 +199,7 @@ export class TypeToGraphQLSchemaConverter {
                         // console.log('with filter"')
                         fields[metadata.propertyName].subscribe = (_, args) => {
                             return withFilter(
-                                () => this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers),
+                                () => this.properties.pubSub!!.asyncIterator(subscriptionResolverFn.triggers),
                                 subscriptionResolverFn.filter!
                             )
                         }
@@ -216,7 +213,7 @@ export class TypeToGraphQLSchemaConverter {
                                 }
                             }
                             if (subscriptionResolverFn.onUnsubscribe) {
-                                return withCancel(this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers), () => {
+                                return withCancel(this.properties.pubSub!!.asyncIterator(subscriptionResolverFn.triggers), () => {
                                     // todo: we need to send args if args were defined
                                     if (metadata.args !== undefined) {
                                         subscriptionResolverFn.onUnsubscribe!!(args, context)
@@ -225,7 +222,7 @@ export class TypeToGraphQLSchemaConverter {
                                     }
                                 })
                             }
-                            return this.pubSub!!.asyncIterator(subscriptionResolverFn.triggers)
+                            return this.properties.pubSub!!.asyncIterator(subscriptionResolverFn.triggers)
                         }
                     }
                 }
@@ -300,7 +297,7 @@ export class TypeToGraphQLSchemaConverter {
             throw new Error("No name in metadata")
 
         let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
-        for (let resolver of this.app.properties.resolvers) {
+        for (let resolver of this.resolvers) {
             if (resolver.type === "declaration-resolver") {
                 if (resolver.declarationType === "any" || resolver.declarationType === mode) {
                     if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
@@ -322,7 +319,7 @@ export class TypeToGraphQLSchemaConverter {
         return async (parent: any, args: any, context: any, info: any) => {
             try {
                 loggerHelper.logBeforeResolve({ mode, typeName: "", propertyName: metadata.propertyName!, args, context, info, parent })
-                const userContext = await buildContext(this.app, { request: context.request, response: context.response })
+                const userContext = await Utils.buildContext(this.resolvers, { request: context.request, response: context.response })
 
                 // perform args validation
                 if (metadata.args) {
@@ -346,7 +343,7 @@ export class TypeToGraphQLSchemaConverter {
                 await validate("model", this.app, metadata, returnedValue, userContext)
 
                 // after-logging
-                this.app.properties.logger.logGraphQLResponse({
+                this.app.logger.logGraphQLResponse({
                     app: this.app,
                     name: metadata.propertyName!,
                     propertyName: metadata.propertyName!,
@@ -385,7 +382,7 @@ export class TypeToGraphQLSchemaConverter {
             throw new Error("No property name in metadata")
 
         let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
-        for (let resolver of this.app.properties.resolvers) {
+        for (let resolver of this.resolvers) {
             if (resolver.type === "model-resolver" && resolver.dataLoader === false) {
                 if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
                     resolverFn = (resolver.resolverFn as any)[metadata.propertyName].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
@@ -397,7 +394,7 @@ export class TypeToGraphQLSchemaConverter {
         //     return undefined
 
         // check if we have a resolver defined for this model and property
-        // const resolver = this.app.properties.resolvers.find(resolver => {
+        // const resolver = this.resolvers.find(resolver => {
         //     return (
         //         resolver.type === "model" &&
         //         resolver.name === modelName &&
@@ -413,7 +410,7 @@ export class TypeToGraphQLSchemaConverter {
             return async (parent: any, args: any, context: any, info: any) => {
                 try {
                     loggerHelper.logBeforeResolve({ mode: "model", typeName: modelName, propertyName: metadata.propertyName!!, args, context, info, parent })
-                    const userContext = await buildContext(this.app, { request: context.request, response: context.response })
+                    const userContext = await Utils.buildContext(this.resolvers, { request: context.request, response: context.response })
 
                     // perform args validation
                     if (metadata.args) {
@@ -437,7 +434,7 @@ export class TypeToGraphQLSchemaConverter {
                     await validate("model", this.app, metadata, returnedValue, userContext)
 
                     // after-logging
-                    this.app.properties.logger.logGraphQLResponse({
+                    this.app.logger.logGraphQLResponse({
                         app: this.app,
                         name: modelName,
                         propertyName: metadata.propertyName!!,
@@ -467,7 +464,7 @@ export class TypeToGraphQLSchemaConverter {
         }
 
         let dataLoaderResolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
-        for (let resolver of this.app.properties.resolvers) {
+        for (let resolver of this.resolvers) {
             if (resolver.type === "model-resolver" && resolver.dataLoader === true) {
                 if ((resolver.resolverFn as any)[metadata.propertyName] !== undefined) {
                     dataLoaderResolverFn = (resolver.resolverFn as any)[metadata.propertyName].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
@@ -476,7 +473,7 @@ export class TypeToGraphQLSchemaConverter {
         }
         if (/*!resolve && */dataLoaderResolverFn) {
             return (parent: any, args: any, context: any, info: any) => {
-                this.app.properties.logger.resolveModel({
+                this.app.logger.resolveModel({
                     app: this.app,
                     name: modelName,
                     propertyName: metadata.propertyName!!,
@@ -500,7 +497,7 @@ export class TypeToGraphQLSchemaConverter {
                         if (!(dataLoaderResolverFn instanceof Function))
                             return dataLoaderResolverFn as any
 
-                        return buildContext(this.app, { request: context.request, response: context.response })
+                        return Utils.buildContext(this.resolvers, { request: context.request, response: context.response })
                             .then(context => {
                                 if (metadata.args) {
                                     return (dataLoaderResolverFn as any)(entities, keys[0].args, context) // keys[0].info
@@ -509,7 +506,7 @@ export class TypeToGraphQLSchemaConverter {
                                 }
                             })
                             .then(result => {
-                                this.app.properties.logger.logGraphQLResponse({
+                                this.app.logger.logGraphQLResponse({
                                     app: this.app,
                                     name: modelName,
                                     propertyName: metadata.propertyName!!,
@@ -544,26 +541,20 @@ export class TypeToGraphQLSchemaConverter {
         }
 
         // if no resolver is defined check if we this model has entity and check if this entity property must be resolved
-        if (this.app.properties.dataSource) {
-            const entity = this
-                .app
-                .properties
-                .entities
-                .find(entity => {
-                    if (isModel(entity.name)) {
-                        return entity.name.name === modelName
-                    }
+        if (this.properties.dataSource) {
+            // console.log(this.properties.dataSource.options);
+            if (this.properties.dataSource.hasMetadata(modelName)) {
+                const entityMetadata = this.properties.dataSource.getMetadata(modelName)
+                // if (entity.entityResolveSchema === true || (entity.entityResolveSchema instanceof Object && entity.entityResolveSchema[metadata.propertyName!!] === true)) {
+                    const entityRelation = entityMetadata.relations.find(relation => {
+                        return relation.propertyName === metadata.propertyName!!
+                    })
 
-                    return entity.name === modelName
-                })
-
-            if (entity) {
-                const entityMetadata = this.app.properties.dataSource.getMetadata(modelName)
-                if (entity.entityResolveSchema === true || (entity.entityResolveSchema instanceof Object && entity.entityResolveSchema[metadata.propertyName!!] === true)) {
-                    const entityRelation = entityMetadata.relations.find(relation => relation.propertyName === metadata.propertyName!!)
-                    if (entityRelation) {
+                // console.log("entityRelation", entityRelation, entityMetadata.relations.map(relation => relation.propertyName));
+                // console.log(metadata.propertyName!!)
+                if (entityRelation) {
                         return ((parent: any, args: any, context: any, info: any) => {
-                            this.app.properties.logger.resolveModel({
+                            this.app.logger.resolveModel({
                                 app: this.app,
                                 name: modelName,
                                 propertyName: metadata.propertyName!!,
@@ -583,12 +574,12 @@ export class TypeToGraphQLSchemaConverter {
                             if (!context.dataLoaders[modelName][metadata.propertyName!!]) {
                                 context.dataLoaders[modelName][metadata.propertyName!!] = new DataLoader((keys: { parent: any, args: any, context: any, info: any }[]) => {
                                     const entities = keys.map(key => key.parent)
-                                    return this.app.properties.dataSource!
+                                    return this.properties.dataSource!
                                         .relationIdLoader
                                         .loadManyToManyRelationIdsAndGroup(entityRelation, entities)
                                         .then(groups => groups.map(group => group.related))
                                         .then(result => {
-                                            this.app.properties.logger.logGraphQLResponse({
+                                            this.app.logger.logGraphQLResponse({
                                                 app: this.app,
                                                 name: modelName,
                                                 propertyName: metadata.propertyName!!,
@@ -621,7 +612,7 @@ export class TypeToGraphQLSchemaConverter {
                             return context.dataLoaders[modelName][metadata.propertyName!!].load({ parent, args, context, info })
                         })
                     }
-                }
+                // }
             }
         }
     }
@@ -758,7 +749,7 @@ export class TypeToGraphQLSchemaConverter {
         request: any
     }) {
         if (name === "Query") {
-            this.app.properties.logger.resolveQueryError({
+            this.app.logger.resolveQueryError({
                 app: this.app,
                 propertyName,
                 error,
@@ -768,7 +759,7 @@ export class TypeToGraphQLSchemaConverter {
                 request
             })
         } else if (name === "Mutation") {
-            this.app.properties.logger.resolveMutationError({
+            this.app.logger.resolveMutationError({
                 app: this.app,
                 propertyName,
                 error,
@@ -778,7 +769,7 @@ export class TypeToGraphQLSchemaConverter {
                 request
             })
         } else {
-            this.app.properties.logger.resolveModelError({
+            this.app.logger.resolveModelError({
                 app: this.app,
                 name,
                 propertyName,
@@ -791,7 +782,7 @@ export class TypeToGraphQLSchemaConverter {
             })
         }
 
-        return this.app.properties.errorHandler.resolverError({
+        return this.properties.errorHandler!!.resolverError({
             app: this.app,
             name,
             error,

@@ -1,6 +1,6 @@
 {
   "name": "@microframework/model",
-  "version": "0.0.54",
+  "version": "0.1.0",
   "description": "Microframework model",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "prettier": "^1.18.2",
     "sqlite3": "^4.1.0",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "test": "../../node_modules/.bin/jest"

@@ -1,6 +1,6 @@
 {
   "name": "@microframework/node",
-  "version": "0.0.54",
+  "version": "0.1.0",
   "description": "Microframework server",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "subscriptions-transport-ws": "^0.9.16",
     "graphql": "^14.4.2",
     "ts-node": "^8.3.0",
-    "typeorm": "0.3.0-rc.13"
+    "typeorm": "0.3.0-rc.16"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.3.3",
@@ -37,7 +37,7 @@
     "prettier": "^1.18.2",
     "sqlite3": "^4.1.0",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "test": "../../node_modules/.bin/jest"

@@ -29,9 +29,6 @@ export const Errors = {
   modelWasNotFound(name: string) {
     return new Error(`Model "${name}" was not found registered in the app.`)
   },
-  entityWasNotFound(modelName: string) {
-    return new Error(`No entity for model "${modelName}" was not found registered in the app.`)
-  },
   blueprintValidationTypeMismatch(expectedType: string, actualType: string, value: any) {
     return new Error(`Blueprint validation type mismatch: expected "${expectedType}" but got "${actualType}" in ${JSON.stringify(value)}`)
   }

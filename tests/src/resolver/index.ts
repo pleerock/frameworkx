@@ -27,10 +27,10 @@ describe("resolvers", () => {
         const port = await obtainPort()
         const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostSimpleDecoratorModelResolver,
             PostSimpleDecoratorDeclarationResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const query = gql`
             query {
@@ -67,10 +67,10 @@ describe("resolvers", () => {
         const port = await obtainPort()
         const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostDLDecoratorModelResolver,
             PostSimpleDecoratorDeclarationResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const query = gql`
             query {
@@ -107,10 +107,10 @@ describe("resolvers", () => {
         const port = await obtainPort()
         const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostItemFnDeclarationResolver,
             PostsItemFnDeclarationResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const result1 = await fetcher.fetch(gql`
             query {
@@ -159,9 +159,9 @@ describe("resolvers", () => {
         const port = await obtainPort()
         const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostObjectFnDeclarationResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const result1 = await fetcher.fetch(gql`
             query {
@@ -210,10 +210,10 @@ describe("resolvers", () => {
         const port = await obtainPort()
         const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostObjectModelResolver,
             PostObjectRawDeclarationResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const result1 = await fetcher.fetch(gql`
             query {
@@ -267,10 +267,10 @@ describe("resolvers", () => {
         const port = await obtainPort()
         const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostObjectDLModelResolver,
             PostObjectRawDeclarationResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const result1 = await fetcher.fetch(gql`
             query {
@@ -323,9 +323,9 @@ describe("resolvers", () => {
     test("class action resolver", async () => {
         const port = await obtainPort()
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostClassActionResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const response1 = await fetch(`http://localhost:${port}/posts`, {
             method: "GET",
@@ -367,9 +367,9 @@ describe("resolvers", () => {
     test("object action resolver", async () => {
         const port = await obtainPort()
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostObjectActionDeclarationResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const response1 = await fetch(`http://localhost:${port}/posts`, {
             method: "GET",
@@ -412,10 +412,10 @@ describe("resolvers", () => {
         const port = await obtainPort()
         const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
 
-        await App.setResolvers([
+        await App.bootstrap(AppServer(port, [
             PostDeclarationWithContextResolver,
             PostContextResolver,
-        ]).bootstrap(AppServer(port))
+        ]))
 
         const result2 = await fetcher.fetch(gql`
             query {

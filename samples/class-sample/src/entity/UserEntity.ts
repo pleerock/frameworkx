@@ -1,16 +1,19 @@
-import { entity } from "@microframework/core"
+import * as typeorm from "typeorm"
+import { entity } from "typeorm"
 import { AppModels } from "../app/AppModels";
 
-export const UserEntity = entity(AppModels.User).schema({
-  id: {
-    type: "int",
-    primary: true,
-    generated: "increment",
-  },
-  firstName: {
-    type: "varchar",
-  },
-  lastName: {
-    type: "varchar",
-  },
+export const UserEntity = entity(AppModels.User, {
+  projection: {
+    id: {
+      type: "int",
+      primary: true,
+      generated: "increment",
+    },
+    firstName: {
+      type: "varchar",
+    },
+    lastName: {
+      type: "varchar",
+    },
+  }
 })

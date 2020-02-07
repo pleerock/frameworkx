@@ -1,6 +1,6 @@
 import {TypeMetadata, TypeMetadataKind} from "./type-metadata";
 
-export const MetadataUtils = {
+export const TypeMetadataUtils = {
 
     createType(kind: TypeMetadataKind, type?: Partial<TypeMetadata>): TypeMetadata {
         return {

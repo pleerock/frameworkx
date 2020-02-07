@@ -29,6 +29,7 @@ do
   echo "> $dir"
   cd "$dir" || exit
 
+  rm -rf _
   rm -rf tsconfig.tsbuildinfo
   if [ "$1" = "--hard" ] || [ "$1" = "hard" ]; then
     rm -rf node_modules

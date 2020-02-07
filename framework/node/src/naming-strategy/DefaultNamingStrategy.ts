@@ -112,11 +112,17 @@ export const DefaultNamingStrategy: NamingStrategy = {
     where(typeName: string) {
       return capitalize(camelize(typeName + " Where"))
     },
+    save(typeName: string) {
+      return capitalize(camelize(typeName + " Save"))
+    },
     order(typeName: string) {
       return capitalize(camelize(typeName + " OrderBy"))
     },
     whereRelation(typeName: string, relationName: string) {
       return capitalize(camelize(typeName + " " + relationName + " InWhere"))
+    },
+    saveRelation(typeName: string, relationName: string) {
+      return capitalize(camelize(typeName + " " + relationName + " InSave"))
     },
   },
 }

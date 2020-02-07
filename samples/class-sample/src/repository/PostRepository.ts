@@ -9,3 +9,7 @@ export const PostRepository = AppConnection
         return this.find()
       },
     })
+
+// AppConnection
+//     .entity(AppModels.Post)
+//     .

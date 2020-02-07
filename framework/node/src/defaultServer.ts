@@ -6,6 +6,7 @@ import {
   TypeMetadata
 } from "@microframework/core";
 import { ApplicationServer } from "@microframework/core";
+import { DeclarationResolverMetadata, isResolverMetadata, ResolverMetadata } from "@microframework/core/_";
 import { parse } from "@microframework/parser";
 import { Request, Response } from "express";
 import * as fs from "fs"
@@ -13,11 +14,12 @@ import { execute, GraphQLError, GraphQLSchema, GraphQLSchemaConfig, subscribe } 
 import { createServer } from 'http';
 import * as path from "path"
 import { SubscriptionServer } from "subscriptions-transport-ws";
-import { appEntitiesToTypeormEntities } from "./appEntitiesToTypeormEntities";
-import { buildContext } from "./ContextBuilder";
-import { DefaultServerOptions } from "./DefaultServerOptions";
+import { DefaultErrorHandler } from "./error-handler";
 import { generateEntityResolvers } from "./generateEntityResolvers";
+import { DefaultNamingStrategy } from "./naming-strategy/DefaultNamingStrategy";
+import { ServerProperties } from "./ServerProperties";
 import { TypeToGraphQLSchemaConverter } from "./TypeToGraphQLSchemaConverter";
+import { Utils } from "./utils";
 import cors = require("cors");
 
 const express = require("express")
@@ -25,14 +27,63 @@ const graphqlHTTP = require("express-graphql")
 
 export const defaultServer = <Options extends AnyApplicationOptions>(
   app: Application<Options>,
-  serverOptions: DefaultServerOptions<Options["context"]>
+  properties: ServerProperties
 ): ApplicationServer => {
   return async (/*options: AnyApplicationOptions*/) => {
 
-    app.properties.pubsub = serverOptions.pubSub
+    if (!properties.maxGeneratedConditionsDeepness) {
+      properties.maxGeneratedConditionsDeepness = 5
+    }
+    if (!properties.namingStrategy) {
+      properties.namingStrategy = DefaultNamingStrategy
+    }
+    if (!properties.errorHandler) {
+      properties.errorHandler = DefaultErrorHandler
+    }
 
-    const tsFilePath = path.normalize(serverOptions.appPath + ".ts")
-    const dtsFilePath = path.normalize(serverOptions.appPath + ".d.ts")
+    const resolvers: ResolverMetadata[] = []
+    if (properties.resolvers instanceof Array) {
+      resolvers.push(...properties.resolvers.map(resolver => {
+        if (resolver instanceof Function) {
+          return resolver.prototype.resolver
+
+        } else if (resolver instanceof Object && !isResolverMetadata(resolver)) {
+          return {
+            instanceof: "Resolver",
+            type: "declaration-resolver",
+            declarationType: "any",
+            resolverFn: resolver,
+          } as DeclarationResolverMetadata
+
+        } else {
+          return resolver
+        }
+      }))
+
+    } else {
+      resolvers.push(...Object.keys(properties.resolvers).map(key => {
+        const resolver = (properties.resolvers as any)[key]
+        if (resolver instanceof Function) {
+          return resolver.prototype.resolver
+
+        } else if (resolver instanceof Object && !isResolverMetadata(resolver)) {
+          return {
+            instanceof: "Resolver",
+            type: "declaration-resolver",
+            declarationType: "any",
+            resolverFn: resolver,
+          } as DeclarationResolverMetadata
+
+        } else {
+          return resolver
+        }
+      }))
+    }
+
+
+
+    const tsFilePath = path.normalize(properties.appPath + ".ts")
+    const dtsFilePath = path.normalize(properties.appPath + ".d.ts")
 
     if (fs.existsSync(tsFilePath)) {
       app.setMetadata(parse(tsFilePath))
@@ -43,13 +94,13 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
     }
 
 
-    if (app.properties.dataSourceFactory) {
-      const connection = await app.properties.dataSourceFactory(appEntitiesToTypeormEntities(app, app.properties.entities))
-      app.properties.dataSource = connection
+    if (properties.dataSourceFactory) {
+      const connection = await properties.dataSourceFactory( { mappedEntitySchemaProperties: Utils.modelsToApp(app.metadata.models) })
+      properties.dataSource = connection
     }
 
 
-    const entityResolvers = generateEntityResolvers(app) /*{
+    const entityResolvers = generateEntityResolvers(app, properties) /*{
       queryResolverSchema: [],
       mutationResolverSchema: [],
       queryDeclarations: [],
@@ -74,24 +125,25 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       ...entityResolvers.subscriptionDeclarations,
     ]
 
-    app.properties.resolvers.push(...entityResolvers.queryResolverSchema)
-    app.properties.resolvers.push(...entityResolvers.mutationResolverSchema)
-    app.properties.resolvers.push(...entityResolvers.subscriptionResolverSchema)
+    resolvers.push(...entityResolvers.queryResolverSchema)
+    resolvers.push(...entityResolvers.mutationResolverSchema)
+    resolvers.push(...entityResolvers.subscriptionResolverSchema)
 
     // create and setup express server
-    const expressApp = serverOptions.express || express()
-    if (serverOptions.cors === true) {
+    const expressApp = properties.express || express()
+    if (properties.cors === true) {
       expressApp.use(cors())
 
-    } else if (serverOptions.cors instanceof Object) {
-      expressApp.use(cors(serverOptions.cors))
+    } else if (properties.cors instanceof Object) {
+      expressApp.use(cors(properties.cors))
     }
 
     // setip graphql
     if (Object.keys(queries).length || Object.keys(mutations).length) {
       const typeRegistry = new TypeToGraphQLSchemaConverter({
         app,
-        pubSub: serverOptions.pubSub
+        properties,
+        resolvers
       })
 
       let config: GraphQLSchemaConfig = {
@@ -111,7 +163,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       const schema = new GraphQLSchema(config)
 
       expressApp.use(
-        serverOptions.route || "/graphql",
+        properties.route || "/graphql",
         graphqlHTTP((request: any, response: any) => ({
           schema: schema,
           graphiql: true,
@@ -135,26 +187,26 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       // })
 
       // setup playground
-      if (serverOptions.playground) {
+      if (properties.playground) {
         const expressPlayground = require('graphql-playground-middleware-express').default
         expressApp.get('/playground', expressPlayground({
-          endpoint: serverOptions.route || "/graphql",
-          subscriptionsEndpoint: `ws://localhost:${serverOptions.websocketPort}/${serverOptions.subscriptionsRoute || "subscriptions"}`
+          endpoint: properties.route || "/graphql",
+          subscriptionsEndpoint: `ws://localhost:${properties.websocketPort}/${properties.subscriptionsRoute || "subscriptions"}`
         }))
       }
 
       // run websocket server
-      if (serverOptions.websocketPort) {
+      if (properties.websocketPort) {
 
         const websocketServer = createServer((request, response) => {
           response.writeHead(404);
           response.end();
         })
-        websocketServer.listen(serverOptions.websocketPort, () => {})
+        websocketServer.listen(properties.websocketPort, () => {})
 
         new SubscriptionServer(
           { schema, execute, subscribe },
-          { server: websocketServer, path: '/' + (serverOptions.subscriptionsRoute || "subscriptions") },
+          { server: websocketServer, path: '/' + (properties.subscriptionsRoute || "subscriptions") },
         );
       }
     }
@@ -166,9 +218,10 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       const route = name.substr(name.indexOf(" ") + 1).toLowerCase()
       // const metadata -
 
-      const middlewares = app.properties.actionMiddlewares[name] ? app.properties.actionMiddlewares[name]() : []
+
+      const middlewares = (properties.actionMiddlewares && properties.actionMiddlewares[name]) ? properties.actionMiddlewares[name]() : []
       expressApp[type](route, ...middlewares, async (request: Request, response: Response, next: any) => {
-        app.properties.logger.resolveAction({
+        app.logger.resolveAction({
           app,
           route: route,
           method: type,
@@ -177,7 +230,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
         try {
           // TODO: FIX TYPES OF PARAMS/QUERIES,ETC NOT BEING NORMALIZED BASED ON TYPE METADATA
           let actionResolverFn: ActionItemResolver<any, any> | undefined = undefined
-          for (let resolver of app.properties.resolvers) {
+          for (let resolver of resolvers) {
             if (resolver.type === "declaration-resolver") {
               if (resolver.declarationType === "any" || resolver.declarationType === "action") {
                 if ((resolver.resolverFn as any)[name] !== undefined) {
@@ -195,7 +248,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           if (!actionResolverFn)
             throw new Error(`Action resolver ${name} was not found`)
 
-          const context = await buildContext(app, { request, response })
+          const context = await Utils.buildContext(resolvers, { request, response })
           const result = actionResolverFn({
             params: request.params,
             query: request.query,
@@ -207,7 +260,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           if (result instanceof Promise) {
             return result
               .then(result => {
-                app.properties.logger.logActionResponse({
+                app.logger.logActionResponse({
                   app,
                   route: route,
                   method: type,
@@ -221,14 +274,14 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
                   response.json(result)
               })
               .catch(error => {
-                app.properties.logger.resolveActionError({
+                app.logger.resolveActionError({
                   app,
                   route: route,
                   method: type,
                   error,
                   request
                 })
-                return app.properties.errorHandler.actionError({
+                return properties.errorHandler!!.actionError({
                   app,
                   route: route,
                   method: type,
@@ -238,7 +291,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
                 })
               })
           } else {
-            app.properties.logger.logActionResponse({
+            app.logger.logActionResponse({
               app,
               route: route,
               method: type,
@@ -251,14 +304,14 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
           } // think about text responses, status, etc.
 
         } catch (error) {
-          app.properties.logger.resolveActionError({
+          app.logger.resolveActionError({
             app,
             route: route,
             method: type,
             error,
             request
           })
-          return app.properties.errorHandler.actionError({
+          return properties.errorHandler!!.actionError({
             app,
             route: route,
             method: type,
@@ -270,7 +323,7 @@ export const defaultServer = <Options extends AnyApplicationOptions>(
       })
     }
 
-    const server = expressApp.listen(serverOptions.port)
+    const server = expressApp.listen(properties.port)
 
     return () => new Promise<void>((ok, fail) => {
       server.close((err: any) => err ? fail(err) : ok())

@@ -49,8 +49,10 @@ export type NamingStrategy = {
 
   generatedModelInputs: {
     where(typeName: string): string
+    save(typeName: string): string
     order(typeName: string): string
     whereRelation(typeName: string, relationName: string): string
+    saveRelation(typeName: string, relationName: string): string
   }
 
 
