@@ -107,14 +107,14 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Bootstraps a server.
    */
-  async bootstrap(server: ApplicationServer): Promise<void> {
+  async bootstrap(server: ApplicationServer){
     this.serverStopFn = await server()
   }
 
   /**
    * Stops the running server.
    */
-  async stop(): Promise<void> {
+  async stop() {
     if (this.serverStopFn !== undefined)
       await this.serverStopFn()
   }

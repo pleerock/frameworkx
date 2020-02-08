@@ -5,12 +5,7 @@ declare -a projectDirs=(
   "./framework/node"
   "./framework/logger"
   "./framework/model"
-  "./samples/basic-sample"
   "./samples/class-sample"
-  "./samples/client-server-sample/client"
-  "./samples/client-server-sample/common"
-  "./samples/client-server-sample/server"
-  "./samples/microservices-sample/post-module"
   "./tests"
 )
 

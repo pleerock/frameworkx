@@ -4,7 +4,6 @@ import {AnyApplication, ValidationRule, TypeMetadataUtils, TypeMetadata} from "@
  * Validates given input or model.
  */
 export async function validate(
-  type: "input" | "model",
   app: AnyApplication,
   metadata: TypeMetadata,
   value: any,
@@ -21,7 +20,7 @@ export async function validate(
 
   if (metadata.array === true) {
     for (const subVal of value) {
-      await validate(type, app, {...metadata, array: false}, subVal, context)
+      await validate(app, {...metadata, array: false}, subVal, context)
     }
 
   } else {
@@ -30,18 +29,13 @@ export async function validate(
     let validators: ValidationRule<any, any>[] = app
       .properties
       .validationRules
-      .filter(validator => {
-        if (validator instanceof ValidationRule && validator.modelName === metadata.typeName) {
-          return true
-        }
-        return false
-      })
+      .filter(validator => validator.name === metadata.typeName)
 
 
     // if validator has validate function specified, use it
     for (const validator of validators) {
-      if (validator.modelValidator) {
-        let result = validator.modelValidator(value, context)
+      if (validator.options.validate) {
+        let result = validator.options.validate(value, context)
         if (result) await result
       }
     }
@@ -51,8 +45,8 @@ export async function validate(
       const property = metadata.properties[key]
 
       for (const validator of validators) {
-        if (validator.validationSchema) {
-          const validationSchema = validator.validationSchema[property.propertyName!!]
+        if (validator.options.projection) {
+          const validationSchema = validator.options.projection[property.propertyName!!]
           if (validationSchema) {
             if (validationSchema instanceof Function) {
               let result = validationSchema(value[property.propertyName!!], value, context)
@@ -73,7 +67,7 @@ export async function validate(
 
       // if its a sub-object validate nested properties
       if (TypeMetadataUtils.isTypePrimitive(property) === false) {
-        await validate(type, app, property, value[property.propertyName!!], context)
+        await validate(app, property, value[property.propertyName!!], context)
       }
     }
   }

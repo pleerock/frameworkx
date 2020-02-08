@@ -323,7 +323,7 @@ export class TypeToGraphQLSchemaConverter {
 
                 // perform args validation
                 if (metadata.args) {
-                    await validate("input", this.app, metadata.args, args, userContext)
+                    await validate(this.app, metadata.args, args, userContext)
                 }
 
                 // execute the resolver and get the value it returns
@@ -340,7 +340,7 @@ export class TypeToGraphQLSchemaConverter {
 
                 // perform returning value model validation
                 // console.log("validating model", returnedValue, blueprint)
-                await validate("model", this.app, metadata, returnedValue, userContext)
+                await validate(this.app, metadata, returnedValue, userContext)
 
                 // after-logging
                 this.app.logger.logGraphQLResponse({
@@ -414,7 +414,7 @@ export class TypeToGraphQLSchemaConverter {
 
                     // perform args validation
                     if (metadata.args) {
-                        await validate("input", this.app, metadata.args, args, userContext)
+                        await validate(this.app, metadata.args, args, userContext)
                     }
 
                     // execute the resolver and get the value it returns
@@ -431,7 +431,7 @@ export class TypeToGraphQLSchemaConverter {
 
                     // perform returning value model validation
                     // console.log("validating model", returnedValue, blueprint)
-                    await validate("model", this.app, metadata, returnedValue, userContext)
+                    await validate(this.app, metadata, returnedValue, userContext)
 
                     // after-logging
                     this.app.logger.logGraphQLResponse({

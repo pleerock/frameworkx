@@ -1,4 +1,4 @@
-import {ValidationSchemaConstraints} from "..";
+import { NumberValidationConstraints, StringValidationConstraints } from "./index"
 
 /**
  * Validator implementation should implement this type for framework to execute a validation.
@@ -6,5 +6,5 @@ import {ValidationSchemaConstraints} from "..";
 export type Validator = (options: {
   key: string,
   value: any,
-  options: ValidationSchemaConstraints
+  options: StringValidationConstraints | NumberValidationConstraints
 }) => void | Promise<void>
