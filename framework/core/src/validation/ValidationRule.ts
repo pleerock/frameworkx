@@ -22,3 +22,8 @@ export type ValidationRule<T, Context extends ContextList> = {
   options: ValidationRuleOptions<T, Context>
 
 }
+
+/**
+ * Represents any validation rule.
+ */
+export type AnyValidationRule = ValidationRule<any, any>

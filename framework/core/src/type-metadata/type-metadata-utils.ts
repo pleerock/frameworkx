@@ -1,4 +1,4 @@
-import {TypeMetadata, TypeMetadataKind} from "./type-metadata";
+import {TypeMetadata, TypeMetadataKind} from "./type-metadata-types";
 
 export const TypeMetadataUtils = {
 

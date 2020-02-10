@@ -50,10 +50,3 @@ export type ResolverMetadata =
     | DeclarationItemResolverMetadata
     | ModelResolverMetadata
     | ContextResolverMetadata
-
-/**
- * Checks if provided object is resolver metadata.
- */
-export function isResolverMetadata(obj: any): obj is ResolverMetadata {
-    return obj["instanceof"] && obj["instanceof"] === "Resolver"
-}

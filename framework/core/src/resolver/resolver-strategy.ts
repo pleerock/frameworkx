@@ -1,4 +1,4 @@
-import { Action, AnyApplication, AnyApplicationOptions, ContextList, DeclarationItem, ModelType } from "../application"
+import { Action, AnyApplication, AnyApplicationOptions, ContextList, GraphQLDeclarationItem, ModelType } from "../application"
 import { ActionArgs, DefaultContext, ResolveKey, ResolverReturnValue } from "./index"
 
 /**
@@ -82,7 +82,7 @@ export type ResolveStrategy<
  * Defines a query or mutation resolving strategy.
  */
 export type QueryMutationItemResolver<
-  Declaration extends DeclarationItem,
+  Declaration extends GraphQLDeclarationItem,
   Context extends ContextList
 > =
   Parameters<Declaration> extends [] ? (
@@ -97,7 +97,7 @@ export type QueryMutationItemResolver<
  * Defines a subscription resolving strategy.
  */
 export type SubscriptionItemResolver<
-  Declaration extends DeclarationItem,
+  Declaration extends GraphQLDeclarationItem,
   Context extends ContextList
 > =
   Declaration extends (args: infer Args) => infer Return ? ({

@@ -1,5 +1,5 @@
 import { Logger } from "../logger"
-import { ValidationRule, Validator } from "../validation"
+import { AnyValidationRule, Validator } from "../validation"
 
 /**
  * Application properties.
@@ -19,6 +19,6 @@ export type ApplicationProperties = {
   /**
    * List of registered validation rules.
    */
-  validationRules: ValidationRule<any, any>[]
+  validationRules: AnyValidationRule[]
 
 }

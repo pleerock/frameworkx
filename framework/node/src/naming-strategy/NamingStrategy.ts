@@ -5,6 +5,11 @@
  */
 export type NamingStrategy = {
 
+  namelessInput(): string
+  namelessModel(): string
+  defaultTypeName(type: "query" | "mutation" | "subscription"): string
+  defaultTypeDescription(type: "query" | "mutation" | "subscription"): string
+
   /**
    * Defines how generated root queries and mutations will be named.
    */

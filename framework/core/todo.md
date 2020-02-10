@@ -1,5 +1,6 @@
 * todo: rename "framework" to "packages"
 * add Date support
+* add deprecationReason and isDeprecated to type metadata
 * provide mechanism for allowing allowed queries (e.g. `options#allowedQueries`)
 * for App add support of classes and interfaces as well
 * maybe we don't need to specify list of models and inputs in App anymore? Or at least check if we can make it array back

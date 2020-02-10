@@ -1,6 +1,6 @@
 import { isModel, Model } from "@microframework/model"
 import { AnyApplication } from "../application"
-import { ValidationRule } from "./ValidationRule"
+import { AnyValidationRule, ValidationRule } from "./ValidationRule"
 import { ValidationRuleOptions } from "./ValidationRuleOptions"
 
 /**
@@ -42,7 +42,7 @@ export function validationRule(
     arg1: AnyApplication | string | Model<any>,
     arg2: string | Model<any> | ValidationRuleOptions<any, any>,
     arg3?: ValidationRuleOptions<any, any>
-): ValidationRule<any, any> {
+): AnyValidationRule {
     // const app = arg1 instanceof Application ? arg1 : undefined
     const name = typeof arg1 === "string" ? arg1 : isModel(arg1) ? arg1.name : arg2 as string
     const options = (arguments.length === 3 ? arg3 : arg2) as ValidationRuleOptions<any, any>

@@ -1,9 +1,31 @@
-import {NamingStrategy} from "./NamingStrategy";
+import { NamingStrategy } from "./NamingStrategy"
 
 /**
  * Default framework naming strategy.
  */
 export const DefaultNamingStrategy: NamingStrategy = {
+
+  namelessInput() {
+    return generateRandomString(10) + "Input"
+  },
+
+  namelessModel() {
+    return generateRandomString(10) + "Model"
+  },
+
+  defaultTypeName(type: "query" | "mutation" | "subscription"): string {
+    return  (type === "query") ? "Query" :
+            (type === "mutation") ? "Mutation" :
+            (type === "subscription") ? "Subscription" :
+            ""
+  },
+
+  defaultTypeDescription(type: "query" | "mutation" | "subscription"): string {
+    return  (type === "query") ? "Root queries." :
+            (type === "mutation") ? "Root mutations." :
+            (type === "subscription") ? "Root subscriptions." :
+            ""
+  },
 
   generatedModelDeclarations: {
     one(modelName: string) {
@@ -140,4 +162,14 @@ function camelize(str: string) {
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function generateRandomString(length: number) {
+  let result = ""
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+  const charactersLength = characters.length
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+  return result
 }

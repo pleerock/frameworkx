@@ -9,6 +9,8 @@
     "@microframework/core": "*",
     "@microframework/parser": "*",
     "@microframework/model": "*",
+    "@microframework/validator": "*",
+    "@microframework/logger": "*",
     "@types/ws": "^6.0.3",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.0",
