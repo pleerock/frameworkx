@@ -19,39 +19,46 @@ export type ApplicationServerProperties = {
     appPath: string
 
     /**
-     * Custom express server instance.
-     * You can create and configure your own instance of express and framework will use it.
-     * If not passed, default express server will be used.
+     * Express server options.
      */
-    express?: any
+    webserver: {
 
-    /**
-     * Port on which to run express server.
-     */
-    port: number
+        /**
+         * Custom express server instance.
+         * You can create and configure your own instance of express and framework will use it.
+         * If not passed, default express server will be used.
+         */
+        express?: any
 
-    /**
-     * Should be set to true to enable cors.
-     */
-    cors: boolean | CorsOptions
+        /**
+         * Port on which to run express server.
+         */
+        port: number
 
-    /**
-     * List of static directories to register in the Express server.
-     */
-    staticDirs: {
-        [route: string]: string
+        /**
+         * Should be set to true to enable cors.
+         */
+        cors: boolean | CorsOptions
+
+        /**
+         * List of static directories to register in the Express server.
+         */
+        staticDirs: {
+            [route: string]: string
+        }
+
+        /**
+         * List of registered app middlewares.
+         */
+        middlewares: HandleFunction[]
+
+        /**
+         * List of registered action middlewares.
+         * This way you can setup middlewares per specific action.
+         */
+        actionMiddlewares: { [key: string]: HandleFunction[] }
+
     }
-
-    /**
-     * List of registered app middlewares.
-     */
-    middlewares: HandleFunction[]
-
-    /**
-     * List of registered action middlewares.
-     * This way you can setup middlewares per specific action.
-     */
-    actionMiddlewares: { [key: string]: HandleFunction[] }
 
     /**
      * Options to setup a GraphQL.
@@ -126,16 +133,6 @@ export type ApplicationServerProperties = {
     entities?: ListOfType<Function|string|EntitySchema>
 
     /**
-     * Strategy for naming special identifiers used in the framework.
-     */
-    namingStrategy: NamingStrategy
-
-    /**
-     * Handling errors logic.
-     */
-    errorHandler: ErrorHandler
-
-    /**
      * List of registered resolvers.
      */
     resolvers: ResolverMetadata[]
@@ -146,14 +143,14 @@ export type ApplicationServerProperties = {
     validationRules: AnyValidationRule[]
 
     /**
-     * Indicates if framework should automatically generate root queries and mutations for your models.
+     * Strategy for naming special identifiers used in the framework.
      */
-    generateModelRootQueries: boolean
+    namingStrategy: NamingStrategy
 
     /**
-     * Maximal deepness for nested conditions of automatically generated queries.
+     * Handling errors logic.
      */
-    maxGeneratedConditionsDeepness: number
+    errorHandler: ErrorHandler
 
     /**
      * Validation library to be used in the application.
@@ -166,6 +163,16 @@ export type ApplicationServerProperties = {
      * If not specified, default logger will be used.
      */
     logger: Logger
+
+    /**
+     * Indicates if framework should automatically generate root queries and mutations for your models.
+     */
+    generateModelRootQueries: boolean
+
+    /**
+     * Maximal deepness for nested conditions of automatically generated queries.
+     */
+    maxGeneratedConditionsDeepness: number
 
     /**
      * ORM data source (connection) used in the application.

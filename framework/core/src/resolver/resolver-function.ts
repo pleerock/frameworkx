@@ -1,3 +1,4 @@
+import { AnyModel, isModel, Model } from "@microframework/model/_";
 import { AnyApplication } from "../application"
 import {
   ContextResolver,
@@ -100,15 +101,15 @@ export function resolver<
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
  * This particular function is used to create a resolver for a single query / mutation / subscription / action / model.
- * 
+ *
  * For example, for { query: { posts(): Post[], post(): Post } } declaration you can create a following resolver:
- * 
+ *
  *    export const PostsQueryResolver = resolver(App, "posts", () => {
  *      return [...]
  *    })
- * 
+ *
  * Another example, for model Post { id: number, title: string } you can create a following resolver:
- * 
+ *
  *    export const PostsQueryResolver = resolver(App, "Post", {
  *        title(post) {
  *          ...
@@ -122,6 +123,35 @@ export function resolver<
   app: App,
   name: Key,
   resolver: ResolveStrategy<App["_options"], Key>,
+): ResolverMetadata
+
+/**
+ * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
+ * This particular function is used to create a resolver for a single query / mutation / subscription / action / model.
+ *
+ * For example, for { query: { posts(): Post[], post(): Post } } declaration you can create a following resolver:
+ *
+ *    export const PostsQueryResolver = resolver(App, "posts", () => {
+ *      return [...]
+ *    })
+ *
+ * Another example, for model Post { id: number, title: string } you can create a following resolver:
+ *
+ *    export const PostsQueryResolver = resolver(App, "Post", {
+ *        title(post) {
+ *          ...
+ *        }
+ *    })
+ */
+export function resolver<
+  App extends AnyApplication,
+  Model extends AnyModel,
+>(
+  app: App,
+  model: Model,
+  resolver:
+      | ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>
+      | (() => ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>)
 ): ResolverMetadata
 
 /**
@@ -152,6 +182,30 @@ export function resolver<
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
  * This particular function is used to create a resolver for a particular model.
  * Using this signature you can configure additional resolving options.
+ *
+ * For example, for model Post { id: number, title: string } you can create a following resolver:
+ *
+ *    export const PostsQueryResolver = resolver(App, { model: PostModel, dataLoader: true }, {
+ *        title(posts) {
+ *          return posts.map(post => ...)
+ *        }
+ *    })
+ */
+export function resolver<
+  App extends AnyApplication,
+  Model extends AnyModel,
+>(
+  app: App,
+  options: { model: Model, dataLoader: true },
+  resolver:
+      | ModelDLResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>
+      | (() => ModelDLResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>)
+): ResolverMetadata
+
+/**
+ * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
+ * This particular function is used to create a resolver for a particular model.
+ * Using this signature you can configure additional resolving options.
  * 
  * For example, for model Post { id: number, title: string } you can create a following resolver:
  * 
@@ -173,20 +227,41 @@ export function resolver<
 ): ResolverMetadata
 
 /**
- * Creates a new resolver metadata to resolve queries, mutations, subscriptions, actions or models.
+ * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
+ * This particular function is used to create a resolver for a particular model.
+ * Using this signature you can configure additional resolving options.
+ *
+ * For example, for model Post { id: number, title: string } you can create a following resolver:
+ *
+ *    export const PostsQueryResolver = resolver(App, { model: PostModel, dataLoader: true }, {
+ *        title(posts) {
+ *          return posts.map(post => ...)
+ *        }
+ *    })
  */
 export function resolver<
   App extends AnyApplication,
-  Key extends ResolveKey<App["_options"]>,
+  Model extends AnyModel,
 >(
-  arg0?: App | { name: string, dataLoader?: boolean },
-  arg1?: Key | DeclarationResolver<App>,
+  app: App,
+  options: { model: Model, dataLoader?: false },
+  resolver:
+      | ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>
+      | (() => ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>)
+): ResolverMetadata
+
+/**
+ * Creates a new resolver metadata to resolve queries, mutations, subscriptions, actions or models.
+ */
+export function resolver(
+  arg0?: AnyApplication | { name: string, dataLoader?: boolean },
+  arg1?: ResolveKey<any> | DeclarationResolver<any> | AnyModel,
   arg2?:
-      | ResolveStrategy<App["_options"], Key>
-      | ModelResolver<App["_options"][Key], App["_options"]["context"]>
-      | (() => ModelResolver<App["_options"][Key], App["_options"]["context"]>)
-      | ModelDLResolver<App["_options"][Key], App["_options"]["context"]>
-      | (() => ModelDLResolver<App["_options"][Key], App["_options"]["context"]>)
+      | ResolveStrategy<any, any>
+      | ModelResolver<any, any>
+      | (() => ModelResolver<any, any>)
+      | ModelDLResolver<any, any>
+      | (() => ModelDLResolver<any, any>)
 ): ResolverMetadata | ((object: any) => any) {
 
   if (arguments.length === 0) {
@@ -232,7 +307,7 @@ export function resolver<
   } else if (arguments.length === 2 && arg1 instanceof Object) {
     // resolves root declarations
     // syntax: resolver(App, { categories() { ... }, ... })
-    const resolverFn = arg1 as DeclarationResolver<App>
+    const resolverFn = arg1 as DeclarationResolver<any>
     return {
       instanceof: "Resolver",
       type: "declaration-resolver",
@@ -267,16 +342,30 @@ export function resolver<
       resolverFn
     }
 
-  } else if (arguments.length === 3 && arg1 instanceof Object && (arg2 instanceof Object || arg2 instanceof Function)) {
-    // resolves a model with second argument providing model options
-    // syntax: resolver(App, { name: "CategoryModel", dataLoader: true }, { name() { ... }, ... })
+  } else if (arguments.length === 3 && isModel(arg1) && (arg2 instanceof Object || arg2 instanceof Function)) {
+    // resolves a model with second argument providing Model
+    // syntax: resolver(App, CategoryModel, { name() { ... }, ... })
 
-    const modelOptions = arg1 as { name: string, dataLoader?: boolean }
+    const model = arg1 as AnyModel
     const resolverFn = (arg2 instanceof Function ? arg2() : arg2) as ModelResolver<any>
     return {
       instanceof: "Resolver",
       type: "model-resolver",
-      name: modelOptions.name,
+      name: model.name,
+      dataLoader: false,
+      resolverFn
+    }
+  } else if (arguments.length === 3 && arg1 instanceof Object && (arg2 instanceof Object || arg2 instanceof Function)) {
+    // resolves a model with second argument providing model options
+    // syntax: resolver(App, { name: "CategoryModel", dataLoader: true }, { name() { ... }, ... })
+
+    const modelOptions = arg1 as { name?: string, model?: AnyModel, dataLoader?: boolean }
+    const name = modelOptions.model ? modelOptions.model.name : modelOptions.name
+    const resolverFn = (arg2 instanceof Function ? arg2() : arg2) as ModelResolver<any>
+    return {
+      instanceof: "Resolver",
+      type: "model-resolver",
+      name: name || "",
       dataLoader: modelOptions.dataLoader || false,
       resolverFn
     }

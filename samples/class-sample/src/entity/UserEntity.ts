@@ -1,7 +1,10 @@
 import * as typeorm from "typeorm"
 import { entity } from "typeorm"
-import { AppModels } from "../app/AppModels";
+import { AppModels } from "../app/AppModels"
 
+/**
+ * Database schema for User model.
+ */
 export const UserEntity = entity(AppModels.User, {
   projection: {
     id: {
@@ -15,5 +18,5 @@ export const UserEntity = entity(AppModels.User, {
     lastName: {
       type: "varchar",
     },
-  }
+  },
 })

@@ -49,12 +49,14 @@ export class ApplicationServer<App extends AnyApplication> {
     this.app = app
     this.properties = {
       appPath: options.appPath,
-      express: options.express,
-      port: options.port,
-      cors: options.cors || false,
-      staticDirs: options.staticDirs || {},
-      middlewares: options.middlewares ? listOfTypeToArray(options.middlewares) : [],
-      actionMiddlewares: options.actionMiddlewares || {},
+      webserver: {
+        express: options.webserver.express,
+        port: options.webserver.port,
+        cors: options.webserver.cors || false,
+        staticDirs: options.webserver.staticDirs || {},
+        middlewares: options.webserver.middlewares ? listOfTypeToArray(options.webserver.middlewares) : [],
+        actionMiddlewares: options.webserver.actionMiddlewares || {},
+      },
       graphql: {
         route: options.graphql?.route || "/graphql",
         graphiql: options.graphql?.graphiql || false,
@@ -100,14 +102,14 @@ export class ApplicationServer<App extends AnyApplication> {
     }
 
     // create and setup express server
-    const expressApp = this.properties.express || express()
+    const expressApp = this.properties.webserver.express || express()
 
     // apply middlewares
-    this.properties.middlewares.forEach(middleware => expressApp.use(middleware))
+    this.properties.webserver.middlewares.forEach(middleware => expressApp.use(middleware))
 
     // setup CORS
-    if (this.properties.cors) {
-      const corsMiddleware = typeof this.properties.cors === "object" ? cors(this.properties.cors) : cors()
+    if (this.properties.webserver.cors) {
+      const corsMiddleware = typeof this.properties.webserver.cors === "object" ? cors(this.properties.webserver.cors) : cors()
       expressApp.use(corsMiddleware)
     }
 
@@ -144,21 +146,21 @@ export class ApplicationServer<App extends AnyApplication> {
       if (!method || !route)
         throw new Error(`Invalid action defined "${action.name}". Action name must contain HTTP method (e.g. "get", "post", ...) and URL (e.g. "/users", ...).`)
 
-      const middlewares = this.properties.actionMiddlewares[action.name] || []
+      const middlewares = this.properties.webserver.actionMiddlewares[action.name] || []
       expressApp[method](route, ...middlewares, async (request: Request, response: Response, _next: any) => {
         this.resolverHelper.createActionResolver({ method, route, request, response }, action)
       })
     }
 
     // register static directories
-    if (this.properties.staticDirs) {
-      for (let route in this.properties.staticDirs) {
-        expressApp.use(route, express.static(this.properties.staticDirs[route]))
+    if (this.properties.webserver.staticDirs) {
+      for (let route in this.properties.webserver.staticDirs) {
+        expressApp.use(route, express.static(this.properties.webserver.staticDirs[route]))
       }
     }
 
     // launch the server
-    this.server = expressApp.listen(this.properties.port)
+    this.server = expressApp.listen(this.properties.webserver.port)
 
     return this
   }

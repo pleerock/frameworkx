@@ -5,8 +5,10 @@ import { App } from "./app"
 export const AppServer = (port: number, resolvers: ListOfType<AppResolverType>) => {
     return createApplicationServer(App, {
         appPath: __dirname + "/app",
-        port: port,
-        cors: true,
+        webserver: {
+            port: port,
+            cors: true,
+        },
         graphql: {
             graphiql: true,
             playground: true,

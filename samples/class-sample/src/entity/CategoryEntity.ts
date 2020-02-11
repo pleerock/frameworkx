@@ -1,7 +1,10 @@
 import * as typeorm from "typeorm"
-import { entity } from "typeorm";
-import { AppModels } from "../app/AppModels";
+import { entity } from "typeorm"
+import { AppModels } from "../app/AppModels"
 
+/**
+ * Database schema for Category model.
+ */
 export const CategoryEntity = entity(AppModels.Category, {
   projection: {
     id: {
@@ -17,5 +20,5 @@ export const CategoryEntity = entity(AppModels.Category, {
       owner: false,
       inverse: "categories",
     },
-  }
+  },
 })

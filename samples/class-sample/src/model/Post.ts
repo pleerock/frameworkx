@@ -1,4 +1,4 @@
-import { ModelWithArgs } from "@microframework/core";
+import { ModelWithArgs } from "@microframework/core"
 import { PostStatus } from "../enum"
 import { Category } from "./Category"
 import { User } from "./User"

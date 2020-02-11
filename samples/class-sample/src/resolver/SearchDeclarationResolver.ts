@@ -1,15 +1,17 @@
-import { DeclarationResolver } from "@microframework/core"
+import { resolver } from "@microframework/core"
 import { Like } from "typeorm"
-import { SearchDeclaration } from "../declaration"
+import { App } from "../app/App"
 import { Category, Post, SearchType, User } from "../model"
 import {
   CategoryRepository,
   PostRepository,
   UserRepository,
 } from "../repository"
-import { App } from "../app/App"
 
-export class SearchDeclarationResolver implements DeclarationResolver<typeof App> {
+/**
+ * Resolver for search declarations.
+ */
+export const SearchDeclarationResolver = resolver(App, {
   async search({ keyword }: { keyword: string }): Promise<SearchType[]> {
     const categories = await CategoryRepository.find({
       name: Like(`%${keyword}%`),
@@ -25,5 +27,5 @@ export class SearchDeclarationResolver implements DeclarationResolver<typeof App
       ...users.map(obj => ({ __typename: "User", ...obj })),
       ...posts.map(obj => ({ __typename: "Post", ...obj })),
     ]
-  }
-}
+  },
+})

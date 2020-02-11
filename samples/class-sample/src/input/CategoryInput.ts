@@ -5,7 +5,7 @@ export type CategoryInput = {
   /**
    * Category id.
    */
-  id?: number
+  id?: number | null
 
   /**
    * Category name.

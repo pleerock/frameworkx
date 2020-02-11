@@ -14,6 +14,65 @@ export class GeneratedEntitySchemaBuilder {
   }
 
   /**
+   * Registers a new resolver in the app.
+   */
+  private registerResolver(
+    type: "query" | "mutation" | "subscription",
+    name: string,
+    resolverFn: any
+  ) {
+
+    // we try to find resolver with the same name to prevent user defined resolver override
+    const sameNameResolver = this.properties.resolvers.find(resolver => {
+      if (resolver.type === "declaration-item-resolver") {
+        return resolver.name === name
+      }
+      return false
+    })
+
+    // register a new resolver
+    if (!sameNameResolver) {
+      this.properties.resolvers.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: type,
+        name: name,
+        resolverFn: resolverFn
+      })
+    }
+  }
+
+  /**
+   * Registers a new query in the application metadata.
+   */
+  private registerQuery(type: TypeMetadata) {
+    const sameNameQuery = this.appMetadata.queries.find(query => query.propertyName === type.propertyName)
+    if (!sameNameQuery) {
+      this.appMetadata.queries.push(type)
+    }
+  }
+
+  /**
+   * Registers a new mutation in the application metadata.
+   */
+  private registerMutation(type: TypeMetadata) {
+    const sameNameMutation = this.appMetadata.mutations.find(query => query.propertyName === type.propertyName)
+    if (!sameNameMutation) {
+      this.appMetadata.mutations.push(type)
+    }
+  }
+
+  /**
+   * Registers a new subscription in the application metadata.
+   */
+  private registerSubscription(type: TypeMetadata) {
+    const sameNameSubscription = this.appMetadata.subscriptions.find(query => query.propertyName === type.propertyName)
+    if (!sameNameSubscription) {
+      this.appMetadata.subscriptions.push(type)
+    }
+  }
+
+  /**
    * Generates types and resolvers and pushes them into provided variables.
    */
   generate() {
@@ -30,80 +89,69 @@ export class GeneratedEntitySchemaBuilder {
       if (!dataSource.hasMetadata(modelName)) continue
       const entityMetadata = dataSource.getMetadata(modelName)
 
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "query",
-        name: namingStrategy.generatedModelDeclarations.one(modelName),
-        resolverFn: async (args: any) => {
-          args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await dataSource
-              .getRepository(entityMetadata.name)
-              .findOne({ where: args.where })
-        }
-      })
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "query",
-        name: namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
-        resolverFn: async (args: any) => {
-          args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await dataSource
-              .getRepository(entityMetadata.name)
-              .findOne({ where: args.where })
-        }
-      })
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "query",
-        name: namingStrategy.generatedModelDeclarations.many(modelName),
-        resolverFn: async (args: any) => {
-          args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await dataSource
-              .getRepository(entityMetadata.name)
-              .find({ where: args.where, order: args.order, take: args.limit, skip: args.offset })
-        }
-      })
+      this.registerResolver(
+          "query",
+          namingStrategy.generatedModelDeclarations.one(modelName),
+          (args: any) => {
+            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            return dataSource
+                .getRepository(entityMetadata.name)
+                .findOne({where: args.where})
+          },
+      )
 
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "query",
-        name: namingStrategy.generatedModelDeclarations.count(modelName),
-        resolverFn: async (args: any) => {
-          args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return await dataSource
-              .getRepository(entityMetadata.name)
-              .count(args)
-        }
-      })
+      this.registerResolver(
+          "query",
+          namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
+          (args: any) => {
+            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            return dataSource
+                .getRepository(entityMetadata.name)
+                .findOneOrFail({where: args.where})
+          },
+      )
 
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "mutation",
-        name: namingStrategy.generatedModelDeclarations.save(modelName),
-        resolverFn: async (input: any) => {
-          return await dataSource
-              .getRepository(entityMetadata.name)
-              .save(input)
-        }
-      })
+      this.registerResolver(
+          "query",
+          namingStrategy.generatedModelDeclarations.many(modelName),
+          (args: any) => {
+            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            return dataSource
+                .getRepository(entityMetadata.name)
+                .find({where: args.where, order: args.order, take: args.limit, skip: args.offset})
+          },
+      )
 
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "mutation",
-        name: namingStrategy.generatedModelDeclarations.remove(modelName),
-        resolverFn: async (args: any) => {
-          await dataSource
-              .getRepository(entityMetadata.name)
-              .remove(args)
-          return true
-        }
-      })
+      this.registerResolver(
+          "query",
+          namingStrategy.generatedModelDeclarations.count(modelName),
+          (args: any) => {
+            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            return dataSource
+                .getRepository(entityMetadata.name)
+                .count(args)
+          },
+      )
+
+      this.registerResolver(
+          "mutation",
+          namingStrategy.generatedModelDeclarations.save(modelName),
+          (input: any) => {
+            return dataSource
+                .getRepository(entityMetadata.name)
+                .save(input)
+          }
+      )
+
+      this.registerResolver(
+          "mutation",
+          namingStrategy.generatedModelDeclarations.remove(modelName),
+          (args: any) => {
+            return dataSource
+                .getRepository(entityMetadata.name)
+                .remove(args)
+          }
+      )
 
       const manyTriggerName = namingStrategy.generatedModelDeclarations.observeManyTriggerName(entityMetadata.name)
       const oneTriggerName = namingStrategy.generatedModelDeclarations.observeOneTriggerName(entityMetadata.name)
@@ -113,143 +161,133 @@ export class GeneratedEntitySchemaBuilder {
       const updateTriggerName = namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
       const removeTriggerName = namingStrategy.generatedModelDeclarations.observeRemoveTriggerName(entityMetadata.name)
 
-      dataSource
-          .subscribers
-          .push({
-            listenTo: () => {
-              return entityMetadata.target;
-            },
-            afterInsert: (event: InsertEvent<any>) => {
-              pubSub!.publish(insertTriggerName, event.entity)
-              pubSub!.publish(saveTriggerName, event.entity)
-            },
-            afterUpdate: event => {
-              pubSub!.publish(updateTriggerName, event.entity)
-              pubSub!.publish(saveTriggerName, event.entity)
-            },
-            afterRemove: event => {
-              pubSub!.publish(removeTriggerName, event.entity)
-            }
-          })
+      if (pubSub) {
+        dataSource
+            .subscribers
+            .push({
+              listenTo: () => {
+                return entityMetadata.target;
+              },
+              afterInsert: (event: InsertEvent<any>) => {
+                pubSub!.publish(insertTriggerName, event.entity)
+                pubSub!.publish(saveTriggerName, event.entity)
+              },
+              afterUpdate: event => {
+                pubSub!.publish(updateTriggerName, event.entity)
+                pubSub!.publish(saveTriggerName, event.entity)
+              },
+              afterRemove: event => {
+                pubSub!.publish(removeTriggerName, event.entity)
+              }
+            })
 
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "subscription",
-        name: namingStrategy.generatedModelDeclarations.observeInsert(modelName),
-        resolverFn: {
-          triggers: [insertTriggerName]
-        }
-      })
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "subscription",
-        name: namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
-        resolverFn: {
-          triggers: [updateTriggerName]
-        }
-      })
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "subscription",
-        name: namingStrategy.generatedModelDeclarations.observeSave(modelName),
-        resolverFn: {
-          triggers: [saveTriggerName]
-        }
-      })
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "subscription",
-        name: namingStrategy.generatedModelDeclarations.observeRemove(modelName),
-        resolverFn: {
-          triggers: [removeTriggerName]
-        }
-      })
+        this.registerResolver(
+            "subscription",
+            namingStrategy.generatedModelDeclarations.observeInsert(modelName),
+            {
+              triggers: [insertTriggerName]
+            }
+        )
 
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "subscription",
-        name: namingStrategy.generatedModelDeclarations.observeOne(modelName),
-        resolverFn: {
-          triggers: [oneTriggerName],
-          onSubscribe: (args: any, context: any) => {
-            // console.log("subscribed", args)
-            context.observeOneEntitySubscription = dataSource
-                .manager
-                .getRepository(entityMetadata.name)
-                .observeOne(args)
-                .subscribe(entity => {
-                  // console.log("trigger", oneTriggerName)
-                  args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-                  pubSub!.publish(oneTriggerName, entity)
-                })
-          },
-          onUnsubscribe: (args: any, context: any) => {
-            if (context.observeOneEntitySubscription) {
-              // console.log("unsubscribed", args)
-              context.observeOneEntitySubscription.unsubscribe()
+        this.registerResolver(
+            "subscription",
+            namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
+            {
+              triggers: [updateTriggerName]
             }
-          }
-        }
-      })
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "subscription",
-        name: namingStrategy.generatedModelDeclarations.observeMany(modelName),
-        resolverFn: {
-          triggers: [manyTriggerName],
-          onSubscribe: (args: any, context: any) => {
-            // console.log("subscribed", args)
-            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-            context.observeOneEntitySubscription = dataSource
-                .manager
-                .getRepository(entityMetadata.name)
-                .observe(args)
-                .subscribe(entities => {
-                  // console.log("trigger", manyTriggerName, entities)
-                  pubSub!.publish(manyTriggerName, entities)
-                })
-          },
-          onUnsubscribe: (args: any, context: any) => {
-            if (context.observeOneEntitySubscription) {
-              // console.log("unsubscribed", args)
-              context.observeOneEntitySubscription.unsubscribe()
+        )
+
+        this.registerResolver(
+            "subscription",
+            namingStrategy.generatedModelDeclarations.observeSave(modelName),
+            {
+              triggers: [saveTriggerName]
             }
-          }
-        }
-      })
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: "subscription",
-        name: namingStrategy.generatedModelDeclarations.observeCount(modelName),
-        resolverFn: {
-          triggers: [countTriggerName],
-          onSubscribe: (args: any, context: any) => {
-            // console.log("subscribed", args)
-            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-            context.observeOneEntitySubscription = dataSource
-                .manager
-                .getRepository(entityMetadata.name)
-                .observeCount(args)
-                .subscribe(entity => {
-                  // console.log("trigger", countTriggerName)
-                  pubSub!.publish(countTriggerName, entity)
-                })
-          },
-          onUnsubscribe: (args: any, context: any) => {
-            if (context.observeOneEntitySubscription) {
-              // console.log("unsubscribed", args)
-              context.observeOneEntitySubscription.unsubscribe()
+        )
+        this.registerResolver(
+            "subscription",
+            namingStrategy.generatedModelDeclarations.observeRemove(modelName),
+            {
+              triggers: [removeTriggerName]
             }
-          }
-        }
-      })
+        )
+
+        this.registerResolver(
+            "subscription",
+            namingStrategy.generatedModelDeclarations.observeOne(modelName),
+            {
+              triggers: [oneTriggerName],
+              onSubscribe: (args: any, context: any) => {
+                // console.log("subscribed", args)
+                context.observeOneEntitySubscription = dataSource
+                    .manager
+                    .getRepository(entityMetadata.name)
+                    .observeOne(args)
+                    .subscribe(entity => {
+                      // console.log("trigger", oneTriggerName)
+                      args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+                      pubSub!.publish(oneTriggerName, entity)
+                    })
+              },
+              onUnsubscribe: (args: any, context: any) => {
+                if (context.observeOneEntitySubscription) {
+                  // console.log("unsubscribed", args)
+                  context.observeOneEntitySubscription.unsubscribe()
+                }
+              }
+            }
+        )
+        this.registerResolver(
+            "subscription",
+            namingStrategy.generatedModelDeclarations.observeMany(modelName),
+            {
+              triggers: [manyTriggerName],
+              onSubscribe: (args: any, context: any) => {
+                // console.log("subscribed", args)
+                args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+                context.observeOneEntitySubscription = dataSource
+                    .manager
+                    .getRepository(entityMetadata.name)
+                    .observe(args)
+                    .subscribe(entities => {
+                      // console.log("trigger", manyTriggerName, entities)
+                      pubSub!.publish(manyTriggerName, entities)
+                    })
+              },
+              onUnsubscribe: (args: any, context: any) => {
+                if (context.observeOneEntitySubscription) {
+                  // console.log("unsubscribed", args)
+                  context.observeOneEntitySubscription.unsubscribe()
+                }
+              }
+            }
+        )
+        this.registerResolver(
+            "subscription",
+            namingStrategy.generatedModelDeclarations.observeCount(modelName),
+            {
+              triggers: [countTriggerName],
+              onSubscribe: (args: any, context: any) => {
+                // console.log("subscribed", args)
+                args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+                context.observeOneEntitySubscription = dataSource
+                    .manager
+                    .getRepository(entityMetadata.name)
+                    .observeCount(args)
+                    .subscribe(entity => {
+                      // console.log("trigger", countTriggerName)
+                      pubSub!.publish(countTriggerName, entity)
+                    })
+              },
+              onUnsubscribe: (args: any, context: any) => {
+                if (context.observeOneEntitySubscription) {
+                  // console.log("unsubscribed", args)
+                  context.observeOneEntitySubscription.unsubscribe()
+                }
+              }
+            }
+        )
+      }
 
       const whereArgsProperties = this.createWhereArgs(entityMetadata, model, 0)
       const saveArgsProperties = this.createSaveArgs(entityMetadata, model, 0)
@@ -289,107 +327,91 @@ export class GeneratedEntitySchemaBuilder {
         properties: [whereArgs, orderByArgs]
       })
 
-      this.appMetadata.queries.push({
+      this.registerQuery({
         ...model,
         nullable: true,
         propertyName: namingStrategy.generatedModelDeclarations.one(modelName),
         description: namingStrategy.generatedModelDeclarationDescriptions.one(modelName),
         args: queryArgs
       })
-      this.appMetadata.queries.push({
+      this.registerQuery({
         ...model,
         nullable: false,
         propertyName: namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
         description: namingStrategy.generatedModelDeclarationDescriptions.oneNotNull(modelName),
         args: queryArgs
       })
-      this.appMetadata.queries.push({
+      this.registerQuery({
         ...model,
         array: true,
         propertyName: namingStrategy.generatedModelDeclarations.many(modelName),
         description: namingStrategy.generatedModelDeclarationDescriptions.many(modelName),
         args: queryArgs
       })
-      this.appMetadata.queries.push({
+      this.registerQuery({
         ...TypeMetadataUtils.createType("number"),
         propertyName: namingStrategy.generatedModelDeclarations.count(modelName),
         description: namingStrategy.generatedModelDeclarationDescriptions.count(modelName),
         args: whereArgs,
       })
-      this.appMetadata.mutations.push({
+      this.registerMutation({
         ...model,
         propertyName: namingStrategy.generatedModelDeclarations.save(modelName),
         description: namingStrategy.generatedModelDeclarationDescriptions.save(modelName),
         args: saveArgs,
       })
-      this.appMetadata.mutations.push({
+      this.registerMutation({
         ...TypeMetadataUtils.createType("boolean"),
         propertyName: namingStrategy.generatedModelDeclarations.remove(modelName),
         description: namingStrategy.generatedModelDeclarationDescriptions.remove(modelName),
         args: whereArgs,
       })
-      this.appMetadata.subscriptions.push({
-        ...model,
-        propertyName: namingStrategy.generatedModelDeclarations.observeInsert(modelName),
-        description: namingStrategy.generatedModelDeclarationDescriptions.observeInsert(modelName),
-        // args: whereArgs,
-      })
-      this.appMetadata.subscriptions.push({
-        ...model,
-        propertyName: namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
-        description: namingStrategy.generatedModelDeclarationDescriptions.observeUpdate(modelName),
-        // args: whereArgs,
-      })
-      this.appMetadata.subscriptions.push({
-        ...model,
-        propertyName: namingStrategy.generatedModelDeclarations.observeSave(modelName),
-        description: namingStrategy.generatedModelDeclarationDescriptions.observeSave(modelName),
-        // args: whereArgs,
-      })
-      this.appMetadata.subscriptions.push({
-        ...model,
-        propertyName: namingStrategy.generatedModelDeclarations.observeRemove(modelName),
-        description: namingStrategy.generatedModelDeclarationDescriptions.observeRemove(modelName),
-        // args: whereArgs,
-      })
-      this.appMetadata.subscriptions.push({
-        ...model,
-        propertyName: namingStrategy.generatedModelDeclarations.observeOne(modelName),
-        description: namingStrategy.generatedModelDeclarationDescriptions.observeOne(modelName),
-        args: whereArgs,
-      })
-      this.appMetadata.subscriptions.push({
-        ...model,
-        array: true,
-        propertyName: namingStrategy.generatedModelDeclarations.observeMany(modelName),
-        description: namingStrategy.generatedModelDeclarationDescriptions.observeMany(modelName),
-        args: queryArgs,
-      })
-      this.appMetadata.subscriptions.push({
-        ...TypeMetadataUtils.createType("number"),
-        propertyName: namingStrategy.generatedModelDeclarations.observeCount(modelName),
-        description: namingStrategy.generatedModelDeclarationDescriptions.observeCount(modelName),
-        args: whereArgs,
-      })
-
-      // this.appMetadata.queries[namingStrategy.generatedModelDeclarations.oneNotNull(modelName)] = args(entity.model, {
-      //   where: nullable(whereArgs),
-      //   order: nullable(orderArgs),
-      // })
-      // this.appMetadata.queries[namingStrategy.generatedModelDeclarations.many(modelName)] = args(array(entity.model), {
-      //   where: nullable(whereArgs),
-      //   order: nullable(orderArgs),
-      //   offset: nullable(Number),
-      //   limit: nullable(Number),
-      // })
-      // this.appMetadata.queries[namingStrategy.generatedModelDeclarations.count(modelName)] = args({ count: Number }, whereArgs)
-      //
-      // this.appMetadata.mutations[namingStrategy.generatedModelDeclarations.save(modelName)] = args(entity.model, whereArgs)
-      // this.appMetadata.mutations[namingStrategy.generatedModelDeclarations.remove(modelName)] = args({ status: String }, whereArgs)
+      if (pubSub) {
+        this.registerSubscription({
+          ...model,
+          propertyName: namingStrategy.generatedModelDeclarations.observeInsert(modelName),
+          description: namingStrategy.generatedModelDeclarationDescriptions.observeInsert(modelName),
+          // args: whereArgs,
+        })
+        this.registerSubscription({
+          ...model,
+          propertyName: namingStrategy.generatedModelDeclarations.observeUpdate(modelName),
+          description: namingStrategy.generatedModelDeclarationDescriptions.observeUpdate(modelName),
+          // args: whereArgs,
+        })
+        this.registerSubscription({
+          ...model,
+          propertyName: namingStrategy.generatedModelDeclarations.observeSave(modelName),
+          description: namingStrategy.generatedModelDeclarationDescriptions.observeSave(modelName),
+          // args: whereArgs,
+        })
+        this.registerSubscription({
+          ...model,
+          propertyName: namingStrategy.generatedModelDeclarations.observeRemove(modelName),
+          description: namingStrategy.generatedModelDeclarationDescriptions.observeRemove(modelName),
+          // args: whereArgs,
+        })
+        this.registerSubscription({
+          ...model,
+          propertyName: namingStrategy.generatedModelDeclarations.observeOne(modelName),
+          description: namingStrategy.generatedModelDeclarationDescriptions.observeOne(modelName),
+          args: whereArgs,
+        })
+        this.registerSubscription({
+          ...model,
+          array: true,
+          propertyName: namingStrategy.generatedModelDeclarations.observeMany(modelName),
+          description: namingStrategy.generatedModelDeclarationDescriptions.observeMany(modelName),
+          args: queryArgs,
+        })
+        this.registerSubscription({
+          ...TypeMetadataUtils.createType("number"),
+          propertyName: namingStrategy.generatedModelDeclarations.observeCount(modelName),
+          description: namingStrategy.generatedModelDeclarationDescriptions.observeCount(modelName),
+          args: whereArgs,
+        })
     }
-
-    // console.log(JSON.stringify(appMetadata.queries, undefined, 2));
-
+    }
   }
 
   private createWhereArgs(

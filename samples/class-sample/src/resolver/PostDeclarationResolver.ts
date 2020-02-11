@@ -1,11 +1,13 @@
-import { DeclarationResolver } from "@microframework/core"
-import { PostDeclaration } from "../declaration"
+import { resolver } from "@microframework/core"
+import { App } from "../app/App"
 import { PostFilterInput, PostInput } from "../input"
 import { Post } from "../model"
 import { PostRepository } from "../repository"
-import { App } from "../app/App"
 
-export const PostDeclarationResolver: DeclarationResolver<typeof App> = {
+/**
+ * Resolver for post declarations.
+ */
+export const PostDeclarationResolver = resolver(App, {
   async posts(args: PostFilterInput): Promise<Post[]> {
     return PostRepository.findAllPosts()
   },
@@ -17,14 +19,10 @@ export const PostDeclarationResolver: DeclarationResolver<typeof App> = {
   },
 
   postSave(args: PostInput): Promise<Post> {
-    return PostRepository.findOneOrFail(args.id!)
-  }
-}
-
-// export const posts = resolveQuery("posts", (args: PostFilterInput) => {
-//
-// })
-//
-// export const PostModel = resolveModel("posts", {
-//
-// })
+    return PostRepository.save({
+      id: args.id || undefined,
+      title: args.title,
+      text: args.text,
+    })
+  },
+})

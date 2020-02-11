@@ -20,39 +20,45 @@ export type ApplicationServerOptions = {
     appPath: string
 
     /**
-     * Custom express server instance.
-     * You can create and configure your own instance of express and framework will use it.
-     * If not passed, default express server will be used.
+     * Express server options.
      */
-    express?: any
+    webserver: {
 
-    /**
-     * Port on which to run express server.
-     */
-    port: number
+        /**
+         * Custom express server instance.
+         * You can create and configure your own instance of express and framework will use it.
+         * If not passed, default express server will be used.
+         */
+        express?: any
 
-    /**
-     * Should be set to true to enable cors.
-     */
-    cors?: boolean | CorsOptions
+        /**
+         * Port on which to run express server.
+         */
+        port: number
 
-    /**
-     * List of static directories to register in the Express server.
-     */
-    staticDirs?: {
-        [route: string]: string
+        /**
+         * Should be set to true to enable cors.
+         */
+        cors?: boolean | CorsOptions
+
+        /**
+         * List of static directories to register in the Express server.
+         */
+        staticDirs?: {
+            [route: string]: string
+        }
+
+        /**
+         * List of registered app middlewares.
+         */
+        middlewares?: HandleFunction[]
+
+        /**
+         * List of registered action middlewares.
+         * This way you can setup middlewares per specific action.
+         */
+        actionMiddlewares?: { [key: string]: HandleFunction[] }
     }
-
-    /**
-     * List of registered app middlewares.
-     */
-    middlewares?: HandleFunction[]
-
-    /**
-     * List of registered action middlewares.
-     * This way you can setup middlewares per specific action.
-     */
-    actionMiddlewares?: { [key: string]: HandleFunction[] }
 
     /**
      * Options to setup a GraphQL.

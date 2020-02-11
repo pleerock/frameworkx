@@ -1,7 +1,10 @@
-import { contextResolver } from "@microframework/core";
+import { contextResolver } from "@microframework/core"
 import { UserRepository } from "../repository"
-import { App } from "./App";
+import { App } from "./App"
 
+/**
+ * Main application context.
+ */
 export const AppContext = contextResolver(App, {
   async currentUser() {
     const user = await UserRepository.findOne(1)

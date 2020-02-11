@@ -1,6 +1,9 @@
 import { validationRule } from "@microframework/core"
-import { AppModels } from "../app/AppModels";
+import { AppModels } from "../app/AppModels"
 
+/**
+ * Validates Post model.
+ */
 export const PostValidator = validationRule(AppModels.Post, {
   projection: {
     text: {
