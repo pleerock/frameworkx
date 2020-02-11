@@ -6,6 +6,9 @@
   },
   "references": [
     { "path": "../core" },
-    { "path": "../parser" }
+    { "path": "../parser" },
+    { "path": "../model" },
+    { "path": "../validator" },
+    { "path": "../logger" }
   ]
 }

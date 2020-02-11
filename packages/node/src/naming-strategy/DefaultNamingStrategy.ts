@@ -150,18 +150,18 @@ export const DefaultNamingStrategy: NamingStrategy = {
 }
 
 function lowercaseFirstLetter(str: string) {
-  return str.charAt(0).toLowerCase() + str.slice(1);
+  return str.charAt(0).toLowerCase() + str.slice(1)
 }
 
 function camelize(str: string) {
   return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
-    if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
-    return index == 0 ? match.toLowerCase() : match.toUpperCase();
-  });
+    if (+match === 0) return "" // or if (/\s+/.test(match)) for white spaces
+    return index == 0 ? match.toLowerCase() : match.toUpperCase()
+  })
 }
 
 function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 function generateRandomString(length: number) {

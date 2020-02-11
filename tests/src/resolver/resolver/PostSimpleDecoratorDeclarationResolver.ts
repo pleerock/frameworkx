@@ -1,4 +1,4 @@
-import { resolver } from "@microframework/core";
+import { resolver } from "@microframework/core"
 
 @resolver()
 export class PostSimpleDecoratorDeclarationResolver {

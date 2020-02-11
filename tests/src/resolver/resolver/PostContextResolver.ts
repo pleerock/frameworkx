@@ -1,5 +1,5 @@
-import { contextResolver } from "@microframework/core";
-import { App } from "../app";
+import { contextResolver } from "@microframework/core"
+import { App } from "../app"
 
 export const PostContextResolver = contextResolver(App, {
 

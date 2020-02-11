@@ -1,4 +1,4 @@
-import * as _typeorm from "typeorm"
+import * as typeorm from "typeorm"
 import { getConnectionManager } from "typeorm"
 
 /**
@@ -9,4 +9,5 @@ export const AppConnection = getConnectionManager().create({
   database: __dirname + "/../database.sqlite",
   synchronize: true,
   logging: false,
+  typename: "__typename"
 })

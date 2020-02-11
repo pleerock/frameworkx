@@ -1,4 +1,4 @@
-import { AnyModel, isModel, Model } from "@microframework/model";
+import { AnyModel, isModel } from "@microframework/model"
 import { AnyApplication } from "../application"
 import {
   ContextResolver,

@@ -1,20 +1,20 @@
-import { AnyApplication, ApplicationTypeMetadata, listOfTypeToArray, ResolverUtils } from "@microframework/core";
+import { AnyApplication, ApplicationTypeMetadata, listOfTypeToArray, ResolverUtils } from "@microframework/core"
 import { debugLogger } from "@microframework/logger"
 import { defaultValidator } from "@microframework/validator"
-import { Request, Response } from "express";
-import { execute, GraphQLError, GraphQLSchema, subscribe } from "graphql";
-import { createServer, Server as HttpServer } from 'http';
-import { SubscriptionServer } from "subscriptions-transport-ws";
-import { ConnectionOptions } from "typeorm";
-import { ApplicationServerOptions } from "./ApplicationServerOptions";
-import { ApplicationServerProperties } from "./ApplicationServerProperties";
-import { ApplicationServerUtils } from "./ApplicationServerUtils";
-import { DefaultErrorHandler } from "./error-handler";
-import { GeneratedEntitySchemaBuilder } from "./GeneratedEntitySchemaBuilder";
-import { GraphQLSchemaBuilder } from "./GraphQLSchemaBuilder";
-import { DefaultNamingStrategy } from "./naming-strategy/DefaultNamingStrategy";
-import { ResolverHelper } from "./ResolverHelper";
-import cors = require("cors");
+import { Request, Response } from "express"
+import { execute, GraphQLError, GraphQLSchema, subscribe } from "graphql"
+import { createServer, Server as HttpServer } from 'http'
+import { SubscriptionServer } from "subscriptions-transport-ws"
+import { ConnectionOptions } from "typeorm"
+import { ApplicationServerOptions } from "./ApplicationServerOptions"
+import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { ApplicationServerUtils } from "./ApplicationServerUtils"
+import { DefaultErrorHandler } from "./error-handler"
+import { GeneratedEntitySchemaBuilder } from "./GeneratedEntitySchemaBuilder"
+import { GraphQLSchemaBuilder } from "./GraphQLSchemaBuilder"
+import { DefaultNamingStrategy } from "./naming-strategy/DefaultNamingStrategy"
+import { ResolverHelper } from "./ResolverHelper"
+import cors = require("cors")
 
 const express = require("express")
 const graphqlHTTP = require("express-graphql")
@@ -249,8 +249,8 @@ export class ApplicationServer<App extends AnyApplication> {
    */
   private createWebsocketServer(schema?: GraphQLSchema) {
     this.websocketServer = createServer((request, response) => {
-      response.writeHead(404);
-      response.end();
+      response.writeHead(404)
+      response.end()
     })
     this.websocketServer.listen(this.properties.websocket.port, () => {})
 

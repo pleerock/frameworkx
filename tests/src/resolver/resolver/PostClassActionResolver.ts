@@ -1,5 +1,5 @@
-import { DeclarationResolver, resolver } from "@microframework/core";
-import { App } from "../app";
+import { DeclarationResolver, resolver } from "@microframework/core"
+import { App } from "../app"
 
 @resolver()
 export class PostClassActionResolver implements DeclarationResolver<typeof App> {

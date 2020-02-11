@@ -1,6 +1,6 @@
 import { Action, AnyApplicationOptions } from "../application"
-import { ResolverMetadata } from "./resolver-metadata";
-import { DeclarationResolver } from "./resolver-strategy";
+import { ResolverMetadata } from "./resolver-metadata"
+import { DeclarationResolver } from "./resolver-strategy"
 
 /**
  * What type of things we can create resolver for.

@@ -1,5 +1,5 @@
-import { Application } from "./application-class";
-import { AnyApplicationOptions } from "./application-options";
+import { Application } from "./application-class"
+import { AnyApplicationOptions } from "./application-options"
 
 /**
  * List of T items passed as an array of imported using import * as syntax.

@@ -1,4 +1,4 @@
-import { ActionList, ContextList, GraphQLDeclarationList, InputTypeList, ModelList } from "./application-core-types";
+import { ActionList, ContextList, GraphQLDeclarationList, InputTypeList, ModelList } from "./application-core-types"
 
 /**
  * Handy way of using ApplicationOptions when its generics don't matter.

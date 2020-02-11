@@ -1,4 +1,11 @@
-import { Action, AnyApplication, AnyApplicationOptions, ContextList, GraphQLDeclarationItem, ModelType } from "../application"
+import {
+    Action,
+    AnyApplication,
+    AnyApplicationOptions,
+    ContextList,
+    GraphQLDeclarationItem,
+    ModelType
+} from "../application"
 import { ActionArgs, DefaultContext, ResolveKey, ResolverReturnValue } from "./index"
 
 /**

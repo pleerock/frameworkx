@@ -1,14 +1,10 @@
-import {
-    ActionTypeMetadata,
-    ApplicationTypeMetadata,
-    TypeMetadata
-} from "@microframework/core";
+import { ActionTypeMetadata, ApplicationTypeMetadata, TypeMetadata } from "@microframework/core";
 import * as ts from "typescript";
-import {Errors} from "./errors";
-import {ModelParser} from "./models-parser";
-import {DefaultParserNamingStrategy} from "./naming-strategy";
-import {ParserOptions} from "./options";
-import {findTypeLiteralProperty, isNodeExported} from "./utils";
+import { Errors } from "./errors";
+import { ModelParser } from "./models-parser";
+import { DefaultParserNamingStrategy } from "./naming-strategy";
+import { ParserOptions } from "./options";
+import { findTypeLiteralProperty, isNodeExported } from "./utils";
 
 export function parse(appFileName: string, options?: ParserOptions): ApplicationTypeMetadata {
 

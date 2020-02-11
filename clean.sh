@@ -5,7 +5,7 @@ declare -a projectDirs=(
   "./packages/node"
   "./packages/logger"
   "./packages/model"
-  "./samples/class-sample"
+  "./samples/complete-sample"
   "./tests"
 )
 
@@ -28,6 +28,7 @@ do
   rm -rf tsconfig.tsbuildinfo
   if [ "$1" = "--hard" ] || [ "$1" = "hard" ]; then
     rm -rf node_modules
+    rm -rf package-lock.json
   fi
 
   cd "$currentDir" || exit

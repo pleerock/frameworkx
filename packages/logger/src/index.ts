@@ -1,6 +1,6 @@
-import {Logger} from "@microframework/core";
+import { Logger } from "@microframework/core"
 
-const debug = require("debug");
+const debug = require("debug")
 
 export const debugLogger: Logger = {
 

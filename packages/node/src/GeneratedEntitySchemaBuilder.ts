@@ -1,7 +1,10 @@
-import { ApplicationTypeMetadata, TypeMetadata, TypeMetadataUtils, } from "@microframework/core";
-import { EntityMetadata, InsertEvent } from "typeorm";
-import { ApplicationServerProperties } from "./ApplicationServerProperties";
+import { ApplicationTypeMetadata, TypeMetadata, TypeMetadataUtils, } from "@microframework/core"
+import { EntityMetadata, InsertEvent } from "typeorm"
+import { ApplicationServerProperties } from "./ApplicationServerProperties"
 
+/**
+ * Generates resolvers and root declarations for the app entities.
+ */
 export class GeneratedEntitySchemaBuilder {
   
   private appMetadata: ApplicationTypeMetadata
@@ -11,65 +14,6 @@ export class GeneratedEntitySchemaBuilder {
               properties: ApplicationServerProperties) {
     this.appMetadata = appMetadata
     this.properties = properties
-  }
-
-  /**
-   * Registers a new resolver in the app.
-   */
-  private registerResolver(
-    type: "query" | "mutation" | "subscription",
-    name: string,
-    resolverFn: any
-  ) {
-
-    // we try to find resolver with the same name to prevent user defined resolver override
-    const sameNameResolver = this.properties.resolvers.find(resolver => {
-      if (resolver.type === "declaration-item-resolver") {
-        return resolver.name === name
-      }
-      return false
-    })
-
-    // register a new resolver
-    if (!sameNameResolver) {
-      this.properties.resolvers.push({
-        instanceof: "Resolver",
-        type: "declaration-item-resolver",
-        declarationType: type,
-        name: name,
-        resolverFn: resolverFn
-      })
-    }
-  }
-
-  /**
-   * Registers a new query in the application metadata.
-   */
-  private registerQuery(type: TypeMetadata) {
-    const sameNameQuery = this.appMetadata.queries.find(query => query.propertyName === type.propertyName)
-    if (!sameNameQuery) {
-      this.appMetadata.queries.push(type)
-    }
-  }
-
-  /**
-   * Registers a new mutation in the application metadata.
-   */
-  private registerMutation(type: TypeMetadata) {
-    const sameNameMutation = this.appMetadata.mutations.find(query => query.propertyName === type.propertyName)
-    if (!sameNameMutation) {
-      this.appMetadata.mutations.push(type)
-    }
-  }
-
-  /**
-   * Registers a new subscription in the application metadata.
-   */
-  private registerSubscription(type: TypeMetadata) {
-    const sameNameSubscription = this.appMetadata.subscriptions.find(query => query.propertyName === type.propertyName)
-    if (!sameNameSubscription) {
-      this.appMetadata.subscriptions.push(type)
-    }
   }
 
   /**
@@ -88,6 +32,10 @@ export class GeneratedEntitySchemaBuilder {
       const modelName = model.typeName!!
       if (!dataSource.hasMetadata(modelName)) continue
       const entityMetadata = dataSource.getMetadata(modelName)
+
+      // ------------------------------------------------------------
+      // register query resolvers
+      // ------------------------------------------------------------
 
       this.registerResolver(
           "query",
@@ -133,6 +81,10 @@ export class GeneratedEntitySchemaBuilder {
           },
       )
 
+      // ------------------------------------------------------------
+      // register mutation resolvers
+      // ------------------------------------------------------------
+
       this.registerResolver(
           "mutation",
           namingStrategy.generatedModelDeclarations.save(modelName),
@@ -153,20 +105,25 @@ export class GeneratedEntitySchemaBuilder {
           }
       )
 
-      const manyTriggerName = namingStrategy.generatedModelDeclarations.observeManyTriggerName(entityMetadata.name)
-      const oneTriggerName = namingStrategy.generatedModelDeclarations.observeOneTriggerName(entityMetadata.name)
-      const countTriggerName = namingStrategy.generatedModelDeclarations.observeCountTriggerName(entityMetadata.name)
-      const insertTriggerName = namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
-      const saveTriggerName = namingStrategy.generatedModelDeclarations.observeSaveTriggerName(entityMetadata.name)
-      const updateTriggerName = namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
-      const removeTriggerName = namingStrategy.generatedModelDeclarations.observeRemoveTriggerName(entityMetadata.name)
+      // ------------------------------------------------------------
+      // register subscription resolvers
+      // ------------------------------------------------------------
 
       if (pubSub) {
+
+        const manyTriggerName = namingStrategy.generatedModelDeclarations.observeManyTriggerName(entityMetadata.name)
+        const oneTriggerName = namingStrategy.generatedModelDeclarations.observeOneTriggerName(entityMetadata.name)
+        const countTriggerName = namingStrategy.generatedModelDeclarations.observeCountTriggerName(entityMetadata.name)
+        const insertTriggerName = namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
+        const saveTriggerName = namingStrategy.generatedModelDeclarations.observeSaveTriggerName(entityMetadata.name)
+        const updateTriggerName = namingStrategy.generatedModelDeclarations.observeInsertTriggerName(entityMetadata.name)
+        const removeTriggerName = namingStrategy.generatedModelDeclarations.observeRemoveTriggerName(entityMetadata.name)
+
         dataSource
             .subscribers
             .push({
               listenTo: () => {
-                return entityMetadata.target;
+                return entityMetadata.target
               },
               afterInsert: (event: InsertEvent<any>) => {
                 pubSub!.publish(insertTriggerName, event.entity)
@@ -289,6 +246,10 @@ export class GeneratedEntitySchemaBuilder {
         )
       }
 
+      // ------------------------------------------------------------
+      // prepare root declaration args
+      // ------------------------------------------------------------
+
       const whereArgsProperties = this.createWhereArgs(entityMetadata, model, 0)
       const saveArgsProperties = this.createSaveArgs(entityMetadata, model, 0)
 
@@ -327,6 +288,10 @@ export class GeneratedEntitySchemaBuilder {
         properties: [whereArgs, orderByArgs]
       })
 
+      // ------------------------------------------------------------
+      // register root queries
+      // ------------------------------------------------------------
+
       this.registerQuery({
         ...model,
         nullable: true,
@@ -354,6 +319,11 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.count(modelName),
         args: whereArgs,
       })
+
+      // ------------------------------------------------------------
+      // register root mutations
+      // ------------------------------------------------------------
+
       this.registerMutation({
         ...model,
         propertyName: namingStrategy.generatedModelDeclarations.save(modelName),
@@ -366,6 +336,11 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.remove(modelName),
         args: whereArgs,
       })
+
+      // ------------------------------------------------------------
+      // register root subscriptions
+      // ------------------------------------------------------------
+
       if (pubSub) {
         this.registerSubscription({
           ...model,
@@ -414,6 +389,9 @@ export class GeneratedEntitySchemaBuilder {
     }
   }
 
+  /**
+   * Recursively creates WhereArgs for entity.
+   */
   private createWhereArgs(
       entityMetadata: EntityMetadata,
       type: TypeMetadata,
@@ -451,6 +429,9 @@ export class GeneratedEntitySchemaBuilder {
     return allTypes
   }
 
+  /**
+   * Recursively creates SaveArgs for entity.
+   */
   private createSaveArgs(
       entityMetadata: EntityMetadata,
       type: TypeMetadata,
@@ -490,6 +471,65 @@ export class GeneratedEntitySchemaBuilder {
 
     // }
     return allTypes
+  }
+
+  /**
+   * Registers a new resolver in the app.
+   */
+  private registerResolver(
+      type: "query" | "mutation" | "subscription",
+      name: string,
+      resolverFn: any
+  ) {
+
+    // we try to find resolver with the same name to prevent user defined resolver override
+    const sameNameResolver = this.properties.resolvers.find(resolver => {
+      if (resolver.type === "declaration-item-resolver") {
+        return resolver.name === name
+      }
+      return false
+    })
+
+    // register a new resolver
+    if (!sameNameResolver) {
+      this.properties.resolvers.push({
+        instanceof: "Resolver",
+        type: "declaration-item-resolver",
+        declarationType: type,
+        name: name,
+        resolverFn: resolverFn
+      })
+    }
+  }
+
+  /**
+   * Registers a new query in the application metadata.
+   */
+  private registerQuery(type: TypeMetadata) {
+    const sameNameQuery = this.appMetadata.queries.find(query => query.propertyName === type.propertyName)
+    if (!sameNameQuery) {
+      this.appMetadata.queries.push(type)
+    }
+  }
+
+  /**
+   * Registers a new mutation in the application metadata.
+   */
+  private registerMutation(type: TypeMetadata) {
+    const sameNameMutation = this.appMetadata.mutations.find(query => query.propertyName === type.propertyName)
+    if (!sameNameMutation) {
+      this.appMetadata.mutations.push(type)
+    }
+  }
+
+  /**
+   * Registers a new subscription in the application metadata.
+   */
+  private registerSubscription(type: TypeMetadata) {
+    const sameNameSubscription = this.appMetadata.subscriptions.find(query => query.propertyName === type.propertyName)
+    if (!sameNameSubscription) {
+      this.appMetadata.subscriptions.push(type)
+    }
   }
 
 }

@@ -1,25 +1,21 @@
-import gql from 'graphql-tag';
-import { GraphqlFetcher } from "../util/graphql-fetcher";
-import { obtainPort } from "../util/port-generator";
-import { App } from "./app";
-import { PostClassActionResolver } from "./resolver/PostClassActionResolver";
-import { PostContextResolver } from "./resolver/PostContextResolver";
-import {
-    PostItemFnDeclarationResolver,
-    PostsItemFnDeclarationResolver
-} from "./resolver/PostDeclarationItemsResolver";
-import { PostDeclarationWithContextResolver } from "./resolver/PostDeclarationWithContextResolver";
-import { PostDLDecoratorModelResolver } from "./resolver/PostDLDecoratorModelResolver";
-import { PostObjectActionDeclarationResolver } from "./resolver/PostObjectActionDeclarationResolver";
-import { PostObjectDLModelResolver } from "./resolver/PostObjectDLModelResolver";
-import { PostObjectFnDeclarationResolver } from "./resolver/PostObjectFnDeclarationResolver";
-import { PostObjectModelResolver } from "./resolver/PostObjectModelResolver";
-import { PostObjectRawDeclarationResolver } from "./resolver/PostObjectRawDeclarationResolver";
-import { PostSimpleDecoratorDeclarationResolver } from "./resolver/PostSimpleDecoratorDeclarationResolver";
-import { PostSimpleDecoratorModelResolver } from "./resolver/PostSimpleDecoratorModelResolver";
-import { AppServer } from "./server";
+import gql from 'graphql-tag'
+import { GraphqlFetcher } from "../util/graphql-fetcher"
+import { obtainPort } from "../util/port-generator"
+import { PostClassActionResolver } from "./resolver/PostClassActionResolver"
+import { PostContextResolver } from "./resolver/PostContextResolver"
+import { PostItemFnDeclarationResolver, PostsItemFnDeclarationResolver } from "./resolver/PostDeclarationItemsResolver"
+import { PostDeclarationWithContextResolver } from "./resolver/PostDeclarationWithContextResolver"
+import { PostDLDecoratorModelResolver } from "./resolver/PostDLDecoratorModelResolver"
+import { PostObjectActionDeclarationResolver } from "./resolver/PostObjectActionDeclarationResolver"
+import { PostObjectDLModelResolver } from "./resolver/PostObjectDLModelResolver"
+import { PostObjectFnDeclarationResolver } from "./resolver/PostObjectFnDeclarationResolver"
+import { PostObjectModelResolver } from "./resolver/PostObjectModelResolver"
+import { PostObjectRawDeclarationResolver } from "./resolver/PostObjectRawDeclarationResolver"
+import { PostSimpleDecoratorDeclarationResolver } from "./resolver/PostSimpleDecoratorDeclarationResolver"
+import { PostSimpleDecoratorModelResolver } from "./resolver/PostSimpleDecoratorModelResolver"
+import { AppServer } from "./server"
 
-const fetch = require('node-fetch');
+const fetch = require('node-fetch')
 
 describe("resolvers", () => {
 

@@ -1,4 +1,4 @@
-import { ListOfType } from "./application-helper-types";
+import { ListOfType } from "./application-helper-types"
 
 /**
  * Converts ListOfType<T> type of object into array of T items.

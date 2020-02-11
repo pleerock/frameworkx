@@ -1,4 +1,4 @@
-import { ApplicationTypeMetadata, TypeMetadata } from "@microframework/core";
+import { ApplicationTypeMetadata, TypeMetadata } from "@microframework/core"
 import {
     GraphQLBoolean,
     GraphQLEnumType,
@@ -15,9 +15,9 @@ import {
     GraphQLSchema,
     GraphQLString,
     GraphQLUnionType
-} from "graphql";
-import { ApplicationServerProperties } from "./ApplicationServerProperties";
-import { ResolverHelper } from "./ResolverHelper";
+} from "graphql"
+import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { ResolverHelper } from "./ResolverHelper"
 
 /**
  * Builds a GraphQL schema for a provided application metadata.

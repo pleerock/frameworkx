@@ -1,6 +1,6 @@
-import { ListOfType } from "../application";
-import { AppResolverType } from "./resolver-helper-types";
-import { DeclarationResolverMetadata, ResolverMetadata } from "./resolver-metadata";
+import { ListOfType } from "../application"
+import { AppResolverType } from "./resolver-helper-types"
+import { DeclarationResolverMetadata, ResolverMetadata } from "./resolver-metadata"
 
 /**
  * Core resolver utility functions.

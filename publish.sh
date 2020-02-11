@@ -1,24 +1,29 @@
-cd ./framework/core
+cd ./packages/core
 npm version patch
 npm publish
 cd ../../
 
-cd ./framework/logger
+cd ./packages/logger
 npm version patch
 npm publish
 cd ../../
 
-cd ./framework/model
+cd ./packages/model
 npm version patch
 npm publish
 cd ../../
 
-cd ./framework/node
+cd ./packages/node
 npm version patch
 npm publish
 cd ../../
 
-cd ./framework/validator
+cd ./packages/parser
+npm version patch
+npm publish
+cd ../../
+
+cd ./packages/validator
 npm version patch
 npm publish
 cd ../../

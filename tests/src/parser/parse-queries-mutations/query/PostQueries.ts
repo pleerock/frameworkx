@@ -1,4 +1,4 @@
-import { PostModel } from "../model/PostModel";
+import { PostModel } from "../model/PostModel"
 
 export type PostQueries = {
     post(): PostModel,

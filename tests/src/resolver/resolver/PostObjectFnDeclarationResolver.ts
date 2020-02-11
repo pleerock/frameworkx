@@ -1,5 +1,5 @@
-import { resolver } from "@microframework/core";
-import { App } from "../app";
+import { resolver } from "@microframework/core"
+import { App } from "../app"
 
 export const PostObjectFnDeclarationResolver = resolver(App, {
 

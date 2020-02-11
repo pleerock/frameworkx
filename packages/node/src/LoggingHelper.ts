@@ -1,5 +1,5 @@
-import { DefaultContext, Logger, ResolverType, TypeMetadata } from "@microframework/core";
-import { ActionEvent } from "./action/ActionEvent";
+import { DefaultContext, Logger, ResolverType, TypeMetadata } from "@microframework/core"
+import { ActionEvent } from "./action/ActionEvent"
 
 export type GraphQLResolveArgs = {
     parent: any
@@ -20,7 +20,7 @@ export type ResolveLogErrorInfo = ResolveLogInfo & {
     error: any
 }
 
-export class ServerLogger {
+export class LoggingHelper {
     
     constructor(logger: Logger) {
     }

@@ -1,4 +1,4 @@
-import { ErrorHandler } from "./ErrorHandler";
+import { ErrorHandler } from "./ErrorHandler"
 
 export const DefaultErrorHandler: ErrorHandler = {
 

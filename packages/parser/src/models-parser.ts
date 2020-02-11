@@ -1,8 +1,8 @@
-import {TypeMetadataUtils, TypeMetadata} from "@microframework/core";
+import { TypeMetadata, TypeMetadataUtils } from "@microframework/core";
 import * as ts from "typescript";
-import {Errors} from "./errors";
-import {ParserOptions} from "./options";
-import {ParserUtils} from "./utils";
+import { Errors } from "./errors";
+import { ParserOptions } from "./options";
+import { ParserUtils } from "./utils";
 
 export class ModelParser {
 

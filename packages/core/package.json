@@ -1,6 +1,6 @@
 {
   "name": "@microframework/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Microframework core",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -9,6 +9,7 @@
     "@microframework/model": "*"
   },
   "devDependencies": {
+    "ts-node": "^8.6.2",
     "prettier": "^1.19.1",
     "typescript": "^3.7.5"
   }

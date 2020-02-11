@@ -1,5 +1,5 @@
-import { createApp } from "@microframework/core";
-import { PostType } from "./model/PostType";
+import { createApp } from "@microframework/core"
+import { PostType } from "./model/PostType"
 
 export const App = createApp<{
     actions: {

@@ -1,11 +1,11 @@
 import { createApplicationServer } from "@microframework/node"
+import * as entities from "../entity"
+import * as resolvers from "../resolver"
+import * as validationRules from "../validator"
 import { App } from "./App"
 import { AppConnection } from "./AppConnection"
 import { AppContext } from "./AppContext"
 import { AppPubSub } from "./AppPubSub"
-import * as resolvers from "../resolver"
-import * as entities from "../entity"
-import * as validationRules from "../validator"
 
 /**
  * Application server setup.

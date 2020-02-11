@@ -1,4 +1,4 @@
-import { AnyApplicationOptions } from "./application-options";
+import { AnyApplicationOptions } from "./application-options"
 
 /**
  * Application is a root point of the framework.

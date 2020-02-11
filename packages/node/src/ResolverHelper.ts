@@ -6,24 +6,23 @@ import {
     SubscriptionItemResolver,
     TypeMetadata
 } from "@microframework/core"
-import DataLoader from "dataloader";
-import { Request, Response } from "express";
-import { withFilter } from "graphql-subscriptions";
-import { GraphQLFieldResolver } from "graphql/type/definition";
-import { ActionEvent } from "./action/ActionEvent";
-import { ApplicationServerProperties } from "./ApplicationServerProperties";
-import { ResolveLogInfo, ServerLogger } from "./ServerLogger";
-import { ValidationHelper } from "./ValidationHelper";
+import DataLoader from "dataloader"
+import { withFilter } from "graphql-subscriptions"
+import { GraphQLFieldResolver } from "graphql/type/definition"
+import { ActionEvent } from "./action/ActionEvent"
+import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { LoggingHelper, ResolveLogInfo } from "./LoggingHelper"
+import { ValidationHelper } from "./ValidationHelper"
 
 export class ResolverHelper {
 
-    private logger: ServerLogger
+    private logger: LoggingHelper
     private validator: ValidationHelper
 
     constructor(
         public properties: ApplicationServerProperties,
     ) {
-        this.logger = new ServerLogger(properties.logger)
+        this.logger = new LoggingHelper(properties.logger)
         this.validator = new ValidationHelper(properties.validator, properties.validationRules)
     }
 
@@ -170,9 +169,9 @@ export class ResolverHelper {
             try {
 
                 if (!context.dataLoaders)
-                    context.dataLoaders = {};
+                    context.dataLoaders = {}
                 if (!context.dataLoaders[parentTypeName])
-                    context.dataLoaders[parentTypeName] = {};
+                    context.dataLoaders[parentTypeName] = {}
 
                 // log resolving start process
                 this.logger.logBeforeResolve(logInfo)
@@ -214,7 +213,7 @@ export class ResolverHelper {
                             }
                         }, {
                             cacheKeyFn: (key: { parent: any, args: any, context: any, info: any }) => {
-                                return JSON.stringify({parent: key.parent, args: key.args});
+                                return JSON.stringify({parent: key.parent, args: key.args})
                             }
                         }
                     )
@@ -257,9 +256,9 @@ export class ResolverHelper {
             try {
 
                 if (!context.dataLoaders)
-                    context.dataLoaders = {};
+                    context.dataLoaders = {}
                 if (!context.dataLoaders[parentTypeName])
-                    context.dataLoaders[parentTypeName] = {};
+                    context.dataLoaders[parentTypeName] = {}
 
                 // log resolving start process
                 this.logger.logBeforeResolve(logInfo)
@@ -301,7 +300,7 @@ export class ResolverHelper {
                             }
                         }, {
                             cacheKeyFn: (key: { parent: any, args: any, context: any, info: any }) => {
-                                return JSON.stringify({parent: key.parent, args: key.args});
+                                return JSON.stringify({parent: key.parent, args: key.args})
                             }
                         }
                     )
@@ -398,15 +397,15 @@ export class ResolverHelper {
     }
 
     withCancel = (asyncIterator: any, onCancel: () => any) => {
-        const asyncReturn = asyncIterator.return;
+        const asyncReturn = asyncIterator.return
 
         asyncIterator.return = () => {
-            onCancel();
-            return asyncReturn ? asyncReturn.call(asyncIterator) : Promise.resolve({value: undefined, done: true});
-        };
+            onCancel()
+            return asyncReturn ? asyncReturn.call(asyncIterator) : Promise.resolve({ value: undefined, done: true })
+        }
 
-        return asyncIterator;
-    };
+        return asyncIterator
+    }
 
     findDataLoaderResolver(modelName: string, propertyName: string) {
         let dataLoaderResolverFn: QueryMutationItemResolver<any, any> | undefined = undefined

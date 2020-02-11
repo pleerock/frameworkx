@@ -1,8 +1,8 @@
-import { TypeMetadata } from "@microframework/core";
-import { parse } from "@microframework/parser";
-import * as fs from "fs";
-import * as path from "path";
-import { MappedEntitySchemaProperty } from "typeorm";
+import { TypeMetadata } from "@microframework/core"
+import { parse } from "@microframework/parser"
+import * as fs from "fs"
+import * as path from "path"
+import { MappedEntitySchemaProperty } from "typeorm"
 
 /**
  * Application Server utility functions.

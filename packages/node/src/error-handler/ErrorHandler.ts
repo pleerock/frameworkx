@@ -1,5 +1,5 @@
-import { ActionEvent } from "../action/ActionEvent";
-import { ResolveLogErrorInfo } from "../ServerLogger";
+import { ActionEvent } from "../action/ActionEvent"
+import { ResolveLogErrorInfo } from "../LoggingHelper"
 
 /**
  * Error handling interface.

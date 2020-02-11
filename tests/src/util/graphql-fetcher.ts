@@ -1,6 +1,6 @@
-import { DocumentNode } from "graphql";
+import { DocumentNode } from "graphql"
 
-const fetch = require('node-fetch');
+const fetch = require('node-fetch')
 
 export class GraphqlFetcher {
 
@@ -21,7 +21,7 @@ export class GraphqlFetcher {
         if (response.status >= 200 && response.status < 300)
             return Promise.resolve(response.json())
 
-        console.error(await response.json());
+        console.error(await response.json())
         throw new Error(response.statusText || String(response.status))
     }
 }

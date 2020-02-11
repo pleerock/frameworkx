@@ -1,5 +1,5 @@
-import { DeclarationResolver } from "@microframework/core";
-import { App } from "../app";
+import { DeclarationResolver } from "@microframework/core"
+import { App } from "../app"
 
 export const PostObjectRawDeclarationResolver: DeclarationResolver<typeof App> = {
 
