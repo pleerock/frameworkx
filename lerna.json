@@ -1,12 +1,12 @@
 {
   "packages": [
-    "./framework/core",
-    "./framework/model",
-    "./framework/parser",
-    "./framework/node",
-    "./framework/logger",
-    "./framework/validator",
-    "./samples/class-sample",
+    "./packages/core",
+    "./packages/model",
+    "./packages/parser",
+    "./packages/node",
+    "./packages/logger",
+    "./packages/validator",
+    "./samples/complete-sample",
     "./tests"
   ],
   "version": "0.0.0"

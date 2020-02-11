@@ -8,6 +8,6 @@
   "scripts": {
     "start": "lerna bootstrap",
     "watch": "tsc -b -w",
-    "class-sample": "node samples/class-sample/_/index.js"
+    "class-sample": "node samples/complete-sample/_/index.js"
   }
 }

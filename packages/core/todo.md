@@ -1,4 +1,3 @@
-* todo: rename "framework" to "packages"
 * add Date support
 * add deprecationReason and isDeprecated to type metadata
 * provide mechanism for allowing allowed queries (e.g. `options#allowedQueries`)

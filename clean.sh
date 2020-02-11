@@ -1,10 +1,10 @@
 currentDir=${PWD}
 declare -a projectDirs=(
-  "./framework/core"
-  "./framework/parser"
-  "./framework/node"
-  "./framework/logger"
-  "./framework/model"
+  "./packages/core"
+  "./packages/parser"
+  "./packages/node"
+  "./packages/logger"
+  "./packages/model"
   "./samples/class-sample"
   "./tests"
 )

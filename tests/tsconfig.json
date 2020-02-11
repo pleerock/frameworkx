@@ -5,10 +5,10 @@
     "rootDir": "src"
   },
   "references": [
-    { "path": "../framework/core" },
-    { "path": "../framework/parser" },
-    { "path": "../framework/node" },
-    { "path": "../framework/logger" },
-    { "path": "../framework/validator" }
+    { "path": "../packages/core"},
+    { "path": "../packages/parser"},
+    { "path": "../packages/node"},
+    { "path": "../packages/logger"},
+    { "path": "../packages/validator"}
   ]
 }
