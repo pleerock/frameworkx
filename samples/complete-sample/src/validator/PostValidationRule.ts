@@ -4,7 +4,7 @@ import { AppModels } from "../app/AppModels"
 /**
  * Validates Post model.
  */
-export const PostValidator = validationRule(AppModels.Post, {
+export const PostValidationRule = validationRule(AppModels.Post, {
   projection: {
     text: {
       minLength: 10,

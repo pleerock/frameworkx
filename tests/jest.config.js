@@ -4,4 +4,4 @@ module.exports = {
     testMatch: [
         '**/src/**/**/**/index.ts',
     ]
-};
+}

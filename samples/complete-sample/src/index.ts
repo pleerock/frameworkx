@@ -1,3 +1,4 @@
+require("dotenv").config()
 import { AppServer } from "./app/AppServer"
 
 AppServer.start()

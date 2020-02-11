@@ -1,4 +1,4 @@
-import { camelize, capitalize } from "./utils";
+import { camelize, capitalize } from "./utils"
 
 export type ParserNamingStrategy = {
     enumNameFromStringLiteralUnion(name: string): string

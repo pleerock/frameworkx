@@ -8,8 +8,8 @@ import { PostRepository } from "../repository"
  * Resolver for post declarations.
  */
 export const PostDeclarationResolver = resolver(App, {
-  async posts(args: PostFilterInput): Promise<Post[]> {
-    return PostRepository.findAllPosts()
+  async posts(args: PostFilterInput, { logger }): Promise<Post[]> {
+    return PostRepository.findAllPosts(args.offset, args.limit)
   },
 
   async postRemove(args: { id: number }): Promise<boolean> {

@@ -1,4 +1,10 @@
-import { AnyApplication, ApplicationTypeMetadata, listOfTypeToArray, ResolverUtils } from "@microframework/core"
+import {
+  AnyApplication,
+  ApplicationLogger,
+  ApplicationTypeMetadata,
+  listOfTypeToArray,
+  ResolverUtils
+} from "@microframework/core"
 import { debugLogger } from "@microframework/logger"
 import { defaultValidator } from "@microframework/validator"
 import { Request, Response } from "express"
@@ -12,6 +18,7 @@ import { ApplicationServerUtils } from "./ApplicationServerUtils"
 import { DefaultErrorHandler } from "./error-handler"
 import { GeneratedEntitySchemaBuilder } from "./GeneratedEntitySchemaBuilder"
 import { GraphQLSchemaBuilder } from "./GraphQLSchemaBuilder"
+import { LoggerHelper } from "./LoggerHelper"
 import { DefaultNamingStrategy } from "./naming-strategy/DefaultNamingStrategy"
 import { ResolverHelper } from "./ResolverHelper"
 import cors = require("cors")
@@ -24,12 +31,18 @@ const graphqlHTTP = require("express-graphql")
  */
 export class ApplicationServer<App extends AnyApplication> {
 
+  /**
+   * Logger can be used to log application-level events.
+   */
+  logger: ApplicationLogger
+
   private app: App
   private server?: HttpServer
   private websocketServer?: HttpServer
   private subscriptionServer?: SubscriptionServer
   private properties: ApplicationServerProperties
   private resolverHelper: ResolverHelper
+  private loggerHelper: LoggerHelper
 
   /**
    * Application types metadata.
@@ -60,7 +73,7 @@ export class ApplicationServer<App extends AnyApplication> {
       graphql: {
         route: options.graphql?.route || "/graphql",
         graphiql: options.graphql?.graphiql || false,
-        playground: options.graphql?.playground || false,
+        playground: options.graphql?.playground,
         options: options.graphql?.options
       },
       websocket: {
@@ -80,7 +93,9 @@ export class ApplicationServer<App extends AnyApplication> {
       validator: options.validator || defaultValidator,
       logger: options.logger || debugLogger,
     }
-    this.resolverHelper = new ResolverHelper(this.properties)
+    this.loggerHelper = new LoggerHelper(this.properties.logger)
+    this.resolverHelper = new ResolverHelper(this.loggerHelper, this.properties)
+    this.logger = this.loggerHelper.createApplicationLogger()
   }
 
   /**
@@ -115,7 +130,7 @@ export class ApplicationServer<App extends AnyApplication> {
 
     // setup GraphQL
     let schema: GraphQLSchema | undefined = undefined
-    const typeRegistry = new GraphQLSchemaBuilder(this.metadata, this.properties)
+    const typeRegistry = new GraphQLSchemaBuilder(this.loggerHelper, this.metadata, this.properties)
     if (typeRegistry.canHaveSchema()) {
 
       // create a GraphQL schema
@@ -142,13 +157,13 @@ export class ApplicationServer<App extends AnyApplication> {
     // register action routes in express app
     for (let action of this.metadata.actions) {
       const method = action.name.substr(0, action.name.indexOf(" ")).toLowerCase() // todo: make sure to validate this before
-      const route = action.name.substr(action.name.indexOf(" ") + 1).toLowerCase()
+      const route = action.name.substr(action.name.indexOf(" ") + 1)
       if (!method || !route)
         throw new Error(`Invalid action defined "${action.name}". Action name must contain HTTP method (e.g. "get", "post", ...) and URL (e.g. "/users", ...).`)
 
       const middlewares = this.properties.webserver.actionMiddlewares[action.name] || []
       expressApp[method](route, ...middlewares, async (request: Request, response: Response, _next: any) => {
-        this.resolverHelper.createActionResolver({ method, route, request, response }, action)
+        this.resolverHelper.createActionResolver(request, response, action)
       })
     }
 

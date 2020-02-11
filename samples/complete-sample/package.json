@@ -10,6 +10,7 @@
     "@microframework/node": "*",
     "@microframework/server": "*",
     "@microframework/validator": "*",
+    "dotenv": "^8.2.0",
     "graphql-subscriptions": "^1.1.0",
     "sqlite": "^3.0.3",
     "sqlite3": "^4.1.1",

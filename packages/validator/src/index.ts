@@ -1,4 +1,4 @@
-import { NumberValidationConstraints, StringValidationConstraints, Validator } from "@microframework/core";
+import { NumberValidationConstraints, StringValidationConstraints, Validator } from "@microframework/core"
 
 const validatorjs = require("validator")
 

@@ -1,8 +1,8 @@
-import { TypeMetadata, TypeMetadataUtils } from "@microframework/core";
-import * as ts from "typescript";
-import { Errors } from "./errors";
-import { ParserOptions } from "./options";
-import { ParserUtils } from "./utils";
+import { TypeMetadata, TypeMetadataUtils } from "@microframework/core"
+import * as ts from "typescript"
+import { Errors } from "./errors"
+import { ParserOptions } from "./options"
+import { ParserUtils } from "./utils"
 
 export class ModelParser {
 
@@ -368,7 +368,7 @@ export class ModelParser {
                 })
 
             // } else {
-            //     console.log(member);
+            //     console.log(member)
             }
         }
         return properties

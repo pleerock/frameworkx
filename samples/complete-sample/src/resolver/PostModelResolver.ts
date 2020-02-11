@@ -6,8 +6,9 @@ import { PostStatus } from "../enum"
 /**
  * Resolver for Post model.
  */
-export const PostTypeResolver = resolver(App, AppModels.Post, {
-  status() {
+export const PostModelResolver = resolver(App, AppModels.Post, {
+  status(post, { logger }) {
+    logger.log("I'm resolving a status property!")
     return PostStatus.under_moderation
   },
 })

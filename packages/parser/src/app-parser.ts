@@ -1,10 +1,10 @@
-import { ActionTypeMetadata, ApplicationTypeMetadata, TypeMetadata } from "@microframework/core";
-import * as ts from "typescript";
-import { Errors } from "./errors";
-import { ModelParser } from "./models-parser";
-import { DefaultParserNamingStrategy } from "./naming-strategy";
-import { ParserOptions } from "./options";
-import { findTypeLiteralProperty, isNodeExported } from "./utils";
+import { ActionTypeMetadata, ApplicationTypeMetadata, TypeMetadata } from "@microframework/core"
+import * as ts from "typescript"
+import { Errors } from "./errors"
+import { ModelParser } from "./models-parser"
+import { DefaultParserNamingStrategy } from "./naming-strategy"
+import { ParserOptions } from "./options"
+import { findTypeLiteralProperty, isNodeExported } from "./utils"
 
 export function parse(appFileName: string, options?: ParserOptions): ApplicationTypeMetadata {
 
@@ -19,7 +19,7 @@ export function parse(appFileName: string, options?: ParserOptions): Application
     const program = ts.createProgram([appFileName], {
         target: ts.ScriptTarget.ES5,
         module: ts.ModuleKind.CommonJS
-    });
+    })
 
     // find a provided application source file
     const appSourceFile = program.getSourceFiles().find(file => {
@@ -264,7 +264,7 @@ function parseQueries(program: ts.Program, appDefOptions: ts.TypeLiteralNode, op
 
     const modelParser = new ModelParser(program, options)
     const type = modelParser.parse(modelsMember)
-    // console.log(JSON.stringify(type, undefined, 2));
+    // console.log(JSON.stringify(type, undefined, 2))
     return type.properties
 }
 

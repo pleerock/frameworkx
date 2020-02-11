@@ -1,1 +1,1 @@
-export * from "./PostValidator"
+export * from "./PostValidationRule"

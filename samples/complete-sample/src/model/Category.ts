@@ -18,4 +18,10 @@ export type Category = {
    * All posts attached to this category.
    */
   posts: Post[]
+
+  /**
+   * Number of posts in the category.
+   */
+  postsCount: number
+
 }

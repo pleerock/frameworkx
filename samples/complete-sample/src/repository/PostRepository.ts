@@ -8,7 +8,7 @@ import { AppModels } from "../app/AppModels"
 export const PostRepository = AppConnection.getRepository(
   AppModels.Post,
 ).extend({
-  findAllPosts() {
-    return this.find()
+  findAllPosts(offset: number, limit: number) {
+    return this.find({ take: limit, skip: offset })
   },
 })

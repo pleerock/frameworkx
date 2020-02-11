@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import * as ts from "typescript"
 
 /**
  * Errors thrown in the app.

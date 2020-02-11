@@ -150,8 +150,8 @@ export function resolver<
   app: App,
   model: Model,
   resolver:
-      | ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>
-      | (() => ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>)
+      | ModelResolver<Model["type"], App["_options"]["context"]>
+      | (() => ModelResolver<Model["type"], App["_options"]["context"]>)
 ): ResolverMetadata
 
 /**
@@ -198,8 +198,8 @@ export function resolver<
   app: App,
   options: { model: Model, dataLoader: true },
   resolver:
-      | ModelDLResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>
-      | (() => ModelDLResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>)
+      | ModelDLResolver<Model["type"], App["_options"]["context"]>
+      | (() => ModelDLResolver<Model["type"], App["_options"]["context"]>)
 ): ResolverMetadata
 
 /**
@@ -246,8 +246,8 @@ export function resolver<
   app: App,
   options: { model: Model, dataLoader?: false },
   resolver:
-      | ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>
-      | (() => ModelResolver<App["_options"]["models"][Model["type"]], App["_options"]["context"]>)
+      | ModelResolver<Model["type"], App["_options"]["context"]>
+      | (() => ModelResolver<Model["type"], App["_options"]["context"]>)
 ): ResolverMetadata
 
 /**

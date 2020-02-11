@@ -1,14 +1,15 @@
+import { LogEvent } from "@microframework/core"
 import { ErrorHandler } from "./ErrorHandler"
 
 export const DefaultErrorHandler: ErrorHandler = {
 
-  actionError({ error, response }) {
-    response.status(500)
-    response.json(error)
+  actionError(error: any, event: LogEvent) {
+    event.response.status(500)
+    event.response.json(error)
   },
 
-  resolverError(options) {
-    throw options.error
+  resolverError(error: any, event: LogEvent) {
+    throw error
   }
 
 }

@@ -1,4 +1,5 @@
 import { Action, AnyApplicationOptions } from "../application"
+import { ContextLogger, Logger } from "../logger"
 import { ResolverMetadata } from "./resolver-metadata"
 import { DeclarationResolver } from "./resolver-strategy"
 
@@ -13,6 +14,7 @@ export type ResolverType = "query" | "mutation" | "subscription" | "model" | "ac
 export type DefaultContext = {
     request: any
     response: any
+    logger: ContextLogger
 }
 
 /**

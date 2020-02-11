@@ -79,7 +79,7 @@ export type ApplicationServerProperties = {
         /**
          * Indicates if playground should be enabled or not.
          */
-        playground: boolean
+        playground?: boolean | string
 
         /**
          * Additional GraphQL options when GraphQL middleware is created.

@@ -17,6 +17,7 @@ import {
     GraphQLUnionType
 } from "graphql"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { LoggerHelper } from "./LoggerHelper"
 import { ResolverHelper } from "./ResolverHelper"
 
 /**
@@ -33,12 +34,13 @@ export class GraphQLSchemaBuilder {
     private unionTypes: GraphQLUnionType[] = []
 
     constructor(
+        loggerHelper: LoggerHelper,
         appMetadata: ApplicationTypeMetadata, 
         properties: ApplicationServerProperties
     ) {
         this.appMetadata = appMetadata
         this.properties = properties
-        this.resolverHelper = new ResolverHelper(properties)
+        this.resolverHelper = new ResolverHelper(loggerHelper, properties)
     }
 
     /**
@@ -230,7 +232,7 @@ export class GraphQLSchemaBuilder {
 
         let typeName = metadata.typeName
         if (!typeName) {
-            // console.log(metadata);
+            // console.log(metadata)
             throw new Error("Metadata doesn't have a name, cannot create object")
         }
 

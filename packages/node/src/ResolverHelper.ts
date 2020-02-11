@@ -6,23 +6,29 @@ import {
     SubscriptionItemResolver,
     TypeMetadata
 } from "@microframework/core"
+import { LogEvent } from "@microframework/core"
 import DataLoader from "dataloader"
 import { withFilter } from "graphql-subscriptions"
 import { GraphQLFieldResolver } from "graphql/type/definition"
-import { ActionEvent } from "./action/ActionEvent"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
-import { LoggingHelper, ResolveLogInfo } from "./LoggingHelper"
+import { LoggerHelper } from "./LoggerHelper"
 import { ValidationHelper } from "./ValidationHelper"
 
+/**
+ * Helper over resolving operations.
+ */
 export class ResolverHelper {
 
-    private logger: LoggingHelper
+    private loggerHelper: LoggerHelper
     private validator: ValidationHelper
+    private properties: ApplicationServerProperties
 
     constructor(
-        public properties: ApplicationServerProperties,
+        logger: LoggerHelper,
+        properties: ApplicationServerProperties,
     ) {
-        this.logger = new LoggingHelper(properties.logger)
+        this.loggerHelper = logger
+        this.properties = properties
         this.validator = new ValidationHelper(properties.validator, properties.validationRules)
     }
 
@@ -93,25 +99,27 @@ export class ResolverHelper {
         type: "query" | "mutation" | "subscription" | "model",
         metadata: TypeMetadata,
         resolverFn: any,
-        parentTypeName?: string,
+        modelName?: string,
     ): GraphQLFieldResolver<any, any, any> | undefined {
         return async (parent: any, args: any, context: any, info: any) => {
+            const logEvent: LogEvent = {
+                request: context.request,
+                response: context.response,
+                typeMetadata: metadata,
+                modelName,
+                propertyName: metadata.propertyName,
+                graphQLResolverArgs: { parent, args, context, info }
+            }
+            const logger = this.loggerHelper.createContextLogger(type, logEvent)
             const defaultContext: DefaultContext = {
                 request: context.request,
                 response: context.response,
-                // logger: () => {} // todo!
-            }
-            const logInfo: ResolveLogInfo = {
-                type,
-                metadata,
-                defaultContext,
-                parentTypeName,
-                args: { parent, args, context, info }
+                logger: logger,
             }
             try {
 
                 // log resolving start process
-                this.logger.logBeforeResolve(logInfo)
+                logger.log(`${Object.keys(args).length ? `args(${JSON.stringify(args)})` : ""}`)
                 const userContext = await this.buildContext(defaultContext)
 
                 // validate args
@@ -136,12 +144,13 @@ export class ResolverHelper {
                 await this.validator.validate(metadata, result, context)
 
                 // log once again after resolver execution is finished
-                this.logger.logGraphQLResponse({ ...logInfo, content: result })
+                logger.log(`return(${JSON.stringify(result)})`)  // this.logger.logGraphQLResponse({ ...logInfo, content: result })
                 return result
 
             } catch (error) {
-                this.logger.resolveError(args)
-                this.properties.errorHandler.resolverError(args)
+                logger.error(error) // this.logger.resolveError(error)
+                // throw error
+                this.properties.errorHandler.resolverError(error, logEvent)
                 // throw error // todo: check if we need it (if yes check if resolverError can do it)
             }
         }
@@ -150,34 +159,36 @@ export class ResolverHelper {
     createGraphQLTypeDataLoaderResolver(
         metadata: TypeMetadata,
         resolverFn: any,
-        parentTypeName: string,
+        modelName: string,
     ): GraphQLFieldResolver<any, any, any> | undefined {
         const type = "model"
         return async (parent: any, args: any, context: any, info: any) => {
+            const logEvent: LogEvent = {
+                request: context.request,
+                response: context.response,
+                typeMetadata: metadata,
+                modelName,
+                propertyName: metadata.propertyName,
+                graphQLResolverArgs: { parent, args, context, info }
+            }
+            const logger = this.loggerHelper.createContextLogger(type, logEvent)
             const defaultContext: DefaultContext = {
                 request: context.request,
                 response: context.response,
-                // logger: () => {} // todo!
-            }
-            const logInfo: ResolveLogInfo = {
-                type,
-                metadata,
-                defaultContext,
-                parentTypeName,
-                args: { parent, args, context, info }
+                logger,
             }
             try {
 
                 if (!context.dataLoaders)
                     context.dataLoaders = {}
-                if (!context.dataLoaders[parentTypeName])
-                    context.dataLoaders[parentTypeName] = {}
+                if (!context.dataLoaders[modelName])
+                    context.dataLoaders[modelName] = {}
 
                 // log resolving start process
-                this.logger.logBeforeResolve(logInfo)
+                logger.log(`[data-loader]${Object.keys(args).length ? ` args(${JSON.stringify(args)})` : ""}`)
 
-                if (!context.dataLoaders[parentTypeName][metadata.propertyName!!]) {
-                    context.dataLoaders[parentTypeName][metadata.propertyName!!] = new DataLoader(
+                if (!context.dataLoaders[modelName][metadata.propertyName!!]) {
+                    context.dataLoaders[modelName][metadata.propertyName!!] = new DataLoader(
                         async (keys: { parent: any, args: any, context: any, info: any }[]) => {
                             try {
 
@@ -207,8 +218,8 @@ export class ResolverHelper {
                                 return result
                             } catch (err) {
                                 // todo: not sure if we should handle it here, need to check
-                                // this.logger.resolveError(args)
-                                // this.errorHandler.resolverError(args)
+                                // this.logger.resolveError(err)
+                                // this.errorHandler.resolverError(err)
                                 throw err
                             }
                         }, {
@@ -219,16 +230,16 @@ export class ResolverHelper {
                     )
                 }
 
-                const dataLoaderResolver = context.dataLoaders[parentTypeName][metadata.propertyName!!]
+                const dataLoaderResolver = context.dataLoaders[modelName][metadata.propertyName!!]
                 const result = await dataLoaderResolver.load({ parent, args, context, info })
 
                 // log once again after resolver execution is finished
-                this.logger.logGraphQLResponse({ ...logInfo, content: result })
+                logger.log(`[data-loader] return(${JSON.stringify(result)})`)
                 return result
 
             } catch (error) {
-                this.logger.resolveError(args)
-                this.properties.errorHandler.resolverError(args)
+                logger.log(error) // this.logger.resolveError(error)
+                this.properties.errorHandler.resolverError(error, logEvent)
                 // throw error // todo: check if we need it (if yes check if resolverError can do it)
             }
         }
@@ -237,34 +248,36 @@ export class ResolverHelper {
     createGraphQLTypeGeneratedRelationResolver(
         metadata: TypeMetadata,
         resolverFn: any,
-        parentTypeName: string,
+        modelName: string,
     ): GraphQLFieldResolver<any, any, any> | undefined {
         const type = "model"
         return async (parent: any, args: any, context: any, info: any) => {
+            const logEvent: LogEvent = {
+                request: context.request,
+                response: context.response,
+                typeMetadata: metadata,
+                modelName,
+                propertyName: metadata.propertyName,
+                graphQLResolverArgs: { parent, args, context, info }
+            }
+            const logger = this.loggerHelper.createContextLogger(type, logEvent)
             const defaultContext: DefaultContext = {
                 request: context.request,
                 response: context.response,
-                // logger: () => {} // todo!
-            }
-            const logInfo: ResolveLogInfo = {
-                type,
-                metadata,
-                defaultContext,
-                parentTypeName,
-                args: { parent, args, context, info }
+                logger
             }
             try {
 
                 if (!context.dataLoaders)
                     context.dataLoaders = {}
-                if (!context.dataLoaders[parentTypeName])
-                    context.dataLoaders[parentTypeName] = {}
+                if (!context.dataLoaders[modelName])
+                    context.dataLoaders[modelName] = {}
 
                 // log resolving start process
-                this.logger.logBeforeResolve(logInfo)
+                logger.log(`[generated] ${Object.keys(args).length ? `(${JSON.stringify(args)})` : ""}`)
 
-                if (!context.dataLoaders[parentTypeName][metadata.propertyName!!]) {
-                    context.dataLoaders[parentTypeName][metadata.propertyName!!] = new DataLoader(
+                if (!context.dataLoaders[modelName][metadata.propertyName!!]) {
+                    context.dataLoaders[modelName][metadata.propertyName!!] = new DataLoader(
                         async (keys: { parent: any, args: any, context: any, info: any }[]) => {
                             try {
 
@@ -306,16 +319,16 @@ export class ResolverHelper {
                     )
                 }
 
-                const dataLoaderResolver = context.dataLoaders[parentTypeName][metadata.propertyName!!]
+                const dataLoaderResolver = context.dataLoaders[modelName][metadata.propertyName!!]
                 const result = await dataLoaderResolver.load({ parent, args, context, info })
 
                 // log once again after resolver execution is finished
-                this.logger.logGraphQLResponse({ ...logInfo, content: result })
+                logger.log(`[generated] "${JSON.stringify(result)}"`)
                 return result
 
             } catch (error) {
-                this.logger.resolveError(args)
-                this.properties.errorHandler.resolverError(args)
+                logger.error(error) // this.logger.resolveError(error)
+                this.properties.errorHandler.resolverError(error, logEvent)
                 // throw error // todo: check if we need it (if yes check if resolverError can do it)
             }
         }
@@ -350,9 +363,19 @@ export class ResolverHelper {
         }
     }
 
-    async createActionResolver(actionEvent: ActionEvent, actionMetadata: ActionTypeMetadata) {
-        const { request, response } = actionEvent
-        this.logger.resolveAction(actionEvent)
+    async createActionResolver(
+        request: any,
+        response: any,
+        actionMetadata: ActionTypeMetadata
+    ) {
+        const logEvent: LogEvent = {
+            request,
+            response,
+            actionMetadata
+        }
+        const logger = this.loggerHelper.createContextLogger("action",  logEvent)
+        const defaultContext: DefaultContext = { request, response, logger }
+        logger.log("") // this.logger.resolveAction(actionEvent)
         try {
 
             // TODO: FIX TYPES OF PARAMS/QUERIES,ETC NOT BEING NORMALIZED BASED ON TYPE METADATA
@@ -360,7 +383,7 @@ export class ResolverHelper {
             if (!actionResolverFn)
                 throw new Error(`Action resolver ${actionMetadata.name} was not found`)
 
-            const context = await this.buildContext({ request, response })
+            const context = await this.buildContext(defaultContext)
             const result = actionResolverFn({
                 params: request.params,
                 query: request.query,
@@ -372,7 +395,7 @@ export class ResolverHelper {
             if (result instanceof Promise) {
                 return result
                     .then(result => {
-                        this.logger.logActionResponse({ ...actionEvent, content: result })
+                        logger.log(`return(${JSON.stringify(result)})`) // this.logger.logActionResponse({ ...actionEvent, content: result })
                         return result
                     })
                     .then(result => {
@@ -380,19 +403,19 @@ export class ResolverHelper {
                             response.json(result)
                     })
                     .catch(error => {
-                        this.logger.resolveActionError({ ...actionEvent, error })
-                        return this.properties.errorHandler.actionError({ ...actionEvent, error })
+                        logger.error(error) // this.logger.resolveActionError({ ...actionEvent, error })
+                        return this.properties.errorHandler.actionError(error, logEvent)
                     })
-            } else {
-                this.logger.logActionResponse({ ...actionEvent, content: result })
+            } else { // this.logger.logActionResponse({ ...actionEvent, content: result })
                 if (actionMetadata.return !== undefined) {
+                    logger.log(`return(${JSON.stringify(result)})`)
                     response.json(result)
                 }
             } // think about text responses, status, etc.
 
         } catch (error) {
-            this.logger.resolveActionError({ ...actionEvent, error })
-            return this.properties.errorHandler.actionError({ ...actionEvent, error })
+            logger.error(error) // this.logger.resolveActionError({ ...actionEvent, error })
+            return this.properties.errorHandler.actionError(error, logEvent)
         }
     }
 
@@ -453,4 +476,5 @@ export class ResolverHelper {
             return resolverFn
         }
     }
+
 }

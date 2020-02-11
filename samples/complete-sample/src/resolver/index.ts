@@ -1,4 +1,5 @@
 export * from "./CategoryDeclarationResolver"
 export * from "./PostDeclarationResolver"
 export * from "./SearchDeclarationResolver"
-export * from "./PostResolver"
+export * from "./PostModelResolver"
+export * from "./CategoryModelResolver"

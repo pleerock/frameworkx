@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import * as ts from "typescript"
 
 /**
  * Checks if given node is exported or not.
@@ -7,7 +7,7 @@ export function isNodeExported(node: ts.Node): boolean {
     return (
         (ts.ModifierFlags.Export) !== 0 ||
         (!!node.parent && node.parent.kind === ts.SyntaxKind.SourceFile)
-    );
+    )
 }
 
 /**
@@ -26,13 +26,13 @@ export function findTypeLiteralProperty(node: ts.TypeLiteralNode, propertyName: 
 
 export function camelize(str: string) {
     return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
-        if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
-        return index == 0 ? match.toLowerCase() : match.toUpperCase();
-    });
+        if (+match === 0) return "" // or if (/\s+/.test(match)) for white spaces
+        return index == 0 ? match.toLowerCase() : match.toUpperCase()
+    })
 }
 
 export function capitalize(str: string) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+    return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 export const ParserUtils = {
