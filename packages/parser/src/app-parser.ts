@@ -22,8 +22,9 @@ export function parse(appFileName: string, options?: ParserOptions): Application
     })
 
     // find a provided application source file
+    const normalizedAppFileName = appFileName.replace(/\\/g, '/')
     const appSourceFile = program.getSourceFiles().find(file => {
-        return file.fileName === appFileName // && file.isDeclarationFile === false
+        return file.fileName === normalizedAppFileName
     })
     if (!appSourceFile)
         throw Errors.appFileInvalid(appFileName)

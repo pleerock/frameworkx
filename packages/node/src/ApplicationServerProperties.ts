@@ -1,5 +1,4 @@
 import { AnyValidationRule, ListOfType, Logger, ResolverMetadata, Validator } from "@microframework/core"
-import { HandleFunction } from "connect"
 import { CorsOptions } from "cors"
 import { OptionsResult } from "express-graphql"
 import { PubSub } from "graphql-subscriptions"
@@ -50,13 +49,13 @@ export type ApplicationServerProperties = {
         /**
          * List of registered app middlewares.
          */
-        middlewares: HandleFunction[]
+        middlewares: any[]
 
         /**
          * List of registered action middlewares.
          * This way you can setup middlewares per specific action.
          */
-        actionMiddlewares: { [key: string]: HandleFunction[] }
+        actionMiddlewares: { [key: string]: any[] }
 
     }
 

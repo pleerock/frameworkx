@@ -486,6 +486,8 @@ export class GeneratedEntitySchemaBuilder {
     const sameNameResolver = this.properties.resolvers.find(resolver => {
       if (resolver.type === "declaration-item-resolver") {
         return resolver.name === name
+      } else if (resolver.type === "declaration-resolver") {
+        return (resolver.resolverFn as any)[name] !== undefined
       }
       return false
     })

@@ -57,7 +57,11 @@ export class ResolverHelper {
             if (resolver.type === "declaration-resolver") {
                 if (resolver.declarationType === "any" || resolver.declarationType === "subscription") {
                     if ((resolver.resolverFn as any)[name] !== undefined) {
-                        return (resolver.resolverFn as any)[name].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                        if ((resolver.resolverFn as any)[name] instanceof Function) {
+                            return (resolver.resolverFn as any)[name].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                        } else {
+                            return (resolver.resolverFn as any)[name] // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                        }
                     }
                 }
             } else if (resolver.type === "declaration-item-resolver") {
@@ -341,6 +345,7 @@ export class ResolverHelper {
     }): GraphQLFieldResolver<any, any, any> {
         if (subscriptionResolverFn.filter) {
             return (_, _args) => {
+                console.log("IM HERE");
                 return withFilter(
                     () => pubSub.asyncIterator(subscriptionResolverFn.triggers),
                     subscriptionResolverFn.filter!
@@ -348,6 +353,7 @@ export class ResolverHelper {
             }
         } else {
             return (_, args, context) => {
+                console.log("IM HERE2", subscriptionResolverFn.triggers);
                 const callArgs = hasArgs ? [hasArgs, context] : [context]
                 if (subscriptionResolverFn.onSubscribe)
                     subscriptionResolverFn.onSubscribe(...callArgs)
@@ -378,10 +384,20 @@ export class ResolverHelper {
         logger.log("") // this.logger.resolveAction(actionEvent)
         try {
 
-            // TODO: FIX TYPES OF PARAMS/QUERIES,ETC NOT BEING NORMALIZED BASED ON TYPE METADATA
             let actionResolverFn = this.findAction(actionMetadata.name)
             if (!actionResolverFn)
                 throw new Error(`Action resolver ${actionMetadata.name} was not found`)
+
+            // TODO: FIX TYPES OF PARAMS/QUERIES,ETC NOT BEING NORMALIZED BASED ON TYPE METADATA
+            // let actionParams: any
+            // let actionQuery: any
+            // let actionHeader: any
+            // let actionCookie: any
+            // if (actionParams) {
+            //     if (actionMetadata.params) {
+            //
+            //     }
+            // }
 
             const context = await this.buildContext(defaultContext)
             const result = actionResolverFn({

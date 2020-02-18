@@ -107,17 +107,17 @@ export type SubscriptionItemResolver<
   Declaration extends GraphQLDeclarationItem,
   Context extends ContextList
 > =
+  Parameters<Declaration> extends [] ? ({
+    triggers: string | string[]
+    filter?: (payload: any, context: Context & DefaultContext) => boolean | Promise<boolean>
+    onSubscribe?: (context: Context & DefaultContext) => any
+    onUnsubscribe?: (context: Context & DefaultContext) => any
+  }) :
   Declaration extends (args: infer Args) => infer Return ? ({
     triggers: string | string[]
     filter?: (payload: any, args: Args, context: Context & DefaultContext) => boolean | Promise<boolean>
     onSubscribe?: (args: Args, context: Context & DefaultContext) => any
     onUnsubscribe?: (args: Args, context: Context & DefaultContext) => any
-  }) :
-  Declaration extends () => infer Return ? ({
-    triggers: string | string[]
-    filter?: (payload: any, context: Context & DefaultContext) => boolean | Promise<boolean>
-    onSubscribe?: (context: Context & DefaultContext) => any
-    onUnsubscribe?: (context: Context & DefaultContext) => any
   }) :
   unknown
 

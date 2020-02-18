@@ -32,4 +32,12 @@ export type PostDeclaration = {
      */
     postRemove(args: { id: number }): boolean
   }
+
+  subscriptions: {
+
+    /**
+     * Called when a new post was added.
+     */
+    postAdded: Post
+  }
 }

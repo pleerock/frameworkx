@@ -1,5 +1,6 @@
 import { resolver } from "@microframework/core"
 import { App } from "../app/App"
+import { AppPubSub } from "../app/AppPubSub";
 import { PostFilterInput, PostInput } from "../input"
 import { Post } from "../model"
 import { PostRepository } from "../repository"
@@ -18,11 +19,19 @@ export const PostDeclarationResolver = resolver(App, {
     return true
   },
 
-  postSave(args: PostInput): Promise<Post> {
-    return PostRepository.save({
+  async postSave(args: PostInput): Promise<Post> {
+    const post = await PostRepository.save({
       id: args.id || undefined,
       title: args.title,
       text: args.text,
     })
+    if (!args.id) {
+      await AppPubSub.publish("POST_ADDED", post)
+    }
+    return post
   },
+
+  postAdded: {
+    triggers: ["POST_ADDED"]
+  }
 })

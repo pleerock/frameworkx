@@ -81,6 +81,7 @@ export class ApplicationServer<App extends AnyApplication> {
         host: options.websocket?.host || "ws://localhost",
         path: options.websocket?.path || "subscriptions",
         options: options.websocket?.options || {},
+        pubSub: options.websocket?.pubSub
       },
       dataSourceFactory: options.dataSourceFactory,
       entities: options.entities,
@@ -239,10 +240,14 @@ export class ApplicationServer<App extends AnyApplication> {
         request,
         response,
       },
-      customFormatErrorFn: (error: GraphQLError) => ({
-        ...error,
-        trace: process.env.NODE_ENV !== "production" ? error.stack : null
-      }),
+      customFormatErrorFn: (error: GraphQLError) => {
+        return {
+          ...error,
+          // trace: process.env.NODE_ENV !== "production" ? error.stack : null,
+          stack: error.stack ? error.stack.split('\n') : [],
+          path: error.path,
+        }
+      },
       ...(this.properties.graphql.options || {})
     }))
   }
@@ -274,7 +279,7 @@ export class ApplicationServer<App extends AnyApplication> {
           { schema, execute, subscribe },
           {
             server: this.websocketServer,
-            path: this.properties.websocket.path,
+            path: "/" + this.properties.websocket.path,
             ...this.properties.websocket.options
           },
       )
