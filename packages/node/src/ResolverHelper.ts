@@ -344,16 +344,12 @@ export class ResolverHelper {
         subscriptionResolverFn: any,
     }): GraphQLFieldResolver<any, any, any> {
         if (subscriptionResolverFn.filter) {
-            return (_, _args) => {
-                console.log("IM HERE");
-                return withFilter(
-                    () => pubSub.asyncIterator(subscriptionResolverFn.triggers),
-                    subscriptionResolverFn.filter!
-                )
-            }
+            return withFilter(
+                () => pubSub.asyncIterator(subscriptionResolverFn.triggers),
+                subscriptionResolverFn.filter!
+            )
         } else {
             return (_, args, context) => {
-                console.log("IM HERE2", subscriptionResolverFn.triggers);
                 const callArgs = hasArgs ? [hasArgs, context] : [context]
                 if (subscriptionResolverFn.onSubscribe)
                     subscriptionResolverFn.onSubscribe(...callArgs)
