@@ -196,8 +196,8 @@ function parseActions(program: ts.Program, appDefOptions: ts.TypeLiteralNode, op
             throw new Error("Property name was not set in the action")
 
         const returning = action.properties.find(property => property.propertyName === "return")
-        if (!returning)
-            throw new Error(`Returning was not found in the action ${action.propertyName}`)
+        // if (!returning)
+        //     throw new Error(`Returning was not found in the action ${action.propertyName}`)
 
         const query = action.properties.find(property => property.propertyName === "query")
         const params = action.properties.find(property => property.propertyName === "params")
@@ -207,7 +207,7 @@ function parseActions(program: ts.Program, appDefOptions: ts.TypeLiteralNode, op
 
         return {
             name: action.propertyName,
-            return: { ...returning, propertyName: "" },
+            return: returning ? { ...returning, propertyName: "" } : undefined,
             query,
             params,
             headers,

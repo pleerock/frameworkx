@@ -22,7 +22,7 @@ export type TypeMetadata = {
 
 export type ActionTypeMetadata = {
     name: string
-    return: TypeMetadata
+    return?: TypeMetadata
     query?: TypeMetadata
     params?: TypeMetadata
     headers?: TypeMetadata

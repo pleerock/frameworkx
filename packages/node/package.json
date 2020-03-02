@@ -1,6 +1,6 @@
 {
   "name": "@microframework/node",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "description": "Microframework server",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "graphql-playground-middleware-express": "^1.1.0",
     "subscriptions-transport-ws": "^0.9.16",
     "graphql": "^14.4.2",
-    "typeorm": "0.3.0-rc.17"
+    "typeorm": "^0.3.0-rc.18"
   },
   "devDependencies": {
     "ts-node": "^8.6.2",
