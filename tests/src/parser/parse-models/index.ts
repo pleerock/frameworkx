@@ -50,4 +50,10 @@ describe("parse models", () => {
         // expect(result).toEqual({})
     })
 
+    test('model with literal type', () => {
+        const result = parse(__dirname + "/app/literal-type-app.ts")
+        console.log(JSON.stringify(result, undefined, 2))
+        // expect(result).toEqual({})
+    })
+
 })

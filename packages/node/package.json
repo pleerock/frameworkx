@@ -1,6 +1,6 @@
 {
   "name": "@microframework/node",
-  "version": "0.1.7",
+  "version": "0.1.10",
   "description": "Microframework server",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "@microframework/model": "*",
     "@microframework/validator": "*",
     "@microframework/logger": "*",
-    "@types/ws": "^6.0.3",
+    "@types/ws": "^7.2.3",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.0",
     "@types/graphql": "^14.2.3",
@@ -24,7 +24,8 @@
     "graphql-playground-middleware-express": "^1.1.0",
     "subscriptions-transport-ws": "^0.9.16",
     "graphql": "^14.4.2",
-    "typeorm": "^0.3.0-rc.18"
+    "typeorm": "^0.3.0-rc.19",
+    "ws": "^7.2.3"
   },
   "devDependencies": {
     "ts-node": "^8.6.2",

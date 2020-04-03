@@ -116,10 +116,11 @@ export class ResolverHelper {
             }
             const logger = this.loggerHelper.createContextLogger(type, logEvent)
             const defaultContext: DefaultContext = {
-                request: context.request,
-                response: context.response,
+                ...context,
                 logger: logger,
             }
+            if ((defaultContext as any)["dataLoaders"])
+                delete (defaultContext as any)["dataLoaders"]
             try {
 
                 // log resolving start process
@@ -177,10 +178,11 @@ export class ResolverHelper {
             }
             const logger = this.loggerHelper.createContextLogger(type, logEvent)
             const defaultContext: DefaultContext = {
-                request: context.request,
-                response: context.response,
+                ...context,
                 logger,
             }
+            if ((defaultContext as any)["dataLoaders"])
+                delete (defaultContext as any)["dataLoaders"]
             try {
 
                 if (!context.dataLoaders)
@@ -343,25 +345,21 @@ export class ResolverHelper {
         hasArgs: boolean,
         subscriptionResolverFn: any,
     }): GraphQLFieldResolver<any, any, any> {
-        if (subscriptionResolverFn.filter) {
-            return withFilter(
-                () => pubSub.asyncIterator(subscriptionResolverFn.triggers),
-                subscriptionResolverFn.filter!
-            )
-        } else {
-            return (_, args, context) => {
-                const callArgs = hasArgs ? [hasArgs, context] : [context]
-                if (subscriptionResolverFn.onSubscribe)
-                    subscriptionResolverFn.onSubscribe(...callArgs)
+        const resolver = (_: any, args: any, context: any) => {
+            const asyncIterator = pubSub.asyncIterator(subscriptionResolverFn.triggers)
+            const callArgs = hasArgs ? [args, context] : [context]
+            if (subscriptionResolverFn.onSubscribe)
+                subscriptionResolverFn.onSubscribe(...callArgs)
 
-                if (subscriptionResolverFn.onUnsubscribe) {
-                    return this.withCancel(
-                        pubSub.asyncIterator(subscriptionResolverFn.triggers),
-                        () => subscriptionResolverFn.onUnsubscribe(...callArgs)
-                    )
-                }
-                return pubSub.asyncIterator(subscriptionResolverFn.triggers)
+            if (subscriptionResolverFn.onUnsubscribe) {
+                this.withCancel(asyncIterator, () => subscriptionResolverFn.onUnsubscribe(...callArgs))
             }
+            return asyncIterator
+        }
+        if (subscriptionResolverFn.filter) {
+            return withFilter(resolver, subscriptionResolverFn.filter)
+        } else {
+            return resolver
         }
     }
 

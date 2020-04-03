@@ -20,6 +20,7 @@ export const App = createApp<{
         posts(): PostType[]
         post(args: { id: number }): PostType
         postFromSession(): PostType
+        postMaybe(args: { id: number }): PostType | undefined
     },
     context: {
         sessionPost: PostType

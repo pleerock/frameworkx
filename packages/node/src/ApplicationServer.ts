@@ -9,9 +9,10 @@ import { debugLogger } from "@microframework/logger"
 import { defaultValidator } from "@microframework/validator"
 import { Request, Response } from "express"
 import { execute, GraphQLError, GraphQLSchema, subscribe } from "graphql"
-import { createServer, Server as HttpServer } from 'http'
+import { Server as HttpServer } from 'http'
 import { SubscriptionServer } from "subscriptions-transport-ws"
 import { ConnectionOptions } from "typeorm"
+import { Server as WebsocketServer } from "ws"
 import { ApplicationServerOptions } from "./ApplicationServerOptions"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
 import { ApplicationServerUtils } from "./ApplicationServerUtils"
@@ -21,7 +22,7 @@ import { GraphQLSchemaBuilder } from "./GraphQLSchemaBuilder"
 import { LoggerHelper } from "./LoggerHelper"
 import { DefaultNamingStrategy } from "./naming-strategy/DefaultNamingStrategy"
 import { ResolverHelper } from "./ResolverHelper"
-import cors = require("cors")
+import cors = require("cors");
 
 const express = require("express")
 const graphqlHTTP = require("express-graphql")
@@ -36,9 +37,17 @@ export class ApplicationServer<App extends AnyApplication> {
    */
   logger: ApplicationLogger
 
+  /**
+   * Http server created on application start.
+   */
+  server?: HttpServer
+
+  /**
+   * Websocket server created on application start.
+   */
+  websocketServer?: WebsocketServer
+
   private app: App
-  private server?: HttpServer
-  private websocketServer?: HttpServer
   private subscriptionServer?: SubscriptionServer
   private properties: ApplicationServerProperties
   private resolverHelper: ResolverHelper
@@ -81,7 +90,8 @@ export class ApplicationServer<App extends AnyApplication> {
         host: options.websocket?.host || "ws://localhost",
         path: options.websocket?.path || "subscriptions",
         options: options.websocket?.options || {},
-        pubSub: options.websocket?.pubSub
+        pubSub: options.websocket?.pubSub,
+        disconnectTimeout: options.websocket?.disconnectTimeout
       },
       dataSourceFactory: options.dataSourceFactory,
       entities: options.entities,
@@ -268,20 +278,39 @@ export class ApplicationServer<App extends AnyApplication> {
    * Creates a websocket server.
    */
   private createWebsocketServer(schema?: GraphQLSchema) {
-    this.websocketServer = createServer((request, response) => {
-      response.writeHead(404)
-      response.end()
+    this.websocketServer = new WebsocketServer({
+      port: this.properties.websocket.port,
+      path: "/" + this.properties.websocket.path,
+      ...this.properties.websocket.options
     })
-    this.websocketServer.listen(this.properties.websocket.port, () => {})
+
+    // setup a disconnection timeout to know when websocket user is disconnected
+    // https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
+    if (this.properties.websocket.disconnectTimeout) {
+      this.websocketServer!!.on("connection", ws => {
+        (ws as any)["isAlive"] = true
+        ws.on("pong", () => {
+          (ws as any)["isAlive"] = true
+        });
+      });
+
+      const interval = setInterval(() => {
+        this.websocketServer!.clients.forEach(ws => {
+          if ((ws as any)["isAlive"] === false) return ws.terminate();
+          (ws as any)["isAlive"] = false
+          ws.ping(function() { })
+        })
+      }, this.properties.websocket.disconnectTimeout)
+
+      this.websocketServer!!.on("close", function close() {
+        clearInterval(interval)
+      });
+    }
 
     if (schema) {
       this.subscriptionServer = new SubscriptionServer(
           { schema, execute, subscribe },
-          {
-            server: this.websocketServer,
-            path: "/" + this.properties.websocket.path,
-            ...this.properties.websocket.options
-          },
+          this.websocketServer
       )
     }
   }

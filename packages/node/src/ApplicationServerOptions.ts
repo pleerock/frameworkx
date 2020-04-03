@@ -121,6 +121,14 @@ export type ApplicationServerOptions = {
          */
         pubSub?: PubSub
 
+        /**
+         * When a connected user doesn't respond in a given amount of time,
+         * he will be disconnected from a websocket.
+         * Server and client must exchange with "ping"/"pong" messages.
+         *
+         * @see https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
+         */
+        disconnectTimeout?: number
     }
 
     /**
