@@ -379,7 +379,7 @@ export class GraphQLSchemaBuilder {
             return (val: any) => val
 
         // find a used defined resolver function
-        const resolverFn = this.resolverHelper.findGraphQLDeclaration(type, metadata.propertyName)
+        const resolverFn = this.resolverHelper.findGraphQLDeclaration(type, metadata.propertyName, parentTypeName)
         if (resolverFn) {
             return this.resolverHelper.createGraphQLTypeResolver(type, metadata, resolverFn, parentTypeName)
         }

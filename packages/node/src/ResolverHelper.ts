@@ -453,7 +453,7 @@ export class ResolverHelper {
         return dataLoaderResolverFn
     }
 
-    findGraphQLDeclaration(type: "query" | "mutation"/* | "subscription"*/ | "model", name: string) {
+    findGraphQLDeclaration(type: "query" | "mutation"/* | "subscription"*/ | "model", name: string, parentTypeName?: string) {
         if (type === "query" || type === "mutation") {
             let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
             for (let resolver of this.properties.resolvers) {
@@ -476,7 +476,7 @@ export class ResolverHelper {
         } else if (type === "model") {
             let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
             for (let resolver of this.properties.resolvers) {
-                if (resolver.type === "model-resolver" && resolver.dataLoader === false) {
+                if (resolver.type === "model-resolver" && resolver.name === parentTypeName && resolver.dataLoader === false) {
                     if ((resolver.resolverFn as any)[name] !== undefined) {
                         resolverFn = (resolver.resolverFn as any)[name].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
                     }
