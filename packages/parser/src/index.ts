@@ -5,5 +5,3 @@ export * from "./app-parser"
 //         parsingOptions: string
 //     }
 // }
-
-export type Float = number

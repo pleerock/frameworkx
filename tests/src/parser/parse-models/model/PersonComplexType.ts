@@ -1,4 +1,4 @@
-import { Float } from "@microframework/parser"
+import { Float } from "@microframework/core"
 import { PhotoInterface } from "./PhotoInterface"
 import { PostModel } from "./PostModel"
 import { StatusEnum } from "./StatusEnum"
