@@ -12,6 +12,7 @@ import { withFilter } from "graphql-subscriptions"
 import { GraphQLFieldResolver } from "graphql/type/definition"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
 import { LoggerHelper } from "./LoggerHelper"
+import { RateLimitNodeOptions } from "./rate-limit";
 import { ValidationHelper } from "./ValidationHelper"
 
 /**
@@ -345,6 +346,8 @@ export class ResolverHelper {
         hasArgs: boolean,
         subscriptionResolverFn: any,
     }): GraphQLFieldResolver<any, any, any> {
+
+        // todo: rate limitation
         const resolver = (_: any, args: any, context: any) => {
             const asyncIterator = pubSub.asyncIterator(subscriptionResolverFn.triggers)
             const callArgs = hasArgs ? [args, context] : [context]
@@ -392,6 +395,14 @@ export class ResolverHelper {
             //
             //     }
             // }
+
+            actionResolverFn = this.applyRateLimitOptions(
+                "action",
+                actionMetadata.name,
+                undefined,
+                actionResolverFn,
+                () => request.ip
+            )
 
             const context = await this.buildContext(defaultContext)
             const result = actionResolverFn({
@@ -453,7 +464,53 @@ export class ResolverHelper {
         return dataLoaderResolverFn
     }
 
-    findGraphQLDeclaration(type: "query" | "mutation"/* | "subscription"*/ | "model", name: string, parentTypeName?: string) {
+    private applyRateLimitOptions<T>(
+        declarationType: "query" | "mutation" | "any" | "models" | "action",
+        name: string,
+        parentTypeName: string | undefined,
+        resolverFn: T,
+        resolverIpFactory: (args: any[]) => string
+    ): T {
+        if (this.properties.rateLimits) {
+            if (!this.properties.rateLimitConstructor)
+                throw new Error(`You must set "rateLimitConstructor" to use rate limiting options.`)
+
+            let rateLimitOptions: RateLimitNodeOptions | undefined = undefined
+            if (declarationType === "query" && this.properties.rateLimits["queries"]) {
+                rateLimitOptions = this.properties.rateLimits["queries"][name]
+
+            } else if (declarationType === "mutation" && this.properties.rateLimits["mutations"]) {
+                rateLimitOptions = this.properties.rateLimits["mutations"][name]
+
+            } else if (declarationType === "any") {
+                if (this.properties.rateLimits["queries"]?.[name]) {
+                    rateLimitOptions = this.properties.rateLimits["queries"][name]
+                }
+                if (this.properties.rateLimits["mutations"]?.[name]) {
+                    rateLimitOptions = this.properties.rateLimits["mutations"][name]
+                }
+
+            } else if (declarationType === "models" && parentTypeName && this.properties.rateLimits["models"]?.[parentTypeName]?.[name]) {
+                rateLimitOptions = this.properties.rateLimits["models"]?.[parentTypeName]?.[name]
+
+            } else if (declarationType === "action" && this.properties.rateLimits["actions"]) {
+                rateLimitOptions = this.properties.rateLimits["actions"][name]
+            }
+
+            if (rateLimitOptions) {
+                const rateLimiter = this.properties.rateLimitConstructor(rateLimitOptions)
+                return (async (...args: any[]) => {
+                    // console.log("ip", args[argsParameterIndex].request.ip)
+                    // await rateLimiter.consume(args[argsParameterIndex].request.ip)
+                    await rateLimiter.consume(resolverIpFactory(args))
+                    return (resolverFn as any)(...args)
+                }) as any
+            }
+        }
+        return resolverFn
+    }
+
+    findGraphQLDeclaration(type: "query" | "mutation"/* | "subscription"*/ | "model", name: string, parentTypeName?: string, hasArgs: boolean = false) {
         if (type === "query" || type === "mutation") {
             let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
             for (let resolver of this.properties.resolvers) {
@@ -461,12 +518,26 @@ export class ResolverHelper {
                     if (resolver.declarationType === "any" || resolver.declarationType === type) {
                         if ((resolver.resolverFn as any)[name] !== undefined) {
                             resolverFn = (resolver.resolverFn as any)[name].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                            resolverFn = this.applyRateLimitOptions(
+                                resolver.declarationType,
+                                name,
+                                parentTypeName,
+                                resolverFn,
+                                (args: any[]) => hasArgs ? args[1].request.ip : args[0].request.ip
+                            )
                         }
                     }
                 } else if (resolver.type === "declaration-item-resolver") {
                     if (resolver.declarationType === "any" || resolver.declarationType === type) {
                         if (resolver.name === name) {
-                            resolverFn = resolver.resolverFn as SubscriptionItemResolver<any, any>
+                            resolverFn = resolver.resolverFn // as SubscriptionItemResolver<any, any>
+                            resolverFn = this.applyRateLimitOptions(
+                                resolver.declarationType,
+                                name,
+                                parentTypeName,
+                                resolverFn,
+                                (args: any[]) => hasArgs ? args[1].request.ip : args[0].request.ip
+                            )
                         }
                     }
                 }
@@ -476,9 +547,20 @@ export class ResolverHelper {
         } else if (type === "model") {
             let resolverFn: QueryMutationItemResolver<any, any> | undefined = undefined
             for (let resolver of this.properties.resolvers) {
-                if (resolver.type === "model-resolver" && resolver.name === parentTypeName && resolver.dataLoader === false) {
+                if (
+                    resolver.type === "model-resolver" &&
+                    resolver.name === parentTypeName &&
+                    resolver.dataLoader === false
+                ) {
                     if ((resolver.resolverFn as any)[name] !== undefined) {
                         resolverFn = (resolver.resolverFn as any)[name].bind(resolver.resolverFn) // (...args: any[]) => (resolver.resolverFn as any)[name](...args)
+                        resolverFn = this.applyRateLimitOptions(
+                            "models",
+                            name,
+                            parentTypeName,
+                            resolverFn,
+                            (args: any[]) => hasArgs ? args[2].request.ip : args[1].request.ip
+                        )
                     }
                 }
             }

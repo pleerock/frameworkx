@@ -6,6 +6,8 @@ import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "./error-handler"
 import { NamingStrategy } from "./naming-strategy/NamingStrategy"
+import { RateLimitNodeOptions } from "./rate-limit";
+import { RateLimitOptions } from "./rate-limit/RateLimitOptions";
 
 /**
  * Application server startup options.
@@ -185,5 +187,15 @@ export type ApplicationServerOptions = {
      * Maximal deepness for nested conditions of automatically generated queries.
      */
     maxGeneratedConditionsDeepness?: number
+
+    /**
+     * Rate limiting options.
+     */
+    rateLimits?: RateLimitOptions<any>
+
+    /**
+     * Used to create a rate limiter instance.
+     */
+    rateLimitConstructor?: (options: RateLimitNodeOptions) => any
 
 }

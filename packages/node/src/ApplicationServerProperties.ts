@@ -6,6 +6,7 @@ import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "./error-handler"
 import { NamingStrategy } from "./naming-strategy/NamingStrategy"
+import { RateLimitNodeOptions, RateLimitOptions } from "./rate-limit";
 
 /**
  * Properties held by ApplicationServer.
@@ -186,5 +187,15 @@ export type ApplicationServerProperties = {
      * ORM data source (connection) used in the application.
      */
     dataSource?: Connection
+
+    /**
+     * Rate limiting options.
+     */
+    rateLimits?: RateLimitOptions<any>
+
+    /**
+     * Used to create a rate limiter instance.
+     */
+    rateLimitConstructor?: (options: RateLimitNodeOptions) => any
 
 }

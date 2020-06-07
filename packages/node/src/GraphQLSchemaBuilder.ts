@@ -378,8 +378,8 @@ export class GraphQLSchemaBuilder {
         if (type === "subscription")
             return (val: any) => val
 
-        // find a used defined resolver function
-        const resolverFn = this.resolverHelper.findGraphQLDeclaration(type, metadata.propertyName, parentTypeName)
+        // find a user defined resolver function
+        const resolverFn = this.resolverHelper.findGraphQLDeclaration(type, metadata.propertyName, parentTypeName, metadata.args ? true : false)
         if (resolverFn) {
             return this.resolverHelper.createGraphQLTypeResolver(type, metadata, resolverFn, parentTypeName)
         }

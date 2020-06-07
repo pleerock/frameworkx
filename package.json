@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "lerna bootstrap",
+    "docker": "docker-compose up",
     "watch": "tsc -b -w",
     "class-sample": "node samples/complete-sample/_/index.js"
   }

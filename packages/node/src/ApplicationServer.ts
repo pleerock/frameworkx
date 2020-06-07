@@ -103,6 +103,8 @@ export class ApplicationServer<App extends AnyApplication> {
       maxGeneratedConditionsDeepness: options.maxGeneratedConditionsDeepness !== undefined ? options.maxGeneratedConditionsDeepness : 5,
       validator: options.validator || defaultValidator,
       logger: options.logger || debugLogger,
+      rateLimits: options.rateLimits,
+      rateLimitConstructor: options.rateLimitConstructor
     }
     this.loggerHelper = new LoggerHelper(this.properties.logger)
     this.resolverHelper = new ResolverHelper(this.loggerHelper, this.properties)
@@ -254,6 +256,7 @@ export class ApplicationServer<App extends AnyApplication> {
         return {
           ...error,
           // trace: process.env.NODE_ENV !== "production" ? error.stack : null,
+          code: (error.originalError as Error & { code?: number })?.code,
           stack: error.stack ? error.stack.split('\n') : [],
           path: error.path,
         }

@@ -1,0 +1,13 @@
+version: '3.0'
+
+networks:
+  network:
+
+services:
+
+  redis:
+    image: "redis:6.0.4"
+    container_name: "framework-redis"
+    ports:
+      - "6379:6379"
+

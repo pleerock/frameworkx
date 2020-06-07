@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
-import { GraphqlFetcher } from "../util/graphql-fetcher"
-import { obtainPort } from "../util/port-generator"
+import { TestFetcher } from "../util/test-fetcher"
+import { obtainPort } from "../util/test-common"
 import { PostClassActionResolver } from "./resolver/PostClassActionResolver"
 import { PostContextResolver } from "./resolver/PostContextResolver"
 import { PostItemFnDeclarationResolver, PostsItemFnDeclarationResolver } from "./resolver/PostDeclarationItemsResolver"
@@ -21,7 +21,7 @@ describe("resolvers", () => {
 
     test("simple decorator resolvers for declarations and models", async () => {
         const port = await obtainPort()
-        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+        const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
 
         const server = await AppServer(port, [
             PostSimpleDecoratorModelResolver,
@@ -38,7 +38,7 @@ describe("resolvers", () => {
             }
         `
 
-        const result = await fetcher.fetch(query)
+        const result = await fetcher.graphql(query)
         expect(result).toEqual({
             "data": {
                 "posts": [
@@ -61,7 +61,7 @@ describe("resolvers", () => {
 
     test("decorator resolvers for declarations and models with data loader applied", async () => {
         const port = await obtainPort()
-        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+        const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
 
         const server = await AppServer(port, [
             PostDLDecoratorModelResolver,
@@ -78,7 +78,7 @@ describe("resolvers", () => {
             }
         `
 
-        const result = await fetcher.fetch(query)
+        const result = await fetcher.graphql(query)
         expect(result).toEqual({
             "data": {
                 "posts": [
@@ -101,14 +101,14 @@ describe("resolvers", () => {
 
     test("function resolvers for query and mutation declaration items", async () => {
         const port = await obtainPort()
-        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+        const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
 
         const server = await AppServer(port, [
             PostItemFnDeclarationResolver,
             PostsItemFnDeclarationResolver,
         ]).start()
 
-        const result1 = await fetcher.fetch(gql`
+        const result1 = await fetcher.graphql(gql`
             query {
                 posts {
                     id
@@ -131,7 +131,7 @@ describe("resolvers", () => {
             }
         })
 
-        const result2 = await fetcher.fetch(gql`
+        const result2 = await fetcher.graphql(gql`
             query {
                 post(id: 777) {
                     id
@@ -153,13 +153,13 @@ describe("resolvers", () => {
 
     test("object resolver using resolver function for declarations", async () => {
         const port = await obtainPort()
-        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+        const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
 
         const server = await AppServer(port, [
             PostObjectFnDeclarationResolver,
         ]).start()
 
-        const result1 = await fetcher.fetch(gql`
+        const result1 = await fetcher.graphql(gql`
             query {
                 posts {
                     id
@@ -182,7 +182,7 @@ describe("resolvers", () => {
             }
         })
 
-        const result2 = await fetcher.fetch(gql`
+        const result2 = await fetcher.graphql(gql`
             query {
                 post(id: 777) {
                     id
@@ -204,14 +204,14 @@ describe("resolvers", () => {
 
     test("object resolver without function for declarations", async () => {
         const port = await obtainPort()
-        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+        const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
 
         const server = await AppServer(port, [
             PostObjectModelResolver,
             PostObjectRawDeclarationResolver,
         ]).start()
 
-        const result1 = await fetcher.fetch(gql`
+        const result1 = await fetcher.graphql(gql`
             query {
                 posts {
                     id
@@ -237,7 +237,7 @@ describe("resolvers", () => {
             }
         })
 
-        const result2 = await fetcher.fetch(gql`
+        const result2 = await fetcher.graphql(gql`
             query {
                 post(id: 777) {
                     id
@@ -261,14 +261,14 @@ describe("resolvers", () => {
 
     test("object resolver for model with data loader", async () => {
         const port = await obtainPort()
-        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+        const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
 
         const server = await AppServer(port, [
             PostObjectDLModelResolver,
             PostObjectRawDeclarationResolver,
         ]).start()
 
-        const result1 = await fetcher.fetch(gql`
+        const result1 = await fetcher.graphql(gql`
             query {
                 posts {
                     id
@@ -294,7 +294,7 @@ describe("resolvers", () => {
             }
         })
 
-        const result2 = await fetcher.fetch(gql`
+        const result2 = await fetcher.graphql(gql`
             query {
                 post(id: 777) {
                     id
@@ -406,14 +406,14 @@ describe("resolvers", () => {
 
     test("context resolver", async () => {
         const port = await obtainPort()
-        const fetcher = new GraphqlFetcher(`http://localhost:${port}/graphql`)
+        const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
 
         const server = await AppServer(port, [
             PostDeclarationWithContextResolver,
             PostContextResolver,
         ]).start()
 
-        const result2 = await fetcher.fetch(gql`
+        const result2 = await fetcher.graphql(gql`
             query {
                 postFromSession {
                     id
