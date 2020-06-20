@@ -23,11 +23,10 @@ export const AppServer = (port: number, rateLimits: RateLimitOptions<typeof App>
             PostActionResolver,
             PostTypeResolver,
         ],
-        rateLimitConstructor: () => {
+        rateLimitConstructor: options => {
             return new RateLimiterRedis({
                 storeClient: redisClient,
-                points: 10, // Number of points
-                duration: 1, // Per second
+                ...options
             });
         },
         rateLimits

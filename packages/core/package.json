@@ -1,6 +1,6 @@
 {
   "name": "@microframework/core",
-  "version": "0.1.15",
+  "version": "0.1.17",
   "description": "Microframework core",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",

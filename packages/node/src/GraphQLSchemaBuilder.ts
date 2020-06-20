@@ -353,7 +353,10 @@ export class GraphQLSchemaBuilder {
             const metadataModel = this.appMetadata.models.find(model => model.typeName === metadata.typeName)
             if (metadataModel) {
                 return this.resolveGraphQLType("object", { ...metadata, kind: metadataModel.kind })
+            } else if (metadata.typeName === "Float") {
+                return this.resolveGraphQLType("object", metadata)
             }
+
         } else {
             return this.resolveGraphQLType("object", metadata)
         }

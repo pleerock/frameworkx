@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
+import { obtainPort } from "../../util/test-common"
 import { TestFetcher } from "../../util/test-fetcher"
-import { obtainPort, sleep } from "../../util/test-common"
 import { AppServer } from "./server"
 
 describe("node > features > error handling", () => {
@@ -122,7 +122,7 @@ describe("node > features > error handling", () => {
         expect(error3).toBeTruthy()
         expect(error3.message).toEqual("You have no access to this content.")
 
-        // await server.stop()
+        await server.stop()
     })
 
 })
