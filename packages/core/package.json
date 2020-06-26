@@ -9,8 +9,8 @@
     "@microframework/model": "*"
   },
   "devDependencies": {
-    "ts-node": "^8.6.2",
-    "prettier": "^1.19.1",
-    "typescript": "^3.7.5"
+    "ts-node": "^8.10.2",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.5"
   }
 }

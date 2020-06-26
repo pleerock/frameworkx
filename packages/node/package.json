@@ -11,25 +11,25 @@
     "@microframework/model": "*",
     "@microframework/validator": "*",
     "@microframework/logger": "*",
-    "@types/ws": "^7.2.3",
+    "@types/ws": "^7.2.5",
     "@types/cors": "^2.8.6",
-    "@types/express": "^4.17.0",
-    "@types/graphql": "^14.2.3",
-    "@types/node": "^13.7.0",
+    "@types/express": "^4.17.6",
+    "@types/graphql": "^14.5.0",
+    "@types/node": "^14.0.14",
     "cors": "^2.8.5",
-    "dataloader": "^1.4.0",
+    "dataloader": "^2.0.0",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql-subscriptions": "^1.1.0",
-    "graphql-playground-middleware-express": "^1.1.0",
+    "graphql-playground-middleware-express": "^1.7.18",
     "subscriptions-transport-ws": "^0.9.16",
-    "graphql": "^14.4.2",
+    "graphql": "^15.1.0",
     "typeorm": "^0.3.0-rc.19",
-    "ws": "^7.2.3"
+    "ws": "^7.3.0"
   },
   "devDependencies": {
-    "ts-node": "^8.6.2",
-    "prettier": "^1.19.1",
-    "typescript": "^3.7.5"
+    "ts-node": "^8.10.2",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.5"
   }
 }
