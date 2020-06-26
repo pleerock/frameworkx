@@ -1,4 +1,10 @@
-import { AnyValidationRule, AppResolverType, ListOfType, Logger, Validator } from "@microframework/core"
+import {
+  AnyValidationRule,
+  AppResolverType,
+  ListOfType,
+  Logger,
+  Validator,
+} from "@microframework/core"
 import { CorsOptions } from "cors"
 import { OptionsResult } from "express-graphql"
 import { PubSub } from "graphql-subscriptions"
@@ -6,196 +12,193 @@ import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "./error-handler"
 import { NamingStrategy } from "./naming-strategy/NamingStrategy"
-import { RateLimitNodeOptions } from "./rate-limit";
-import { RateLimitOptions } from "./rate-limit/RateLimitOptions";
+import { RateLimitNodeOptions } from "./rate-limit"
+import { RateLimitOptions } from "./rate-limit/RateLimitOptions"
 
 /**
  * Application server startup options.
  */
 export type ApplicationServerOptions = {
+  /**
+   * App file path.
+   * Must point to .d.ts file in the javascript runtime.
+   */
+  appPath: string
+
+  /**
+   * Express server options.
+   */
+  webserver: {
+    /**
+     * Custom express server instance.
+     * You can create and configure your own instance of express and framework will use it.
+     * If not passed, default express server will be used.
+     */
+    express?: any
 
     /**
-     * App file path.
-     * Must point to .d.ts file in the javascript runtime.
+     * Port on which to run express server.
      */
-    appPath: string
+    port: number
 
     /**
-     * Express server options.
+     * Should be set to true to enable cors.
      */
-    webserver: {
+    cors?: boolean | CorsOptions
 
-        /**
-         * Custom express server instance.
-         * You can create and configure your own instance of express and framework will use it.
-         * If not passed, default express server will be used.
-         */
-        express?: any
-
-        /**
-         * Port on which to run express server.
-         */
-        port: number
-
-        /**
-         * Should be set to true to enable cors.
-         */
-        cors?: boolean | CorsOptions
-
-        /**
-         * List of static directories to register in the Express server.
-         */
-        staticDirs?: {
-            [route: string]: string
-        }
-
-        /**
-         * List of registered app middlewares.
-         */
-        middlewares?: any[]
-
-        /**
-         * List of registered action middlewares.
-         * This way you can setup middlewares per specific action.
-         */
-        actionMiddlewares?: { [key: string]: any[] }
+    /**
+     * List of static directories to register in the Express server.
+     */
+    staticDirs?: {
+      [route: string]: string
     }
 
     /**
-     * Options to setup a GraphQL.
+     * List of registered app middlewares.
      */
-    graphql?: {
-
-        /**
-         * Route on which to register a graphql requests.
-         * If not set, default is "/graphql".
-         */
-        route?: string
-
-        /**
-         * Indicates if graphiQL should be enabled or not.
-         */
-        graphiql?: boolean
-
-        /**
-         * Indicates if playground should be enabled or not.
-         */
-        playground?: boolean
-
-        /**
-         * Additional GraphQL options when GraphQL middleware is created.
-         */
-        options?: OptionsResult
-    }
+    middlewares?: any[]
 
     /**
-     * Can be set to use websocket server.
+     * List of registered action middlewares.
+     * This way you can setup middlewares per specific action.
      */
-    websocket?: {
+    actionMiddlewares?: { [key: string]: any[] }
+  }
 
-        /**
-         * Websocket host.
-         * Defaults to "ws://localhost".
-         */
-        host?: string
-
-        /**
-         * Port on which to run websocket server.
-         * Required parameter to enable websockets server.
-         */
-        port?: number
-
-        /**
-         * Route on which to register a subscriptions websocket interface.
-         * If not set, default is "/subscriptions".
-         */
-        path?: string
-
-        /**
-         * Additional websocket server options.
-         */
-        options?: Partial<ServerOptions>
-
-        /**
-         * PubSub to be used for default subscriptions.
-         *
-         * todo: make sure to validate pubsub existence when subscription declarations were found
-         */
-        pubSub?: PubSub
-
-        /**
-         * When a connected user doesn't respond in a given amount of time,
-         * he will be disconnected from a websocket.
-         * Server and client must exchange with "ping"/"pong" messages.
-         *
-         * @see https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
-         */
-        disconnectTimeout?: number
-    }
+  /**
+   * Options to setup a GraphQL.
+   */
+  graphql?: {
+    /**
+     * Route on which to register a graphql requests.
+     * If not set, default is "/graphql".
+     */
+    route?: string
 
     /**
-     * Callback that creates ORM data source.
+     * Indicates if graphiQL should be enabled or not.
      */
-    dataSourceFactory?: (options: Partial<ConnectionOptions>) => Promise<Connection>
+    graphiql?: boolean
 
     /**
-     * List of entities to use in connection.
-     * If this property is set, they will be overridden in ORM.
+     * Indicates if playground should be enabled or not.
      */
-    entities?: ListOfType<Function|string|EntitySchema>
+    playground?: boolean
 
     /**
-     * List of registered resolvers.
+     * Additional GraphQL options when GraphQL middleware is created.
      */
-    resolvers: ListOfType<AppResolverType>
+    options?: OptionsResult
+  }
+
+  /**
+   * Can be set to use websocket server.
+   */
+  websocket?: {
+    /**
+     * Websocket host.
+     * Defaults to "ws://localhost".
+     */
+    host?: string
 
     /**
-     * List of validation rules to apply.
+     * Port on which to run websocket server.
+     * Required parameter to enable websockets server.
      */
-    validationRules?: ListOfType<AnyValidationRule>
+    port?: number
 
     /**
-     * Validation library to be used in the application.
-     * If not specified, default validator will be used.
+     * Route on which to register a subscriptions websocket interface.
+     * If not set, default is "/subscriptions".
      */
-    validator?: Validator
+    path?: string
 
     /**
-     * Logger to be used in the application.
-     * If not specified, default logger will be used.
+     * Additional websocket server options.
      */
-    logger?: Logger
+    options?: Partial<ServerOptions>
 
     /**
-     * Strategy for naming special identifiers used in the framework.
-     * If not specified, default naming strategy will be used.
+     * PubSub to be used for default subscriptions.
+     *
+     * todo: make sure to validate pubsub existence when subscription declarations were found
      */
-    namingStrategy?: NamingStrategy
+    pubSub?: PubSub
 
     /**
-     * Handling errors logic.
-     * If not specified, default error handler will be used.
+     * When a connected user doesn't respond in a given amount of time,
+     * he will be disconnected from a websocket.
+     * Server and client must exchange with "ping"/"pong" messages.
+     *
+     * @see https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
      */
-    errorHandler?: ErrorHandler
+    disconnectTimeout?: number
+  }
 
-    /**
-     * Indicates if framework should automatically generate root queries and mutations for your models.
-     */
-    generateModelRootQueries?: boolean
+  /**
+   * Callback that creates ORM data source.
+   */
+  dataSourceFactory?: (
+    options: Partial<ConnectionOptions>,
+  ) => Promise<Connection>
 
-    /**
-     * Maximal deepness for nested conditions of automatically generated queries.
-     */
-    maxGeneratedConditionsDeepness?: number
+  /**
+   * List of entities to use in connection.
+   * If this property is set, they will be overridden in ORM.
+   */
+  entities?: ListOfType<Function | string | EntitySchema>
 
-    /**
-     * Rate limiting options.
-     */
-    rateLimits?: RateLimitOptions<any>
+  /**
+   * List of registered resolvers.
+   */
+  resolvers: ListOfType<AppResolverType>
 
-    /**
-     * Used to create a rate limiter instance.
-     */
-    rateLimitConstructor?: (options: RateLimitNodeOptions) => any
+  /**
+   * List of validation rules to apply.
+   */
+  validationRules?: ListOfType<AnyValidationRule>
 
+  /**
+   * Validation library to be used in the application.
+   * If not specified, default validator will be used.
+   */
+  validator?: Validator
+
+  /**
+   * Logger to be used in the application.
+   * If not specified, default logger will be used.
+   */
+  logger?: Logger
+
+  /**
+   * Strategy for naming special identifiers used in the framework.
+   * If not specified, default naming strategy will be used.
+   */
+  namingStrategy?: NamingStrategy
+
+  /**
+   * Handling errors logic.
+   * If not specified, default error handler will be used.
+   */
+  errorHandler?: ErrorHandler
+
+  /**
+   * Indicates if framework should automatically generate root queries and mutations for your models.
+   */
+  generateModelRootQueries?: boolean
+
+  /**
+   * Maximal deepness for nested conditions of automatically generated queries.
+   */
+  maxGeneratedConditionsDeepness?: number
+
+  /**
+   * Rate limiting options.
+   */
+  rateLimits?: RateLimitOptions<any>
+
+  /**
+   * Used to create a rate limiter instance.
+   */
+  rateLimitConstructor?: (options: RateLimitNodeOptions) => any
 }

@@ -4,23 +4,23 @@ import * as fs from "fs"
 import * as path from "path"
 import { MappedEntitySchemaProperty } from "typeorm"
 
+// fs.writeFileSync(filenameWithoutExt + ".json", JSON.stringify(result))
+
 /**
  * Application Server utility functions.
  */
 export const ApplicationServerUtils = {
-
   /**
    * Loads application metadata from the declaration file.
    */
   loadAppMetadata(filenameWithoutExt: string) {
+    const jsonFilePath = path.normalize(filenameWithoutExt + ".json")
     const tsFilePath = path.normalize(filenameWithoutExt + ".ts")
     const dtsFilePath = path.normalize(filenameWithoutExt + ".d.ts")
 
-    if (fs.existsSync(tsFilePath))
-      return parse(tsFilePath)
-
-    if (fs.existsSync(dtsFilePath))
-      return parse(dtsFilePath)
+    if (fs.existsSync(jsonFilePath)) return require(jsonFilePath)
+    if (fs.existsSync(tsFilePath)) return parse(tsFilePath)
+    if (fs.existsSync(dtsFilePath)) return parse(dtsFilePath)
 
     throw new Error(`${tsFilePath} or ${dtsFilePath} were not found!`)
   },
@@ -35,11 +35,10 @@ export const ApplicationServerUtils = {
         mappedEntities.push({
           model: model.typeName!,
           property: property.propertyName!,
-          target: property.typeName!
+          target: property.typeName!,
         })
       }
     }
     return mappedEntities
   },
-
 }
