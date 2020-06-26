@@ -2,12 +2,14 @@
   "name": "test-basic-app-root",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.14.1",
-    "typescript": "^3.7.5"
+    "lerna": "^3.22.1",
+    "typescript": "^3.9.5",
+    "prettier": "^2.0.5"
   },
   "scripts": {
     "start": "lerna bootstrap",
     "docker": "docker-compose up",
+    "format": "prettier",
     "watch": "tsc -b -w",
     "class-sample": "node samples/complete-sample/_/index.js"
   }
