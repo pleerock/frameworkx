@@ -22,7 +22,7 @@ import { GraphQLSchemaBuilder } from "./GraphQLSchemaBuilder"
 import { LoggerHelper } from "./LoggerHelper"
 import { DefaultNamingStrategy } from "./naming-strategy/DefaultNamingStrategy"
 import { ResolverHelper } from "./ResolverHelper"
-import { validateSchema } from "graphql"
+import { assertValidSchema } from "graphql"
 import cors = require("cors")
 
 const express = require("express")
@@ -287,12 +287,8 @@ export class ApplicationServer<App extends AnyApplication> {
    * Middleware for GraphQL.
    */
   private createGraphQLMiddleware(schema: GraphQLSchema) {
-
     // make sure schema is valid
-    const errors = validateSchema(schema)
-    if (errors.length) {
-      throw new Error(errors.toString())
-    }
+    assertValidSchema(schema)
 
     // create a graphql HTTP server
     return graphqlHTTP((request: any, response: any) => ({

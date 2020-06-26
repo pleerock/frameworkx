@@ -18,6 +18,7 @@ import {
 } from "graphql"
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { GraphQLBigInt } from "./BigIntScalar"
 import { LoggerHelper } from "./LoggerHelper"
 import { ResolverHelper } from "./ResolverHelper"
 
@@ -116,6 +117,10 @@ export class GraphQLSchemaBuilder {
       return GraphQLString
     } else if (type.kind === "number") {
       return GraphQLInt
+    } else if (type.kind === "bigint") {
+      return GraphQLBigInt
+    } else if (type.typeName === "BigInt") {
+      return GraphQLBigInt
     } else if (type.typeName === "Float") {
       return GraphQLFloat
     } else if (type.typeName === "Date") {
@@ -388,6 +393,7 @@ export class GraphQLSchemaBuilder {
         })
       } else if (
         metadata.typeName === "Float" ||
+        metadata.typeName === "BigInt" ||
         metadata.typeName === "Date" ||
         metadata.typeName === "Time" ||
         metadata.typeName === "DateTime"
