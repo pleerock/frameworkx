@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "_/index.js",
   "dependencies": {
+    "@microframework/cli": "*",
     "@microframework/core": "*",
     "@microframework/parser": "*",
     "@microframework/node": "*",
@@ -29,6 +30,7 @@
   "devDependencies": {
   },
   "scripts": {
-    "test": "./node_modules/.bin/jest"
+    "test": "./node_modules/.bin/jest",
+    "cli": "./node_modules/.bin/microframework"
   }
 }

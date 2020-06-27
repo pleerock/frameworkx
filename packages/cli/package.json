@@ -1,0 +1,20 @@
+{
+  "name": "@microframework/cli",
+  "version": "0.1.17",
+  "description": "Microframework core",
+  "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
+  "license": "MIT",
+  "main": "_/index.js",
+  "bin": {
+    "microframework": "./_/index.js"
+  },
+  "dependencies": {
+    "@microframework/parser": "*"
+  },
+  "devDependencies": {
+    "commander": "^5.1.0",
+    "ts-node": "^8.10.2",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.5"
+  }
+}

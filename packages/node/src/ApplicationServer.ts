@@ -8,7 +8,13 @@ import {
 import { debugLogger } from "@microframework/logger"
 import { defaultValidator } from "@microframework/validator"
 import { Request, Response } from "express"
-import { assertValidSchema, execute, GraphQLError, GraphQLSchema, subscribe, } from "graphql"
+import {
+  assertValidSchema,
+  execute,
+  GraphQLError,
+  GraphQLSchema,
+  subscribe,
+} from "graphql"
 import { Server as HttpServer } from "http"
 import { SubscriptionServer } from "subscriptions-transport-ws"
 import { ConnectionOptions } from "typeorm"
@@ -22,7 +28,7 @@ import { GraphQLSchemaBuilder } from "./GraphQLSchemaBuilder"
 import { LoggerHelper } from "./LoggerHelper"
 import { DefaultNamingStrategy } from "./naming-strategy"
 import { ResolverHelper } from "./ResolverHelper"
-import cors = require("cors");
+import cors = require("cors")
 
 const express = require("express")
 const graphqlHTTP = require("express-graphql")
@@ -125,11 +131,9 @@ export class ApplicationServer<App extends AnyApplication> {
    */
   async start(): Promise<this> {
     // load application metadata
-    console.time("load metadata")
     this.metadata = await ApplicationServerUtils.loadAppMetadata(
       this.properties.appPath,
     )
-    console.timeEnd("load metadata")
 
     // setup a database connection
     await this.loadDataSource()

@@ -1,5 +1,6 @@
 currentDir=${PWD}
 declare -a projectDirs=(
+  "./packages/cli"
   "./packages/core"
   "./packages/parser"
   "./packages/node"

@@ -4,8 +4,6 @@ import * as fs from "fs"
 import * as path from "path"
 import { MappedEntitySchemaProperty } from "typeorm"
 
-// fs.writeFileSync(filenameWithoutExt + ".json", JSON.stringify(result))
-
 /**
  * Application Server utility functions.
  */

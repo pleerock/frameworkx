@@ -1,29 +1,22 @@
-cd ./packages/core
-npm version patch
-npm publish
-cd ../../
+currentDir=${PWD}
+declare -a projectDirs=(
+  "./packages/cli"
+  "./packages/core"
+  "./packages/parser"
+  "./packages/node"
+  "./packages/logger"
+  "./packages/model"
+)
 
-cd ./packages/logger
-npm version patch
-npm publish
-cd ../../
+for dir in "${projectDirs[@]}"
+do
+  echo "> $dir"
+  cd "$dir" || exit
 
-cd ./packages/model
-npm version patch
-npm publish
-cd ../../
+  npm version patch
+  npm publish
 
-cd ./packages/node
-npm version patch
-npm publish
-cd ../../
+  cd "$currentDir" || exit
+done
 
-cd ./packages/parser
-npm version patch
-npm publish
-cd ../../
-
-cd ./packages/validator
-npm version patch
-npm publish
-cd ../../
+echo "Published!"
