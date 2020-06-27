@@ -248,9 +248,8 @@ export class ModelParser {
           modelType,
           argsType,
         )
-        model.description = ts.displayPartsToString(
-          modelSymbol.getDocumentationComment(this.typeChecker),
-        )
+        model.description = this.extractDescription(modelSymbol)
+        model.deprecated = this.extractDeprecation(modelSymbol)
         return model
       }
 
@@ -260,11 +259,11 @@ export class ModelParser {
 
       let resolvedType = undefined
       let description: string | undefined = undefined
+      let deprecated: string | boolean | undefined = undefined
       if (symbol) {
         resolvedType = symbol.declarations[0]
-        description = ts.displayPartsToString(
-          symbol.getDocumentationComment(this.typeChecker),
-        )
+        description = this.extractDescription(symbol)
+        deprecated = this.extractDeprecation(symbol)
       }
 
       // if this is a nested call (this case we'll have a parent name) -
@@ -277,6 +276,7 @@ export class ModelParser {
         return TypeMetadataUtils.createType("object", {
           typeName,
           description,
+          deprecated,
         })
       }
 
@@ -290,6 +290,7 @@ export class ModelParser {
         ),
         typeName,
         description,
+        deprecated,
       }
     } else if (ts.isImportTypeNode(node)) {
       // check if we can handle this import
@@ -320,9 +321,8 @@ export class ModelParser {
       }
 
       const model = this.parseModel("", "", modelType, argsType)
-      model.description = ts.displayPartsToString(
-        modelSymbol.symbol.getDocumentationComment(this.typeChecker),
-      )
+      model.description = this.extractDescription(modelSymbol.symbol)
+      model.deprecated = this.extractDeprecation(modelSymbol.symbol)
       return model
     }
 
@@ -391,12 +391,12 @@ export class ModelParser {
 
       // get property description
       let description = undefined
+      let deprecated: string | boolean | undefined = undefined
+
       if ((member as any).symbol) {
         // todo: need to find a way to properly check if member has a documentation
-        const memberSymbol: ts.Symbol = (member as any).symbol
-        description = ts.displayPartsToString(
-          memberSymbol.getDocumentationComment(this.typeChecker),
-        )
+        description = this.extractDescription((member as any).symbol)
+        deprecated = this.extractDeprecation((member as any).symbol)
       }
 
       // get property name
@@ -413,6 +413,9 @@ export class ModelParser {
           }
           if (description) {
             result.description = description
+          }
+          if (deprecated) {
+            result.deprecated = deprecated
           }
           properties.push(result)
         }
@@ -431,8 +434,9 @@ export class ModelParser {
 
         properties.push(
           TypeMetadataUtils.createType("object", {
-            propertyName: propertyName,
-            description: description,
+            propertyName,
+            description,
+            deprecated,
           }),
         )
       } else if (ts.isMethodSignature(member)) {
@@ -454,9 +458,10 @@ export class ModelParser {
             member.type,
             ParserUtils.joinStrings(parentName, propertyName),
           ),
-          propertyName: propertyName,
-          description: description,
-          args: args,
+          propertyName,
+          description,
+          deprecated,
+          args,
         })
 
         // } else {
@@ -464,5 +469,24 @@ export class ModelParser {
       }
     }
     return properties
+  }
+  extractDeprecation(symbol: ts.Symbol) {
+    let deprecated: string | boolean | undefined = undefined
+    const jsDocTags = symbol.getJsDocTags()
+    const deprecatedJsDocTag = jsDocTags.find(
+      (tag) => tag.name === "deprecated",
+    )
+    if (deprecatedJsDocTag) {
+      deprecated = true
+      if (deprecatedJsDocTag.text) {
+        deprecated = deprecatedJsDocTag.text
+      }
+    }
+    return deprecated
+  }
+  extractDescription(symbol: ts.Symbol) {
+    return ts.displayPartsToString(
+      symbol.getDocumentationComment(this.typeChecker),
+    )
   }
 }

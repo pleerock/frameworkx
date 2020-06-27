@@ -17,6 +17,7 @@ export type TypeMetadata = {
   typeName?: string
   propertyName?: string
   description?: string
+  deprecated?: boolean | string
   properties: TypeMetadata[]
   args?: TypeMetadata
 }

@@ -274,9 +274,17 @@ export class GraphQLSchemaBuilder {
         for (const property of metadata.properties) {
           if (!property.propertyName) continue
 
+          let deprecationReason = undefined
+          if (typeof property.deprecated === "string") {
+            deprecationReason = property.deprecated
+          } else if (property.deprecated === true) {
+            deprecationReason = " "
+          }
+
           fields[property.propertyName] = {
             type: this.resolveGraphQLType("object", property),
             description: property.description,
+            deprecationReason: deprecationReason,
             resolve: this.createRootDeclarationResolverFn(
               "model",
               property,
