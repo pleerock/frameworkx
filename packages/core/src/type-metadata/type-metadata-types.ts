@@ -13,6 +13,7 @@ export type TypeMetadata = {
   kind: TypeMetadataKind
   array: boolean
   nullable: boolean
+  canBeUndefined: boolean
   modelName?: string
   typeName?: string
   propertyName?: string

@@ -9,6 +9,7 @@ export const TypeMetadataUtils = {
       kind,
       array: false,
       nullable: false,
+      canBeUndefined: false,
       properties: [],
       ...(type || {}),
     }

@@ -99,7 +99,7 @@ export class GraphQLSchemaBuilder {
     mode: "input" | "object",
     type: TypeMetadata,
   ): any {
-    if (!type.nullable) {
+    if (!type.nullable && !type.canBeUndefined) {
       const subConverted = this.resolveGraphQLType(mode, {
         ...type,
         nullable: true,

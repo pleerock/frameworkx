@@ -23,6 +23,8 @@ export class ModelParser {
     parentName: string = "",
     goDeep: boolean = false,
   ): TypeMetadata {
+    const canBeUndefined = false
+
     if (node.kind === ts.SyntaxKind.NumberKeyword) {
       return TypeMetadataUtils.createType("number")
     } else if (node.kind === ts.SyntaxKind.BigIntKeyword) {
@@ -91,6 +93,7 @@ export class ModelParser {
         (type) => type !== nullType && type !== undefinedType,
       )
       const nullable = nullType !== undefined
+      const canBeUndefined = undefinedType !== undefined
 
       // this can only mean specified type was just "null", "undefined" or both
       if (typesWithoutNullAndUndefined.length === 0) {
@@ -102,6 +105,7 @@ export class ModelParser {
       if (typesWithoutNullAndUndefined.length === 1) {
         const metadata = this.parse(typesWithoutNullAndUndefined[0], parentName)
         metadata.nullable = nullable
+        metadata.canBeUndefined = canBeUndefined
         return metadata
       }
 
@@ -112,7 +116,10 @@ export class ModelParser {
         },
       )
       if (allAllNumberLiterals) {
-        return TypeMetadataUtils.createType("number", { nullable })
+        return TypeMetadataUtils.createType("number", {
+          nullable,
+          canBeUndefined,
+        })
       }
 
       // if union consist of bigints - we just map it to the regular "bigint" kind
@@ -122,7 +129,10 @@ export class ModelParser {
         },
       )
       if (allAllBigIntLiterals) {
-        return TypeMetadataUtils.createType("bigint", { nullable })
+        return TypeMetadataUtils.createType("bigint", {
+          nullable,
+          canBeUndefined,
+        })
       }
 
       // if union consist of booleans - we just map it to the regular "boolean" kind
@@ -136,7 +146,10 @@ export class ModelParser {
         },
       )
       if (allAllBooleanLiterals) {
-        return TypeMetadataUtils.createType("boolean", { nullable })
+        return TypeMetadataUtils.createType("boolean", {
+          nullable,
+          canBeUndefined,
+        })
       }
 
       // if union consist of strings - we create enumeration (maaaagic)
@@ -182,6 +195,7 @@ export class ModelParser {
         return TypeMetadataUtils.createType("enum", {
           typeName,
           nullable,
+          canBeUndefined,
           properties,
         })
       }
@@ -207,6 +221,7 @@ export class ModelParser {
       return TypeMetadataUtils.createType("union", {
         typeName,
         nullable,
+        canBeUndefined,
         properties,
       })
     } else if (ts.isTypeReferenceNode(node)) {
@@ -403,6 +418,7 @@ export class ModelParser {
       let propertyName = ParserUtils.normalizeTextSymbol(member.name.getText())
 
       if (ts.isPropertySignature(member) || ts.isPropertyDeclaration(member)) {
+        const canBeUndefined = member.questionToken !== undefined
         if (member.type) {
           const result = {
             ...this.parse(
@@ -410,6 +426,9 @@ export class ModelParser {
               ParserUtils.joinStrings(parentName, propertyName),
             ),
             propertyName: propertyName,
+          }
+          if (canBeUndefined === true) {
+            result.canBeUndefined = true
           }
           if (description) {
             result.description = description
@@ -453,7 +472,7 @@ export class ModelParser {
           }
         }
 
-        properties.push({
+        const value = {
           ...this.parse(
             member.type,
             ParserUtils.joinStrings(parentName, propertyName),
@@ -462,7 +481,11 @@ export class ModelParser {
           description,
           deprecated,
           args,
-        })
+        }
+        if (member.questionToken) {
+          value.canBeUndefined = true
+        }
+        properties.push(value)
 
         // } else {
         //     console.log(member)
