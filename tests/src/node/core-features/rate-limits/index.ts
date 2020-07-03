@@ -1,7 +1,7 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
-import { obtainPort, sleep } from "../../util/test-common"
-import { TestFetcher } from "../../util/test-fetcher"
+import { obtainPort, sleep } from "../../../util/test-common"
+import { TestFetcher } from "../../../util/test-fetcher"
 import { AppServer } from "./server"
 
 describe("node > core features > rate limitation", () => {

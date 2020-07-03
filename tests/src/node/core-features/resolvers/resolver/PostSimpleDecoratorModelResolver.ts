@@ -1,6 +1,6 @@
 import { ModelResolver, resolver } from "@microframework/core"
 import { App } from "../app"
-import { PostType } from "../model/PostType"
+import { PostType } from "../models"
 
 @resolver(App, "PostType")
 export class PostSimpleDecoratorModelResolver

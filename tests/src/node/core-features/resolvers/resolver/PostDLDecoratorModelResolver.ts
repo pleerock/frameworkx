@@ -1,6 +1,6 @@
 import { ModelDLResolver, resolver } from "@microframework/core"
 import { App } from "../app"
-import { PostType } from "../model/PostType"
+import { PostType } from "../models"
 
 @resolver({ app: App, name: "PostType", dataLoader: true })
 export class PostDLDecoratorModelResolver implements ModelDLResolver<PostType> {

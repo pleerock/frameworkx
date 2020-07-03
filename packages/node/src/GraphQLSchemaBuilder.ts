@@ -234,7 +234,11 @@ export class GraphQLSchemaBuilder {
           const type = this.objectTypes.find(
             (type) => type.name === property.typeName,
           )
-          if (!type) throw new Error("cannot find type from union type")
+          if (!type) {
+            throw new Error(
+              `Cannot find type "${property.typeName}" from union type. Did you forget to register type in the app?`,
+            )
+          }
 
           return type
         })
