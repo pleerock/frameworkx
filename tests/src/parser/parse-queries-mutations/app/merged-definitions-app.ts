@@ -5,11 +5,9 @@ import { CategoryQueries } from "../query/CategoryQueries"
 import { PostQueries } from "../query/PostQueries"
 
 export const App = createApp<{
-    models: {
-        PostType: PostModel,
-        CategoryType: CategoryType,
-    },
-    queries:
-        & PostQueries
-        & CategoryQueries
+  models: {
+    PostType: PostModel
+    CategoryType: CategoryType
+  }
+  queries: PostQueries & CategoryQueries
 }>()

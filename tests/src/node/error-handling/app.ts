@@ -2,24 +2,24 @@ import { createApp } from "@microframework/core"
 import { PostType } from "./models"
 
 export const App = createApp<{
-    actions: {
-        "get /posts": {
-            return: PostType[]
-        }
-        "get /posts-new": {
-            return: PostType[]
-        }
-        "get /posts-old": {
-            return: PostType[]
-        }
+  actions: {
+    "get /posts": {
+      return: PostType[]
     }
-    models: {
-        PostType: PostType
+    "get /posts-new": {
+      return: PostType[]
     }
-    queries: {
-        post(args: { id: number }): PostType
-    },
-    mutations: {
-        postSave(args: { id: number }): boolean
-    },
+    "get /posts-old": {
+      return: PostType[]
+    }
+  }
+  models: {
+    PostType: PostType
+  }
+  queries: {
+    post(args: { id: number }): PostType
+  }
+  mutations: {
+    postSave(args: { id: number }): boolean
+  }
 }>()

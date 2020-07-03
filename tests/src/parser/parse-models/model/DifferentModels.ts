@@ -19,57 +19,57 @@ export type PostInterfaceModel = ModelWithArgs<PostInterface, PostInterfaceArgs>
  * This way we are testing "Model" support with a literal type.
  */
 export type PostLiteralModel = ModelWithArgs<
-    { id: number, name: string },
-    { name: { keyword: string } }
+  { id: number; name: string },
+  { name: { keyword: string } }
 >
 
 /**
  * Type for a PostTypeModel.
  */
 export type PostType = {
-    id: number
-    name: string
+  id: number
+  name: string
 }
 
 /**
  * Class for a PostClassModel.
  */
 export class PostClass {
-    id!: number
-    name!: string
+  id!: number
+  name!: string
 }
 
 /**
  * Interface for a PostModel.
  */
 export interface PostInterface {
-    id: number
-    name: string
+  id: number
+  name: string
 }
 
 /**
  * Args for a PostTypeModel.
  */
 export type PostTypeArgs = {
-    name: {
-        keyword: string
-    }
+  name: {
+    keyword: string
+  }
 }
 
 /**
  * Args for a PostClassModel.
  */
 export class PostClassArgs {
-    name!: {
-        keyword: string
-    }
+  name!: {
+    keyword: string
+  }
 }
 
 /**
  * Args for a PostInterfaceModel.
  */
 export interface PostInterfaceArgs {
-    name: {
-        keyword: string
-    }
+  name: {
+    keyword: string
+  }
 }

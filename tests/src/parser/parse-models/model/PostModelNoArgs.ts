@@ -12,6 +12,6 @@ export type PostModelNoArgs = ModelWithArgs<PostNoArgsType, any>
  * Type for a PostModel.
  */
 export type PostNoArgsType = {
-    id: number
-    name: string
+  id: number
+  name: string
 }

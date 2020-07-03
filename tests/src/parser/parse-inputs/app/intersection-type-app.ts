@@ -3,10 +3,10 @@ import { PersonIntersectionInputType } from "../input/PersonIntersectionInputTyp
 import { PostModel } from "../model/PostModel"
 
 export const App = createApp<{
-    models: {
-        PostModel: PostModel,
-    },
-    inputs: {
-        PersonIntersectionInputType: PersonIntersectionInputType,
-    },
+  models: {
+    PostModel: PostModel
+  }
+  inputs: {
+    PersonIntersectionInputType: PersonIntersectionInputType
+  }
 }>()

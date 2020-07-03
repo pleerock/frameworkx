@@ -1,4 +1,4 @@
-import { createApp } from "@microframework/core"
+import { createApp, DateTime, Time } from "@microframework/core"
 import { PostType } from "./models"
 
 export const App = createApp<{
@@ -9,6 +9,11 @@ export const App = createApp<{
     post(args: { id: number }): PostType
   }
   mutations: {
-    postCreate(args: { title: string; date: Date }): PostType
+    postCreate(args: {
+      title: string
+      lastDate: Date
+      lastTime: Time
+      createdAt: DateTime
+    }): PostType
   }
 }>()

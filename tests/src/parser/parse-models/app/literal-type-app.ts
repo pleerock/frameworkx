@@ -1,10 +1,10 @@
 import { createApp } from "@microframework/core"
-import { AlbumType } from "../model/AlbumType"
 import { AlbumStatusType } from "../model/AlbumStatusType"
+import { AlbumType } from "../model/AlbumType"
 
 export const App = createApp<{
-    models: {
-        AlbumType: AlbumType
-        AlbumStatusType: AlbumStatusType
-    },
+  models: {
+    AlbumType: AlbumType
+    AlbumStatusType: AlbumStatusType
+  }
 }>()

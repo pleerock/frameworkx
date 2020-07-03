@@ -208,10 +208,11 @@ export class ApplicationServer<App extends AnyApplication> {
         .substr(0, action.name.indexOf(" "))
         .toLowerCase() // todo: make sure to validate this before
       const route = action.name.substr(action.name.indexOf(" ") + 1)
-      if (!method || !route)
+      if (!method || !route) {
         throw new Error(
           `Invalid action defined "${action.name}". Action name must contain HTTP method (e.g. "get", "post", ...) and URL (e.g. "/users", ...).`,
         )
+      }
 
       const middlewares =
         this.properties.webserver.actionMiddlewares[action.name] || []

@@ -5,6 +5,6 @@
     "outDir": "_"
   },
   "references": [
-    { "path": "../model" }
+    { "path": "../parser" }
   ]
 }

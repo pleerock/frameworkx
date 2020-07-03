@@ -9,15 +9,15 @@ export type PostModel = ModelWithArgs<PostType, PostArgs>
  * Type for a PostModel.
  */
 export type PostType = {
-    id: number
-    name: string
+  id: number
+  name: string
 }
 
 /**
  * Args for a PostModel.
  */
 export type PostArgs = {
-    name: {
-        keyword: string
-    }
+  name: {
+    keyword: string
+  }
 }

@@ -3,10 +3,9 @@ import { App } from "../app"
 import { PostType } from "../model/PostType"
 
 @resolver(App, "PostType")
-export class PostSimpleDecoratorModelResolver implements ModelResolver<PostType> {
-
-    status() {
-        return "draft"
-    }
-
+export class PostSimpleDecoratorModelResolver
+  implements ModelResolver<PostType> {
+  status() {
+    return "draft"
+  }
 }

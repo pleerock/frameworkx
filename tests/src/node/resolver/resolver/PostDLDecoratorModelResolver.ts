@@ -4,9 +4,7 @@ import { PostType } from "../model/PostType"
 
 @resolver({ app: App, name: "PostType", dataLoader: true })
 export class PostDLDecoratorModelResolver implements ModelDLResolver<PostType> {
-
-    status(posts: PostType[]) {
-        return posts.map(_ => "draft")
-    }
-
+  status(posts: PostType[]) {
+    return posts.map((_) => "draft")
+  }
 }

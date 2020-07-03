@@ -1,5 +1,4 @@
-import { DateTime } from "@microframework/core"
-import { Time } from "@microframework/core"
+import { DateTime, Time } from "@microframework/core"
 
 export type PostType = {
   id: number
