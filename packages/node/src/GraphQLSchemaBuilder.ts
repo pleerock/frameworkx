@@ -18,7 +18,7 @@ import {
 } from "graphql"
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
-import { GraphQLBigInt } from "./BigIntScalar"
+import { GraphQLBigInt } from "./scalar/BigIntScalar"
 import { LoggerHelper } from "./LoggerHelper"
 import { ResolverHelper } from "./ResolverHelper"
 

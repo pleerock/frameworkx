@@ -1,10 +1,9 @@
 import { LogEvent } from "@microframework/core"
-import { CodeError } from "./CodeError";
+import { CodeError } from "./CodeError"
 import { ErrorHandler } from "./ErrorHandler"
-import { HttpError } from "./HttpError";
+import { HttpError } from "./HttpError"
 
 export const DefaultErrorHandler: ErrorHandler = {
-
   actionError(error: any, event: LogEvent) {
     let status = 500
     let jsonError: any = {}
@@ -19,11 +18,9 @@ export const DefaultErrorHandler: ErrorHandler = {
         jsonError["message"] = error.message
         jsonError["code"] = error.code
       }
-
     } else if (error instanceof Error) {
       jsonError["message"] = error.message
       jsonError["stack"] = error.stack
-
     } else {
       jsonError = error
     }
@@ -33,6 +30,5 @@ export const DefaultErrorHandler: ErrorHandler = {
 
   resolverError(error: any, event: LogEvent) {
     throw error
-  }
-
+  },
 }

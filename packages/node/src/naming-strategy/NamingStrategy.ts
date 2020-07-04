@@ -4,7 +4,6 @@
  * todo: looks like its server specific?
  */
 export type NamingStrategy = {
-
   namelessInput(): string
   namelessModel(): string
   defaultTypeName(type: "query" | "mutation" | "subscription"): string
@@ -59,6 +58,4 @@ export type NamingStrategy = {
     whereRelation(typeName: string, relationName: string): string
     saveRelation(typeName: string, relationName: string): string
   }
-
-
 }

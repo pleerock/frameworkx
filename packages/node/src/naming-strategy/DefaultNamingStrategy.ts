@@ -4,7 +4,6 @@ import { NamingStrategy } from "./NamingStrategy"
  * Default framework naming strategy.
  */
 export const DefaultNamingStrategy: NamingStrategy = {
-
   namelessInput() {
     return generateRandomString(10) + "Input"
   },
@@ -14,17 +13,23 @@ export const DefaultNamingStrategy: NamingStrategy = {
   },
 
   defaultTypeName(type: "query" | "mutation" | "subscription"): string {
-    return  (type === "query") ? "Query" :
-            (type === "mutation") ? "Mutation" :
-            (type === "subscription") ? "Subscription" :
-            ""
+    return type === "query"
+      ? "Query"
+      : type === "mutation"
+      ? "Mutation"
+      : type === "subscription"
+      ? "Subscription"
+      : ""
   },
 
   defaultTypeDescription(type: "query" | "mutation" | "subscription"): string {
-    return  (type === "query") ? "Root queries." :
-            (type === "mutation") ? "Root mutations." :
-            (type === "subscription") ? "Root subscriptions." :
-            ""
+    return type === "query"
+      ? "Root queries."
+      : type === "mutation"
+      ? "Root mutations."
+      : type === "subscription"
+      ? "Root subscriptions."
+      : ""
   },
 
   generatedModelDeclarations: {
@@ -154,7 +159,7 @@ function lowercaseFirstLetter(str: string) {
 }
 
 function camelize(str: string) {
-  return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
     if (+match === 0) return "" // or if (/\s+/.test(match)) for white spaces
     return index == 0 ? match.toLowerCase() : match.toUpperCase()
   })

@@ -1,7 +1,7 @@
 import { GraphQLScalarType, Kind } from "graphql"
 
 // unfortunately we have to patch it this way,
-// to make JSON.stringify to work
+// to make JSON.stringify to work for big int
 if (!(BigInt.prototype as any)["toJSON"]) {
   ;(BigInt.prototype as any)["toJSON"] =
     (BigInt.prototype as any)["toJSON"] ||

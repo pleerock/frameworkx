@@ -4,7 +4,6 @@ import { LogEvent } from "@microframework/core"
  * Error handling interface.
  */
 export type ErrorHandler = {
-
   /**
    * Error handling when error occurs on action.
    */
@@ -14,5 +13,4 @@ export type ErrorHandler = {
    * Error handling when error occurs on a GraphQL resolver.
    */
   resolverError(error: any, event: LogEvent): void
-
 }
