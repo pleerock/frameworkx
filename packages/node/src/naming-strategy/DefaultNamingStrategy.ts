@@ -1,15 +1,17 @@
 import { NamingStrategy } from "./NamingStrategy"
+import { NamingStrategyUtils } from "./NamingStrategyUtils"
+const { capitalize, randomString, smallize, camelize } = NamingStrategyUtils
 
 /**
  * Default framework naming strategy.
  */
 export const DefaultNamingStrategy: NamingStrategy = {
   namelessInput() {
-    return generateRandomString(10) + "Input"
+    return randomString(10) + "Input"
   },
 
   namelessModel() {
-    return generateRandomString(10) + "Model"
+    return randomString(10) + "Model"
   },
 
   defaultTypeName(type: "query" | "mutation" | "subscription"): string {
@@ -34,43 +36,43 @@ export const DefaultNamingStrategy: NamingStrategy = {
 
   generatedModelDeclarations: {
     one(modelName: string) {
-      return lowercaseFirstLetter(`${modelName}One`)
+      return smallize(`${modelName}One`)
     },
     oneNotNull(modelName: string) {
-      return lowercaseFirstLetter(`${modelName}NotNullOne`)
+      return smallize(`${modelName}NotNullOne`)
     },
     many(modelName: string) {
-      return lowercaseFirstLetter(`${modelName}Many`)
+      return smallize(`${modelName}Many`)
     },
     count(modelName: string) {
-      return lowercaseFirstLetter(`${modelName}Count`)
+      return smallize(`${modelName}Count`)
     },
     save(modelName: string) {
-      return lowercaseFirstLetter(`${modelName}Save`)
+      return smallize(`${modelName}Save`)
     },
     remove(modelName: string) {
-      return lowercaseFirstLetter(`${modelName}Remove`)
+      return smallize(`${modelName}Remove`)
     },
     observeOne(modelName: string) {
-      return lowercaseFirstLetter(modelName + "ObserveOne")
+      return smallize(modelName + "ObserveOne")
     },
     observeMany(modelName: string) {
-      return lowercaseFirstLetter(modelName + "ObserveMany")
+      return smallize(modelName + "ObserveMany")
     },
     observeCount(modelName: string) {
-      return lowercaseFirstLetter(modelName + "ObserveCount")
+      return smallize(modelName + "ObserveCount")
     },
     observeInsert(modelName: string) {
-      return lowercaseFirstLetter(modelName + "ObserveInsert")
+      return smallize(modelName + "ObserveInsert")
     },
     observeUpdate(modelName: string) {
-      return lowercaseFirstLetter(modelName + "ObserveUpdate")
+      return smallize(modelName + "ObserveUpdate")
     },
     observeSave(modelName: string) {
-      return lowercaseFirstLetter(modelName + "ObserveSave")
+      return smallize(modelName + "ObserveSave")
     },
     observeRemove(modelName: string) {
-      return lowercaseFirstLetter(modelName + "ObserveRemove")
+      return smallize(modelName + "ObserveRemove")
     },
     observeOneTriggerName(modelName: string) {
       return modelName + "ObserveOne"
@@ -152,29 +154,4 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return capitalize(camelize(typeName + " " + relationName + " InSave"))
     },
   },
-}
-
-function lowercaseFirstLetter(str: string) {
-  return str.charAt(0).toLowerCase() + str.slice(1)
-}
-
-function camelize(str: string) {
-  return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
-    if (+match === 0) return "" // or if (/\s+/.test(match)) for white spaces
-    return index == 0 ? match.toLowerCase() : match.toUpperCase()
-  })
-}
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-function generateRandomString(length: number) {
-  let result = ""
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-  const charactersLength = characters.length
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength))
-  }
-  return result
 }
