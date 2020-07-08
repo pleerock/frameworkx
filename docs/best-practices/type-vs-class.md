@@ -1,0 +1,1 @@
+Don't use `instanceof` (list its problems)

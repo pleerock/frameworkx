@@ -3,6 +3,9 @@ import { CodeError } from "./CodeError"
 import { ErrorHandler } from "./ErrorHandler"
 import { HttpError } from "./HttpError"
 
+/**
+ * Default error handling logic.
+ */
 export const DefaultErrorHandler: ErrorHandler = {
   actionError(error: any, event: LogEvent) {
     let status = 500

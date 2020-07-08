@@ -1,20 +1,26 @@
 import { DocumentNode } from "graphql"
-
 const fetch = require("node-fetch")
 
 export class TestFetcher {
   constructor(private url: string) {}
 
   async get() {
-    const response = await fetch(this.url, {
+    return this.handleJsonResponse(await this.getResponse())
+  }
+
+  async getResponse(): Promise<Response> {
+    return await fetch(this.url, {
       method: "GET",
     })
-    return this.handleJsonResponse(response)
   }
 
   async graphql(gql: string | DocumentNode) {
+    return this.handleJsonResponse(await this.graphqlResponse(gql))
+  }
+
+  async graphqlResponse(gql: string | DocumentNode): Promise<Response> {
     const body = typeof gql === "string" ? gql : gql.loc?.source.body
-    const response = await fetch(this.url, {
+    return fetch(this.url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,7 +29,6 @@ export class TestFetcher {
         query: body,
       }),
     })
-    return this.handleJsonResponse(response)
   }
 
   private async handleJsonResponse(response: any) {

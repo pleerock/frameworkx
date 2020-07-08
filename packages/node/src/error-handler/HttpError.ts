@@ -1,3 +1,8 @@
+/**
+ * HttpError is used to throw an error with a custom HTTP status code.
+ * For example, throw new HttpError(404, "User not found")
+ * sets 404 HTTP status code in a response.
+ */
 export class HttpError extends Error {
   instanceof: "HttpError"
   httpCode: number

@@ -104,8 +104,8 @@ export class ApplicationServer<App extends AnyApplication> {
       },
       dataSourceFactory: options.dataSourceFactory,
       entities: options.entities,
-      namingStrategy: DefaultNamingStrategy,
-      errorHandler: DefaultErrorHandler,
+      namingStrategy: options.namingStrategy || DefaultNamingStrategy,
+      errorHandler: options.errorHandler || DefaultErrorHandler,
       resolvers: resolvers,
       validationRules: options.validationRules
         ? listOfTypeToArray(options.validationRules)

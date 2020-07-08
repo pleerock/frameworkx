@@ -168,10 +168,8 @@ export class ResolverHelper {
         logger.log(`return(${JSON.stringify(result)})`) // this.logger.logGraphQLResponse({ ...logInfo, content: result })
         return result
       } catch (error) {
-        logger.error(error) // this.logger.resolveError(error)
-        // throw error
+        logger.error(error)
         this.properties.errorHandler.resolverError(error, logEvent)
-        // throw error // todo: check if we need it (if yes check if resolverError can do it)
       }
     }
   }
@@ -278,9 +276,8 @@ export class ResolverHelper {
         logger.log(`[data-loader] return(${JSON.stringify(result)})`)
         return result
       } catch (error) {
-        logger.log(error) // this.logger.resolveError(error)
+        logger.log(error)
         this.properties.errorHandler.resolverError(error, logEvent)
-        // throw error // todo: check if we need it (if yes check if resolverError can do it)
       }
     }
   }
@@ -386,9 +383,8 @@ export class ResolverHelper {
         logger.log(`[generated] "${JSON.stringify(result)}"`)
         return result
       } catch (error) {
-        logger.error(error) // this.logger.resolveError(error)
+        logger.error(error)
         this.properties.errorHandler.resolverError(error, logEvent)
-        // throw error // todo: check if we need it (if yes check if resolverError can do it)
       }
     }
   }

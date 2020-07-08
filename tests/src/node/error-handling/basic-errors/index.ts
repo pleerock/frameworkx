@@ -4,7 +4,7 @@ import { obtainPort } from "../../../util/test-common"
 import { TestFetcher } from "../../../util/test-fetcher"
 import { AppServer } from "./server"
 
-describe("node > core features > error handling", () => {
+describe("node > error handling > basic errors", () => {
   let port: number = 0
   let server: ApplicationServer<any> | undefined = undefined
   let fetcher: TestFetcher | undefined = undefined
