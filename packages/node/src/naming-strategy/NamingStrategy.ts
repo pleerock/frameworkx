@@ -1,16 +1,29 @@
 /**
- * Strategy for naming special identifiers used in the framework.
- *
- * todo: looks like its server specific?
+ * Strategy on how to name a special identifiers.
  */
 export type NamingStrategy = {
+  /**
+   * What name should be used for Inputs without name defined.
+   */
   namelessInput(): string
+
+  /**
+   * What name should be used for Models without name defined.
+   */
   namelessModel(): string
+
+  /**
+   * Names for root types - for Query, Mutation and Subscription.
+   */
   defaultTypeName(type: "query" | "mutation" | "subscription"): string
+
+  /**
+   * Descriptions for root types - for Query, Mutation and Subscription.
+   */
   defaultTypeDescription(type: "query" | "mutation" | "subscription"): string
 
   /**
-   * Defines how generated root queries and mutations will be named.
+   * Defines names of the generated model declarations.
    */
   generatedModelDeclarations: {
     one(modelName: string): string
@@ -35,6 +48,9 @@ export type NamingStrategy = {
     observeRemoveTriggerName(modelName: string): string
   }
 
+  /**
+   * Defines descriptions of the generated model declarations.
+   */
   generatedModelDeclarationDescriptions: {
     one(modelName: string): string
     oneNotNull(modelName: string): string
@@ -51,6 +67,9 @@ export type NamingStrategy = {
     observeRemove(modelName: string): string
   }
 
+  /**
+   * Defines names of the generated input declarations.
+   */
   generatedModelInputs: {
     where(typeName: string): string
     save(typeName: string): string

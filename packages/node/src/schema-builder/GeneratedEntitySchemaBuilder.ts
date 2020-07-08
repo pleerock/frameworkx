@@ -4,7 +4,7 @@ import {
   TypeMetadataUtils,
 } from "@microframework/core"
 import { EntityMetadata, InsertEvent } from "typeorm"
-import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
 
 /**
  * Generates resolvers and root declarations for the app entities.
@@ -68,14 +68,12 @@ export class GeneratedEntitySchemaBuilder {
         namingStrategy.generatedModelDeclarations.many(modelName),
         (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return dataSource
-            .getRepository(entityMetadata.name)
-            .find({
-              where: args.where,
-              order: args.order,
-              take: args.limit,
-              skip: args.offset,
-            })
+          return dataSource.getRepository(entityMetadata.name).find({
+            where: args.where,
+            order: args.order,
+            take: args.limit,
+            skip: args.offset,
+          })
         },
       )
 

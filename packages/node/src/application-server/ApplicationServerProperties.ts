@@ -10,9 +10,9 @@ import { OptionsResult } from "express-graphql"
 import { PubSub } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
-import { ErrorHandler } from "./error-handler"
-import { NamingStrategy } from "./naming-strategy/NamingStrategy"
-import { RateLimitNodeOptions, RateLimitOptions } from "./rate-limit"
+import { ErrorHandler } from "../error-handler"
+import { NamingStrategy } from "../naming-strategy/NamingStrategy"
+import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
 
 /**
  * Properties held by ApplicationServer.
@@ -200,5 +200,5 @@ export type ApplicationServerProperties = {
   /**
    * Used to create a rate limiter instance.
    */
-  rateLimitConstructor?: (options: RateLimitNodeOptions) => any
+  rateLimitConstructor?: (options: RateLimitItemOptions) => any
 }

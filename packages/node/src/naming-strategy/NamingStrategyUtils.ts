@@ -2,12 +2,10 @@
  * Utility helper functions for naming strategies.
  */
 export const NamingStrategyUtils = {
-  something: 1,
   /**
    * Capitalizes first letter of the given string.
    */
   capitalize(str: string) {
-    console.log("something is", this.something)
     return str.charAt(0).toUpperCase() + str.slice(1)
   },
   /**

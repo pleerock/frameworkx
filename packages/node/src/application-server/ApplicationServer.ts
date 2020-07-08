@@ -22,12 +22,12 @@ import { Server as WebsocketServer } from "ws"
 import { ApplicationServerOptions } from "./ApplicationServerOptions"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
 import { ApplicationServerUtils } from "./ApplicationServerUtils"
-import { DefaultErrorHandler } from "./error-handler"
-import { GeneratedEntitySchemaBuilder } from "./GeneratedEntitySchemaBuilder"
-import { GraphQLSchemaBuilder } from "./GraphQLSchemaBuilder"
-import { LoggerHelper } from "./LoggerHelper"
-import { DefaultNamingStrategy } from "./naming-strategy"
-import { ResolverHelper } from "./ResolverHelper"
+import { DefaultErrorHandler } from "../error-handler"
+import { GeneratedEntitySchemaBuilder } from "../schema-builder/GeneratedEntitySchemaBuilder"
+import { GraphQLSchemaBuilder } from "../schema-builder/GraphQLSchemaBuilder"
+import { LoggerHelper } from "../helper/LoggerHelper"
+import { DefaultNamingStrategy } from "../naming-strategy"
+import { ResolverHelper } from "../helper/ResolverHelper"
 import cors = require("cors")
 
 const express = require("express")

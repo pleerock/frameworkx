@@ -17,10 +17,10 @@ import {
   GraphQLUnionType,
 } from "graphql"
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
-import { ApplicationServerProperties } from "./ApplicationServerProperties"
-import { GraphQLBigInt } from "./scalar/BigIntScalar"
-import { LoggerHelper } from "./LoggerHelper"
-import { ResolverHelper } from "./ResolverHelper"
+import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
+import { GraphQLBigInt } from "../scalar/BigIntScalar"
+import { LoggerHelper } from "../helper/LoggerHelper"
+import { ResolverHelper } from "../helper/ResolverHelper"
 
 /**
  * Builds a GraphQL schema for a provided application metadata.

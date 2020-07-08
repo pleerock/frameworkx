@@ -1,3 +1,3 @@
 export * from "./RateLimitOptions"
-export * from "./RateLimitNodeOptions"
+export * from "./RateLimitItemOptions"
 export * from "./RateLimitFn"

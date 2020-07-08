@@ -10,6 +10,9 @@ if (!(BigInt.prototype as any)["toJSON"]) {
     }
 }
 
+/**
+ * GraphQL type for a BitInt scalar type.
+ */
 export const GraphQLBigInt = new GraphQLScalarType({
   name: "BigInt",
   description:

@@ -10,9 +10,9 @@ import { LogEvent } from "@microframework/core"
 import DataLoader from "dataloader"
 import { withFilter } from "graphql-subscriptions"
 import { GraphQLFieldResolver } from "graphql/type/definition"
-import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
 import { LoggerHelper } from "./LoggerHelper"
-import { RateLimitNodeOptions } from "./rate-limit"
+import { RateLimitItemOptions } from "../rate-limit"
 import { ValidationHelper } from "./ValidationHelper"
 
 /**
@@ -543,7 +543,7 @@ export class ResolverHelper {
           `You must set "rateLimitConstructor" to use rate limiting options.`,
         )
 
-      let rateLimitOptions: RateLimitNodeOptions | undefined = undefined
+      let rateLimitOptions: RateLimitItemOptions | undefined = undefined
       if (
         declarationType === "query" &&
         this.properties.rateLimits["queries"]
