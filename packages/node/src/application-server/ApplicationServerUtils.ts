@@ -1,8 +1,18 @@
-import { TypeMetadata } from "@microframework/core"
+import {
+  listOfTypeToArray,
+  ResolverUtils,
+  TypeMetadata,
+} from "@microframework/core"
+import { debugLogger } from "@microframework/logger"
 import { parse } from "@microframework/parser"
+import { defaultValidator } from "@microframework/validator"
 import * as fs from "fs"
 import * as path from "path"
 import { MappedEntitySchemaProperty } from "typeorm"
+import { DefaultErrorHandler } from "../error-handler"
+import { DefaultNamingStrategy } from "../naming-strategy"
+import { ApplicationServerOptions } from "./ApplicationServerOptions"
+import { ApplicationServerProperties } from "./ApplicationServerProperties"
 
 /**
  * Application Server utility functions.
@@ -10,6 +20,7 @@ import { MappedEntitySchemaProperty } from "typeorm"
 export const ApplicationServerUtils = {
   /**
    * Loads application metadata from the declaration file.
+   * Given file name shouldn't have an extension.
    */
   loadAppMetadata(filenameWithoutExt: string) {
     const jsonFilePath = path.normalize(filenameWithoutExt + ".json")
@@ -25,6 +36,7 @@ export const ApplicationServerUtils = {
 
   /**
    * Converts given type metadata models into MappedEntitySchemaProperty objects.
+   * These objects are used by TypeORM to set types to entity properties dynamically.
    */
   modelsToApp(models: TypeMetadata[]): MappedEntitySchemaProperty[] {
     const mappedEntities: MappedEntitySchemaProperty[] = []
@@ -38,5 +50,61 @@ export const ApplicationServerUtils = {
       }
     }
     return mappedEntities
+  },
+
+  /**
+   * Converts given ApplicationServerOptions object into ApplicationServerProperties object
+   * and sets default properties if something was not set in options.
+   */
+  optionsToProperties(
+    options: ApplicationServerOptions,
+  ): ApplicationServerProperties {
+    const resolvers = ResolverUtils.normalizeResolverMetadatas(
+      options.resolvers,
+    )
+    return {
+      appPath: options.appPath,
+      webserver: {
+        express: options.webserver.express,
+        port: options.webserver.port,
+        cors: options.webserver.cors || false,
+        staticDirs: options.webserver.staticDirs || {},
+        middlewares: options.webserver.middlewares
+          ? listOfTypeToArray(options.webserver.middlewares)
+          : [],
+        actionMiddlewares: options.webserver.actionMiddlewares || {},
+      },
+      graphql: {
+        route: options.graphql?.route || "/graphql",
+        graphiql: options.graphql?.graphiql || false,
+        playground: options.graphql?.playground,
+        options: options.graphql?.options,
+      },
+      websocket: {
+        port: options.websocket?.port,
+        host: options.websocket?.host || "ws://localhost",
+        path: options.websocket?.path || "subscriptions",
+        options: options.websocket?.options || {},
+        pubSub: options.websocket?.pubSub,
+        disconnectTimeout: options.websocket?.disconnectTimeout,
+      },
+      dataSourceFactory: options.dataSourceFactory,
+      entities: options.entities,
+      namingStrategy: options.namingStrategy || DefaultNamingStrategy,
+      errorHandler: options.errorHandler || DefaultErrorHandler,
+      resolvers: resolvers,
+      validationRules: options.validationRules
+        ? listOfTypeToArray(options.validationRules)
+        : [],
+      generateModelRootQueries: options.generateModelRootQueries || false,
+      maxGeneratedConditionsDeepness:
+        options.maxGeneratedConditionsDeepness !== undefined
+          ? options.maxGeneratedConditionsDeepness
+          : 5,
+      validator: options.validator || defaultValidator,
+      logger: options.logger || debugLogger,
+      rateLimits: options.rateLimits,
+      rateLimitConstructor: options.rateLimitConstructor,
+    }
   },
 }

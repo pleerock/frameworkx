@@ -1,7 +1,7 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
-import { obtainPort } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { obtainPort } from "../../util/test-common"
+import { TestFetcher } from "../../util/test-fetcher"
 import { PostClassActionResolver } from "./resolver/PostClassActionResolver"
 import { PostContextResolver } from "./resolver/PostContextResolver"
 import {
@@ -21,7 +21,7 @@ import { AppServer } from "./server"
 
 const fetch = require("node-fetch")
 
-describe("node > core features > resolvers", () => {
+describe("node > resolvers", () => {
   let port = 0
   let server: ApplicationServer<any> | undefined = undefined
   let fetcher: TestFetcher | undefined = undefined

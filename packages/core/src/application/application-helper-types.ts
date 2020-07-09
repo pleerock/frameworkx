@@ -9,7 +9,7 @@ export type ListOfType<T> = T[] | { [key: string]: T }
 /**
  * Type for the server implementation for application.
  */
-export type ApplicationServer = () => Promise<() => Promise<void>>
+// export type ApplicationServer = () => Promise<() => Promise<void>>
 
 /**
  * Represents any application type.
@@ -20,5 +20,5 @@ export type AnyApplication = Application<any>
  * Creates a new Application instance.
  */
 export function createApp<Options extends AnyApplicationOptions>() {
-    return new Application<Options>()
+  return new Application<Options>()
 }

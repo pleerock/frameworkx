@@ -5,11 +5,10 @@ import { ValidationRuleOptions } from "./ValidationRuleOptions"
  * Set of validation rules for a particular model.
  */
 export type ValidationRule<T, Context extends ContextList> = {
-
   /**
    * Unique model identifier.
    */
-  instanceof: "ValidationRule"
+  typeof: "ValidationRule"
 
   /**
    * Model that needs to be validated.
@@ -20,7 +19,6 @@ export type ValidationRule<T, Context extends ContextList> = {
    * Validation options.
    */
   options: ValidationRuleOptions<T, Context>
-
 }
 
 /**

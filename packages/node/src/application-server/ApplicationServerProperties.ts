@@ -11,7 +11,7 @@ import { PubSub } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"
-import { NamingStrategy } from "../naming-strategy/NamingStrategy"
+import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
 
 /**

@@ -1,4 +1,3 @@
-
 /**
  * Collection of root queries, mutations and subscriptions.
  */
@@ -52,8 +51,8 @@ export type GraphQLDeclarationItemReturnType =
  *    postsCount(): number
  */
 export type GraphQLDeclarationItem =
-    | ((args: { [key: string]: any }) => GraphQLDeclarationItemReturnType) // example: post(args: { id: number }): Post
-    | (() => GraphQLDeclarationItemReturnType)  // example: posts(): Post[]
+  | ((args: { [key: string]: any }) => GraphQLDeclarationItemReturnType) // example: post(args: { id: number }): Post
+  | (() => GraphQLDeclarationItemReturnType) // example: posts(): Post[]
 
 /**
  * Action is a single HTTP route that serves network requests.
@@ -86,8 +85,11 @@ export type ArgsOfModel<Type extends ModelType> = {
 /**
  * Used to create a model with Args.
  */
-export type ModelWithArgs<Type extends ModelType, Args extends ArgsOfModel<Type>> = {
-  instanceof: "ModelWithArgs",
+export type ModelWithArgs<
+  Type extends ModelType,
+  Args extends ArgsOfModel<Type>
+> = {
+  typeof: "ModelWithArgs"
   type: Type
   args: Args
 }

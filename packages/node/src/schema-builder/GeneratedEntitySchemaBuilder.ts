@@ -592,7 +592,7 @@ export class GeneratedEntitySchemaBuilder {
     // register a new resolver
     if (!sameNameResolver) {
       this.properties.resolvers.push({
-        instanceof: "Resolver",
+        typeof: "Resolver",
         type: "declaration-item-resolver",
         declarationType: type,
         name: name,

@@ -17,6 +17,7 @@ export const AppServer = createApplicationServer(App, {
     cors: true,
   },
   websocket: {
+    host: "ws://localhost",
     port: 3001,
     pubSub: AppPubSub,
   },
@@ -27,6 +28,6 @@ export const AppServer = createApplicationServer(App, {
   resolvers: { ...resolvers, AppContext },
   entities,
   validationRules,
-  dataSourceFactory: options => AppConnection.setOptions(options).connect(),
+  dataSourceFactory: (options) => AppConnection.setOptions(options).connect(),
   generateModelRootQueries: true,
 })

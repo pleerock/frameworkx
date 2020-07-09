@@ -11,9 +11,8 @@ import { PubSub } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"
-import { NamingStrategy } from "../naming-strategy/NamingStrategy"
-import { RateLimitItemOptions } from "../rate-limit"
-import { RateLimitOptions } from "../rate-limit/RateLimitOptions"
+import { NamingStrategy } from "../naming-strategy"
+import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
 
 /**
  * Application server startup options.
@@ -97,15 +96,15 @@ export type ApplicationServerOptions = {
   websocket?: {
     /**
      * Websocket host.
-     * Defaults to "ws://localhost".
+     * For example, "ws://localhost".
      */
-    host?: string
+    host: string
 
     /**
      * Port on which to run websocket server.
      * Required parameter to enable websockets server.
      */
-    port?: number
+    port: number
 
     /**
      * Route on which to register a subscriptions websocket interface.
