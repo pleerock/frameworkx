@@ -1,8 +1,12 @@
-import { AnyApplication, ApplicationLogger } from "@microframework/core"
-import { ApplicationTypeMetadata } from "@microframework/core/_"
+import {
+  AnyApplication,
+  ApplicationLogger,
+  ApplicationTypeMetadata,
+} from "@microframework/core"
 import { Express } from "express"
 import { Server as HttpServer } from "http"
 import { Server as WebsocketServer } from "ws"
+import { ApplicationServerProperties } from "./ApplicationServerProperties"
 
 /**
  * Application server.
@@ -14,9 +18,14 @@ export interface ApplicationServer<App extends AnyApplication> {
   readonly typeof: "ApplicationServer"
 
   /**
-   * Express instance, which is used
+   * Express instance, which is used for a webserver creation.
    */
   readonly express: Express
+
+  /**
+   * Application properties.
+   */
+  readonly properties: ApplicationServerProperties
 
   /**
    * Logger can be used to log application-level events.

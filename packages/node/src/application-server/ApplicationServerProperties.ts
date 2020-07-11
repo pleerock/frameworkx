@@ -6,7 +6,7 @@ import {
   Validator,
 } from "@microframework/core"
 import { CorsOptions } from "cors"
-import { OptionsResult } from "express-graphql"
+import { OptionsData } from "express-graphql"
 import { PubSub } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
@@ -22,105 +22,105 @@ export type ApplicationServerProperties = {
    * App file path.
    * Must point to .d.ts file in the javascript runtime.
    */
-  appPath: string
+  readonly appPath: string
 
   /**
    * Express server options.
    */
-  webserver: {
+  readonly webserver: {
     /**
      * Custom express server instance.
      * You can create and configure your own instance of express and framework will use it.
      * If not passed, default express server will be used.
      */
-    express?: any
+    readonly express?: any
 
     /**
      * Port on which to run express server.
      */
-    port: number
+    readonly port: number
 
     /**
      * Should be set to true to enable cors.
      */
-    cors: boolean | CorsOptions
+    readonly cors: boolean | CorsOptions
 
     /**
      * List of static directories to register in the Express server.
      */
-    staticDirs: {
+    readonly staticDirs: {
       [route: string]: string
     }
 
     /**
      * List of registered app middlewares.
      */
-    middlewares: any[]
+    readonly middlewares: any[]
 
     /**
      * List of registered action middlewares.
      * This way you can setup middlewares per specific action.
      */
-    actionMiddlewares: { [key: string]: any[] }
+    readonly actionMiddleware: { [key: string]: any[] }
   }
 
   /**
    * Options to setup a GraphQL.
    */
-  graphql: {
+  readonly graphql: {
     /**
      * Route on which to register a graphql requests.
      * If not set, default is "/graphql".
      */
-    route: string
+    readonly route: string
 
     /**
      * Indicates if graphiQL should be enabled or not.
      */
-    graphiql: boolean
+    readonly graphiql: boolean
 
     /**
      * Indicates if playground should be enabled or not.
      */
-    playground?: boolean | string
+    readonly playground?: boolean | string
 
     /**
      * Additional GraphQL options when GraphQL middleware is created.
      */
-    options?: OptionsResult
+    readonly options?: OptionsData
   }
 
   /**
    * Can be set to use websockets.
    */
-  websocket: {
+  readonly websocket: {
     /**
      * Websocket host.
      * Defaults to "ws://localhost".
      */
-    host: string
+    readonly host: string
 
     /**
      * Port on which to run websocket server.
      * Required parameter to enable websockets server.
      */
-    port?: number
+    readonly port?: number
 
     /**
      * Path on which to register a subscriptions websocket interface.
      * If not set, default is "/subscriptions".
      */
-    path: string
+    readonly path: string
 
     /**
      * Additional websocket server options.
      */
-    options: Partial<ServerOptions>
+    readonly options: Partial<ServerOptions>
 
     /**
      * PubSub to be used for subscriptions.
      */
-    pubSub?: PubSub
+    readonly pubSub?: PubSub
 
     /**
      * When a connected user doesn't respond in a given amount of time,
@@ -129,13 +129,13 @@ export type ApplicationServerProperties = {
      *
      * @see https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
      */
-    disconnectTimeout?: number
+    readonly disconnectTimeout?: number
   }
 
   /**
    * Callback that creates ORM data source.
    */
-  dataSourceFactory?: (
+  readonly dataSourceFactory?: (
     options: Partial<ConnectionOptions>,
   ) => Promise<Connection>
 
@@ -143,62 +143,62 @@ export type ApplicationServerProperties = {
    * List of entities to use in connection.
    * If this property is set, they will be overridden in ORM.
    */
-  entities?: ListOfType<Function | string | EntitySchema>
+  readonly entities?: ListOfType<Function | string | EntitySchema>
 
   /**
    * List of registered resolvers.
    */
-  resolvers: ResolverMetadata[]
+  readonly resolvers: ResolverMetadata[]
 
   /**
    * List of validation rules to apply.
    */
-  validationRules: AnyValidationRule[]
+  readonly validationRules: AnyValidationRule[]
 
   /**
    * Strategy for naming special identifiers used in the framework.
    */
-  namingStrategy: NamingStrategy
+  readonly namingStrategy: NamingStrategy
 
   /**
    * Handling errors logic.
    */
-  errorHandler: ErrorHandler
+  readonly errorHandler: ErrorHandler
 
   /**
    * Validation library to be used in the application.
    * If not specified, default validator will be used.
    */
-  validator: Validator
+  readonly validator: Validator
 
   /**
    * Logger to be used in the application.
    * If not specified, default logger will be used.
    */
-  logger: Logger
+  readonly logger: Logger
 
   /**
    * Indicates if framework should automatically generate root queries and mutations for your models.
    */
-  generateModelRootQueries: boolean
+  readonly generateModelRootQueries: boolean
 
   /**
    * Maximal deepness for nested conditions of automatically generated queries.
    */
-  maxGeneratedConditionsDeepness: number
+  readonly maxGeneratedConditionsDeepness: number
 
   /**
    * ORM data source (connection) used in the application.
    */
-  dataSource?: Connection
+  readonly dataSource?: Connection
 
   /**
    * Rate limiting options.
    */
-  rateLimits?: RateLimitOptions<any>
+  readonly rateLimits?: RateLimitOptions<any>
 
   /**
    * Used to create a rate limiter instance.
    */
-  rateLimitConstructor?: (options: RateLimitItemOptions) => any
+  readonly rateLimitConstructor?: (options: RateLimitItemOptions) => any
 }

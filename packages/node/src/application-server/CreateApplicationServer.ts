@@ -5,7 +5,8 @@ import {
 } from "@microframework/core"
 import cors from "cors"
 import express, { Request, Response } from "express"
-import graphqlHTTP from "express-graphql"
+import { graphqlHTTP } from "express-graphql"
+import * as aaa from "express-graphql"
 import {
   assertValidSchema,
   execute,
@@ -65,9 +66,9 @@ export function createApplicationServer<App extends AnyApplication>(
         entities: properties.entities,
       })
     }
-    properties.dataSource = await properties.dataSourceFactory(
-      dataSourceOptions,
-    )
+    assign(properties, {
+      dataSource: await properties.dataSourceFactory(dataSourceOptions),
+    })
   }
 
   /**
@@ -75,6 +76,8 @@ export function createApplicationServer<App extends AnyApplication>(
    */
   const createGraphQLMiddleware = (schema: GraphQLSchema) => {
     // create a graphql HTTP server
+    console.log(aaa)
+    console.log(graphqlHTTP)
     return graphqlHTTP((request, response) => ({
       schema: schema,
       graphiql: properties.graphql.graphiql || false,
@@ -155,6 +158,7 @@ export function createApplicationServer<App extends AnyApplication>(
   return {
     typeof: "ApplicationServer",
     express: expressApp,
+    properties: properties,
     logger: logger,
     // properties: properties,
     server: undefined,
@@ -254,7 +258,7 @@ export function createApplicationServer<App extends AnyApplication>(
           )
         }
 
-        const middlewares = properties.webserver.actionMiddlewares[action.name]
+        const middlewares = properties.webserver.actionMiddleware[action.name]
         ;(expressApp as any)[method](
           route,
           ...(middlewares || []),

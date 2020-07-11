@@ -6,6 +6,9 @@ export const App = createApp<{
     "get /posts": {
       return: PostType[]
     }
+    "post /posts": {
+      return: PostType[]
+    }
   }
   models: {
     PostType: PostType

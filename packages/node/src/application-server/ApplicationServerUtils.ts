@@ -72,7 +72,7 @@ export const ApplicationServerUtils = {
         middlewares: options.webserver.middlewares
           ? listOfTypeToArray(options.webserver.middlewares)
           : [],
-        actionMiddlewares: options.webserver.actionMiddlewares || {},
+        actionMiddleware: options.webserver.actionMiddleware || {},
       },
       graphql: {
         route: options.graphql?.route || "/graphql",

@@ -6,7 +6,7 @@ import {
   Validator,
 } from "@microframework/core"
 import { CorsOptions } from "cors"
-import { OptionsResult } from "express-graphql"
+import { OptionsData } from "express-graphql"
 import { PubSub } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
@@ -61,7 +61,7 @@ export type ApplicationServerOptions = {
      * List of registered action middlewares.
      * This way you can setup middlewares per specific action.
      */
-    actionMiddlewares?: { [key: string]: any[] }
+    actionMiddleware?: { [key: string]: any[] }
   }
 
   /**
@@ -87,7 +87,7 @@ export type ApplicationServerOptions = {
     /**
      * Additional GraphQL options when GraphQL middleware is created.
      */
-    options?: OptionsResult
+    options?: OptionsData
   }
 
   /**
