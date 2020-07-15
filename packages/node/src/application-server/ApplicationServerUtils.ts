@@ -88,7 +88,7 @@ export const ApplicationServerUtils = {
         pubSub: options.websocket?.pubSub,
         disconnectTimeout: options.websocket?.disconnectTimeout,
       },
-      dataSourceFactory: options.dataSourceFactory,
+      dataSource: options.dataSource,
       entities: options.entities,
       namingStrategy: options.namingStrategy || DefaultNamingStrategy,
       errorHandler: options.errorHandler || DefaultErrorHandler,

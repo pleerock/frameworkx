@@ -27,6 +27,7 @@
     "find-free-port": "^2.0.0",
     "typescript": "^3.9.5",
     "node-fetch": "^2.6.0",
+    "sqlite3": "^5.0.0",
     "graphql-subscriptions": "^1.1.0",
     "ws": "^7.3.1"
   },

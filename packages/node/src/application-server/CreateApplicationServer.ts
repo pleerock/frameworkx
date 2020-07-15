@@ -6,7 +6,6 @@ import {
 import cors from "cors"
 import express, { Request, Response } from "express"
 import { graphqlHTTP } from "express-graphql"
-import * as aaa from "express-graphql"
 import {
   assertValidSchema,
   execute,
@@ -15,7 +14,7 @@ import {
   subscribe,
 } from "graphql"
 import { SubscriptionServer } from "subscriptions-transport-ws"
-import { ConnectionOptions } from "typeorm"
+import { Connection, ConnectionOptions } from "typeorm"
 import { Server as WebsocketServer } from "ws"
 import {
   GeneratedEntitySchemaBuilder,
@@ -50,25 +49,33 @@ export function createApplicationServer<App extends AnyApplication>(
    */
   const loadDataSource = async (
     metadata: ApplicationTypeMetadata,
-  ): Promise<void> => {
-    if (!properties.dataSourceFactory) return
+  ): Promise<Connection> => {
+    // as usual, we can't rely on "instanceof", so let's just check if its a Connection object
+    // until we have "typeof" property in the next TypeORM version
+    if (
+      (properties.dataSource as Connection)["name"] &&
+      (properties.dataSource as Connection)["options"]
+    ) {
+      return properties.dataSource as Connection
+    }
+    if (typeof properties.dataSource === "function") {
+      const dataSourceOptions: Partial<ConnectionOptions> = {}
+      if (metadata && metadata.models.length > 0) {
+        assign(dataSourceOptions, {
+          mappedEntitySchemaProperties: ApplicationServerUtils.modelsToApp(
+            metadata.models,
+          ),
+        })
+      }
+      if (properties.entities) {
+        assign(dataSourceOptions, {
+          entities: properties.entities,
+        })
+      }
+      return properties.dataSource(dataSourceOptions)
+    }
 
-    const dataSourceOptions: Partial<ConnectionOptions> = {}
-    if (metadata && metadata.models.length > 0) {
-      assign(dataSourceOptions, {
-        mappedEntitySchemaProperties: ApplicationServerUtils.modelsToApp(
-          metadata.models,
-        ),
-      })
-    }
-    if (properties.entities) {
-      assign(dataSourceOptions, {
-        entities: properties.entities,
-      })
-    }
-    assign(properties, {
-      dataSource: await properties.dataSourceFactory(dataSourceOptions),
-    })
+    throw new Error("Data source was not set in app options.")
   }
 
   /**
@@ -162,6 +169,7 @@ export function createApplicationServer<App extends AnyApplication>(
     // properties: properties,
     server: undefined,
     websocketServer: undefined,
+    dataSource: undefined,
     metadata: {
       name: "",
       actions: [],
@@ -184,13 +192,17 @@ export function createApplicationServer<App extends AnyApplication>(
       assign(this, { metadata })
 
       // setup a database connection
-      await loadDataSource(this.metadata)
+      if (this.properties.dataSource) {
+        const dataSource = await loadDataSource(this.metadata)
+        assign(this, { dataSource } as Partial<ApplicationServer<any>>)
+      }
 
       // generate additional root definitions / resolvers for root models
-      if (properties.dataSource && properties.generateModelRootQueries) {
+      if (this.dataSource && properties.generateModelRootQueries) {
         const generator = new GeneratedEntitySchemaBuilder(
           this.metadata!,
           properties,
+          this.dataSource,
         )
         generator.generate()
       }
@@ -215,6 +227,7 @@ export function createApplicationServer<App extends AnyApplication>(
         loggerHelper,
         metadata!,
         properties,
+        this.dataSource,
       )
       if (typeRegistry.canHaveSchema()) {
         // create a GraphQL schema

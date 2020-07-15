@@ -28,6 +28,6 @@ export const AppServer = createApplicationServer(App, {
   resolvers: { ...resolvers, AppContext },
   entities,
   validationRules,
-  dataSourceFactory: (options) => AppConnection.setOptions(options).connect(),
+  dataSource: (options) => AppConnection.setOptions(options).connect(),
   generateModelRootQueries: true,
 })

@@ -3,7 +3,7 @@ import {
   TypeMetadata,
   TypeMetadataUtils,
 } from "@microframework/core"
-import { EntityMetadata, InsertEvent } from "typeorm"
+import { Connection, EntityMetadata, InsertEvent } from "typeorm"
 import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
 
 /**
@@ -12,30 +12,32 @@ import { ApplicationServerProperties } from "../application-server/ApplicationSe
 export class GeneratedEntitySchemaBuilder {
   private appMetadata: ApplicationTypeMetadata
   private properties: ApplicationServerProperties
+  private dataSource: Connection
 
   constructor(
     appMetadata: ApplicationTypeMetadata,
     properties: ApplicationServerProperties,
+    dataSource: Connection,
   ) {
     this.appMetadata = appMetadata
     this.properties = properties
+    this.dataSource = dataSource
   }
 
   /**
    * Generates types and resolvers and pushes them into provided variables.
    */
   generate() {
-    const dataSource = this.properties.dataSource
     const namingStrategy = this.properties.namingStrategy
     const pubSub = this.properties.websocket.pubSub
-    if (!dataSource)
+    if (!this.dataSource)
       throw new Error(`Data source is not setup in the application.`)
 
     // if db connection was established - auto-generate endpoints for models
     for (const model of this.appMetadata.models) {
       const modelName = model.typeName!!
-      if (!dataSource.hasMetadata(modelName)) continue
-      const entityMetadata = dataSource.getMetadata(modelName)
+      if (!this.dataSource.hasMetadata(modelName)) continue
+      const entityMetadata = this.dataSource.getMetadata(modelName)
 
       // ------------------------------------------------------------
       // register query resolvers
@@ -46,7 +48,7 @@ export class GeneratedEntitySchemaBuilder {
         namingStrategy.generatedModelDeclarations.one(modelName),
         (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return dataSource
+          return this.dataSource
             .getRepository(entityMetadata.name)
             .findOne({ where: args.where })
         },
@@ -57,7 +59,7 @@ export class GeneratedEntitySchemaBuilder {
         namingStrategy.generatedModelDeclarations.oneNotNull(modelName),
         (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return dataSource
+          return this.dataSource
             .getRepository(entityMetadata.name)
             .findOneOrFail({ where: args.where })
         },
@@ -68,7 +70,7 @@ export class GeneratedEntitySchemaBuilder {
         namingStrategy.generatedModelDeclarations.many(modelName),
         (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return dataSource.getRepository(entityMetadata.name).find({
+          return this.dataSource.getRepository(entityMetadata.name).find({
             where: args.where,
             order: args.order,
             take: args.limit,
@@ -82,7 +84,7 @@ export class GeneratedEntitySchemaBuilder {
         namingStrategy.generatedModelDeclarations.count(modelName),
         (args: any) => {
           args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-          return dataSource.getRepository(entityMetadata.name).count(args)
+          return this.dataSource.getRepository(entityMetadata.name).count(args)
         },
       )
 
@@ -94,7 +96,7 @@ export class GeneratedEntitySchemaBuilder {
         "mutation",
         namingStrategy.generatedModelDeclarations.save(modelName),
         (input: any) => {
-          return dataSource.getRepository(entityMetadata.name).save(input)
+          return this.dataSource.getRepository(entityMetadata.name).save(input)
         },
       )
 
@@ -102,7 +104,7 @@ export class GeneratedEntitySchemaBuilder {
         "mutation",
         namingStrategy.generatedModelDeclarations.remove(modelName),
         (args: any) => {
-          return dataSource.getRepository(entityMetadata.name).remove(args)
+          return this.dataSource.getRepository(entityMetadata.name).remove(args)
         },
       )
 
@@ -133,7 +135,7 @@ export class GeneratedEntitySchemaBuilder {
           entityMetadata.name,
         )
 
-        dataSource.subscribers.push({
+        this.dataSource.subscribers.push({
           listenTo: () => {
             return entityMetadata.target
           },
@@ -188,7 +190,7 @@ export class GeneratedEntitySchemaBuilder {
             triggers: [oneTriggerName],
             onSubscribe: (args: any, context: any) => {
               // console.log("subscribed", args)
-              context.observeOneEntitySubscription = dataSource.manager
+              context.observeOneEntitySubscription = this.dataSource.manager
                 .getRepository(entityMetadata.name)
                 .observeOne(args)
                 .subscribe((entity) => {
@@ -213,7 +215,7 @@ export class GeneratedEntitySchemaBuilder {
             onSubscribe: (args: any, context: any) => {
               // console.log("subscribed", args)
               args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-              context.observeOneEntitySubscription = dataSource.manager
+              context.observeOneEntitySubscription = this.dataSource.manager
                 .getRepository(entityMetadata.name)
                 .observe(args)
                 .subscribe((entities) => {
@@ -237,7 +239,7 @@ export class GeneratedEntitySchemaBuilder {
             onSubscribe: (args: any, context: any) => {
               // console.log("subscribed", args)
               args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
-              context.observeOneEntitySubscription = dataSource.manager
+              context.observeOneEntitySubscription = this.dataSource.manager
                 .getRepository(entityMetadata.name)
                 .observeCount(args)
                 .subscribe((entity) => {

@@ -133,16 +133,11 @@ export type ApplicationServerProperties = {
   }
 
   /**
-   * Callback that creates ORM data source.
-   */
-  readonly dataSourceFactory?: (
-    options: Partial<ConnectionOptions>,
-  ) => Promise<Connection>
-
-  /**
    * ORM data source (connection) used in the application.
    */
-  readonly dataSource?: Connection
+  readonly dataSource?:
+    | Connection
+    | ((options: Partial<ConnectionOptions>) => Promise<Connection>)
 
   /**
    * List of entities to use in connection.

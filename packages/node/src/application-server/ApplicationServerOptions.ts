@@ -133,11 +133,11 @@ export type ApplicationServerOptions = {
   }
 
   /**
-   * Callback that creates ORM data source.
+   * ORM data source (connection) used in the application.
    */
-  dataSourceFactory?: (
-    options: Partial<ConnectionOptions>,
-  ) => Promise<Connection>
+  dataSource?:
+    | Connection
+    | ((options: Partial<ConnectionOptions>) => Promise<Connection>)
 
   /**
    * List of entities to use in connection.

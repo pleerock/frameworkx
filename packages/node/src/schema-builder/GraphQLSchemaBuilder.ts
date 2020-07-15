@@ -17,6 +17,7 @@ import {
   GraphQLUnionType,
 } from "graphql"
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
+import { Connection } from "typeorm"
 import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
 import { GraphQLBigInt } from "../scalar/BigIntScalar"
 import { LoggerHelper } from "../helper/LoggerHelper"
@@ -29,6 +30,7 @@ import { Errors } from "../error"
 export class GraphQLSchemaBuilder {
   private appMetadata: ApplicationTypeMetadata
   private properties: ApplicationServerProperties
+  private dataSource?: Connection
   private resolverHelper: ResolverHelper
   private objectTypes: GraphQLObjectType[] = []
   private inputTypes: GraphQLInputObjectType[] = []
@@ -39,9 +41,11 @@ export class GraphQLSchemaBuilder {
     loggerHelper: LoggerHelper,
     appMetadata: ApplicationTypeMetadata,
     properties: ApplicationServerProperties,
+    dataSource: Connection | undefined,
   ) {
     this.appMetadata = appMetadata
     this.properties = properties
+    this.dataSource = dataSource
     this.resolverHelper = new ResolverHelper(loggerHelper, properties)
   }
 
@@ -470,23 +474,18 @@ export class GraphQLSchemaBuilder {
       }
 
       // try generated relation resolver if we have a data source setup
-      if (
-        this.properties.dataSource &&
-        this.properties.dataSource.hasMetadata(parentTypeName)
-      ) {
-        const entityRelation = this.properties.dataSource
+      if (this.dataSource && this.dataSource.hasMetadata(parentTypeName)) {
+        const entityRelation = this.dataSource
           .getMetadata(parentTypeName)
           .relations.find(
             (relation) => relation.propertyName === metadata.propertyName!!,
           )
         if (entityRelation) {
           const entityRelationResolverFn = (parents: any[]) => {
-            return this.properties
-              .dataSource!.relationIdLoader.loadManyToManyRelationIdsAndGroup(
-                entityRelation,
-                parents,
-              )
-              .then((groups) => groups.map((group) => group.related))
+            return this.dataSource!.relationIdLoader.loadManyToManyRelationIdsAndGroup(
+              entityRelation,
+              parents,
+            ).then((groups) => groups.map((group) => group.related))
           }
           return this.resolverHelper.createGraphQLTypeGeneratedRelationResolver(
             metadata,
