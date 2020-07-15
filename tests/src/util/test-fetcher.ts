@@ -8,9 +8,10 @@ export class TestFetcher {
     return this.handleJsonResponse(await this.getResponse())
   }
 
-  async getResponse(): Promise<Response> {
+  async getResponse(options?: RequestInit): Promise<Response> {
     return await fetch(this.url, {
       method: "GET",
+      ...(options || {}),
     })
   }
 

@@ -4,6 +4,8 @@ import { obtainPort, sleep } from "../../util/test-common"
 import { TestFetcher } from "../../util/test-fetcher"
 import { AppServer } from "./server"
 
+// NOTE: if these tests are failing for you, make sure you have redis running
+
 describe("node > rate limitation", () => {
   let port: number = 0
   let server: ApplicationServer<any> | undefined = undefined

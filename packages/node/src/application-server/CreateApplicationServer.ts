@@ -76,8 +76,6 @@ export function createApplicationServer<App extends AnyApplication>(
    */
   const createGraphQLMiddleware = (schema: GraphQLSchema) => {
     // create a graphql HTTP server
-    console.log(aaa)
-    console.log(graphqlHTTP)
     return graphqlHTTP((request, response) => ({
       schema: schema,
       graphiql: properties.graphql.graphiql || false,
@@ -116,6 +114,7 @@ export function createApplicationServer<App extends AnyApplication>(
    */
   const createWebsocketServer = (schema?: GraphQLSchema) => {
     let websocketServer = new WebsocketServer({
+      host: properties.websocket.host,
       port: properties.websocket.port,
       path: "/" + properties.websocket.path,
       ...properties.websocket.options,
@@ -296,13 +295,17 @@ export function createApplicationServer<App extends AnyApplication>(
 
       await new Promise<void>((ok, fail) => {
         if (!this.websocketServer) return ok()
-        this.websocketServer.close((err: any) => (err ? fail(err) : ok()))
+        this.websocketServer.close((err: any) => {
+          err ? fail(err) : ok()
+          console.log("closed connection with websocket server")
+        })
       })
 
       await new Promise<void>((ok, fail) => {
         if (!subscriptionServer) return ok()
         try {
           subscriptionServer.close()
+          console.log("closed connection with subscription server")
           ok()
         } catch (err) {
           fail(err)

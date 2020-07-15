@@ -87,7 +87,7 @@ export type ApplicationServerOptions = {
     /**
      * Additional GraphQL options when GraphQL middleware is created.
      */
-    options?: OptionsData
+    options?: Partial<OptionsData>
   }
 
   /**
@@ -119,8 +119,6 @@ export type ApplicationServerOptions = {
 
     /**
      * PubSub to be used for default subscriptions.
-     *
-     * todo: make sure to validate pubsub existence when subscription declarations were found
      */
     pubSub?: PubSub
 

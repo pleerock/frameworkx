@@ -26,6 +26,7 @@
     "graphql-playground-middleware-express": "^1.7.18",
     "subscriptions-transport-ws": "^0.9.16",
     "graphql": "^15.3.0",
+    "graphql-tools": "^6.0.13",
     "typeorm": "^0.3.0-rc.19",
     "ws": "^7.3.0"
   },

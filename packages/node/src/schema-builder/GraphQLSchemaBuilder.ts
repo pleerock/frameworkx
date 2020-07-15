@@ -21,6 +21,7 @@ import { ApplicationServerProperties } from "../application-server/ApplicationSe
 import { GraphQLBigInt } from "../scalar/BigIntScalar"
 import { LoggerHelper } from "../helper/LoggerHelper"
 import { ResolverHelper } from "../helper/ResolverHelper"
+import { Errors } from "../error"
 
 /**
  * Builds a GraphQL schema for a provided application metadata.
@@ -338,11 +339,13 @@ export class GraphQLSchemaBuilder {
       }
 
       if (type === "subscription") {
-        let subscriptionResolverFn = this.resolverHelper.findSubscriptionResolver(
+        const subscriptionResolverFn = this.resolverHelper.findSubscriptionResolver(
           metadata.propertyName,
         )
 
         if (subscriptionResolverFn) {
+          if (!this.properties.websocket.pubSub) throw Errors.pubSubNotDefined()
+
           fields[
             metadata.propertyName
           ].subscribe = this.resolverHelper.createSubscribeResolver({

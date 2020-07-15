@@ -87,7 +87,7 @@ export type ApplicationServerProperties = {
     /**
      * Additional GraphQL options when GraphQL middleware is created.
      */
-    readonly options?: OptionsData
+    readonly options?: Partial<OptionsData>
   }
 
   /**
@@ -140,6 +140,11 @@ export type ApplicationServerProperties = {
   ) => Promise<Connection>
 
   /**
+   * ORM data source (connection) used in the application.
+   */
+  readonly dataSource?: Connection
+
+  /**
    * List of entities to use in connection.
    * If this property is set, they will be overridden in ORM.
    */
@@ -186,11 +191,6 @@ export type ApplicationServerProperties = {
    * Maximal deepness for nested conditions of automatically generated queries.
    */
   readonly maxGeneratedConditionsDeepness: number
-
-  /**
-   * ORM data source (connection) used in the application.
-   */
-  readonly dataSource?: Connection
 
   /**
    * Rate limiting options.
