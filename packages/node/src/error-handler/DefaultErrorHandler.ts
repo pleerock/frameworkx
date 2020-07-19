@@ -13,13 +13,15 @@ export const DefaultErrorHandler: ErrorHandler = {
     if (typeof error === "object" && error["typeof"] !== undefined) {
       if (error["typeof"] === "HttpError") {
         status = error.httpCode
-        jsonError["message"] = error.message
         if (error.code) {
           jsonError["code"] = error.code
         }
-      } else if (error["typeof"] === "CodeError") {
         jsonError["message"] = error.message
+        jsonError["stack"] = error.stack
+      } else if (error["typeof"] === "CodeError") {
         jsonError["code"] = error.code
+        jsonError["message"] = error.message
+        jsonError["stack"] = error.stack
       }
     } else if (error instanceof Error) {
       jsonError["message"] = error.message

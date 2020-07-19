@@ -1,0 +1,103 @@
+{
+  "name": "App",
+  "actions": [
+    {
+      "name": "get /posts",
+      "return": {
+        "kind": "object",
+        "array": true,
+        "nullable": false,
+        "canBeUndefined": false,
+        "properties": [],
+        "typeName": "PostType",
+        "description": "",
+        "propertyName": ""
+      }
+    }
+  ],
+  "models": [
+    {
+      "kind": "object",
+      "array": false,
+      "nullable": false,
+      "canBeUndefined": false,
+      "properties": [
+        {
+          "kind": "number",
+          "array": false,
+          "nullable": false,
+          "canBeUndefined": false,
+          "properties": [],
+          "propertyName": "id"
+        },
+        {
+          "kind": "string",
+          "array": false,
+          "nullable": false,
+          "canBeUndefined": false,
+          "properties": [],
+          "propertyName": "title"
+        }
+      ],
+      "typeName": "PostType",
+      "description": ""
+    }
+  ],
+  "inputs": [],
+  "queries": [
+    {
+      "kind": "object",
+      "array": false,
+      "nullable": false,
+      "canBeUndefined": false,
+      "properties": [],
+      "typeName": "PostType",
+      "description": "",
+      "propertyName": "post",
+      "args": {
+        "kind": "object",
+        "array": false,
+        "nullable": false,
+        "canBeUndefined": false,
+        "properties": [
+          {
+            "kind": "number",
+            "array": false,
+            "nullable": false,
+            "canBeUndefined": false,
+            "properties": [],
+            "propertyName": "id"
+          }
+        ]
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "kind": "boolean",
+      "array": false,
+      "nullable": false,
+      "canBeUndefined": false,
+      "properties": [],
+      "propertyName": "postSave",
+      "description": "",
+      "args": {
+        "kind": "object",
+        "array": false,
+        "nullable": false,
+        "canBeUndefined": false,
+        "properties": [
+          {
+            "kind": "number",
+            "array": false,
+            "nullable": false,
+            "canBeUndefined": false,
+            "properties": [],
+            "propertyName": "id"
+          }
+        ]
+      }
+    }
+  ],
+  "subscriptions": []
+}
