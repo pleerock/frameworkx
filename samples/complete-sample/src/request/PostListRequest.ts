@@ -1,4 +1,9 @@
-import { request, query, RequestReturnType } from "@microframework/core"
+import {
+  mutation,
+  query,
+  request,
+  RequestReturnType,
+} from "@microframework/core"
 import { App } from "../app/App"
 
 export const PostListRequest = request("PostList", {
@@ -27,7 +32,11 @@ export const PostListRequest = request("PostList", {
       id: true,
     },
   }),
-  // removePost: mutation(App, "postRemove", false),
+  removePost: mutation(App, "postRemove", {
+    input: {
+      id: 1,
+    },
+  }),
 })
 
 export type PostListQueryType = RequestReturnType<

@@ -53,14 +53,20 @@ export type RequestItemOptions<
   Declaration extends GraphQLDeclarationItem,
   Selection extends RequestSelectionSchema<App, Declaration>
 > = Parameters<Declaration> extends []
-  ? {
-      select: Selection
-    }
+  ? ReturnType<Declaration> extends object
+    ? {
+        select: Selection
+      }
+    : undefined
   : Declaration extends (args: infer Args) => infer Return
-  ? {
-      input: Args
-      select: Selection
-    }
+  ? Return extends object
+    ? {
+        input: Args
+        select: Selection
+      }
+    : {
+        input: Args
+      }
   : never
 
 /**
@@ -73,7 +79,7 @@ export type RequestQuery<
   Selection extends RequestSelectionSchema<App, App["_options"]["queries"][Key]>
 > = {
   selection: Selection
-  model: NonNullable<ReturnType<App["_options"]["queries"][Key]>>
+  model: ReturnType<App["_options"]["queries"][Key]>
   type: "query"
   name: Key
   options: RequestItemOptions<App, Declaration, Selection>
@@ -92,7 +98,7 @@ export type RequestMutation<
   >
 > = {
   selection: Selection
-  model: NonNullable<ReturnType<App["_options"]["mutations"][Key]>>
+  model: ReturnType<App["_options"]["mutations"][Key]>
   type: "mutation"
   name: Key
   options: RequestItemOptions<App, Declaration, Selection>
@@ -111,7 +117,7 @@ export type RequestSubscription<
   >
 > = {
   selection: Selection
-  model: NonNullable<ReturnType<App["_options"]["subscriptions"][Key]>>
+  model: ReturnType<App["_options"]["subscriptions"][Key]>
   type: "subscription"
   name: Key
   options: RequestItemOptions<App, Declaration, Selection>
@@ -176,6 +182,15 @@ export type RequestSelection<Model, Selection> = Model extends Object
 export type RequestReturnType<
   T extends Request<any>,
   P extends keyof T["map"]
-> = T["map"][P]["model"] extends Array<infer U>
+> = NonNullable<T["map"][P]["model"]> extends Array<infer U>
   ? RequestSelection<U, T["map"][P]["selection"]>[]
-  : RequestSelection<T["map"][P]["model"], T["map"][P]["selection"]>
+  : NonNullable<T["map"][P]["model"]> extends number
+  ? T["map"][P]["model"]
+  : NonNullable<T["map"][P]["model"]> extends string
+  ? T["map"][P]["model"]
+  : NonNullable<T["map"][P]["model"]> extends boolean
+  ? T["map"][P]["model"]
+  : RequestSelection<
+      NonNullable<T["map"][P]["model"]>,
+      T["map"][P]["selection"]
+    >
