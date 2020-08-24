@@ -1,5 +1,6 @@
 export * from "./application"
 export * from "./logger"
+export * from "./request"
 export * from "./resolver"
 export * from "./service"
 export * from "./scalar"

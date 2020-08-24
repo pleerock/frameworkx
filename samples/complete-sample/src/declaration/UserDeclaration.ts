@@ -7,4 +7,7 @@ export type UserDeclaration = {
   models: {
     User: User
   }
+  queries: {
+    currentUser(): User
+  }
 }
