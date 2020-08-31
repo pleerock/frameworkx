@@ -1,7 +1,7 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort, sleep } from "../../util/test-common"
-import { TestFetcher } from "../../util/test-fetcher"
+import { Fetcher } from "@microframework/fetcher"
 import { AppServer } from "./server"
 
 // NOTE: if these tests are failing for you, make sure you have redis running
@@ -9,11 +9,13 @@ import { AppServer } from "./server"
 describe("node > rate limitation", () => {
   let port: number = 0
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: TestFetcher | undefined = undefined
+  let fetcher: Fetcher | undefined = undefined
 
   beforeEach(async () => {
     port = await obtainPort()
-    fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
+    fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/graphql`,
+    })
   })
 
   afterEach(async () => {
@@ -39,7 +41,7 @@ describe("node > rate limitation", () => {
     `
     await sleep(1000)
     for await (let item of new Array(10)) {
-      const result = await fetcher!.graphql(query)
+      const result = await fetcher!.fetch(query)
       expect(result).toEqual({
         data: {
           postSave: true,
@@ -51,7 +53,7 @@ describe("node > rate limitation", () => {
     try {
       await sleep(1000)
       for await (let item of new Array(11)) {
-        await fetcher!.graphql(query)
+        await fetcher!.fetch(query)
       }
     } catch (err) {
       error = err
@@ -80,7 +82,7 @@ describe("node > rate limitation", () => {
     `
     await sleep(1000)
     for await (let item of new Array(10)) {
-      const result = await fetcher!.graphql(query)
+      const result = await fetcher!.fetch(query)
       expect(result).toEqual({
         data: {
           post: {
@@ -96,7 +98,7 @@ describe("node > rate limitation", () => {
     try {
       await sleep(1000)
       for await (let item of new Array(11)) {
-        await fetcher!.graphql(query)
+        await fetcher!.fetch(query)
       }
     } catch (err) {
       error = err
@@ -105,7 +107,6 @@ describe("node > rate limitation", () => {
   })
 
   test("action limiting should work", async () => {
-    fetcher = new TestFetcher(`http://localhost:${port}/posts`)
     server = await AppServer(port, {
       actions: {
         "get /posts": {
@@ -117,7 +118,8 @@ describe("node > rate limitation", () => {
 
     await sleep(1000)
     for await (let item of new Array(10)) {
-      const result = await fetcher.get()
+      const response = await fetch(`http://localhost:${port}/posts`)
+      const result = await response.json()
       expect(result).toEqual([
         {
           id: 1,
@@ -131,7 +133,10 @@ describe("node > rate limitation", () => {
     try {
       await sleep(1000)
       for await (let item of new Array(11)) {
-        await fetcher.get()
+        const response = await fetch(`http://localhost:${port}/posts`)
+        if (response.status === 500) {
+          error = await response.json()
+        }
       }
     } catch (err) {
       error = err

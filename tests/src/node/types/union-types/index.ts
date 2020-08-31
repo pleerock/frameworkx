@@ -1,16 +1,18 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { Fetcher } from "@microframework/fetcher"
 import { AppServer } from "./server"
 
 describe("node > types > union types", () => {
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: TestFetcher | undefined = undefined
+  let fetcher: Fetcher | undefined = undefined
 
   beforeEach(async () => {
     const port = await obtainPort()
-    fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
+    fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/graphql`,
+    })
     server = await AppServer(port).start()
   })
 
@@ -21,7 +23,7 @@ describe("node > types > union types", () => {
   })
 
   test("union type in returned value", async () => {
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         post(id: 1) {
           id
@@ -54,7 +56,7 @@ describe("node > types > union types", () => {
       },
     })
 
-    const result2 = await fetcher!.graphql(gql`
+    const result2 = await fetcher!.fetch(gql`
       query {
         post(id: 2) {
           id

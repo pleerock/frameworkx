@@ -1,17 +1,20 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { Fetcher, FetcherError } from "@microframework/fetcher"
 import { AppServer } from "./server"
+import { FetchError } from "node-fetch"
 
 describe("node > error handling > basic errors", () => {
   let port: number = 0
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: TestFetcher | undefined = undefined
+  let fetcher: Fetcher | undefined = undefined
 
   beforeEach(async () => {
     port = await obtainPort()
-    fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
+    fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/graphql`,
+    })
     server = await AppServer(port).start()
   })
 
@@ -22,7 +25,7 @@ describe("node > error handling > basic errors", () => {
   })
 
   test("throw error in root resolver", async () => {
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         post(id: 1) {
           id
@@ -41,7 +44,7 @@ describe("node > error handling > basic errors", () => {
 
     let error: any
     try {
-      await fetcher!.graphql(gql`
+      await fetcher!.fetch(gql`
         query {
           post(id: -1) {
             id
@@ -61,9 +64,9 @@ describe("node > error handling > basic errors", () => {
   })
 
   test("throw error in model resolver", async () => {
-    let error: any
+    let error: FetcherError | undefined = undefined
     try {
-      await fetcher!.graphql(gql`
+      await fetcher!.fetch(gql`
         query {
           post(id: 3) {
             id
@@ -76,45 +79,29 @@ describe("node > error handling > basic errors", () => {
       error = err
     }
 
-    expect(error).toBeTruthy()
-    expect(error.errors).toBeDefined()
-    expect(error.errors.length).toEqual(1)
-    expect(error.errors[0].message).toEqual("Status can't be set.")
-    expect(error.errors[0].code).toEqual("CANT_SET_STATUS")
+    expect(error).toBeInstanceOf(FetcherError)
+    expect(error!.errors).toBeDefined()
+    expect(error!.errors.length).toEqual(1)
+    expect(error!.errors[0].message).toEqual("Status can't be set.")
+    expect(error!.errors[0].code).toEqual("CANT_SET_STATUS")
   })
 
   test("throw error in action resolver", async () => {
-    let error1: any
-    try {
-      const fetcher = new TestFetcher(`http://localhost:${port}/posts`)
-      await fetcher.get()
-    } catch (err) {
-      error1 = err
-    }
+    const response1 = await fetch(`http://localhost:${port}/posts`)
+    const error1 = await response1.json()
 
-    expect(error1).toBeTruthy()
+    expect(response1.status).toEqual(500)
     expect(error1.message).toEqual("You have no access to this content.")
 
-    let error2: any
-    try {
-      const fetcher = new TestFetcher(`http://localhost:${port}/posts-new`)
-      await fetcher.get()
-    } catch (err) {
-      error2 = err
-    }
+    const response2 = await fetch(`http://localhost:${port}/posts-new`)
+    const error2 = await response2.json()
 
-    expect(error2).toBeTruthy()
+    expect(response2.status).toEqual(500)
     expect(error2.message).toEqual("You have no access to this content.")
     expect(error2.code).toEqual("NO_ACCESS")
 
-    let error3: any
-    try {
-      const fetcher = new TestFetcher(`http://localhost:${port}/posts-old`)
-      await fetcher.get()
-    } catch (err) {
-      error3 = err
-    }
-
+    const response3 = await fetch(`http://localhost:${port}/posts-old`)
+    const error3 = await response3.json()
     expect(error3).toBeTruthy()
     expect(error3.message).toEqual("You have no access to this content.")
   })

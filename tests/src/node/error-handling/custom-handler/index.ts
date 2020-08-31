@@ -1,17 +1,19 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { Fetcher } from "@microframework/fetcher"
 import { AppServer } from "./server"
 
 describe("node > error handling > custom handler", () => {
   let port: number = 0
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: TestFetcher | undefined = undefined
+  let fetcher: Fetcher | undefined = undefined
 
   beforeEach(async () => {
     port = await obtainPort()
-    fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
+    fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/graphql`,
+    })
     server = await AppServer(port).start()
   })
 
@@ -22,7 +24,7 @@ describe("node > error handling > custom handler", () => {
   })
 
   test("resolver custom error handling", async () => {
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         post(id: 1) {
           id
@@ -39,7 +41,7 @@ describe("node > error handling > custom handler", () => {
       },
     })
 
-    const response = await fetcher!.graphqlResponse(gql`
+    const response = await fetcher!.fetchResponse(gql`
       query {
         post(id: -1) {
           id
@@ -57,8 +59,7 @@ describe("node > error handling > custom handler", () => {
   })
 
   test("actions custom error handling", async () => {
-    const fetcher = new TestFetcher(`http://localhost:${port}/posts`)
-    const response = await fetcher.getResponse()
+    const response = await fetch(`http://localhost:${port}/posts`)
     const error = await response.json()
 
     expect(response.status).toEqual(400)

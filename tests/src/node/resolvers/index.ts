@@ -1,7 +1,7 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort } from "../../util/test-common"
-import { TestFetcher } from "../../util/test-fetcher"
+import { Fetcher } from "@microframework/fetcher"
 import { PostClassActionResolver } from "./resolver/PostClassActionResolver"
 import { PostContextResolver } from "./resolver/PostContextResolver"
 import {
@@ -24,11 +24,13 @@ const fetch = require("node-fetch")
 describe("node > resolvers", () => {
   let port = 0
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: TestFetcher | undefined = undefined
+  let fetcher: Fetcher | undefined = undefined
 
   beforeEach(async () => {
     port = await obtainPort()
-    fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
+    fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/graphql`,
+    })
   })
 
   afterEach(async () => {
@@ -53,7 +55,7 @@ describe("node > resolvers", () => {
       }
     `
 
-    const result = await fetcher!.graphql(query)
+    const result = await fetcher!.fetch(query)
     expect(result).toEqual({
       data: {
         posts: [
@@ -88,7 +90,7 @@ describe("node > resolvers", () => {
       }
     `
 
-    const result = await fetcher!.graphql(query)
+    const result = await fetcher!.fetch(query)
     expect(result).toEqual({
       data: {
         posts: [
@@ -113,7 +115,7 @@ describe("node > resolvers", () => {
       PostsItemFnDeclarationResolver,
     ]).start()
 
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         posts {
           id
@@ -136,7 +138,7 @@ describe("node > resolvers", () => {
       },
     })
 
-    const result2 = await fetcher!.graphql(gql`
+    const result2 = await fetcher!.fetch(gql`
       query {
         post(id: 777) {
           id
@@ -157,7 +159,7 @@ describe("node > resolvers", () => {
   test("object resolver using resolver function for declarations", async () => {
     server = await AppServer(port, [PostObjectFnDeclarationResolver]).start()
 
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         posts {
           id
@@ -180,7 +182,7 @@ describe("node > resolvers", () => {
       },
     })
 
-    const result2 = await fetcher!.graphql(gql`
+    const result2 = await fetcher!.fetch(gql`
       query {
         post(id: 777) {
           id
@@ -204,7 +206,7 @@ describe("node > resolvers", () => {
       PostObjectRawDeclarationResolver,
     ]).start()
 
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         posts {
           id
@@ -230,7 +232,7 @@ describe("node > resolvers", () => {
       },
     })
 
-    const result2 = await fetcher!.graphql(gql`
+    const result2 = await fetcher!.fetch(gql`
       query {
         post(id: 777) {
           id
@@ -256,7 +258,7 @@ describe("node > resolvers", () => {
       PostObjectRawDeclarationResolver,
     ]).start()
 
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         posts {
           id
@@ -282,7 +284,7 @@ describe("node > resolvers", () => {
       },
     })
 
-    const result2 = await fetcher!.graphql(gql`
+    const result2 = await fetcher!.fetch(gql`
       query {
         post(id: 777) {
           id
@@ -306,7 +308,6 @@ describe("node > resolvers", () => {
     server = await AppServer(port, [PostClassActionResolver]).start()
 
     const response1 = await fetch(`http://localhost:${port}/posts`, {
-      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
@@ -327,7 +328,6 @@ describe("node > resolvers", () => {
     ])
 
     const response2 = await fetch(`http://localhost:${port}/post/777`, {
-      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
@@ -346,7 +346,6 @@ describe("node > resolvers", () => {
     ]).start()
 
     const response1 = await fetch(`http://localhost:${port}/posts`, {
-      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
@@ -367,7 +366,6 @@ describe("node > resolvers", () => {
     ])
 
     const response2 = await fetch(`http://localhost:${port}/post/777`, {
-      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
@@ -386,7 +384,7 @@ describe("node > resolvers", () => {
       PostContextResolver,
     ]).start()
 
-    const result2 = await fetcher!.graphql(gql`
+    const result2 = await fetcher!.fetch(gql`
       query {
         postFromSession {
           id

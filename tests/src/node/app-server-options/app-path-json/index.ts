@@ -1,6 +1,6 @@
 import { createApplicationServer } from "@microframework/node"
 import { obtainPort } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { Fetcher } from "@microframework/fetcher"
 import { App } from "./app"
 import { PostActionResolver } from "./resolvers"
 
@@ -16,9 +16,8 @@ describe("node > app server options > app path json", () => {
     })
 
     await server.start()
-
-    const fetcher = new TestFetcher(`http://localhost:${port}/posts`)
-    const result = await fetcher.get()
+    const response = await fetch(`http://localhost:${port}/posts`)
+    const result = await response.json()
 
     expect(result).toMatchObject([
       {

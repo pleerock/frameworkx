@@ -1,17 +1,19 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { Fetcher } from "@microframework/fetcher"
 import { StatusType } from "./models"
 import { AppServer } from "./server"
 
 describe("node > types > enum type", () => {
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: TestFetcher | undefined = undefined
+  let fetcher: Fetcher | undefined = undefined
 
   beforeEach(async () => {
     const port = await obtainPort()
-    fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
+    fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/graphql`,
+    })
     server = await AppServer(port).start()
   })
 
@@ -22,7 +24,7 @@ describe("node > types > enum type", () => {
   })
 
   test("enum type in returned value", async () => {
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         post(id: 1) {
           id
@@ -41,7 +43,7 @@ describe("node > types > enum type", () => {
       },
     })
 
-    const result2 = await fetcher!.graphql(gql`
+    const result2 = await fetcher!.fetch(gql`
       query {
         post(id: 2) {
           id
@@ -62,7 +64,7 @@ describe("node > types > enum type", () => {
   })
 
   test("enum type in input", async () => {
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       mutation {
         postCreate(title: "New post", status: ON_MODERATION) {
           id

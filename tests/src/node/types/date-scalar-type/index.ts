@@ -1,17 +1,19 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { Fetcher } from "@microframework/fetcher"
 import { AppServer } from "./server"
 
 describe("node > types > dates", () => {
   const date = new Date(2020, 6, 1, 6, 0, 0, 0)
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: TestFetcher | undefined = undefined
+  let fetcher: Fetcher | undefined = undefined
 
   beforeEach(async () => {
     const port = await obtainPort()
-    fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
+    fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/graphql`,
+    })
     server = await AppServer(port).start()
   })
 
@@ -22,7 +24,7 @@ describe("node > types > dates", () => {
   })
 
   test("date types in returned values", async () => {
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       query {
         post(id: 1) {
           id
@@ -47,7 +49,7 @@ describe("node > types > dates", () => {
   })
 
   test("date types in inputs", async () => {
-    const result1 = await fetcher!.graphql(gql`
+    const result1 = await fetcher!.fetch(gql`
       mutation {
         postCreate(
           title: "Hello World"

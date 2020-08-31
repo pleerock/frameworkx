@@ -1,15 +1,11 @@
 import { createApplicationServer } from "@microframework/node"
+import { Fetcher } from "@microframework/fetcher"
 import gql from "graphql-tag"
-import { obtainPort, sleep } from "../../../util/test-common"
-import { TestFetcher } from "../../../util/test-fetcher"
+import { obtainPort } from "../../../util/test-common"
 import { App } from "../../rate-limits/app"
 import { PostResolver } from "./resolvers"
 
 describe("node > app server options > graphql options", () => {
-  beforeEach(() => {
-    // ;(cors as Mock).mockClear()
-  })
-
   test("custom route", async () => {
     const port = await obtainPort()
     const server = await createApplicationServer(App, {
@@ -26,7 +22,9 @@ describe("node > app server options > graphql options", () => {
     // make sure option property was set
     expect(server.properties.graphql.route).toBe("/api")
 
-    const fetcher = new TestFetcher(`http://localhost:${port}/api`)
+    const fetcher = new Fetcher({
+      graphqlEndpoint: `http://localhost:${port}/api`,
+    })
     const query = gql`
       query {
         post(id: 1) {
@@ -35,7 +33,7 @@ describe("node > app server options > graphql options", () => {
         }
       }
     `
-    const result = await fetcher!.graphql(query)
+    const result = await fetcher!.fetch(query)
     expect(result).toEqual({
       data: {
         post: {
@@ -62,10 +60,8 @@ describe("node > app server options > graphql options", () => {
       resolvers: [PostResolver],
     }).start()
 
-    await sleep(2000)
-
-    const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
-    const response = await fetcher.getResponse({
+    // await sleep(2000)
+    const response = await fetch(`http://localhost:${port}/graphql`, {
       headers: {
         Accept: "text/html",
       },
@@ -90,8 +86,7 @@ describe("node > app server options > graphql options", () => {
       resolvers: [PostResolver],
     }).start()
 
-    const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
-    const response = await fetcher.getResponse({
+    const response = await fetch(`http://localhost:${port}/graphql`, {
       headers: {
         Accept: "text/html",
       },
@@ -116,8 +111,7 @@ describe("node > app server options > graphql options", () => {
       resolvers: [PostResolver],
     }).start()
 
-    const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
-    const response = await fetcher.getResponse({
+    const response = await fetch(`http://localhost:${port}/graphql`, {
       headers: {
         Accept: "text/html",
       },
@@ -142,8 +136,7 @@ describe("node > app server options > graphql options", () => {
       resolvers: [PostResolver],
     }).start()
 
-    const fetcher = new TestFetcher(`http://localhost:${port}/playground`)
-    const response = await fetcher.getResponse({
+    const response = await fetch(`http://localhost:${port}/playground`, {
       headers: {
         Accept: "text/html",
       },
@@ -168,8 +161,7 @@ describe("node > app server options > graphql options", () => {
       resolvers: [PostResolver],
     }).start()
 
-    const fetcher = new TestFetcher(`http://localhost:${port}/playground`)
-    const response = await fetcher.getResponse({
+    const response = await fetch(`http://localhost:${port}/playground`, {
       headers: {
         Accept: "text/html",
       },
@@ -194,10 +186,8 @@ describe("node > app server options > graphql options", () => {
       resolvers: [PostResolver],
     }).start()
 
-    await sleep(2000)
-
-    const fetcher = new TestFetcher(`http://localhost:${port}/playground`)
-    const response = await fetcher.getResponse({
+    // await sleep(2000)
+    const response = await fetch(`http://localhost:${port}/playground`, {
       headers: {
         Accept: "text/html",
       },
@@ -224,8 +214,7 @@ describe("node > app server options > graphql options", () => {
       resolvers: [PostResolver],
     }).start()
 
-    const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
-    const response = await fetcher.getResponse({
+    const response = await fetch(`http://localhost:${port}/graphql`, {
       headers: {
         Accept: "text/html",
       },
