@@ -71,7 +71,7 @@ describe("node > app server options > graphql options", () => {
     expect(response.status).toEqual(200)
 
     await server.stop()
-  }, 20000)
+  }, 30000)
 
   test("disable graphiql", async () => {
     const port = await obtainPort()

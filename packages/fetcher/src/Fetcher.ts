@@ -6,6 +6,8 @@ import Observable from "zen-observable"
 import { v4 as uuidv4 } from "uuid"
 import { FetcherOptions } from "./FetcherOptions"
 import { FetcherError } from "./FetcherError"
+import { RequestMap } from "@microframework/core"
+import { RequestMapReturnType } from "@microframework/core/_"
 
 export class Fetcher {
   private websocketProtocols: string[] = ["graphql-ws"]
@@ -83,10 +85,18 @@ export class Fetcher {
   /**
    * Loads data from a server.
    */
-  async fetch<T = any>(
-    request: Request<any> | string | any, // | DocumentNode,
+  async fetch<T extends RequestMap>(
+    request: Request<T>,
     variables?: { [key: string]: any },
-  ): Promise<T> {
+  ): Promise<{ data: RequestMapReturnType<T>; errors?: any[] }>
+  async fetch<T = any>(
+    request: string | any,
+    variables?: { [key: string]: any },
+  ): Promise<T>
+  async fetch(
+    request: Request<any> | string | any,
+    variables?: { [key: string]: any },
+  ): Promise<any> {
     const { queryName, queryString } = this.extractQueryMetadata(request)
     const headers = await this.buildHeaders()
     const response = await fetch(

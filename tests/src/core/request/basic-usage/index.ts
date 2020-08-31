@@ -7,6 +7,7 @@ import ws from "ws"
 import { obtainPort, sleep } from "../../../util/test-common"
 import { App } from "./app"
 import { AppServer } from "./server"
+import { RequestReturnType } from "@microframework/core/_"
 
 const Redis = require("ioredis")
 
@@ -16,7 +17,7 @@ describe("core > request > basic usage", () => {
   let server: ApplicationServer<any> | undefined = undefined
   let fetcher: Fetcher | undefined = undefined
   let appPubSub: RedisPubSub
-  const options = {
+  const redisOptions = {
     host: "localhost",
     port: 6379,
     retryStrategy: (times: number) => {
@@ -29,8 +30,8 @@ describe("core > request > basic usage", () => {
     webserverPort = await obtainPort()
     websocketPort = await obtainPort()
     appPubSub = new RedisPubSub({
-      publisher: new Redis(options),
-      subscriber: new Redis(options),
+      publisher: new Redis(redisOptions),
+      subscriber: new Redis(redisOptions),
     })
     server = await AppServer(webserverPort, websocketPort, appPubSub).start()
     fetcher = new Fetcher({
@@ -297,6 +298,7 @@ describe("core > request > basic usage", () => {
     })
 
     const result = await fetcher!.fetch(postsRequest)
+    console.log(result.data.posts[0].id)
     expect(result).toEqual({
       data: {
         firstPost: {

@@ -183,15 +183,42 @@ export type RequestSelection<Model, Selection> = Model extends Object
 export type RequestReturnType<
   T extends Request<any>,
   P extends keyof T["map"]
-> = NonNullable<T["map"][P]["model"]> extends Array<infer U>
-  ? RequestSelection<U, T["map"][P]["selection"]>[]
-  : NonNullable<T["map"][P]["model"]> extends number
-  ? T["map"][P]["model"]
-  : NonNullable<T["map"][P]["model"]> extends string
-  ? T["map"][P]["model"]
-  : NonNullable<T["map"][P]["model"]> extends boolean
-  ? T["map"][P]["model"]
-  : RequestSelection<
-      NonNullable<T["map"][P]["model"]>,
-      T["map"][P]["selection"]
-    >
+> = RequestMapItemReturnType<T["map"][P]>
+
+/**
+ * Types of the items from the RequestMap.
+ */
+export type RequestMapReturnType<T extends RequestMap> = {
+  [P in keyof T]: RequestMapItemReturnType<T[P]>
+}
+
+/**
+ * Type of the RequestMapItem.
+ */
+export type RequestMapItemReturnType<
+  T extends RequestMapItem
+> = T["model"] extends Array<infer U>
+  ? T["model"] extends null
+    ? U extends number
+      ? U[] | null
+      : U extends string
+      ? U[] | null
+      : U extends boolean
+      ? U[] | null
+      : RequestSelection<U, T["selection"]>[] | null
+    : U extends number
+    ? U[]
+    : U extends string
+    ? U[]
+    : U extends boolean
+    ? U[]
+    : RequestSelection<U, T["selection"]>[]
+  : NonNullable<T["model"]> extends number
+  ? T["model"]
+  : NonNullable<T["model"]> extends string
+  ? T["model"]
+  : NonNullable<T["model"]> extends boolean
+  ? T["model"]
+  : T["model"] extends object | null
+  ? RequestSelection<NonNullable<T["model"]>, T["selection"]> | null
+  : RequestSelection<NonNullable<T["model"]>, T["selection"]>
