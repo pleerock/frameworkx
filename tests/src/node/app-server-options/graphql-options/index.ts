@@ -1,6 +1,6 @@
 import { createApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
-import { obtainPort } from "../../../util/test-common"
+import { obtainPort, sleep } from "../../../util/test-common"
 import { TestFetcher } from "../../../util/test-fetcher"
 import { App } from "../../rate-limits/app"
 import { PostResolver } from "./resolvers"
@@ -49,6 +49,7 @@ describe("node > app server options > graphql options", () => {
   }, 10000)
 
   test("enable graphiql", async () => {
+    // todo: figure out why this test fails sometimes
     const port = await obtainPort()
     const server = await createApplicationServer(App, {
       appPath: __dirname + "/app",
@@ -60,6 +61,8 @@ describe("node > app server options > graphql options", () => {
       },
       resolvers: [PostResolver],
     }).start()
+
+    await sleep(2000)
 
     const fetcher = new TestFetcher(`http://localhost:${port}/graphql`)
     const response = await fetcher.getResponse({
@@ -190,6 +193,8 @@ describe("node > app server options > graphql options", () => {
       },
       resolvers: [PostResolver],
     }).start()
+
+    await sleep(2000)
 
     const fetcher = new TestFetcher(`http://localhost:${port}/playground`)
     const response = await fetcher.getResponse({

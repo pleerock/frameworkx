@@ -5,6 +5,7 @@ import { TestFetcher } from "../../../util/test-fetcher"
 import { AppServer } from "./server"
 
 describe("node > types > dates", () => {
+  const date = new Date(2020, 6, 1, 6, 0, 0, 0)
   let server: ApplicationServer<any> | undefined = undefined
   let fetcher: TestFetcher | undefined = undefined
 
@@ -38,8 +39,8 @@ describe("node > types > dates", () => {
           id: 1,
           title: "Hello",
           lastDate: "2020-07-01",
-          lastTime: "03:00:00.000Z",
-          createdAt: "2020-07-01T03:00:00.000Z",
+          lastTime: date.toISOString().replace("2020-07-01T", ""),
+          createdAt: date.toISOString(),
         },
       },
     })

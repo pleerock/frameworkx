@@ -17,7 +17,7 @@ export const AppServer = createApplicationServer(App, {
     cors: true,
   },
   websocket: {
-    host: "ws://localhost",
+    host: "localhost",
     port: 3001,
     pubSub: AppPubSub,
   },

@@ -143,6 +143,7 @@ export type RequestMap = {
  * Request is a named object with list of queries / mutations / subscriptions inside.
  */
 export type Request<Map extends RequestMap> = {
+  typeof: "Request"
   name: string
   map: Map
 }

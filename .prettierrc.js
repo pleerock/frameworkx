@@ -1,4 +1,4 @@
-module.exports =  {
-    semi: false,
-    trailingComma: 'all',
+module.exports = {
+  semi: false,
+  trailingComma: "all",
 }

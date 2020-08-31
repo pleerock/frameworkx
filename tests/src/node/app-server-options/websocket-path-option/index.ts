@@ -1,3 +1,4 @@
+import "../../../util/mock-ws"
 import { createApplicationServer } from "@microframework/node"
 import { obtainPort, sleep } from "../../../util/test-common"
 import { App } from "../../rate-limits/app"
@@ -13,9 +14,10 @@ describe("node > app server options > websocket options", () => {
         port,
       },
       websocket: {
-        host: "ws://localhost",
+        host: "localhost",
         port: websocketPort,
         path: "websockets",
+        websocketServer: ws.Server,
       },
       resolvers: [],
     })
@@ -24,7 +26,7 @@ describe("node > app server options > websocket options", () => {
     expect(server.websocketServer).toBeDefined()
     const serverSpy = jest.spyOn(ws, "Server")
     expect(serverSpy).toHaveBeenCalledWith({
-      host: "ws://localhost",
+      host: "localhost",
       path: "/websockets",
       port: websocketPort,
     })

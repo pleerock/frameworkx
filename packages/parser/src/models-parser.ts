@@ -83,15 +83,35 @@ export class ModelParser {
       return TypeMetadataUtils.createType("object", { typeName, properties })
     } else if (ts.isUnionTypeNode(node)) {
       // extract information about nullability and undefined-ability
-      const nullType = node.types.find(
+      let nullType = node.types.find(
         (type) => type.kind === ts.SyntaxKind.NullKeyword,
       )
-      const undefinedType = node.types.find(
+      let undefinedType = node.types.find(
         (type) => type.kind === ts.SyntaxKind.UndefinedKeyword,
       )
-      const typesWithoutNullAndUndefined = node.types.filter(
+      let typesWithoutNullAndUndefined = node.types.filter(
         (type) => type !== nullType && type !== undefinedType,
       )
+
+      // typescript 4.0 changes (https://github.com/microsoft/TypeScript/issues/40258)
+      const literalType = node.types.find(
+        (type) => type.kind === ts.SyntaxKind.LiteralType,
+      )
+      if (literalType && ts.isLiteralTypeNode(literalType)) {
+        if (literalType.literal.kind === ts.SyntaxKind.NullKeyword) {
+          nullType = literalType.literal as any
+          typesWithoutNullAndUndefined = typesWithoutNullAndUndefined.filter(
+            (type) => type !== literalType,
+          )
+        }
+        if (literalType.literal.kind === ts.SyntaxKind.UndefinedKeyword) {
+          undefinedType = literalType.literal as any
+          typesWithoutNullAndUndefined = typesWithoutNullAndUndefined.filter(
+            (type) => type !== literalType,
+          )
+        }
+      }
+
       const nullable = nullType !== undefined
       const canBeUndefined = undefinedType !== undefined
 

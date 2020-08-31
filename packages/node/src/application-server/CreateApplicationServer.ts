@@ -109,7 +109,7 @@ export function createApplicationServer<App extends AnyApplication>(
   const createPlaygroundMiddleware = () => {
     const expressPlayground = require("graphql-playground-middleware-express")
       .default
-    const endpoint = `${properties.websocket.host}:${properties.websocket.port}/${properties.websocket.path}`
+    const endpoint = `ws://${properties.websocket.host}:${properties.websocket.port}/${properties.websocket.path}`
     return expressPlayground({
       endpoint: properties.graphql.route,
       subscriptionsEndpoint: endpoint,
@@ -120,7 +120,9 @@ export function createApplicationServer<App extends AnyApplication>(
    * Creates a websocket server.
    */
   const createWebsocketServer = (schema?: GraphQLSchema) => {
-    let websocketServer = new WebsocketServer({
+    const wsServer: typeof WebsocketServer =
+      properties.websocket.websocketServer || WebsocketServer
+    let websocketServer = new wsServer({
       host: properties.websocket.host,
       port: properties.websocket.port,
       path: "/" + properties.websocket.path,
@@ -310,7 +312,7 @@ export function createApplicationServer<App extends AnyApplication>(
         if (!this.websocketServer) return ok()
         this.websocketServer.close((err: any) => {
           err ? fail(err) : ok()
-          console.log("closed connection with websocket server")
+          // console.log("closed connection with websocket server")
         })
       })
 
@@ -318,7 +320,7 @@ export function createApplicationServer<App extends AnyApplication>(
         if (!subscriptionServer) return ok()
         try {
           subscriptionServer.close()
-          console.log("closed connection with subscription server")
+          // console.log("closed connection with subscription server")
           ok()
         } catch (err) {
           fail(err)

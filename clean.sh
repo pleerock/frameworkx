@@ -6,6 +6,7 @@ declare -a projectDirs=(
   "./packages/node"
   "./packages/logger"
   "./packages/model"
+  "./packages/fetcher"
   "./samples/complete-sample"
   "./tests"
 )

@@ -1,8 +1,8 @@
 import { createApplicationServer } from "@microframework/node"
 import { obtainPort } from "../../../util/test-common"
-import { App } from "../../rate-limits/app"
 import express from "express"
 import cors from "cors"
+import { App } from "./app"
 import Mock = jest.Mock
 
 describe("node > app server options > webserver options", () => {

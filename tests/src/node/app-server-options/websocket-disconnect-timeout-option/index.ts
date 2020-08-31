@@ -12,7 +12,7 @@ describe("node > app server options > websocket options", () => {
         port,
       },
       websocket: {
-        host: "ws://localhost",
+        host: "localhost",
         port: websocketPort,
         disconnectTimeout: 1000,
       },

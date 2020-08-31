@@ -104,6 +104,7 @@ export function request<T extends RequestMap>(
   map: T,
 ): Request<T> {
   return {
+    typeof: "Request",
     name,
     map,
   }

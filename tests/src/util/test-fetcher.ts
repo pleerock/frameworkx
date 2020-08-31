@@ -1,5 +1,4 @@
 import { DocumentNode } from "graphql"
-const fetch = require("node-fetch")
 
 export class TestFetcher {
   constructor(private url: string) {}
@@ -21,7 +20,7 @@ export class TestFetcher {
 
   async graphqlResponse(gql: string | DocumentNode): Promise<Response> {
     const body = typeof gql === "string" ? gql : gql.loc?.source.body
-    return fetch(this.url, {
+    const options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +28,9 @@ export class TestFetcher {
       body: JSON.stringify({
         query: body,
       }),
-    })
+    }
+    // console.log(options)
+    return fetch(this.url, options)
   }
 
   private async handleJsonResponse(response: any) {

@@ -300,7 +300,7 @@ describe("node > resolvers", () => {
         },
       },
     })
-  })
+  }, 10000)
 
   test("class action resolver", async () => {
     server = await AppServer(port, [PostClassActionResolver]).start()

@@ -82,11 +82,12 @@ export const ApplicationServerUtils = {
       },
       websocket: {
         port: options.websocket?.port,
-        host: options.websocket?.host || "ws://localhost",
+        host: options.websocket?.host || "localhost",
         path: options.websocket?.path || "subscriptions",
         options: options.websocket?.options || {},
         pubSub: options.websocket?.pubSub,
         disconnectTimeout: options.websocket?.disconnectTimeout,
+        websocketServer: options.websocket?.websocketServer,
       },
       dataSource: options.dataSource,
       entities: options.entities,

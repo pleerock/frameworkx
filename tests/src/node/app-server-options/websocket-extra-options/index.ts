@@ -1,3 +1,4 @@
+import "../../../util/mock-ws"
 import { createApplicationServer } from "@microframework/node"
 import * as ws from "ws"
 import { obtainPort } from "../../../util/test-common"
@@ -13,8 +14,9 @@ describe("node > app server options > websocket options", () => {
         port,
       },
       websocket: {
-        host: "ws://localhost",
+        host: "localhost",
         port: websocketPort,
+        websocketServer: ws.Server,
         options: {
           keepAlive: 1000,
         },
@@ -28,7 +30,7 @@ describe("node > app server options > websocket options", () => {
 
     const serverSpy = jest.spyOn(ws, "Server")
     expect(serverSpy).toHaveBeenCalledWith({
-      host: "ws://localhost",
+      host: "localhost",
       path: "/subscriptions",
       port: websocketPort,
       keepAlive: 1000,

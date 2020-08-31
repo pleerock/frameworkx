@@ -3,14 +3,16 @@
   "private": true,
   "devDependencies": {
     "lerna": "^3.22.1",
-    "typescript": "^3.9.5",
-    "prettier": "^2.0.5"
+    "typescript": "^4.0.2",
+    "prettier": "^2.1.1"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "npm i && lerna bootstrap",
     "docker": "docker-compose up",
     "format": "prettier",
     "watch": "tsc -b -w",
+    "clean": "sh clean.sh",
+    "clean-hard": "sh clean.sh --hard",
     "class-sample": "node samples/complete-sample/_/index.js"
   }
 }

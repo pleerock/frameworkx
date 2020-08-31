@@ -7,7 +7,7 @@ import {
 } from "@microframework/core"
 import { CorsOptions } from "cors"
 import { OptionsData } from "express-graphql"
-import { PubSub } from "graphql-subscriptions"
+import { PubSub, PubSubEngine } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"
@@ -96,7 +96,7 @@ export type ApplicationServerOptions = {
   websocket?: {
     /**
      * Websocket host.
-     * For example, "ws://localhost".
+     * For example, "localhost".
      */
     host: string
 
@@ -120,7 +120,7 @@ export type ApplicationServerOptions = {
     /**
      * PubSub to be used for default subscriptions.
      */
-    pubSub?: PubSub
+    pubSub?: PubSubEngine
 
     /**
      * When a connected user doesn't respond in a given amount of time,
@@ -130,6 +130,11 @@ export type ApplicationServerOptions = {
      * @see https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
      */
     disconnectTimeout?: number
+
+    /**
+     * Custom websocket to use.
+     */
+    websocketServer?: any
   }
 
   /**

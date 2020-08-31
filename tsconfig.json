@@ -8,6 +8,7 @@
     { "path": "./packages/node"},
     { "path": "./packages/logger"},
     { "path": "./packages/validator"},
+    { "path": "./packages/fetcher"},
 //    { "path": "./packages/web" },
 //    { "path": "./packages/react-tools" },
 //    { "path": "./samples/basic-sample" },
