@@ -5,9 +5,14 @@ import { Options as WebsocketOptions } from "reconnecting-websocket"
  */
 export type FetcherOptions = {
   /**
+   * Endpoint for action queries.
+   */
+  actionEndpoint?: string
+
+  /**
    * Endpoint for GraphQL queries.
    */
-  graphqlEndpoint: string
+  graphqlEndpoint?: string
 
   /**
    * Endpoint for GraphQL websocket queries.

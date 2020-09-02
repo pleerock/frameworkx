@@ -41,4 +41,13 @@ export const PostResolver = resolver(App, {
   postCreated: {
     triggers: ["POST_CREATED"],
   },
+  ["GET /posts"]: () => {
+    return PostList
+  },
+  ["GET /posts/:id"]: ({ params }) => {
+    return PostList.find((post) => post.id === params.id) || null
+  },
+  ["GET /posts-one-by-qs"]: ({ query }) => {
+    return PostList.find((post) => post.id === query.id) || null
+  },
 })

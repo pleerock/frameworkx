@@ -10,6 +10,7 @@
     "reconnecting-websocket": "^4.4.0",
     "@types/zen-observable": "^0.8.0",
     "@types/uuid": "^8.3.0",
+    "path-to-regexp": "^6.1.0",
     "zen-observable": "^0.8.15",
     "uuid": "^8.3.0"
   },

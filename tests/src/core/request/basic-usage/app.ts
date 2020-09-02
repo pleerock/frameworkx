@@ -32,6 +32,23 @@ export const App = createApp<{
     postCreated: PostType // (args: { ids: number[] }): PostType
     postRemoved: PostType
   }
+  actions: {
+    "GET /posts": {
+      return: PostType[]
+    }
+    "GET /posts/:id": {
+      params: {
+        id: number
+      }
+      return: PostType | null
+    }
+    "GET /posts-one-by-qs": {
+      query: {
+        id: number
+      }
+      return: PostType | null
+    }
+  }
   context: {
     appPubSub: RedisPubSub
   }

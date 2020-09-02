@@ -1,13 +1,37 @@
 import { AnyApplication } from "../application"
 import {
-  RequestItemOptions,
+  RequestGraphQLDeclarationItemOptions,
   RequestSelectionSchema,
   Request,
   RequestMap,
   RequestMutation,
   RequestQuery,
   RequestSubscription,
+  RequestAction,
+  RequestActionItemOptions,
+  RequestMapForAction,
 } from "./index"
+
+/**
+ * Creates a "request action".
+ */
+export function action<
+  App extends AnyApplication,
+  ActionKey extends keyof App["_options"]["actions"],
+  Declaration extends App["_options"]["actions"][ActionKey]
+>(
+  app: App,
+  name: ActionKey,
+  options: RequestActionItemOptions<App, App["_options"]["actions"][ActionKey]>,
+): RequestAction<App, ActionKey, Declaration> {
+  return {
+    selection: undefined as any,
+    model: undefined as any,
+    type: "action",
+    name,
+    options,
+  }
+}
 
 /**
  * Creates a "request query".
@@ -23,7 +47,7 @@ export function query<
 >(
   app: App,
   name: QueryKey,
-  options: RequestItemOptions<
+  options: RequestGraphQLDeclarationItemOptions<
     App,
     App["_options"]["queries"][QueryKey],
     Selection
@@ -52,7 +76,7 @@ export function mutation<
 >(
   app: App,
   name: MutationKey,
-  options: RequestItemOptions<
+  options: RequestGraphQLDeclarationItemOptions<
     App,
     App["_options"]["mutations"][MutationKey],
     Selection
@@ -81,7 +105,7 @@ export function subscription<
 >(
   app: App,
   name: SubscriptionKey,
-  options: RequestItemOptions<
+  options: RequestGraphQLDeclarationItemOptions<
     App,
     App["_options"]["subscriptions"][SubscriptionKey],
     Selection
@@ -97,15 +121,25 @@ export function subscription<
 }
 
 /**
+ * Creates action request.
+ */
+export function request<T extends RequestMapForAction>(map: T): Request<T>
+
+/**
+ * Creates a graphql request.
+ */
+export function request<T extends RequestMap>(name: string, map: T): Request<T>
+
+/**
  * Creates a request.
  */
-export function request<T extends RequestMap>(
-  name: string,
-  map: T,
+export function request<T extends RequestMap | RequestMapForAction>(
+  nameOrMap: string | T,
+  maybeMap?: T,
 ): Request<T> {
   return {
     typeof: "Request",
-    name,
-    map,
+    name: typeof nameOrMap === "string" ? nameOrMap : "",
+    map: maybeMap !== undefined ? maybeMap : (nameOrMap as T),
   }
 }

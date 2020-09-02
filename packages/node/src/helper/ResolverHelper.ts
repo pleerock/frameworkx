@@ -439,7 +439,7 @@ export class ResolverHelper {
       if (!actionResolverFn)
         throw new Error(`Action resolver ${actionMetadata.name} was not found`)
 
-      // TODO: FIX TYPES OF PARAMS/QUERIES,ETC NOT BEING NORMALIZED BASED ON TYPE METADATA
+      // todo: fix types of params/queries,etc not being normalized based on type metadata
       // let actionParams: any
       // let actionQuery: any
       // let actionHeader: any
@@ -461,10 +461,16 @@ export class ResolverHelper {
       const context = await this.buildContext(defaultContext)
       const result = actionResolverFn(
         {
-          params: request.params,
-          query: request.query,
-          header: request.header,
-          cookies: request.cookies,
+          params: this.buildActionParams(request.params, actionMetadata.params),
+          query: this.buildActionParams(request.query, actionMetadata.query),
+          headers: this.buildActionParams(
+            request.header,
+            actionMetadata.headers,
+          ),
+          cookies: this.buildActionParams(
+            request.cookies,
+            actionMetadata.cookies,
+          ),
           body: request.body,
         },
         context,
@@ -669,6 +675,32 @@ export class ResolverHelper {
 
       return resolverFn
     }
+  }
+
+  private buildActionParams(
+    requestParams: any,
+    paramsMetadata: TypeMetadata | undefined,
+  ) {
+    if (paramsMetadata) {
+      for (let metadata of paramsMetadata.properties) {
+        if (!metadata.propertyName) continue
+        if (typeof requestParams[metadata.propertyName] !== "string") continue
+        if (metadata.kind === "number") {
+          requestParams[metadata.propertyName] = parseInt(
+            requestParams[metadata.propertyName],
+          )
+        } else if (metadata.kind === "bigint") {
+          requestParams[metadata.propertyName] = BigInt(
+            requestParams[metadata.propertyName],
+          )
+        } else if (metadata.kind === "boolean") {
+          requestParams[metadata.propertyName] =
+            requestParams[metadata.propertyName] === "true" ||
+            requestParams[metadata.propertyName] === "1"
+        }
+      }
+    }
+    return requestParams
   }
 
   // stringify(value: any) {

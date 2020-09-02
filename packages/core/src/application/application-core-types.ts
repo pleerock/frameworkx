@@ -62,7 +62,7 @@ export type Action = {
   return?: any
   params?: any
   query?: any
-  header?: any
+  headers?: any
   cookies?: any
   body?: any
   middlewares?: () => any[]

@@ -17,7 +17,7 @@ export const PostList: PostType[] = [
     secondaryCategory: CategoryList[0],
     active: true,
     likes: 1.2,
-    createdAt: new Date(),
+    createdAt: null,
   },
   {
     id: 2,
@@ -27,7 +27,7 @@ export const PostList: PostType[] = [
     secondaryCategory: CategoryList[1],
     active: true,
     likes: 2.3,
-    createdAt: new Date(),
+    createdAt: null,
   },
   {
     id: 3,
@@ -37,6 +37,6 @@ export const PostList: PostType[] = [
     secondaryCategory: null,
     active: true,
     likes: 5,
-    createdAt: new Date(),
+    createdAt: null,
   },
 ]

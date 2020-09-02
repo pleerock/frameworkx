@@ -8,7 +8,7 @@ export type PostType = {
   secondaryCategory?: CategoryType | null
   active: boolean
   likes: Float
-  createdAt: Date
+  createdAt: Date | null
 }
 
 export type CategoryType = {

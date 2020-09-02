@@ -7,7 +7,12 @@ import { v4 as uuidv4 } from "uuid"
 import { FetcherOptions } from "./FetcherOptions"
 import { FetcherError } from "./FetcherError"
 import { RequestMap } from "@microframework/core"
-import { RequestMapReturnType } from "@microframework/core/_"
+import {
+  RequestAction,
+  RequestMapForAction,
+  RequestMapReturnType,
+} from "@microframework/core"
+import { compile } from "path-to-regexp"
 
 export class Fetcher {
   private websocketProtocols: string[] = ["graphql-ws"]
@@ -85,36 +90,103 @@ export class Fetcher {
   /**
    * Loads data from a server.
    */
+  async fetch<T extends RequestMapForAction>(
+    request: Request<T>,
+  ): Promise<RequestMapReturnType<T>>
+
+  /**
+   * Loads data from a server.
+   */
   async fetch<T extends RequestMap>(
     request: Request<T>,
     variables?: { [key: string]: any },
   ): Promise<{ data: RequestMapReturnType<T>; errors?: any[] }>
+
+  /**
+   * Loads data from a server.
+   */
   async fetch<T = any>(
     request: string | any,
     variables?: { [key: string]: any },
   ): Promise<T>
+
+  /**
+   * Loads data from a server.
+   */
   async fetch(
     request: Request<any> | string | any,
     variables?: { [key: string]: any },
   ): Promise<any> {
-    const { queryName, queryString } = this.extractQueryMetadata(request)
-    const headers = await this.buildHeaders()
-    const response = await fetch(
-      this.options.graphqlEndpoint + "?" + queryName,
-      {
-        method: "POST",
+    if (
+      typeof request === "object" &&
+      request.map &&
+      request.map.type === "action"
+    ) {
+      if (!this.options.actionEndpoint)
+        throw new Error(
+          "`actionEndpoint` must be set in Fetcher options in order to execute requests.",
+        )
+      const requestAction: RequestAction<any, any, any> = request.map
+      let [method, path] = requestAction.name.split(" ")
+      const headers = await this.buildHeaders()
+      let body: any = undefined
+      if (requestAction.options.body) {
+        body = JSON.stringify(requestAction.options.body)
+      }
+
+      if (requestAction.options.params) {
+        const toPath = compile(path, { encode: encodeURIComponent })
+        path = toPath(requestAction.options.params)
+      }
+
+      let query = ""
+      if (requestAction.options.query) {
+        query =
+          "?" +
+          Object.keys(requestAction.options.query)
+            .map(
+              (k) =>
+                encodeURIComponent(k) +
+                "=" +
+                encodeURIComponent(requestAction.options.query[k]),
+            )
+            .join("&")
+      }
+
+      console.log("executing:", this.options.actionEndpoint + path + query)
+      const response = await fetch(this.options.actionEndpoint + path + query, {
+        method: method,
+        // todo: send cookies
         headers: headers,
-        body: JSON.stringify({
-          query: queryString,
-          variables,
-        }),
-      },
-    )
-    const result = await response.json()
-    if (result["errors"]) {
-      throw new FetcherError(queryName, result["errors"])
+        body,
+      })
+      // todo: what about non-json responses?
+      return response.json()
+    } else {
+      if (!this.options.graphqlEndpoint)
+        throw new Error(
+          "`graphqlEndpoint` must be set in Fetcher options in order to execute GraphQL queries.",
+        )
+
+      const { queryName, queryString } = this.extractQueryMetadata(request)
+      const headers = await this.buildHeaders()
+      const response = await fetch(
+        this.options.graphqlEndpoint + "?" + queryName,
+        {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({
+            query: queryString,
+            variables,
+          }),
+        },
+      )
+      const result = await response.json()
+      if (result["errors"]) {
+        throw new FetcherError(queryName, result["errors"])
+      }
+      return result // .data
     }
-    return result // .data
   }
 
   /**
@@ -136,8 +208,8 @@ export class Fetcher {
     })
   }
 
-  subscription<T>(
-    query: Request<any> | string | any, // | DocumentNode,
+  subscription<T extends RequestMap>(
+    query: Request<T> | string | any, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Observable<T> {
     const { queryName, queryString } = this.extractQueryMetadata(query)

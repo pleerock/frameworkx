@@ -1,4 +1,10 @@
-import { mutation, query, request, subscription } from "@microframework/core"
+import {
+  action,
+  mutation,
+  query,
+  request,
+  subscription,
+} from "@microframework/core"
 import { Fetcher } from "@microframework/fetcher"
 import { ApplicationServer } from "@microframework/node"
 import { RedisPubSub } from "graphql-redis-subscriptions"
@@ -7,7 +13,7 @@ import ws from "ws"
 import { obtainPort, sleep } from "../../../util/test-common"
 import { App } from "./app"
 import { AppServer } from "./server"
-import { RequestReturnType } from "@microframework/core/_"
+import { PostList } from "./repositories"
 
 const Redis = require("ioredis")
 
@@ -36,6 +42,7 @@ describe("core > request > basic usage", () => {
     server = await AppServer(webserverPort, websocketPort, appPubSub).start()
     fetcher = new Fetcher({
       clientId: "jest-test-fetcher",
+      actionEndpoint: `http://localhost:${webserverPort}`,
       graphqlEndpoint: `http://localhost:${webserverPort}/graphql`,
       websocketEndpoint: `ws://localhost:${websocketPort}/subscriptions`,
       websocketOptions: {
@@ -298,7 +305,6 @@ describe("core > request > basic usage", () => {
     })
 
     const result = await fetcher!.fetch(postsRequest)
-    console.log(result.data.posts[0].id)
     expect(result).toEqual({
       data: {
         firstPost: {
@@ -416,4 +422,37 @@ describe("core > request > basic usage", () => {
     })
     observable.unsubscribe()
   }, 10000)
+
+  test("fetch by request > case #9 (actions, GET)", async () => {
+    const postsRequest = request(action(App, "GET /posts", {}))
+
+    const result = await fetcher!.fetch(postsRequest)
+    expect(result).toEqual(PostList)
+  })
+
+  test("fetch by request > case #10 (actions, GET with parameter)", async () => {
+    const postsRequest = request(
+      action(App, "GET /posts/:id", {
+        params: {
+          id: 1,
+        },
+      }),
+    )
+
+    const result = await fetcher!.fetch(postsRequest)
+    expect(result).toEqual(PostList.find((post) => post.id === 1))
+  })
+
+  test("fetch by request > case #11 (actions, GET with query param)", async () => {
+    const postsRequest = request(
+      action(App, "GET /posts-one-by-qs", {
+        query: {
+          id: 2,
+        },
+      }),
+    )
+
+    const result = await fetcher!.fetch(postsRequest)
+    expect(result).toEqual(PostList.find((post) => post.id === 2))
+  })
 })
