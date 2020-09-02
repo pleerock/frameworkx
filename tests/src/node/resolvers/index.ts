@@ -334,7 +334,7 @@ describe("node > resolvers", () => {
     })
     const result2 = await response2.json()
     expect(result2).toEqual({
-      id: "777",
+      id: 777,
       title: "Post #777",
       status: "draft",
     })
@@ -372,7 +372,7 @@ describe("node > resolvers", () => {
     })
     const result2 = await response2.json()
     expect(result2).toEqual({
-      id: "777", // todo: this should be a number!
+      id: 777,
       title: "Post #777",
       status: "draft",
     })

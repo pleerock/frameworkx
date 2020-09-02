@@ -98,3 +98,10 @@ export type ModelWithArgs<
  * Input is a type of model that will be used as input for application declarations.
  */
 export type InputType = any
+
+/**
+ * In the case if given type isn't a function, we just return its type.
+ */
+export type ReturnTypeOptional<T> = T extends (...args: any) => any
+  ? ReturnType<T>
+  : T

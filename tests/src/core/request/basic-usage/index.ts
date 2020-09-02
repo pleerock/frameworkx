@@ -7,7 +7,6 @@ import {
 } from "@microframework/core"
 import { Fetcher } from "@microframework/fetcher"
 import { ApplicationServer } from "@microframework/node"
-import { RedisPubSub } from "graphql-redis-subscriptions"
 import gql from "graphql-tag"
 import ws from "ws"
 import { obtainPort, sleep } from "../../../util/test-common"
@@ -15,31 +14,16 @@ import { App } from "./app"
 import { AppServer } from "./server"
 import { PostList } from "./repositories"
 
-const Redis = require("ioredis")
-
 describe("core > request > basic usage", () => {
   let webserverPort: number = 0
   let websocketPort: number = 0
   let server: ApplicationServer<any> | undefined = undefined
   let fetcher: Fetcher | undefined = undefined
-  let appPubSub: RedisPubSub
-  const redisOptions = {
-    host: "localhost",
-    port: 6379,
-    retryStrategy: (times: number) => {
-      // reconnect after
-      return Math.min(times * 50, 2000)
-    },
-  }
 
   beforeEach(async () => {
     webserverPort = await obtainPort()
     websocketPort = await obtainPort()
-    appPubSub = new RedisPubSub({
-      publisher: new Redis(redisOptions),
-      subscriber: new Redis(redisOptions),
-    })
-    server = await AppServer(webserverPort, websocketPort, appPubSub).start()
+    server = await AppServer(webserverPort, websocketPort).start()
     fetcher = new Fetcher({
       clientId: "jest-test-fetcher",
       actionEndpoint: `http://localhost:${webserverPort}`,
@@ -384,7 +368,6 @@ describe("core > request > basic usage", () => {
     const observable = await fetcher!
       .subscription(postsRequest)
       .subscribe((data) => {
-        // console.log("data", data)
         dataFromSubscription = data
       })
 
@@ -421,6 +404,8 @@ describe("core > request > basic usage", () => {
       },
     })
     observable.unsubscribe()
+    await fetcher!.disconnect()
+    await sleep(2000)
   }, 10000)
 
   test("fetch by request > case #9 (actions, GET)", async () => {

@@ -1,4 +1,9 @@
-import { Action, AnyApplication, GraphQLDeclarationItem } from "../application"
+import {
+  Action,
+  AnyApplication,
+  GraphQLDeclarationItem,
+  ReturnTypeOptional,
+} from "../application"
 
 /**
  * Helper type for RequestSelectionSchema type.
@@ -117,7 +122,7 @@ export type RequestQuery<
   Selection extends RequestSelectionSchema<App, App["_options"]["queries"][Key]>
 > = {
   selection: Selection
-  model: ReturnType<App["_options"]["queries"][Key]>
+  model: ReturnTypeOptional<App["_options"]["queries"][Key]>
   type: "query"
   name: Key
   options: RequestGraphQLDeclarationItemOptions<App, Declaration, Selection>
@@ -136,7 +141,7 @@ export type RequestMutation<
   >
 > = {
   selection: Selection
-  model: ReturnType<App["_options"]["mutations"][Key]>
+  model: ReturnTypeOptional<App["_options"]["mutations"][Key]>
   type: "mutation"
   name: Key
   options: RequestGraphQLDeclarationItemOptions<App, Declaration, Selection>
@@ -155,7 +160,7 @@ export type RequestSubscription<
   >
 > = {
   selection: Selection
-  model: ReturnType<App["_options"]["subscriptions"][Key]>
+  model: ReturnTypeOptional<App["_options"]["subscriptions"][Key]>
   type: "subscription"
   name: Key
   options: RequestGraphQLDeclarationItemOptions<App, Declaration, Selection>

@@ -153,7 +153,7 @@ export class Fetcher {
             .join("&")
       }
 
-      console.log("executing:", this.options.actionEndpoint + path + query)
+      // console.log("executing:", this.options.actionEndpoint + path + query)
       const response = await fetch(this.options.actionEndpoint + path + query, {
         method: method,
         // todo: send cookies
@@ -209,9 +209,17 @@ export class Fetcher {
   }
 
   subscription<T extends RequestMap>(
-    query: Request<T> | string | any, // | DocumentNode,
+    query: Request<T>, // | DocumentNode,
     variables?: { [key: string]: any },
-  ): Observable<T> {
+  ): Observable<RequestMapReturnType<T>>
+  subscription<T>(
+    query: string | any, // | DocumentNode,
+    variables?: { [key: string]: any },
+  ): Observable<T>
+  subscription(
+    query: Request<any> | string | any, // | DocumentNode,
+    variables?: { [key: string]: any },
+  ): Observable<any> {
     const { queryName, queryString } = this.extractQueryMetadata(query)
     const id = ++this.id
     const sentData = JSON.stringify({
@@ -238,7 +246,7 @@ export class Fetcher {
       })
     }
 
-    return new Observable<T>((observer: any) => {
+    return new Observable<any>((observer: any) => {
       const onMessageCallback = (event: any) => {
         // console.log("got a message", event)
         const data = JSON.parse(event.data)
@@ -247,24 +255,18 @@ export class Fetcher {
             observer.error(data.payload)
             return
           }
-          if (data.payload.data) {
-            // this check is temporary and based only on query name
-            // need to re-implement with real query ids
+          // if (data.payload.data) {
+          // this check is temporary and based only on query name
+          // need to re-implement with real query ids
 
-            // console.log(name, data.payload.data)
-            const dataName = Object.keys(data.payload.data)[0]
-            if (data.payload.data[dataName]) {
-              if (data.payload.data) {
-                observer.next(data.payload.data)
-              }
-              if (data.payload.errors) {
-                observer.error(data.payload)
-              }
-            }
-          } else {
-            if (data.payload.errors) {
-              observer.error(data.payload)
-            }
+          // console.log(name, data.payload.data)
+          // const dataName = Object.keys(data.payload.data)[0]
+          // if (data.payload.data[dataName]) {
+          if (data.payload.data) {
+            observer.next(data.payload.data)
+          }
+          if (data.payload.errors) {
+            observer.error(data.payload)
           }
         }
       }
