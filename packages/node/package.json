@@ -1,6 +1,6 @@
 {
   "name": "@microframework/node",
-  "version": "0.1.17",
+  "version": "0.1.19",
   "description": "Microframework server",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",

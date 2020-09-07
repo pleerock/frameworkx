@@ -15,7 +15,7 @@ do
   cd "$dir" || exit
 
   npm version patch
-  npm publish
+  npm publish --access public
 
   cd "$currentDir" || exit
 done
