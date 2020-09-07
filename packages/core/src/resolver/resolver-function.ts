@@ -2,6 +2,7 @@ import { AnyModel, isModel } from "@microframework/model"
 import { AnyApplication } from "../application"
 import {
   ContextResolver,
+  ContextResolverMetadata,
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
@@ -399,7 +400,7 @@ export function resolver(
 export function contextResolver<App extends AnyApplication>(
   app: App,
   resolver: ContextResolver<App["_options"]["context"]>,
-) {
+): ContextResolverMetadata {
   return {
     typeof: "Resolver",
     type: "context",

@@ -1,6 +1,5 @@
-import { resolver } from "@microframework/core"
 import { App } from "../app/App"
-import { AppPubSub } from "../app/AppPubSub";
+import { AppPubSub } from "../app/AppPubSub"
 import { PostFilterInput, PostInput } from "../input"
 import { Post } from "../model"
 import { PostRepository } from "../repository"
@@ -8,7 +7,7 @@ import { PostRepository } from "../repository"
 /**
  * Resolver for post declarations.
  */
-export const PostDeclarationResolver = resolver(App, {
+export const PostDeclarationResolver = App.resolver({
   async posts(args: PostFilterInput, { logger }): Promise<Post[]> {
     return PostRepository.findAllPosts(args.offset, args.limit)
   },
@@ -32,6 +31,6 @@ export const PostDeclarationResolver = resolver(App, {
   },
 
   postAdded: {
-    triggers: ["POST_ADDED"]
-  }
+    triggers: ["POST_ADDED"],
+  },
 })

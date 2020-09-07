@@ -8,6 +8,9 @@ export type UserDeclaration = {
     User: User
   }
   queries: {
+    /**
+     * Returns currently authenticated user.
+     */
     currentUser(): User
   }
 }

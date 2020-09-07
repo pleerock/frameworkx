@@ -23,15 +23,15 @@ export function validationRule<
  */
 export function validationRule<
   App extends AnyApplication,
-  Key extends keyof App["_options"]["input"]
+  Key extends keyof App["_options"]["inputs"]
 >(
   app: App,
   name: Key,
   options: ValidationRuleOptions<
-    App["_options"]["input"][Key],
+    App["_options"]["inputs"][Key],
     App["_options"]["context"]
   >,
-): ValidationRule<App["_options"]["input"][Key], App["_options"]["context"]>
+): ValidationRule<App["_options"]["inputs"][Key], App["_options"]["context"]>
 
 /**
  * Creates a new validation rule for a given model.

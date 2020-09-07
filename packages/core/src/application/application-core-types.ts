@@ -95,6 +95,18 @@ export type ModelWithArgs<
 }
 
 /**
+ * Extracts a "real" model type out of mixed model type.
+ * ModelWithArgs | ModelType is called a mixed model type.
+ */
+export type ModelOrigin<
+  MixedModel extends
+    | ModelWithArgs<ModelType, ArgsOfModel<ModelType>>
+    | ModelType
+> = MixedModel extends ModelWithArgs<ModelType, ArgsOfModel<ModelType>>
+  ? MixedModel["type"]
+  : MixedModel
+
+/**
  * Input is a type of model that will be used as input for application declarations.
  */
 export type InputType = any

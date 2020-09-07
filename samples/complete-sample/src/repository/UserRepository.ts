@@ -1,8 +1,7 @@
-import * as typeorm from "typeorm"
 import { AppConnection } from "../app/AppConnection"
-import { AppModels } from "../app/AppModels"
+import { App } from "../app/App"
 
 /**
  * Used to perform User-entity database requests.
  */
-export const UserRepository = AppConnection.getRepository(AppModels.User)
+export const UserRepository = AppConnection.getRepository(App.model("User"))

@@ -1,13 +1,8 @@
-import {
-  mutation,
-  query,
-  request,
-  RequestReturnType,
-} from "@microframework/core"
+import { RequestReturnType } from "@microframework/core"
 import { App } from "../app/App"
 
-export const PostListRequest = request("PostList", {
-  myPosts: query(App, "posts", {
+export const PostListRequest = App.request("PostList", {
+  myPosts: App.query("posts", {
     input: {
       limit: 1,
       offset: 0,
@@ -16,7 +11,7 @@ export const PostListRequest = request("PostList", {
       id: true,
     },
   }),
-  firstCategory: query(App, "category", {
+  firstCategory: App.query("category", {
     input: {
       id: 1,
     },
@@ -27,25 +22,19 @@ export const PostListRequest = request("PostList", {
       },
     },
   }),
-  currentUser: query(App, "currentUser", {
+  currentUser: App.query("currentUser", {
     select: {
       id: true,
     },
   }),
-  removePost: mutation(App, "postRemove", {
+  removePost: App.mutation("postRemove", {
     input: {
       id: 1,
     },
   }),
 })
 
-export type PostListQueryType = RequestReturnType<
+export type PostListType = RequestReturnType<
   typeof PostListRequest,
   "firstCategory"
 >
-const post: PostListQueryType = {
-  id: 1,
-  posts: [{ id: 1 }],
-}
-// export const PostListQueryType = QueryReturnType<typeof PostListQuery, "myPosts">
-// select: staticType({ ... }) dunno

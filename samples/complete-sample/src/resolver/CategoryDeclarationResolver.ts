@@ -1,4 +1,3 @@
-import { resolver } from "@microframework/core"
 import { App } from "../app/App"
 import { CategoryInput } from "../input"
 import { Category } from "../model"
@@ -7,7 +6,7 @@ import { CategoryRepository } from "../repository"
 /**
  * Resolver for category declarations.
  */
-export const CategoryDeclarationResolver = resolver(App, {
+export const CategoryDeclarationResolver = App.resolver({
   async category(args: { id: number }) {
     const category = await CategoryRepository.findOne(args.id)
     return category ? category : null

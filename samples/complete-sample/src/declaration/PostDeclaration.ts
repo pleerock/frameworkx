@@ -34,7 +34,6 @@ export type PostDeclaration = {
   }
 
   subscriptions: {
-
     /**
      * Called when a new post was added.
      */

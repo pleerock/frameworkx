@@ -1,11 +1,10 @@
-import * as typeorm from "typeorm"
 import { entity } from "typeorm"
-import { AppModels } from "../app/AppModels"
+import { App } from "../app/App"
 
 /**
  * Database schema for Category model.
  */
-export const CategoryEntity = entity(AppModels.Category, {
+export const CategoryEntity = entity(App.model("Category"), {
   projection: {
     id: {
       type: "int",

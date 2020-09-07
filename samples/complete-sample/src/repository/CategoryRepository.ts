@@ -1,10 +1,9 @@
-import * as typeorm from "typeorm"
 import { AppConnection } from "../app/AppConnection"
-import { AppModels } from "../app/AppModels"
+import { App } from "../app/App"
 
 /**
  * Used to perform Category-entity database requests.
  */
 export const CategoryRepository = AppConnection.getRepository(
-  AppModels.Category,
+  App.model("Category"),
 )

@@ -1,6 +1,5 @@
 import { createApp } from "@microframework/core"
 import { RedisPubSub } from "graphql-redis-subscriptions"
-import { PubSub } from "graphql-subscriptions"
 import {
   PostFilterInput,
   PostType,

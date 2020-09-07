@@ -1,5 +1,10 @@
 import { createApp } from "@microframework/core"
-import { CategoryDeclaration, PostDeclaration, SearchDeclaration, UserDeclaration, } from "../declaration"
+import {
+  CategoryDeclaration,
+  PostDeclaration,
+  SearchDeclaration,
+  UserDeclaration,
+} from "../declaration"
 
 /**
  * Main application file.

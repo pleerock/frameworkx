@@ -23,5 +23,4 @@ export type Category = {
    * Number of posts in the category.
    */
   postsCount: number
-
 }
