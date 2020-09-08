@@ -42,7 +42,7 @@ import {
  */
 export class Application<Options extends AnyApplicationOptions> {
   /**
-   * Unique identifier.
+   * Unique type identifier.
    */
   readonly typeof: "Application" = "Application"
 
