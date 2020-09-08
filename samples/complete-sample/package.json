@@ -1,5 +1,5 @@
 {
-  "name": "@microframework/class-sample",
+  "name": "microframework-complete-sample",
   "version": "1.0.0",
   "private": true,
   "main": "_/index.js",
@@ -8,7 +8,6 @@
     "@microframework/logger": "*",
     "@microframework/model": "*",
     "@microframework/node": "*",
-    "@microframework/server": "*",
     "@microframework/validator": "*",
     "dotenv": "^8.2.0",
     "graphql-subscriptions": "^1.1.0",

@@ -34,6 +34,4 @@ export type PersonComplexType = {
   status: StatusEnum
   // statusLiteral: "active" | "inactive"
   // statusNumberLiteral: 1 | 2
-
-  // todo: add float, enum, literal types
 }

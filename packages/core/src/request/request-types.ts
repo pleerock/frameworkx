@@ -24,7 +24,13 @@ export type RequestSelectionSchemaMapItem<T> = T extends Array<infer U>
  * Helper type for RequestSelectionSchema type.
  */
 export type RequestSelectionSchemaMap<T> = {
-  [P in keyof T]?: T[P] extends Array<infer U>
+  [P in keyof T]?: T[P] extends string
+    ? boolean
+    : T[P] extends number
+    ? boolean
+    : T[P] extends boolean
+    ? boolean
+    : T[P] extends Array<infer U>
     ? U extends string
       ? boolean
       : U extends number
@@ -32,6 +38,8 @@ export type RequestSelectionSchemaMap<T> = {
       : U extends boolean
       ? boolean
       : RequestSelectionSchemaMapItem<U>
+    : T[P] extends Object
+    ? RequestSelectionSchemaMapItem<T[P]>
     : boolean
 }
 
