@@ -10,15 +10,18 @@ import {
   RequestGraphQLDeclarationItemOptions,
   RequestMap,
   RequestMapForAction,
-  RequestMutation,
-  RequestQuery,
+  RequestMapItem,
   RequestSelectionSchema,
-  RequestSubscription,
   subscription,
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
 import { ModelOrigin } from "./application-core-types"
-import { AnyValidationRule, ValidationRule, validationRule, ValidationRuleOptions, } from "../validation"
+import {
+  AnyValidationRule,
+  ValidationRule,
+  validationRule,
+  ValidationRuleOptions,
+} from "../validation"
 import { AnyApplication, LiteralOrClass } from "./application-helper-types"
 import {
   contextResolver,
@@ -94,11 +97,10 @@ export class Application<Options extends AnyApplicationOptions> {
   >(
     name: QueryKey,
     options: RequestGraphQLDeclarationItemOptions<
-      this,
       this["_options"]["queries"][QueryKey],
       Selection
     >,
-  ): RequestQuery<this, QueryKey, Declaration, Selection> {
+  ): RequestMapItem<this["_options"]["queries"], QueryKey, Selection> {
     return (query as any)(this, ...arguments)
   }
 
@@ -114,11 +116,10 @@ export class Application<Options extends AnyApplicationOptions> {
   >(
     name: MutationKey,
     options: RequestGraphQLDeclarationItemOptions<
-      this,
       this["_options"]["mutations"][MutationKey],
       Selection
     >,
-  ): RequestMutation<this, MutationKey, Declaration, Selection> {
+  ): RequestMapItem<this["_options"]["mutations"], MutationKey, Selection> {
     return (mutation as any)(this, ...arguments)
   }
 
@@ -134,11 +135,14 @@ export class Application<Options extends AnyApplicationOptions> {
   >(
     name: SubscriptionKey,
     options: RequestGraphQLDeclarationItemOptions<
-      this,
       this["_options"]["subscriptions"][SubscriptionKey],
       Selection
     >,
-  ): RequestSubscription<this, SubscriptionKey, Declaration, Selection> {
+  ): RequestMapItem<
+    this["_options"]["subscriptions"],
+    SubscriptionKey,
+    Selection
+  > {
     return (subscription as any)(this, ...arguments)
   }
 

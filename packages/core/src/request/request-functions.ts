@@ -6,10 +6,8 @@ import {
   RequestGraphQLDeclarationItemOptions,
   RequestMap,
   RequestMapForAction,
-  RequestMutation,
-  RequestQuery,
+  RequestMapItem,
   RequestSelectionSchema,
-  RequestSubscription,
 } from "./index"
 
 /**
@@ -45,11 +43,10 @@ export function query<
   app: App,
   name: QueryKey,
   options: RequestGraphQLDeclarationItemOptions<
-    App,
     App["_options"]["queries"][QueryKey],
     Selection
   >,
-): RequestQuery<App, QueryKey, Declaration, Selection> {
+): RequestMapItem<App["_options"]["queries"], QueryKey, Selection> {
   return {
     selection: undefined as any,
     model: undefined as any,
@@ -73,11 +70,10 @@ export function mutation<
   app: App,
   name: MutationKey,
   options: RequestGraphQLDeclarationItemOptions<
-    App,
     App["_options"]["mutations"][MutationKey],
     Selection
   >,
-): RequestMutation<App, MutationKey, Declaration, Selection> {
+): RequestMapItem<App["_options"]["mutations"], MutationKey, Selection> {
   return {
     selection: undefined as any,
     model: undefined as any,
@@ -101,11 +97,14 @@ export function subscription<
   app: App,
   name: SubscriptionKey,
   options: RequestGraphQLDeclarationItemOptions<
-    App,
     App["_options"]["subscriptions"][SubscriptionKey],
     Selection
   >,
-): RequestSubscription<App, SubscriptionKey, Declaration, Selection> {
+): RequestMapItem<
+  App["_options"]["subscriptions"],
+  SubscriptionKey,
+  Selection
+> {
   return {
     selection: undefined as any,
     model: undefined as any,

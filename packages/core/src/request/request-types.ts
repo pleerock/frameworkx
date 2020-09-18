@@ -1,4 +1,10 @@
-import { Action, AnyApplication, GraphQLDeclarationItem, ReturnTypeOptional, } from "../application"
+import {
+  Action,
+  AnyApplication,
+  GraphQLDeclarationItem,
+  GraphQLDeclarationList,
+  ReturnTypeOptional,
+} from "../application"
 
 /**
  * Helper type for RequestSelectionSchema type.
@@ -56,7 +62,6 @@ export type RequestSelectionSchema<
  * A particular query / mutation / subscription request properties.
  */
 export type RequestGraphQLDeclarationItemOptions<
-  App extends AnyApplication,
   Declaration extends GraphQLDeclarationItem,
   Selection extends RequestSelectionSchema<Declaration>
 > = Parameters<Declaration> extends []
@@ -108,62 +113,19 @@ export type RequestAction<
 }
 
 /**
- * Request properties for a particular query.
- */
-export type RequestQuery<
-  App extends AnyApplication,
-  Key extends keyof App["_options"]["queries"],
-  Declaration extends App["_options"]["queries"][Key],
-  Selection extends RequestSelectionSchema<App["_options"]["queries"][Key]>
-> = {
-  selection: Selection
-  model: ReturnTypeOptional<App["_options"]["queries"][Key]>
-  type: "query"
-  name: Key
-  options: RequestGraphQLDeclarationItemOptions<App, Declaration, Selection>
-}
-
-/**
- * Request properties for a particular mutation.
- */
-export type RequestMutation<
-  App extends AnyApplication,
-  Key extends keyof App["_options"]["mutations"],
-  Declaration extends App["_options"]["mutations"][Key],
-  Selection extends RequestSelectionSchema<App["_options"]["mutations"][Key]>
-> = {
-  selection: Selection
-  model: ReturnTypeOptional<App["_options"]["mutations"][Key]>
-  type: "mutation"
-  name: Key
-  options: RequestGraphQLDeclarationItemOptions<App, Declaration, Selection>
-}
-
-/**
- * Request properties for a particular subscription.
- */
-export type RequestSubscription<
-  App extends AnyApplication,
-  Key extends keyof App["_options"]["subscriptions"],
-  Declaration extends App["_options"]["mutations"][Key],
-  Selection extends RequestSelectionSchema<
-    App["_options"]["subscriptions"][Key]
-  >
-> = {
-  selection: Selection
-  model: ReturnTypeOptional<App["_options"]["subscriptions"][Key]>
-  type: "subscription"
-  name: Key
-  options: RequestGraphQLDeclarationItemOptions<App, Declaration, Selection>
-}
-
-/**
  * Helper type to represent request query / mutation / subscription.
  */
-export type RequestMapItem =
-  | RequestQuery<any, any, any, any>
-  | RequestMutation<any, any, any, any>
-  | RequestSubscription<any, any, any, any>
+export type RequestMapItem<
+  Declarations extends GraphQLDeclarationList,
+  Key extends keyof Declarations,
+  Selection extends RequestSelectionSchema<Declarations[Key]>
+> = {
+  selection: Selection
+  model: ReturnTypeOptional<Declarations[Key]>
+  type: "query" | "mutation" | "subscription"
+  name: Key
+  options: RequestGraphQLDeclarationItemOptions<Declarations[Key], Selection>
+}
 
 /**
  * Request map is different for action.
@@ -174,7 +136,7 @@ export type RequestMapForAction = RequestAction<any, any, any>
  * List of request items. Each request is a particular query / mutation / subscription.
  */
 export type RequestMap = {
-  [name: string]: RequestMapItem
+  [name: string]: RequestMapItem<any, any, any>
 }
 
 /**
@@ -244,7 +206,7 @@ export type RequestMapReturnType<
  * Type of the RequestMapItem.
  */
 export type RequestMapItemReturnType<
-  T extends RequestMapItem
+  T extends RequestMapItem<any, any, any>
 > = T["model"] extends Array<infer U>
   ? T["model"] extends null
     ? U extends number

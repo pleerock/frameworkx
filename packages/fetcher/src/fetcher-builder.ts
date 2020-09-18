@@ -1,12 +1,15 @@
 import { Fetcher } from "./index"
-import { Request, RequestMapItem, RequestQuery } from "@microframework/core"
+import { Request, RequestMapItem } from "@microframework/core"
 
 export function FetcherBuilderExecutor(
   fetcher: Fetcher,
   request: Request<any>,
-  builderItem?: RequestMapItem,
+  builderItem?: RequestMapItem<any, any, any>,
 ) {
   return {
+    add(name: string) {
+      return FetcherBuilderProxy(fetcher, request, name)
+    },
     select(selection: any) {
       if (!builderItem) {
         throw new Error(`Add a request item before selection.`)
@@ -14,8 +17,19 @@ export function FetcherBuilderExecutor(
       ;(builderItem.options as any).select = selection
       return FetcherBuilderExecutor(fetcher, request)
     },
-    add(name: string) {
-      return FetcherBuilderProxy(fetcher, request, name)
+    response() {
+      const itemsCount = Object.keys(request.map)
+      if (!itemsCount)
+        throw new Error(`You must build a complete query, before fetching it.`)
+
+      return fetcher.response(request)
+    },
+    fetch() {
+      const itemsCount = Object.keys(request.map)
+      if (!itemsCount)
+        throw new Error(`You must build a complete query, before fetching it.`)
+
+      return fetcher.fetch(request)
     },
     observe() {
       const itemsCount = Object.keys(request.map)
@@ -24,19 +38,7 @@ export function FetcherBuilderExecutor(
           `You must build a complete query, before observing to it.`,
         )
       }
-
-      Object.keys(request.map).forEach((key) => {
-        request.map[key].type = "subscription"
-      })
-      // console.log(request)
       return fetcher.observe(request)
-    },
-    fetch() {
-      const itemsCount = Object.keys(request.map)
-      if (!itemsCount)
-        throw new Error(`You must build a complete query, before fetching it.`)
-
-      return fetcher.fetch(request)
     },
   }
 }
@@ -51,14 +53,22 @@ export function FetcherBuilderProxy(
     {
       get(target, propKey, receiver) {
         return (...args: any[]) => {
-          if (typeof propKey !== "string")
+          if (typeof propKey !== "string") {
             throw new Error(`Bad builder method call.`)
+          }
+          if (
+            request.type !== "query" &&
+            request.type !== "mutation" &&
+            request.type !== "subscription"
+          ) {
+            throw new Error(`Invalid request type is given.`)
+          }
 
-          const item: RequestQuery<any, any, any, any> = {
+          const item: RequestMapItem<any, any, any> = {
             name: propKey,
             selection: undefined,
             model: undefined,
-            type: request.type as any,
+            type: request.type,
             options: {
               input: args[0],
             },
