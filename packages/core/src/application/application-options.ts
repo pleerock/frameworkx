@@ -1,9 +1,17 @@
-import { ActionList, ContextList, GraphQLDeclarationList, InputTypeList, ModelList } from "./application-core-types"
+import { ActionList, ContextList, GraphQLDeclarationList, InputTypeList, ModelList, } from "./application-core-types"
 
 /**
  * Handy way of using ApplicationOptions when its generics don't matter.
  */
-export type AnyApplicationOptions = ApplicationOptions<any, any, any, any, any, any, any>
+export type AnyApplicationOptions = ApplicationOptions<
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any
+>
 
 /**
  * Application options passed to the main application entry point.
@@ -15,9 +23,8 @@ export type ApplicationOptions<
   Subscriptions extends GraphQLDeclarationList,
   Models extends ModelList,
   Inputs extends InputTypeList,
-  Context extends ContextList,
+  Context extends ContextList
 > = {
-
   /**
    * List of actions (routes) defined in the app.
    */
@@ -52,5 +59,4 @@ export type ApplicationOptions<
    * List of context variables used in the resolvers.
    */
   context?: Context
-
 }

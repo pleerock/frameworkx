@@ -1,8 +1,4 @@
-import {
-  listOfTypeToArray,
-  ResolverUtils,
-  TypeMetadata,
-} from "@microframework/core"
+import { listOfTypeToArray, ResolverUtils, TypeMetadata, } from "@microframework/core"
 import { debugLogger } from "@microframework/logger"
 import { parse } from "@microframework/parser"
 import { defaultValidator } from "@microframework/validator"

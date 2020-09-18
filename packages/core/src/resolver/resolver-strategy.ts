@@ -6,12 +6,7 @@ import {
   GraphQLDeclarationItem,
   ModelType,
 } from "../application"
-import {
-  ActionArgs,
-  DefaultContext,
-  ResolveKey,
-  ResolverReturnValue,
-} from "./index"
+import { ActionArgs, DefaultContext, ResolveKey, ResolverReturnValue, } from "./index"
 
 /**
  * Defines a model resolving strategy.

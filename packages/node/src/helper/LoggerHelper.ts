@@ -1,10 +1,4 @@
-import {
-  ApplicationLogger,
-  ContextLogger,
-  LogEvent,
-  Logger,
-  ResolverType,
-} from "@microframework/core"
+import { ApplicationLogger, ContextLogger, LogEvent, Logger, ResolverType, } from "@microframework/core"
 
 /**
  * Helper over logger operations.

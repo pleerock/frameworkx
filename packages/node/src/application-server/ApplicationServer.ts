@@ -1,8 +1,4 @@
-import {
-  AnyApplication,
-  ApplicationLogger,
-  ApplicationTypeMetadata,
-} from "@microframework/core"
+import { AnyApplication, ApplicationLogger, ApplicationTypeMetadata, } from "@microframework/core"
 import { Express } from "express"
 import { Server as HttpServer } from "http"
 import { Connection } from "typeorm"

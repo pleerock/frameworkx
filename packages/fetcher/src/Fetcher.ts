@@ -1,21 +1,24 @@
-import { Request } from "@microframework/core"
-import ReconnectingWebSocket, {
-  Options as WebsocketOptions,
-} from "reconnecting-websocket"
+import {
+  AnyApplication,
+  Request,
+  RequestAction,
+  RequestActionItemOptions,
+  RequestMap,
+  RequestMapForAction,
+  RequestMapReturnType,
+} from "@microframework/core"
+import ReconnectingWebSocket from "reconnecting-websocket"
 import Observable from "zen-observable"
 import { v4 as uuidv4 } from "uuid"
 import { FetcherOptions } from "./FetcherOptions"
 import { FetcherError } from "./FetcherError"
-import { RequestMap } from "@microframework/core"
-import {
-  RequestAction,
-  RequestMapForAction,
-  RequestMapReturnType,
-} from "@microframework/core"
 import { compile } from "path-to-regexp"
+import { FetcherMutationBuilder, FetcherQueryBuilder, FetcherSubscriptionBuilder, } from "./index"
+import { FetcherBuilderExecutor } from "./fetcher-builder"
 
-export class Fetcher {
+export class Fetcher<App extends AnyApplication = any> {
   private websocketProtocols: string[] = ["graphql-ws"]
+  private app: App | undefined
   private options: FetcherOptions
   private clientId: string
   private ws?: ReconnectingWebSocket
@@ -30,11 +33,21 @@ export class Fetcher {
     callback: () => any
   }[] = []
 
-  constructor(options: FetcherOptions) {
+  constructor(app: App, options: FetcherOptions)
+  constructor(options: FetcherOptions)
+  constructor(
+    appOrOptions: App | FetcherOptions,
+    maybeOptions?: FetcherOptions,
+  ) {
+    const app = arguments.length === 2 ? (appOrOptions as App) : undefined
+    const options =
+      arguments.length === 1
+        ? (appOrOptions as FetcherOptions)
+        : (maybeOptions as FetcherOptions)
+    this.app = app
     this.options = options
     this.clientId = options.clientId || uuidv4()
-    // console.log("graphql", options.graphqlEndpoint)
-    // console.log("websockets", options.websocketEndpoint)
+    // console.log("options", options)
   }
 
   /**
@@ -88,6 +101,83 @@ export class Fetcher {
   }
 
   /**
+   * Creates a Fetcher Builder to execute a GraphQL query.
+   */
+  query(name: string): FetcherQueryBuilder<App["_options"]["queries"], {}> {
+    if (!this.app) {
+      throw new Error(
+        `In order to execute an action application instance must be set in the fetcher constructor.`,
+      )
+    }
+    const request: Request<any> = {
+      typeof: "Request",
+      name: name,
+      type: "query",
+      map: {},
+    }
+    return FetcherBuilderExecutor(this, request)
+  }
+
+  /**
+   * Creates a Fetcher Builder to execute a GraphQL mutation.
+   */
+  mutation(
+    name: string,
+  ): FetcherMutationBuilder<App["_options"]["mutations"], {}> {
+    if (!this.app) {
+      throw new Error(
+        `In order to execute an action application instance must be set in the fetcher constructor.`,
+      )
+    }
+    const request: Request<any> = {
+      typeof: "Request",
+      name: name,
+      type: "mutation",
+      map: {},
+    }
+    return FetcherBuilderExecutor(this, request)
+  }
+
+  /**
+   * Creates a Fetcher Builder to execute a GraphQL subscription.
+   */
+  subscription(
+    name: string,
+  ): FetcherSubscriptionBuilder<App["_options"]["subscriptions"], {}> {
+    if (!this.app) {
+      throw new Error(
+        `In order to execute an action application instance must be set in the fetcher constructor.`,
+      )
+    }
+    const request: Request<any> = {
+      typeof: "Request",
+      name: name,
+      type: "subscription",
+      map: {},
+    }
+    return FetcherBuilderExecutor(this, request)
+  }
+
+  /**
+   * Executes an action.
+   */
+  action<ActionKey extends keyof App["_options"]["actions"]>(
+    name: ActionKey,
+    options: RequestActionItemOptions<
+      App,
+      App["_options"]["actions"][ActionKey]
+    >,
+  ) {
+    if (!this.app) {
+      throw new Error(
+        `In order to execute an action application instance must be set in the fetcher constructor.`,
+      )
+    }
+
+    return this.fetch(this.app.request(this.app.action(name, options)))
+  }
+
+  /**
    * Loads data from a server.
    */
   async fetch<T extends RequestMapForAction>(
@@ -95,7 +185,7 @@ export class Fetcher {
   ): Promise<RequestMapReturnType<T>>
 
   /**
-   * Loads data from a server.
+   * Fetches data from a server based on a given Request.
    */
   async fetch<T extends RequestMap>(
     request: Request<T>,
@@ -103,7 +193,7 @@ export class Fetcher {
   ): Promise<{ data: RequestMapReturnType<T>; errors?: any[] }>
 
   /**
-   * Loads data from a server.
+   * Fetches data from a server based on a given Request.
    */
   async fetch<T = any>(
     request: string | any,
@@ -111,7 +201,7 @@ export class Fetcher {
   ): Promise<T>
 
   /**
-   * Loads data from a server.
+   * Fetches data from a server based on a given Request.
    */
   async fetch(
     request: Request<any> | string | any,
@@ -122,10 +212,11 @@ export class Fetcher {
       request.map &&
       request.map.type === "action"
     ) {
-      if (!this.options.actionEndpoint)
+      if (!this.options.actionEndpoint) {
         throw new Error(
           "`actionEndpoint` must be set in Fetcher options in order to execute requests.",
         )
+      }
       const requestAction: RequestAction<any, any, any> = request.map
       let [method, path] = requestAction.name.split(" ")
       const headers = await this.buildHeaders()
@@ -192,7 +283,7 @@ export class Fetcher {
   /**
    * Loads data from a server.
    */
-  async fetchResponse(
+  async response(
     request: Request<any> | string | any, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Promise<Response> {
@@ -208,15 +299,15 @@ export class Fetcher {
     })
   }
 
-  subscription<T extends RequestMap>(
+  observe<T extends RequestMap>(
     query: Request<T>, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Observable<RequestMapReturnType<T>>
-  subscription<T>(
+  observe<T>(
     query: string | any, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Observable<T>
-  subscription(
+  observe(
     query: Request<any> | string | any, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Observable<any> {
@@ -392,15 +483,19 @@ export class Fetcher {
   }
 
   private requestToQuery(request: Request<any>): string {
-    const isQuery = Object.keys(request.map).some(
-      (key) => request.map[key].type === "query",
-    )
-    const isMutation = Object.keys(request.map).some(
-      (key) => request.map[key].type === "mutation",
-    )
-    const isSubscription = Object.keys(request.map).some(
-      (key) => request.map[key].type === "subscription",
-    )
+    const isQuery =
+      request.type === "query" ||
+      Object.keys(request.map).some((key) => request.map[key].type === "query")
+    const isMutation =
+      request.type === "mutation" ||
+      Object.keys(request.map).some(
+        (key) => request.map[key].type === "mutation",
+      )
+    const isSubscription =
+      request.type === "subscription" ||
+      Object.keys(request.map).some(
+        (key) => request.map[key].type === "subscription",
+      )
     const isMixed =
       [isQuery, isMutation, isSubscription].filter((bool) => bool === true)
         .length > 1

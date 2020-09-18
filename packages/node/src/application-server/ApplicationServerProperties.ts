@@ -1,13 +1,7 @@
-import {
-  AnyValidationRule,
-  ListOfType,
-  Logger,
-  ResolverMetadata,
-  Validator,
-} from "@microframework/core"
+import { AnyValidationRule, ListOfType, Logger, ResolverMetadata, Validator, } from "@microframework/core"
 import { CorsOptions } from "cors"
 import { OptionsData } from "express-graphql"
-import { PubSub, PubSubEngine } from "graphql-subscriptions"
+import { PubSubEngine } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"

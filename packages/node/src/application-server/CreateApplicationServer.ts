@@ -1,27 +1,12 @@
-import {
-  AnyApplication,
-  ApplicationTypeMetadata,
-  assign,
-} from "@microframework/core"
+import { AnyApplication, ApplicationTypeMetadata, assign, } from "@microframework/core"
 import cors from "cors"
 import express, { Request, Response } from "express"
 import { graphqlHTTP } from "express-graphql"
-import {
-  assertValidSchema,
-  execute,
-  GraphQLError,
-  GraphQLSchema,
-  subscribe,
-} from "graphql"
+import { assertValidSchema, execute, GraphQLError, GraphQLSchema, subscribe, } from "graphql"
 import { SubscriptionServer } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions } from "typeorm"
 import { Server as WebsocketServer } from "ws"
-import {
-  GeneratedEntitySchemaBuilder,
-  GraphQLSchemaBuilder,
-  LoggerHelper,
-  ResolverHelper,
-} from ".."
+import { GeneratedEntitySchemaBuilder, GraphQLSchemaBuilder, LoggerHelper, ResolverHelper, } from ".."
 import { ApplicationServer } from "./ApplicationServer"
 import { ApplicationServerOptions } from "./ApplicationServerOptions"
 import { ApplicationServerUtils } from "./ApplicationServerUtils"

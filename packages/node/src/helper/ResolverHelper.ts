@@ -2,11 +2,11 @@ import {
   ActionItemResolver,
   ActionTypeMetadata,
   DefaultContext,
+  LogEvent,
   QueryMutationItemResolver,
   SubscriptionItemResolver,
   TypeMetadata,
 } from "@microframework/core"
-import { LogEvent } from "@microframework/core"
 import DataLoader from "dataloader"
 import { withFilter } from "graphql-subscriptions"
 import { GraphQLFieldResolver } from "graphql/type/definition"

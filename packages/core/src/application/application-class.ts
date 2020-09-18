@@ -18,13 +18,8 @@ import {
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
 import { ModelOrigin } from "./application-core-types"
-import {
-  AnyValidationRule,
-  ValidationRule,
-  validationRule,
-  ValidationRuleOptions,
-} from "../validation"
-import { AnyApplication } from "./application-helper-types"
+import { AnyValidationRule, ValidationRule, validationRule, ValidationRuleOptions, } from "../validation"
+import { AnyApplication, LiteralOrClass } from "./application-helper-types"
 import {
   contextResolver,
   ContextResolver,
@@ -94,7 +89,6 @@ export class Application<Options extends AnyApplicationOptions> {
     QueryKey extends keyof this["_options"]["queries"],
     Declaration extends this["_options"]["queries"][QueryKey],
     Selection extends RequestSelectionSchema<
-      this,
       this["_options"]["queries"][QueryKey]
     >
   >(
@@ -115,7 +109,6 @@ export class Application<Options extends AnyApplicationOptions> {
     MutationKey extends keyof this["_options"]["mutations"],
     Declaration extends this["_options"]["mutations"][MutationKey],
     Selection extends RequestSelectionSchema<
-      this,
       this["_options"]["mutations"][MutationKey]
     >
   >(
@@ -136,7 +129,6 @@ export class Application<Options extends AnyApplicationOptions> {
     SubscriptionKey extends keyof this["_options"]["subscriptions"],
     Declaration extends this["_options"]["subscriptions"][SubscriptionKey],
     Selection extends RequestSelectionSchema<
-      this,
       this["_options"]["subscriptions"][SubscriptionKey]
     >
   >(
@@ -225,9 +217,11 @@ export class Application<Options extends AnyApplicationOptions> {
    *          ...
    *        }
    *    })
+   *
+   * Class syntax also supported.
    */
-  resolver<Key extends ResolveKey<this["_options"]>>(
-    resolver: DeclarationResolver<this>,
+  resolver(
+    resolver: LiteralOrClass<DeclarationResolver<this>>,
   ): ResolverMetadata
 
   /**
@@ -274,8 +268,12 @@ export class Application<Options extends AnyApplicationOptions> {
   resolver<Model extends AnyModel>(
     model: Model,
     resolver:
-      | ModelResolver<Model["type"], this["_options"]["context"]>
-      | (() => ModelResolver<Model["type"], this["_options"]["context"]>),
+      | LiteralOrClass<
+          ModelResolver<Model["type"], this["_options"]["context"]>
+        >
+      | (() => LiteralOrClass<
+          ModelResolver<Model["type"], this["_options"]["context"]>
+        >),
   ): ResolverMetadata
 
   /**
@@ -294,13 +292,17 @@ export class Application<Options extends AnyApplicationOptions> {
   resolver<Key extends keyof this["_options"]["models"]>(
     options: { name: Key; dataLoader: true },
     resolver:
-      | ModelDLResolver<
-          this["_options"]["models"][Key],
-          this["_options"]["context"]
+      | LiteralOrClass<
+          ModelDLResolver<
+            this["_options"]["models"][Key],
+            this["_options"]["context"]
+          >
         >
-      | (() => ModelDLResolver<
-          this["_options"]["models"][Key],
-          this["_options"]["context"]
+      | (() => LiteralOrClass<
+          ModelDLResolver<
+            this["_options"]["models"][Key],
+            this["_options"]["context"]
+          >
         >),
   ): ResolverMetadata
 
@@ -320,8 +322,12 @@ export class Application<Options extends AnyApplicationOptions> {
   resolver<Model extends AnyModel>(
     options: { model: Model; dataLoader: true },
     resolver:
-      | ModelDLResolver<Model["type"], this["_options"]["context"]>
-      | (() => ModelDLResolver<Model["type"], this["_options"]["context"]>),
+      | LiteralOrClass<
+          ModelDLResolver<Model["type"], this["_options"]["context"]>
+        >
+      | (() => LiteralOrClass<
+          ModelDLResolver<Model["type"], this["_options"]["context"]>
+        >),
   ): ResolverMetadata
 
   /**
@@ -340,13 +346,17 @@ export class Application<Options extends AnyApplicationOptions> {
   resolver<Key extends keyof this["_options"]["models"]>(
     options: { name: Key; dataLoader?: false },
     resolver:
-      | ModelResolver<
-          this["_options"]["models"][Key],
-          this["_options"]["context"]
+      | LiteralOrClass<
+          ModelResolver<
+            this["_options"]["models"][Key],
+            this["_options"]["context"]
+          >
         >
-      | (() => ModelResolver<
-          this["_options"]["models"][Key],
-          this["_options"]["context"]
+      | (() => LiteralOrClass<
+          ModelResolver<
+            this["_options"]["models"][Key],
+            this["_options"]["context"]
+          >
         >),
   ): ResolverMetadata
 
@@ -367,8 +377,10 @@ export class Application<Options extends AnyApplicationOptions> {
     app: App,
     options: { model: Model; dataLoader?: false },
     resolver:
-      | ModelResolver<Model["type"], App["_options"]["context"]>
-      | (() => ModelResolver<Model["type"], App["_options"]["context"]>),
+      | LiteralOrClass<ModelResolver<Model["type"], App["_options"]["context"]>>
+      | (() => LiteralOrClass<
+          ModelResolver<Model["type"], App["_options"]["context"]>
+        >),
   ): ResolverMetadata
 
   /**
@@ -389,7 +401,9 @@ export class Application<Options extends AnyApplicationOptions> {
    *        }
    *    })
    */
-  contextResolver(resolver: ContextResolver<this["_options"]["context"]>) {
+  contextResolver(
+    resolver: LiteralOrClass<ContextResolver<this["_options"]["context"]>>,
+  ) {
     return contextResolver(this, resolver)
   }
 }

@@ -1,5 +1,5 @@
 import { Action, AnyApplicationOptions } from "../application"
-import { ContextLogger, Logger } from "../logger"
+import { ContextLogger } from "../logger"
 import { ResolverMetadata } from "./resolver-metadata"
 import { DeclarationResolver } from "./resolver-strategy"
 

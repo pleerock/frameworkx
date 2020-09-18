@@ -1,5 +1,6 @@
 import { NamingStrategy } from "./NamingStrategy"
 import { NamingStrategyUtils } from "./NamingStrategyUtils"
+
 const { capitalize, randomString, smallize, camelize } = NamingStrategyUtils
 
 /**

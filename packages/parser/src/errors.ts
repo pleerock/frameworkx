@@ -46,7 +46,7 @@ export const Errors = {
 
     // errors on models parsing
     signatureNotSupported(node: ts.Node) {
-        console.log(node)
+        // console.log(node)
         return new Error(`Signature not supported (kind ${node.kind}).`)
     },
     unionTypeDoesNotContainTypes(parent: string) {

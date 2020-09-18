@@ -1,9 +1,4 @@
-import {
-  AnyValidationRule,
-  TypeMetadata,
-  TypeMetadataUtils,
-  Validator,
-} from "@microframework/core"
+import { AnyValidationRule, TypeMetadata, TypeMetadataUtils, Validator, } from "@microframework/core"
 
 /**
  * Helper over validation operations.

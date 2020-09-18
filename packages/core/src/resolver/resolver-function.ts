@@ -1,5 +1,5 @@
 import { AnyModel, isModel } from "@microframework/model"
-import { AnyApplication } from "../application"
+import { AnyApplication, LiteralOrClass } from "../application"
 import {
   ContextResolver,
   ContextResolverMetadata,
@@ -89,7 +89,10 @@ export function resolver<
 export function resolver<
   App extends AnyApplication,
   Key extends ResolveKey<App["_options"]>
->(app: App, resolver: DeclarationResolver<App>): ResolverMetadata
+>(
+  app: App,
+  resolver: LiteralOrClass<DeclarationResolver<App>>,
+): ResolverMetadata
 
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -140,8 +143,10 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
   app: App,
   model: Model,
   resolver:
-    | ModelResolver<Model["type"], App["_options"]["context"]>
-    | (() => ModelResolver<Model["type"], App["_options"]["context"]>),
+    | LiteralOrClass<ModelResolver<Model["type"], App["_options"]["context"]>>
+    | (() => LiteralOrClass<
+        ModelResolver<Model["type"], App["_options"]["context"]>
+      >),
 ): ResolverMetadata
 
 /**
@@ -164,13 +169,17 @@ export function resolver<
   app: App,
   options: { name: Key; dataLoader: true },
   resolver:
-    | ModelDLResolver<
-        App["_options"]["models"][Key],
-        App["_options"]["context"]
+    | LiteralOrClass<
+        ModelDLResolver<
+          App["_options"]["models"][Key],
+          App["_options"]["context"]
+        >
       >
-    | (() => ModelDLResolver<
-        App["_options"]["models"][Key],
-        App["_options"]["context"]
+    | (() => LiteralOrClass<
+        ModelDLResolver<
+          App["_options"]["models"][Key],
+          App["_options"]["context"]
+        >
       >),
 ): ResolverMetadata
 
@@ -191,8 +200,10 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
   app: App,
   options: { model: Model; dataLoader: true },
   resolver:
-    | ModelDLResolver<Model["type"], App["_options"]["context"]>
-    | (() => ModelDLResolver<Model["type"], App["_options"]["context"]>),
+    | LiteralOrClass<ModelDLResolver<Model["type"], App["_options"]["context"]>>
+    | (() => LiteralOrClass<
+        ModelDLResolver<Model["type"], App["_options"]["context"]>
+      >),
 ): ResolverMetadata
 
 /**
@@ -215,10 +226,17 @@ export function resolver<
   app: App,
   options: { name: Key; dataLoader?: false },
   resolver:
-    | ModelResolver<App["_options"]["models"][Key], App["_options"]["context"]>
-    | (() => ModelResolver<
-        App["_options"]["models"][Key],
-        App["_options"]["context"]
+    | LiteralOrClass<
+        ModelResolver<
+          App["_options"]["models"][Key],
+          App["_options"]["context"]
+        >
+      >
+    | (() => LiteralOrClass<
+        ModelResolver<
+          App["_options"]["models"][Key],
+          App["_options"]["context"]
+        >
       >),
 ): ResolverMetadata
 
@@ -239,8 +257,10 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
   app: App,
   options: { model: Model; dataLoader?: false },
   resolver:
-    | ModelResolver<Model["type"], App["_options"]["context"]>
-    | (() => ModelResolver<Model["type"], App["_options"]["context"]>),
+    | LiteralOrClass<ModelResolver<Model["type"], App["_options"]["context"]>>
+    | (() => LiteralOrClass<
+        ModelResolver<Model["type"], App["_options"]["context"]>
+      >),
 ): ResolverMetadata
 
 /**
@@ -399,12 +419,13 @@ export function resolver(
  */
 export function contextResolver<App extends AnyApplication>(
   app: App,
-  resolver: ContextResolver<App["_options"]["context"]>,
+  resolver: LiteralOrClass<ContextResolver<App["_options"]["context"]>>,
 ): ContextResolverMetadata {
+  const resolverFn = typeof resolver === "function" ? new resolver() : resolver
   return {
     typeof: "Resolver",
     type: "context",
-    resolverFn: resolver,
+    resolverFn,
   }
 }
 

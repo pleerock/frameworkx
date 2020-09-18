@@ -1,15 +1,15 @@
 import { AnyApplication } from "../application"
 import {
-  RequestGraphQLDeclarationItemOptions,
-  RequestSelectionSchema,
   Request,
-  RequestMap,
-  RequestMutation,
-  RequestQuery,
-  RequestSubscription,
   RequestAction,
   RequestActionItemOptions,
+  RequestGraphQLDeclarationItemOptions,
+  RequestMap,
   RequestMapForAction,
+  RequestMutation,
+  RequestQuery,
+  RequestSelectionSchema,
+  RequestSubscription,
 } from "./index"
 
 /**
@@ -40,10 +40,7 @@ export function query<
   App extends AnyApplication,
   QueryKey extends keyof App["_options"]["queries"],
   Declaration extends App["_options"]["queries"][QueryKey],
-  Selection extends RequestSelectionSchema<
-    App,
-    App["_options"]["queries"][QueryKey]
-  >
+  Selection extends RequestSelectionSchema<App["_options"]["queries"][QueryKey]>
 >(
   app: App,
   name: QueryKey,
@@ -70,7 +67,6 @@ export function mutation<
   MutationKey extends keyof App["_options"]["mutations"],
   Declaration extends App["_options"]["mutations"][MutationKey],
   Selection extends RequestSelectionSchema<
-    App,
     App["_options"]["mutations"][MutationKey]
   >
 >(
@@ -99,7 +95,6 @@ export function subscription<
   SubscriptionKey extends keyof App["_options"]["subscriptions"],
   Declaration extends App["_options"]["subscriptions"][SubscriptionKey],
   Selection extends RequestSelectionSchema<
-    App,
     App["_options"]["subscriptions"][SubscriptionKey]
   >
 >(

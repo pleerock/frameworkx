@@ -1,44 +1,41 @@
-import {
-  Action,
-  AnyApplication,
-  GraphQLDeclarationItem,
-  ReturnTypeOptional,
-} from "../application"
+import { Action, AnyApplication, GraphQLDeclarationItem, ReturnTypeOptional, } from "../application"
 
 /**
  * Helper type for RequestSelectionSchema type.
  */
-export type RequestSelectionSchemaMapItem<T> = T extends Array<infer U>
-  ? U extends string
+export declare type RequestSelectionSchemaMapItem<T> = NonNullable<
+  T
+> extends Array<infer U>
+  ? NonNullable<U> extends string
     ? boolean
-    : U extends number
+    : NonNullable<U> extends number
     ? boolean
-    : U extends boolean
+    : NonNullable<U> extends boolean
     ? boolean
     : RequestSelectionSchemaMap<U>
-  : T extends Object
+  : NonNullable<T> extends Object
   ? RequestSelectionSchemaMap<T>
   : boolean
 
 /**
  * Helper type for RequestSelectionSchema type.
  */
-export type RequestSelectionSchemaMap<T> = {
-  [P in keyof T]?: T[P] extends string
+export declare type RequestSelectionSchemaMap<T> = {
+  [P in keyof T]?: NonNullable<T[P]> extends string
     ? boolean
-    : T[P] extends number
+    : NonNullable<T[P]> extends number
     ? boolean
-    : T[P] extends boolean
+    : NonNullable<T[P]> extends boolean
     ? boolean
-    : T[P] extends Array<infer U>
-    ? U extends string
+    : NonNullable<T[P]> extends Array<infer U>
+    ? NonNullable<U> extends string
       ? boolean
-      : U extends number
+      : NonNullable<U> extends number
       ? boolean
-      : U extends boolean
+      : NonNullable<U> extends boolean
       ? boolean
       : RequestSelectionSchemaMapItem<U>
-    : T[P] extends Object
+    : NonNullable<T[P]> extends Object
     ? RequestSelectionSchemaMapItem<T[P]>
     : boolean
 }
@@ -48,13 +45,10 @@ export type RequestSelectionSchemaMap<T> = {
  * Selection schema defines what properties of a declaration item model will be selected.
  */
 export type RequestSelectionSchema<
-  App extends AnyApplication,
   Declaration extends GraphQLDeclarationItem
-> = ReturnType<Declaration> extends Array<infer U>
+> = NonNullable<ReturnType<Declaration>> extends Array<infer U>
   ? RequestSelectionSchemaMap<U>
-  : ReturnType<Declaration> extends Object
-  ? RequestSelectionSchemaMap<ReturnType<Declaration>>
-  : ReturnType<Declaration> extends Object | null
+  : NonNullable<ReturnType<Declaration>> extends Object
   ? RequestSelectionSchemaMap<ReturnType<Declaration>>
   : never
 
@@ -64,7 +58,7 @@ export type RequestSelectionSchema<
 export type RequestGraphQLDeclarationItemOptions<
   App extends AnyApplication,
   Declaration extends GraphQLDeclarationItem,
-  Selection extends RequestSelectionSchema<App, Declaration>
+  Selection extends RequestSelectionSchema<Declaration>
 > = Parameters<Declaration> extends []
   ? ReturnType<Declaration> extends object
     ? {
@@ -96,13 +90,6 @@ export type RequestActionItemOptions<
   body: Action["body"] extends never ? never : Action["body"]
 }[keyof { query: true; params: true; headers: true; cookies: true; body: true }]
 
-// export type RequestActionItemOptions1<
-//   App extends AnyApplication,
-//   Declaration extends Action
-//   > = {
-//   [P in keyof App]:
-// }
-// : never
 // todo: iterate over properties and exclude never, at the end exclude empty object
 
 /**
@@ -127,7 +114,7 @@ export type RequestQuery<
   App extends AnyApplication,
   Key extends keyof App["_options"]["queries"],
   Declaration extends App["_options"]["queries"][Key],
-  Selection extends RequestSelectionSchema<App, App["_options"]["queries"][Key]>
+  Selection extends RequestSelectionSchema<App["_options"]["queries"][Key]>
 > = {
   selection: Selection
   model: ReturnTypeOptional<App["_options"]["queries"][Key]>
@@ -143,10 +130,7 @@ export type RequestMutation<
   App extends AnyApplication,
   Key extends keyof App["_options"]["mutations"],
   Declaration extends App["_options"]["mutations"][Key],
-  Selection extends RequestSelectionSchema<
-    App,
-    App["_options"]["mutations"][Key]
-  >
+  Selection extends RequestSelectionSchema<App["_options"]["mutations"][Key]>
 > = {
   selection: Selection
   model: ReturnTypeOptional<App["_options"]["mutations"][Key]>
@@ -163,7 +147,6 @@ export type RequestSubscription<
   Key extends keyof App["_options"]["subscriptions"],
   Declaration extends App["_options"]["mutations"][Key],
   Selection extends RequestSelectionSchema<
-    App,
     App["_options"]["subscriptions"][Key]
   >
 > = {
@@ -201,6 +184,7 @@ export type RequestMap = {
 export type Request<Map extends RequestMap | RequestMapForAction> = {
   typeof: "Request"
   name: string
+  type?: "query" | "mutation" | "subscription" | "action"
   map: Map
 }
 
@@ -222,7 +206,9 @@ export type RequestSelectionPick<B, S> = Pick<
 /**
  * Returns a subset of a model, new type is based on selection.
  */
-export type RequestSelection<Model, Selection> = Model extends Object
+export type RequestSelection<Model, Selection> = Model extends Array<infer U>
+  ? RequestSelection<U, Selection>[]
+  : Model extends object
   ? {
       [P in keyof RequestSelectionPick<
         Model,

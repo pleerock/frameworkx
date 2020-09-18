@@ -1,8 +1,4 @@
-import {
-  ApplicationTypeMetadata,
-  TypeMetadata,
-  TypeMetadataUtils,
-} from "@microframework/core"
+import { ApplicationTypeMetadata, TypeMetadata, TypeMetadataUtils, } from "@microframework/core"
 import { Connection, EntityMetadata, InsertEvent } from "typeorm"
 import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
 

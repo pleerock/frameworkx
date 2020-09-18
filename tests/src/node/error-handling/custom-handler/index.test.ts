@@ -41,7 +41,7 @@ describe("node > error handling > custom handler", () => {
       },
     })
 
-    const response = await fetcher!.fetchResponse(gql`
+    const response = await fetcher!.response(gql`
       query {
         post(id: -1) {
           id
