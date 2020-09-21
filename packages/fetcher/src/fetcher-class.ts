@@ -10,17 +10,21 @@ import {
 import ReconnectingWebSocket from "reconnecting-websocket"
 import Observable from "zen-observable"
 import { v4 as uuidv4 } from "uuid"
-import { FetcherOptions } from "./FetcherOptions"
-import { FetcherError } from "./FetcherError"
+import { FetcherOptions } from "./fetcher-types"
+import { FetcherError } from "./fetcher-error-classes"
 import { compile } from "path-to-regexp"
 import {
   FetcherMutationBuilder,
   FetcherQueryBuilder,
   FetcherSubscriptionBuilder,
 } from "./index"
-import { FetcherBuilderExecutor } from "./fetcher-builder"
-import { extractQueryMetadata } from "./util/requestToQuery"
+import { createFetcherQueryBuilder } from "./fetcher-builder"
+import { extractQueryMetadata } from "./fetcher-utils"
+import { RequestMapOriginType } from "@microframework/core"
 
+/**
+ * Fetcher helps to execute network queries.
+ */
 export class Fetcher<App extends AnyApplication = any> {
   private websocketProtocols: string[] = ["graphql-ws"]
   private app: App | undefined
@@ -120,7 +124,7 @@ export class Fetcher<App extends AnyApplication = any> {
       type: "query",
       map: {},
     }
-    return FetcherBuilderExecutor(this, request)
+    return createFetcherQueryBuilder(this, request)
   }
 
   /**
@@ -140,7 +144,7 @@ export class Fetcher<App extends AnyApplication = any> {
       type: "mutation",
       map: {},
     }
-    return FetcherBuilderExecutor(this, request)
+    return createFetcherQueryBuilder(this, request)
   }
 
   /**
@@ -160,7 +164,7 @@ export class Fetcher<App extends AnyApplication = any> {
       type: "subscription",
       map: {},
     }
-    return FetcherBuilderExecutor(this, request)
+    return createFetcherQueryBuilder(this, request)
   }
 
   /**
@@ -180,6 +184,34 @@ export class Fetcher<App extends AnyApplication = any> {
     }
 
     return this.fetch(this.app.request(this.app.action(name, options)))
+  }
+
+  /**
+   * Loads data from a server.
+   * Returns original type instead of selection.
+   */
+  async fetchUnsafe<T extends RequestMapForAction>(
+    request: Request<T>,
+  ): Promise<RequestMapOriginType<T>>
+
+  /**
+   * Fetches data from a server based on a given Request.
+   * Returns original type instead of selection.
+   */
+  async fetchUnsafe<T extends RequestMap>(
+    request: Request<T>,
+    variables?: { [key: string]: any },
+  ): Promise<{ data: RequestMapOriginType<T>; errors?: any[] }>
+
+  /**
+   * Fetches data from a server based on a given Request.
+   * Returns original type instead of selection.
+   */
+  async fetchUnsafe(
+    request: Request<any> | string | any,
+    variables?: { [key: string]: any },
+  ): Promise<any> {
+    return this.fetch(request, variables)
   }
 
   /**
@@ -304,14 +336,36 @@ export class Fetcher<App extends AnyApplication = any> {
     })
   }
 
+  /**
+   * Creates an Observable for a given Subscription.
+   * Returns original type instead of selection.
+   */
+  observeUnsafe<T extends RequestMap>(
+    query: Request<T>,
+    variables?: { [key: string]: any },
+  ): Observable<RequestMapReturnType<T>> {
+    return this.observe(query, variables)
+  }
+
+  /**
+   * Creates an Observable for a given Subscription.
+   */
   observe<T extends RequestMap>(
     query: Request<T>, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Observable<RequestMapReturnType<T>>
+
+  /**
+   * Creates an Observable for a given Subscription.
+   */
   observe<T>(
     query: string | any, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Observable<T>
+
+  /**
+   * Creates an Observable for a given Subscription.
+   */
   observe(
     query: Request<any> | string | any, // | DocumentNode,
     variables?: { [key: string]: any },

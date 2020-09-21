@@ -185,12 +185,28 @@ export type RequestSelection<Model, Selection> = Model extends Array<infer U>
  * Used to determine a ReturnType of a particular request's selection.
  */
 export type RequestReturnType<
-  T extends Request<any>,
-  P extends keyof T["map"]
-> = RequestMapItemReturnType<T["map"][P]>
+  T extends Request<any> | ((...args: any[]) => Request<any>),
+  P extends T extends Request<any>
+    ? keyof T["map"]
+    : keyof ReturnTypeOptional<T>["map"]
+> = RequestMapItemReturnType<
+  (T extends Request<any> ? T["map"] : ReturnTypeOptional<T>["map"])[P]
+>
 
 /**
- * Types of the items from the RequestMap.
+ * Used to determine a ReturnType of a particular request's selection.
+ */
+export type RequestOriginType<
+  T extends Request<any> | ((...args: any[]) => Request<any>),
+  P extends T extends Request<any>
+    ? keyof T["map"]
+    : keyof ReturnTypeOptional<T>["map"]
+> = (T extends Request<any>
+  ? T["map"]
+  : ReturnTypeOptional<T>["map"])[P]["model"]
+
+/**
+ * Returned types of the items from a RequestMap.
  */
 export type RequestMapReturnType<
   T extends RequestMap | RequestMapForAction
@@ -203,12 +219,25 @@ export type RequestMapReturnType<
   : never
 
 /**
+ * Original types of the items from a RequestMap.
+ */
+export type RequestMapOriginType<
+  T extends RequestMap | RequestMapForAction
+> = T extends RequestMapForAction
+  ? T["model"]
+  : T extends RequestMap
+  ? {
+      [P in keyof T]: T[P]["model"]
+    }
+  : never
+
+/**
  * Type of the RequestMapItem.
  */
 export type RequestMapItemReturnType<
   T extends RequestMapItem<any, any, any>
-> = T["model"] extends Array<infer U>
-  ? T["model"] extends null
+> = NonNullable<T["model"]> extends Array<infer U>
+  ? null extends T["model"]
     ? U extends number
       ? U[] | null
       : U extends string
@@ -229,6 +258,6 @@ export type RequestMapItemReturnType<
   ? T["model"]
   : NonNullable<T["model"]> extends boolean
   ? T["model"]
-  : T["model"] extends object | null
+  : null extends T["model"]
   ? RequestSelection<NonNullable<T["model"]>, T["selection"]> | null
-  : RequestSelection<NonNullable<T["model"]>, T["selection"]>
+  : RequestSelection<T["model"], T["selection"]>

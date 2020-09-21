@@ -1,21 +1,24 @@
 import { Fetcher } from "./index"
 import { Request, RequestMapItem } from "@microframework/core"
 
-export function FetcherBuilderExecutor(
+/**
+ * Creates a new universal FetcherQueryBuilder.
+ */
+export function createFetcherQueryBuilder(
   fetcher: Fetcher,
   request: Request<any>,
   builderItem?: RequestMapItem<any, any, any>,
 ) {
   return {
     add(name: string) {
-      return FetcherBuilderProxy(fetcher, request, name)
+      return createFetcherMethodsProxy(fetcher, request, name)
     },
     select(selection: any) {
       if (!builderItem) {
         throw new Error(`Add a request item before selection.`)
       }
       ;(builderItem.options as any).select = selection
-      return FetcherBuilderExecutor(fetcher, request)
+      return createFetcherQueryBuilder(fetcher, request)
     },
     response() {
       const itemsCount = Object.keys(request.map)
@@ -31,6 +34,13 @@ export function FetcherBuilderExecutor(
 
       return fetcher.fetch(request)
     },
+    fetchUnsafe() {
+      const itemsCount = Object.keys(request.map)
+      if (!itemsCount)
+        throw new Error(`You must build a complete query, before fetching it.`)
+
+      return fetcher.fetchUnsafe(request)
+    },
     observe() {
       const itemsCount = Object.keys(request.map)
       if (!itemsCount) {
@@ -43,7 +53,10 @@ export function FetcherBuilderExecutor(
   }
 }
 
-export function FetcherBuilderProxy(
+/**
+ * Creates a proxy object that intercepts all fetcher method calls.
+ */
+export function createFetcherMethodsProxy(
   fetcher: Fetcher,
   request: Request<any>,
   itemName: string,
@@ -74,7 +87,7 @@ export function FetcherBuilderProxy(
             },
           }
           request.map[itemName] = item
-          return FetcherBuilderExecutor(fetcher, request, item)
+          return createFetcherQueryBuilder(fetcher, request, item)
         }
       },
     },

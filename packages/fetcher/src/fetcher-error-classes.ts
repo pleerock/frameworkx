@@ -1,3 +1,6 @@
+/**
+ * Special type of Error use show errors occurred during network request execution.
+ */
 export class FetcherError extends Error {
   typeof: "FetcherError"
   errors: any[]
