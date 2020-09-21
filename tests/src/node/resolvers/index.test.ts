@@ -18,6 +18,7 @@ import { PostObjectRawDeclarationResolver } from "./resolver/PostObjectRawDeclar
 import { PostSimpleDecoratorDeclarationResolver } from "./resolver/PostSimpleDecoratorDeclarationResolver"
 import { PostSimpleDecoratorModelResolver } from "./resolver/PostSimpleDecoratorModelResolver"
 import { AppServer } from "./server"
+import { PostInnerClassDeclarationResolver } from "./resolver/PostInnerClassDeclarationResolver"
 
 const fetch = require("node-fetch")
 
@@ -68,6 +69,34 @@ describe("node > resolvers", () => {
             id: 2,
             title: "Post #2",
             status: "draft",
+          },
+        ],
+      },
+    })
+  })
+  test("simple inner class resolvers for declarations", async () => {
+    server = await AppServer(port, [PostInnerClassDeclarationResolver]).start()
+
+    const query = gql`
+      query {
+        posts {
+          id
+          title
+        }
+      }
+    `
+
+    const result = await fetcher!.fetch(query)
+    expect(result).toEqual({
+      data: {
+        posts: [
+          {
+            id: 1,
+            title: "Post #1",
+          },
+          {
+            id: 2,
+            title: "Post #2",
           },
         ],
       },

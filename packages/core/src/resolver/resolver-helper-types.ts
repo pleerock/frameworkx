@@ -1,4 +1,4 @@
-import { Action, AnyApplicationOptions } from "../application"
+import { Action, AnyApplication, AnyApplicationOptions } from "../application"
 import { ContextLogger } from "../logger"
 import { ResolverMetadata } from "./resolver-metadata"
 import { DeclarationResolver } from "./resolver-strategy"

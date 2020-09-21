@@ -1,7 +1,9 @@
-import { resolver } from "@microframework/core"
+import { DeclarationResolver, resolver } from "@microframework/core"
+import { App } from "../app"
 
 @resolver()
-export class PostSimpleDecoratorDeclarationResolver {
+export class PostSimpleDecoratorDeclarationResolver
+  implements DeclarationResolver<typeof App> {
   posts() {
     return [
       { id: 1, title: "Post #1" },

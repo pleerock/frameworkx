@@ -2,11 +2,17 @@ import {
   Action,
   AnyApplication,
   AnyApplicationOptions,
+  ApplicationDeclarations,
   ContextList,
   GraphQLDeclarationItem,
   ModelType,
 } from "../application"
-import { ActionArgs, DefaultContext, ResolveKey, ResolverReturnValue, } from "./index"
+import {
+  ActionArgs,
+  DefaultContext,
+  ResolveKey,
+  ResolverReturnValue,
+} from "./index"
 
 /**
  * Defines a model resolving strategy.
@@ -155,3 +161,19 @@ export type ActionItemResolver<
   args: ActionArgs<A>,
   context: Context & DefaultContext,
 ) => A["return"] | Promise<A["return"]>
+
+/**
+ * Gets args (input) for a given application declaration.
+ */
+export type DeclarationArgs<
+  App extends AnyApplication,
+  Method extends keyof ApplicationDeclarations<App>
+> = App["_options"]["queries"][Method] extends never
+  ? App["_options"]["mutations"][Method] extends never
+    ? App["_options"]["subscriptions"][Method] extends never
+      ? App["_options"]["actions"][Method] extends never
+        ? never
+        : Parameters<App["_options"]["actions"][Method]>[0]
+      : Parameters<App["_options"]["subscriptions"][Method]>[0]
+    : Parameters<App["_options"]["mutations"][Method]>[0]
+  : Parameters<App["_options"]["queries"][Method]>[0]

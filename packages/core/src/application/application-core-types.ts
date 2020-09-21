@@ -1,3 +1,5 @@
+import { AnyApplication } from "./application-helper-types"
+
 /**
  * Collection of root queries, mutations and subscriptions.
  */
@@ -110,3 +112,13 @@ export type ModelOrigin<
  * Input is a type of model that will be used as input for application declarations.
  */
 export type InputType = any
+
+/**
+ * All application declarations in a single type.
+ */
+export type ApplicationDeclarations<
+  App extends AnyApplication
+> = App["_options"]["queries"] &
+  App["_options"]["mutations"] &
+  App["_options"]["subscriptions"] &
+  App["_options"]["actions"]

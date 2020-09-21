@@ -313,6 +313,15 @@ export function resolver(
         resolverFn: new constructor(),
       }
     }
+  } else if (arguments.length === 2 && arg1 instanceof Function) {
+    // resolves root declarations
+    // syntax: resolver(App, class { categories() { ... }, ... })
+    return {
+      typeof: "Resolver",
+      type: "declaration-resolver",
+      declarationType: "any",
+      resolverFn: new (arg1 as any)(),
+    }
   } else if (arguments.length === 2 && arg1 instanceof Object) {
     // resolves root declarations
     // syntax: resolver(App, { categories() { ... }, ... })
