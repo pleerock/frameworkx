@@ -1,32 +1,35 @@
 #!/usr/bin/env node
-import fs from "fs"
-import * as path from "path"
-import { parse } from "@microframework/parser"
 import { program } from "commander"
+import { generateMetadataAction } from "./action/generateMetadataAction"
+import { initAction } from "./action/initAction"
 
 program.version(require("../package.json").version)
 
 program
   .command("generate:metadata <destination>")
   .description("generates a metadata file from a given app .ts / .d.ts file")
-  .action((destination: string) => {
-    const dir = process.cwd() + "/" + destination
-    const tsFilePath = path.normalize(dir + ".ts")
-    const dtsFilePath = path.normalize(dir + ".d.ts")
+  .action((destination: string) => generateMetadataAction(destination))
 
-    if (fs.existsSync(tsFilePath)) {
-      console.log(`Parsing "${tsFilePath}"`)
-      const metadata = parse(tsFilePath)
-      fs.writeFileSync(dir + ".json", JSON.stringify(metadata))
-    } else if (fs.existsSync(dtsFilePath)) {
-      console.log(`Parsing "${dtsFilePath}"`)
-      const metadata = parse(dtsFilePath)
-      fs.writeFileSync(dir + ".json", JSON.stringify(metadata))
-    } else {
-      throw new Error(
-        `"${tsFilePath}" nor "${dtsFilePath}" were found, please make sure to specify correct application file, without it's extension.`,
-      )
-    }
-  })
+program
+  .command("init <name>")
+  .description("creates a boilerplate for a given project scale")
+  .requiredOption(
+    "-d, --destination <items>",
+    "destination directory where project needs to be created",
+  )
+  .requiredOption(
+    "-s, --scale <items>",
+    "project scale",
+    "small,medium,large,monorepo,microservices",
+  )
+  .action(
+    (
+      name: string,
+      options: {
+        destination: string
+        scale: "small" | "medium" | "large" | "monorepo" | "microservices"
+      },
+    ) => initAction(name, options.destination, options.scale),
+  )
 
 program.parse(process.argv)

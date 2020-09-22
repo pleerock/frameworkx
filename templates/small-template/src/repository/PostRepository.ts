@@ -1,0 +1,17 @@
+import { AppConnection } from "../app/AppConnection"
+import { App } from "../app/App"
+
+/**
+ * Used to perform Post-entity database queries.
+ * This repository contains custom repository methods.
+ */
+export const PostRepository = AppConnection.getRepository(
+  App.model("Post"),
+).extend({
+  /**
+   * Takes all posts starting from a given "skip" and taking given "take" number of posts.
+   */
+  findAllPosts(skip: number, take: number) {
+    return this.find({ take, skip })
+  },
+})

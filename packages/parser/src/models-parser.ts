@@ -17,14 +17,14 @@ export class ModelParser {
 
   /**
    * If "goDeep" is set to true, parse doesn't go down deeper for object properties.
+   * "origin" is used for debug purposes to understand where method call come from.
    */
   parse(
     node: ts.Node,
     parentName: string = "",
     goDeep: boolean = false,
+    origin: string,
   ): TypeMetadata {
-    const canBeUndefined = false
-
     if (node.kind === ts.SyntaxKind.NumberKeyword) {
       return TypeMetadataUtils.createType("number")
     } else if (node.kind === ts.SyntaxKind.BigIntKeyword) {
@@ -34,20 +34,35 @@ export class ModelParser {
     } else if (node.kind === ts.SyntaxKind.BooleanKeyword) {
       return TypeMetadataUtils.createType("boolean")
     } else if (ts.isTypeAliasDeclaration(node)) {
-      return this.parse(node.type, parentName)
+      return this.parse(
+        node.type,
+        parentName,
+        false,
+        `${origin}.typeAliasDeclaration(${node.name.text})`,
+      )
     } else if (ts.isPropertySignature(node) && node.type) {
-      return this.parse(node.type, parentName)
+      return this.parse(
+        node.type,
+        parentName,
+        false,
+        `${origin}.propertySignature(${(node.name as ts.ComputedPropertyName).getText()})`,
+      )
     } else if (ts.isArrayTypeNode(node)) {
-      const type = this.parse(node.elementType, parentName)
+      const type = this.parse(
+        node.elementType,
+        parentName,
+        false,
+        `${origin}.arrayTypeNode`,
+      )
       type.array = true
       return type
     } else if (ts.isTypeLiteralNode(node)) {
       return TypeMetadataUtils.createType("object", {
-        properties: this.parseMembers(node.members, parentName),
+        properties: this.parseMembers(node.members, parentName, origin),
       })
     } else if (ts.isEnumDeclaration(node)) {
       return TypeMetadataUtils.createType("enum", {
-        properties: this.parseMembers(node.members, parentName),
+        properties: this.parseMembers(node.members, parentName, origin),
       })
     } else if (ts.isIntersectionTypeNode(node)) {
       const properties: TypeMetadata[] = []
@@ -56,6 +71,7 @@ export class ModelParser {
           type,
           ParserUtils.joinStrings(parentName),
           true,
+          `${origin}.intersectionTypeNode`,
         )
         properties.push(...parsed.properties)
       })
@@ -68,7 +84,9 @@ export class ModelParser {
 
       const typeName = node.name.text
       const properties =
-        !parentName || goDeep ? this.parseMembers(node.members, typeName) : []
+        !parentName || goDeep
+          ? this.parseMembers(node.members, typeName, origin)
+          : []
 
       return TypeMetadataUtils.createType("object", {
         typeName,
@@ -79,7 +97,9 @@ export class ModelParser {
 
       const typeName = node.name.text
       const properties =
-        !parentName || goDeep ? this.parseMembers(node.members, typeName) : []
+        !parentName || goDeep
+          ? this.parseMembers(node.members, typeName, origin)
+          : []
       return TypeMetadataUtils.createType("object", { typeName, properties })
     } else if (ts.isUnionTypeNode(node)) {
       // extract information about nullability and undefined-ability
@@ -123,7 +143,12 @@ export class ModelParser {
       // this means union type isn't real union type - its just a specific type that is also "undefined" and / or "null"
       // examples: "user: User | null", "photo: Photo | undefined", "counter: number | null | undefined"
       if (typesWithoutNullAndUndefined.length === 1) {
-        const metadata = this.parse(typesWithoutNullAndUndefined[0], parentName)
+        const metadata = this.parse(
+          typesWithoutNullAndUndefined[0],
+          parentName,
+          false,
+          `${origin}.unionTypeNode`,
+        )
         metadata.nullable = nullable
         metadata.canBeUndefined = canBeUndefined
         return metadata
@@ -236,7 +261,7 @@ export class ModelParser {
 
       // finally create a union type for type references
       const properties = typesWithoutNullAndUndefined.map((type) =>
-        this.parse(type, parentName),
+        this.parse(type, parentName, false, `${origin}.unionTypeNode`),
       )
       return TypeMetadataUtils.createType("union", {
         typeName,
@@ -282,6 +307,7 @@ export class ModelParser {
           modelName,
           modelType,
           argsType,
+          origin,
         )
         model.description = this.extractDescription(modelSymbol)
         model.deprecated = this.extractDeprecation(modelSymbol)
@@ -322,6 +348,8 @@ export class ModelParser {
         ...this.parse(
           resolvedType,
           ParserUtils.joinStrings(parentName, typeName),
+          true, // if you want to change it, then revisit how it works because change will lead to bugs
+          `${origin}.typeReferenceNode(${node.typeName.getText()})`,
         ),
         typeName,
         description,
@@ -355,7 +383,7 @@ export class ModelParser {
         }
       }
 
-      const model = this.parseModel("", "", modelType, argsType)
+      const model = this.parseModel("", "", modelType, argsType, origin)
       model.description = this.extractDescription(modelSymbol.symbol)
       model.deprecated = this.extractDeprecation(modelSymbol.symbol)
       return model
@@ -368,12 +396,15 @@ export class ModelParser {
     parentName: string,
     modelName: string,
     modelType: ts.Node,
-    argsType?: ts.Node,
+    argsType: ts.Node | undefined,
+    origin: string,
   ) {
     // create a model with a type
     const model = this.parse(
       modelType,
       ParserUtils.joinStrings(parentName /*, typeName*/),
+      false,
+      `${origin}.parseModel(${modelName})`,
     )
     model.modelName = modelName
 
@@ -382,6 +413,8 @@ export class ModelParser {
       const argsModel = this.parse(
         argsType,
         ParserUtils.joinStrings(parentName, /*typeName, */ "Args"),
+        false,
+        `${origin}.parseModel(args)(${modelName})`,
       )
 
       argsModel.properties.forEach((property) => {
@@ -409,6 +442,7 @@ export class ModelParser {
   private parseMembers(
     members: ts.NodeArray<ts.Node>,
     parentName: string,
+    origin: string,
   ): TypeMetadata[] {
     const properties: TypeMetadata[] = []
     for (let member of members) {
@@ -444,6 +478,8 @@ export class ModelParser {
             ...this.parse(
               member.type,
               ParserUtils.joinStrings(parentName, propertyName),
+              false,
+              `${origin}.parseMembers(${member.name})`,
             ),
             propertyName: propertyName,
           }
@@ -488,7 +524,12 @@ export class ModelParser {
             ts.isParameter(member.parameters[0]) &&
             member.parameters[0].type
           ) {
-            args = this.parse(member.parameters[0].type)
+            args = this.parse(
+              member.parameters[0].type,
+              "",
+              false,
+              `${origin}.parseMembers(${member.name})`,
+            )
           }
         }
 
@@ -496,6 +537,8 @@ export class ModelParser {
           ...this.parse(
             member.type,
             ParserUtils.joinStrings(parentName, propertyName),
+            false,
+            `${origin}.parseMembers(${member.name})`,
           ),
           propertyName,
           description,

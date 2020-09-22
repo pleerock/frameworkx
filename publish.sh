@@ -2,11 +2,12 @@ currentDir=${PWD}
 declare -a projectDirs=(
   "./packages/cli"
   "./packages/core"
-  "./packages/parser"
-  "./packages/node"
+  "./packages/fetcher"
   "./packages/logger"
   "./packages/model"
-  "./packages/fetcher"
+  "./packages/node"
+  "./packages/parser"
+  "./packages/validator"
 )
 
 for dir in "${projectDirs[@]}"

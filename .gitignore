@@ -5,3 +5,5 @@ __old/
 node_modules/
 samples/client-server-sample/server/database.sqlite
 tsconfig.tsbuildinfo
+lerna-debug.log
+*.lerna_backup
