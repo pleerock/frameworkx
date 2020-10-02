@@ -8,6 +8,14 @@ declare -a projectDirs=(
   "./packages/model"
   "./packages/fetcher"
   "./samples/complete-sample"
+  "./templates/monolith-template"
+  "./templates/monorepo-template/packages/common"
+  "./templates/monorepo-template/packages/client"
+  "./templates/monorepo-template/packages/server"
+  "./templates/microservices-template/packages/gateway"
+  "./templates/microservices-template/packages/category"
+  "./templates/microservices-template/packages/post"
+  "./templates/microservices-template/packages/user"
   "./tests"
 )
 

@@ -18,18 +18,18 @@ program
     "destination directory where project needs to be created",
   )
   .requiredOption(
-    "-s, --scale <items>",
-    "project scale",
-    "small,medium,large,monorepo,microservices",
+    "-t, --type <items>",
+    "project type",
+    "monolith,monorepo,microservices",
   )
   .action(
     (
       name: string,
       options: {
         destination: string
-        scale: "small" | "medium" | "large" | "monorepo" | "microservices"
+        type: "monolith" | "monorepo" | "microservices"
       },
-    ) => initAction(name, options.destination, options.scale),
+    ) => initAction(name, options.destination, options.type),
   )
 
 program.parse(process.argv)

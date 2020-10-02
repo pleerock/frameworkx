@@ -1,35 +1,56 @@
-import { ncp } from "ncp"
-import { promises as fs } from "fs"
+import { lstatSync, promises as fs } from "fs"
 import mkdirp from "mkdirp"
+import { glob } from "glob"
+
+/**
+ * Lists all files from a given directory but excludes given files.
+ */
+export function scanFiles(source: string, ignore: string[]) {
+  return new Promise<string[]>((ok, fail) => {
+    glob(
+      source + "/**/*",
+      {
+        dot: true,
+        ignore,
+      },
+      function (err, matches) {
+        if (err) return fail(err)
+        ok(matches)
+      },
+    )
+  })
+}
 
 /**
  * Copies all files from source directory into the given destination directory.
  */
-export async function copyDirectory({
+export async function copyFiles({
   source,
+  files,
   destination,
-  filter,
 }: {
   source: string
+  files: string[]
   destination: string
-  filter: RegExp | ((filename: string) => boolean)
 }) {
   await mkdirp(destination)
 
-  return new Promise((ok, fail) => {
-    ncp(
-      source,
-      destination,
-      {
-        filter,
-      },
-      function (err) {
-        if (err) {
-          return fail(String(err))
+  return new Promise<string[]>(async (ok, fail) => {
+    try {
+      const copiedFiles: string[] = []
+      for (let file of files) {
+        const dest = destination + file.replace(source, "")
+        if (lstatSync(file).isDirectory()) {
+          await mkdirp(dest)
+        } else {
+          await fs.copyFile(file, dest)
+          copiedFiles.push(dest)
         }
-        ok()
-      },
-    )
+      }
+      ok(copiedFiles)
+    } catch (e) {
+      fail(e)
+    }
   })
 }
 

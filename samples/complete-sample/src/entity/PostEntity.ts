@@ -1,5 +1,5 @@
 import { entity } from "typeorm"
-import { App } from "../app/App"
+import { App } from "../app"
 
 /**
  * Database schema for Post model.

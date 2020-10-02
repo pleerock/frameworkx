@@ -1,7 +1,8 @@
 import { createApplicationServer } from "@microframework/node"
 import * as entities from "../entity"
-import * as resolvers from "../resolver"
 import * as validationRules from "../validator"
+import * as modelResolvers from "../model-resolver"
+import * as rootResolvers from "../root-resolver"
 import { App } from "./App"
 import { AppConnection } from "./AppConnection"
 import { AppContext } from "./AppContext"
@@ -25,7 +26,11 @@ export const AppServer = createApplicationServer(App, {
     graphiql: true,
     playground: true,
   },
-  resolvers: { ...resolvers, AppContext },
+  resolvers: {
+    ...modelResolvers,
+    ...rootResolvers,
+    AppContext: AppContext,
+  },
   entities,
   validationRules,
   dataSource: (options) => AppConnection.setOptions(options).connect(),

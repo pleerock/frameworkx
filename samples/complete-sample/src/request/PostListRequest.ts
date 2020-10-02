@@ -1,5 +1,5 @@
 import { RequestReturnType } from "@microframework/core"
-import { App } from "../app/App"
+import { App } from "../app"
 
 export const PostListRequest = App.request("PostList", {
   myPosts: App.query("posts", {
@@ -25,11 +25,6 @@ export const PostListRequest = App.request("PostList", {
   currentUser: App.query("currentUser", {
     select: {
       id: true,
-    },
-  }),
-  removePost: App.mutation("postRemove", {
-    input: {
-      id: 1,
     },
   }),
 })

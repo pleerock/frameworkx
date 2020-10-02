@@ -8,7 +8,7 @@ import {
   RequestSelectionSchema,
   ReturnTypeOptional,
 } from "@microframework/core"
-import Observable from "zen-observable"
+import Observable from "zen-observable-ts"
 
 /**
  * Initiates a query building for a GraphQL Query.

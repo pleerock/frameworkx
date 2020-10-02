@@ -1,0 +1,15 @@
+{
+  "name": "microframework-template-monorepo-common",
+  "version": "1.0.0",
+  "main": "_/index.js",
+  "dependencies": {
+    "@microframework/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.3",
+    "prettier": "^2.1.2"
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\""
+  }
+}

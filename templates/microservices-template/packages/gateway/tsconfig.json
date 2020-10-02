@@ -1,0 +1,19 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "_"
+  },
+  "references": [
+    { "path": "../post"},
+    { "path": "../user"},
+    { "path": "../category"},
+    { "path": "../../../../packages/core"},
+    { "path": "../../../../packages/parser"},
+    { "path": "../../../../packages/model"},
+    { "path": "../../../../packages/node"},
+    { "path": "../../../../packages/logger"},
+    { "path": "../../../../packages/fetcher"},
+    { "path": "../../../../packages/validator"}
+  ]
+}

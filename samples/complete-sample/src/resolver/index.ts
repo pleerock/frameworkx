@@ -1,5 +1,0 @@
-export * from "./CategoryDeclarationResolver"
-export * from "./PostDeclarationResolver"
-export * from "./SearchDeclarationResolver"
-export * from "./PostModelResolver"
-export * from "./CategoryModelResolver"

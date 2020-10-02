@@ -1,5 +1,4 @@
-import { AppConnection } from "../app/AppConnection"
-import { App } from "../app/App"
+import { App, AppConnection } from "../app"
 
 /**
  * Used to perform User-entity database requests.

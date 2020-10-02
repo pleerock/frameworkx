@@ -1,0 +1,16 @@
+{
+  "name": "microframework-template-monorepo-root",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^3.22.1",
+    "typescript": "^4.0.3",
+    "prettier": "^2.1.2"
+  },
+  "scripts": {
+    "bootstrap": "npm i && lerna bootstrap",
+    "format": "prettier",
+    "watch": "tsc -b -w",
+    "server": "cd ./packages/server && npm start",
+    "client": "cd ./packages/client && npm start"
+  }
+}

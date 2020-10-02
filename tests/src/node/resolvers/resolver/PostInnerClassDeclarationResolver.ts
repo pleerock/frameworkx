@@ -1,6 +1,6 @@
 import { DeclarationResolver, resolver } from "@microframework/core"
 import { App } from "../app"
-import { DeclarationArgs } from "@microframework/core/_"
+import { DeclarationArgs } from "@microframework/core"
 
 export const PostInnerClassDeclarationResolver = resolver(
   App,

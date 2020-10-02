@@ -9,18 +9,18 @@
     { "path": "./packages/logger"},
     { "path": "./packages/validator"},
     { "path": "./packages/fetcher"},
-//    { "path": "./packages/web" },
-//    { "path": "./packages/react-tools" },
-//    { "path": "./samples/basic-sample" },
     { "path": "./samples/complete-sample"},
-    { "path": "./templates/small-template"},
-//    { "path": "./samples/client-server-sample/common" },
-//    { "path": "./samples/client-server-sample/client" },
-//    { "path": "./samples/client-server-sample/server" },
+    { "path": "./templates/monolith-template"},
+    { "path": "./templates/monorepo-template/packages/common" },
+    { "path": "./templates/monorepo-template/packages/client" },
+    { "path": "./templates/monorepo-template/packages/server" },
+    { "path": "./templates/microservices-template/packages/gateway" },
+    { "path": "./templates/microservices-template/packages/category" },
+    { "path": "./templates/microservices-template/packages/post" },
+    { "path": "./templates/microservices-template/packages/user" },
     { "path": "./tests" }
   ],
   "exclude": [
-    "__old",
-    "tests"
+    "__old"
   ]
 }

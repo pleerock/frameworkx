@@ -1,0 +1,28 @@
+{
+  "name": "microframework-template-microservices-post",
+  "version": "1.0.0",
+  "main": "_/index.js",
+  "dependencies": {
+    "@microframework/core": "*",
+    "@microframework/logger": "*",
+    "@microframework/node": "*",
+    "@microframework/validator": "*",
+    "dotenv": "^8.2.0",
+    "graphql-subscriptions": "^1.1.0",
+    "sqlite3": "^5.0.0",
+    "typeorm": "^0.3.0-rc.21"
+  },
+  "devDependencies": {
+    "@types/node": "^14.11.1",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^9.0.0",
+    "nodemon": "^2.0.4",
+    "typescript": "^4.0.3",
+    "prettier": "^2.1.2"
+  },
+  "scripts": {
+    "start": "tsc && node -r source-map-support/register ./_/app/start.js",
+    "watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app/start.ts",
+    "format": "prettier --write \"src/**/*.ts\""
+  }
+}
