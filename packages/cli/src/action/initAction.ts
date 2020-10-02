@@ -42,10 +42,6 @@ export async function initAction(
       destination + "/tsconfig.json.template",
       destination + "/tsconfig.json",
     )
-    await fs.rename(
-      destination + "/packages/client/.gitignore.template",
-      destination + "/packages/client/.gitignore",
-    )
 
     // replace keywords in template files
     await replaceInFile(destination + "/package.json", {
@@ -121,8 +117,18 @@ export async function initAction(
       destination,
     })
 
+    // replace all imports in the copied files
+    for (let file of copiedFiles) {
+      await replaceInFile(file, {
+        'from "microframework-template-microservices-post"': `from "@${name}/post"`,
+        'from "microframework-template-microservices-category"': `from "@${name}/category"`,
+        'from "microframework-template-microservices-user"': `from "@${name}/user"`,
+      })
+    }
+
     const frameworkDepsReplaceMap = {
       '"\\@microframework\\/(.*)": "\\*"': `"@microframework/$1": "~${frameworkVersion}"`,
+      "microframework-template-microservices-root": `@${name}/root`,
       "microframework-template-microservices-gateway": `@${name}/gateway`,
       "microframework-template-microservices-post": `@${name}/post`,
       "microframework-template-microservices-category": `@${name}/category`,

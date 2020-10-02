@@ -14,5 +14,8 @@
     "resolveJsonModule": true
   },
   "references": [
+    { "path": "../post" },
+    { "path": "../user" },
+    { "path": "../category" },
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "name": "microframework-template-monorepo-root",
+  "name": "microframework-template-microservices-root",
   "private": true,
   "devDependencies": {
     "lerna": "^3.22.1",

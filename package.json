@@ -1,5 +1,5 @@
 {
-  "name": "test-basic-app-root",
+  "name": "@microframework/root",
   "private": true,
   "devDependencies": {
     "lerna": "^3.22.1",
