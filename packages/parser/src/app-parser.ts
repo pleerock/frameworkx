@@ -87,8 +87,19 @@ export function parse(
   if (!ts.isIdentifier(declaration.name))
     throw new Error("Invalid declaration.name")
 
+  // todo: find a more reliable way to extract documentation
+  let description = ""
+  if (
+    (node as any).jsDoc &&
+    (node as any).jsDoc.length &&
+    (node as any).jsDoc[0].comment
+  ) {
+    description = (node as any).jsDoc[0].comment
+  }
+
   const result: ApplicationTypeMetadata = {
     name: declaration.name.text,
+    description,
     actions: [],
     models: [],
     inputs: [],
@@ -227,6 +238,7 @@ function parseActions(
 
     return {
       name: action.propertyName,
+      description: action.description,
       return: returning ? { ...returning, propertyName: "" } : undefined,
       query,
       params,

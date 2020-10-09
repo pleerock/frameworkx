@@ -1,15 +1,32 @@
-import { AnyApplication, ApplicationTypeMetadata, assign, } from "@microframework/core"
+import {
+  AnyApplication,
+  ApplicationTypeMetadata,
+  assign,
+} from "@microframework/core"
 import cors from "cors"
 import express, { Request, Response } from "express"
 import { graphqlHTTP } from "express-graphql"
-import { assertValidSchema, execute, GraphQLError, GraphQLSchema, subscribe, } from "graphql"
+import {
+  assertValidSchema,
+  execute,
+  GraphQLError,
+  GraphQLSchema,
+  subscribe,
+} from "graphql"
 import { SubscriptionServer } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions } from "typeorm"
 import { Server as WebsocketServer } from "ws"
-import { GeneratedEntitySchemaBuilder, GraphQLSchemaBuilder, LoggerHelper, ResolverHelper, } from ".."
+import {
+  GeneratedEntitySchemaBuilder,
+  GraphQLSchemaBuilder,
+  LoggerHelper,
+  ResolverHelper,
+} from ".."
 import { ApplicationServer } from "./ApplicationServer"
 import { ApplicationServerOptions } from "./ApplicationServerOptions"
 import { ApplicationServerUtils } from "./ApplicationServerUtils"
+import { generateSwaggerDocumentation } from "../swagger-generator"
+const swaggerUi = require("swagger-ui-express")
 
 /**
  * Creates a new server.
@@ -159,6 +176,7 @@ export function createApplicationServer<App extends AnyApplication>(
     dataSource: undefined,
     metadata: {
       name: "",
+      description: "",
       actions: [],
       inputs: [],
       models: [],
@@ -247,6 +265,7 @@ export function createApplicationServer<App extends AnyApplication>(
 
       // register action routes in express app
       for (let action of this.metadata!.actions) {
+        // todo: duplicate, extract into utils
         const method = action.name
           .substr(0, action.name.indexOf(" "))
           .toLowerCase() // todo: make sure to validate this before
@@ -275,6 +294,23 @@ export function createApplicationServer<App extends AnyApplication>(
             express.static(properties.webserver.staticDirs[route]),
           )
         }
+      }
+
+      // setup swagger
+      if (properties.swagger) {
+        // console.log(
+        //   JSON.stringify(generateSwaggerDocumentation(this.metadata!), null, 2),
+        // )
+        expressApp.use(
+          properties.swagger.route,
+          swaggerUi.serve,
+          swaggerUi.setup(
+            Object.assign(
+              generateSwaggerDocumentation(this.metadata!),
+              properties.swagger.document || {},
+            ),
+          ),
+        )
       }
 
       // launch the server

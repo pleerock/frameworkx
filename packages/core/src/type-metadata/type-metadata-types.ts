@@ -25,6 +25,7 @@ export type TypeMetadata = {
 
 export type ActionTypeMetadata = {
   name: string
+  description: string | undefined
   return?: TypeMetadata
   query?: TypeMetadata
   params?: TypeMetadata
@@ -35,6 +36,7 @@ export type ActionTypeMetadata = {
 
 export type ApplicationTypeMetadata = {
   name: string
+  description: string | undefined
   actions: ActionTypeMetadata[]
   models: TypeMetadata[]
   inputs: TypeMetadata[]

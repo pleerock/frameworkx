@@ -1,4 +1,8 @@
-import { listOfTypeToArray, ResolverUtils, TypeMetadata, } from "@microframework/core"
+import {
+  listOfTypeToArray,
+  ResolverUtils,
+  TypeMetadata,
+} from "@microframework/core"
 import { debugLogger } from "@microframework/logger"
 import { parse } from "@microframework/parser"
 import { defaultValidator } from "@microframework/validator"
@@ -85,6 +89,13 @@ export const ApplicationServerUtils = {
         disconnectTimeout: options.websocket?.disconnectTimeout,
         websocketServer: options.websocket?.websocketServer,
       },
+      swagger: options.swagger
+        ? {
+            route: options.swagger.route,
+            document: options.swagger.document,
+            options: options.swagger.options,
+          }
+        : undefined,
       dataSource: options.dataSource,
       entities: options.entities,
       namingStrategy: options.namingStrategy || DefaultNamingStrategy,

@@ -31,4 +31,42 @@ export type CategoryDeclaration = {
      */
     categoryRemove(args: { id: number }): boolean
   }
+
+  actions: {
+    /**
+     * Loads a single category by its id.
+     */
+    "GET /api/category/:id": {
+      params: {
+        /**
+         * Category id.
+         */
+        id: number
+      }
+      return: Category
+    }
+
+    /**
+     * Saves a category.
+     */
+    "POST /api/category": {
+      body: CategoryInput
+      return: Category
+    }
+
+    /**
+     * Removes a category.
+     */
+    "DELETE /api/category/:id": {
+      params: {
+        /**
+         * Category id.
+         */
+        id: number
+      }
+      return: {
+        success: boolean
+      }
+    }
+  }
 }

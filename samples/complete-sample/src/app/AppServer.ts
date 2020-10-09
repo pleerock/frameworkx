@@ -22,6 +22,9 @@ export const AppServer = createApplicationServer(App, {
     port: 3001,
     pubSub: AppPubSub,
   },
+  swagger: {
+    route: "/api-docs",
+  },
   graphql: {
     graphiql: true,
     playground: true,
