@@ -1,4 +1,3 @@
-import { AnyApplicationOptions } from "./application-options"
 import {
   action,
   mutation,
@@ -22,7 +21,11 @@ import {
   validationRule,
   ValidationRuleOptions,
 } from "../validation"
-import { AnyApplication, LiteralOrClass } from "./application-helper-types"
+import {
+  AnyApplication,
+  AnyApplicationOptions,
+  LiteralOrClass,
+} from "./application-helper-types"
 import {
   contextResolver,
   ContextResolver,

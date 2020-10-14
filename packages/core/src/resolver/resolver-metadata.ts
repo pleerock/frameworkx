@@ -1,4 +1,9 @@
-import { ContextResolver, DeclarationResolver, ModelResolver, SubscriptionItemResolver, } from "./resolver-strategy"
+import {
+  ContextResolver,
+  DeclarationResolver,
+  ModelResolver,
+  SubscriptionItemResolver,
+} from "./resolver-strategy"
 
 /**
  * Metadata for declaration resolver.

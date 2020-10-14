@@ -1,7 +1,7 @@
 import {
   AnyValidationRule,
   AppResolverType,
-  ListOfType,
+  MixedList,
   Logger,
   Validator,
 } from "@microframework/core"
@@ -171,17 +171,17 @@ export type ApplicationServerOptions = {
    * List of entities to use in connection.
    * If this property is set, they will be overridden in ORM.
    */
-  entities?: ListOfType<Function | string | EntitySchema>
+  entities?: MixedList<Function | string | EntitySchema>
 
   /**
    * List of registered resolvers.
    */
-  resolvers: ListOfType<AppResolverType>
+  resolvers: MixedList<AppResolverType>
 
   /**
    * List of validation rules to apply.
    */
-  validationRules?: ListOfType<AnyValidationRule>
+  validationRules?: MixedList<AnyValidationRule>
 
   /**
    * Validation library to be used in the application.

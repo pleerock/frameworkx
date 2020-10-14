@@ -26,7 +26,6 @@ import { ApplicationServer } from "./ApplicationServer"
 import { ApplicationServerOptions } from "./ApplicationServerOptions"
 import { ApplicationServerUtils } from "./ApplicationServerUtils"
 import { generateSwaggerDocumentation } from "../swagger-generator"
-const swaggerUi = require("swagger-ui-express")
 
 /**
  * Creates a new server.
@@ -298,6 +297,7 @@ export function createApplicationServer<App extends AnyApplication>(
 
       // setup swagger
       if (properties.swagger) {
+        const swaggerUi = require("swagger-ui-express")
         // console.log(
         //   JSON.stringify(generateSwaggerDocumentation(this.metadata!), null, 2),
         // )

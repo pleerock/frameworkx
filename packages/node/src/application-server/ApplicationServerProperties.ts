@@ -1,6 +1,6 @@
 import {
   AnyValidationRule,
-  ListOfType,
+  MixedList,
   Logger,
   ResolverMetadata,
   Validator,
@@ -171,7 +171,7 @@ export type ApplicationServerProperties = {
    * List of entities to use in connection.
    * If this property is set, they will be overridden in ORM.
    */
-  readonly entities?: ListOfType<Function | string | EntitySchema>
+  readonly entities?: MixedList<Function | string | EntitySchema>
 
   /**
    * List of registered resolvers.

@@ -1,10 +1,10 @@
-import { AppResolverType, ListOfType } from "@microframework/core"
+import { AppResolverType, MixedList } from "@microframework/core"
 import { createApplicationServer } from "@microframework/node"
 import { App } from "./app"
 
 export const AppServer = (
   port: number,
-  resolvers: ListOfType<AppResolverType>,
+  resolvers: MixedList<AppResolverType>,
 ) => {
   return createApplicationServer(App, {
     appPath: __dirname + "/app",

@@ -1,10 +1,10 @@
 import { Application } from "./application-class"
-import { AnyApplicationOptions } from "./application-options"
+import { ApplicationOptions } from "./application-options"
 
 /**
- * List of T items passed as an array of imported using import * as syntax.
+ * List of T symbols passed as an array or imported using import * as syntax.
  */
-export type ListOfType<T> = T[] | { [key: string]: T }
+export type MixedList<T> = T[] | { [key: string]: T }
 
 /**
  * If given type is an array, extracts item type instead.
@@ -13,7 +13,7 @@ export type ListOfType<T> = T[] | { [key: string]: T }
 export type NonArray<T> = T extends Array<infer U> ? U : T
 
 /**
- * In the case if given type isn't a function, we just return its type.
+ * In the case if given type isn't a function, just return its type.
  */
 export type ReturnTypeOptional<T> = T extends (...args: any) => any
   ? ReturnType<T>
@@ -25,18 +25,19 @@ export type ReturnTypeOptional<T> = T extends (...args: any) => any
 export type LiteralOrClass<T> = T | { new (...args: any[]): T }
 
 /**
- * Type for the server implementation for application.
- */
-// export type ApplicationServer = () => Promise<() => Promise<void>>
-
-/**
- * Represents any application type.
+ * Handy way of using Application type when its options don't matter.
  */
 export type AnyApplication = Application<any>
 
 /**
- * Creates a new Application instance.
+ * Handy way of using ApplicationOptions type when its generics don't matter.
  */
-export function createApp<Options extends AnyApplicationOptions>() {
-  return new Application<Options>()
-}
+export type AnyApplicationOptions = ApplicationOptions<
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any
+>

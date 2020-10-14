@@ -1,5 +1,5 @@
 import {
-  listOfTypeToArray,
+  ApplicationUtils,
   ResolverUtils,
   TypeMetadata,
 } from "@microframework/core"
@@ -70,7 +70,7 @@ export const ApplicationServerUtils = {
         cors: options.webserver.cors || false,
         staticDirs: options.webserver.staticDirs || {},
         middlewares: options.webserver.middlewares
-          ? listOfTypeToArray(options.webserver.middlewares)
+          ? ApplicationUtils.mixedListToArray(options.webserver.middlewares)
           : [],
         actionMiddleware: options.webserver.actionMiddleware || {},
       },
@@ -102,7 +102,7 @@ export const ApplicationServerUtils = {
       errorHandler: options.errorHandler || DefaultErrorHandler,
       resolvers: resolvers,
       validationRules: options.validationRules
-        ? listOfTypeToArray(options.validationRules)
+        ? ApplicationUtils.mixedListToArray(options.validationRules)
         : [],
       generateModelRootQueries: options.generateModelRootQueries || false,
       maxGeneratedConditionsDeepness:
