@@ -1,4 +1,4 @@
-import { Action, AnyApplicationOptions } from "../application"
+import { AnyAction, AnyApplicationOptions } from "../application"
 import { ContextLogger } from "../logger"
 import { ResolverMetadata } from "./resolver-metadata"
 import { DeclarationResolver } from "./resolver-strategy"
@@ -36,7 +36,7 @@ export type ResolveKey<D extends AnyApplicationOptions> =
 /**
  * Arguments to be passed to action resolving function.
  */
-export type ActionArgs<A extends Action> = {
+export type ActionArgs<A extends AnyAction> = {
   params: A["params"]
   query: A["query"]
   headers: A["headers"]

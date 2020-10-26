@@ -2,7 +2,7 @@
  * Special type of Error use show errors occurred during network request execution.
  */
 export class FetcherError extends Error {
-  typeof: "FetcherError"
+  "@type": "FetcherError"
   errors: any[]
   queryName?: string
 
@@ -11,7 +11,7 @@ export class FetcherError extends Error {
       (queryName ? `GraphQL(${queryName}):` : `GraphQL`) +
         JSON.stringify(errors),
     )
-    this.typeof = "FetcherError"
+    this["@type"] = "FetcherError"
     this.queryName = queryName
     this.errors = errors
     Object.setPrototypeOf(this, FetcherError.prototype)

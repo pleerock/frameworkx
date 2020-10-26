@@ -60,7 +60,7 @@ export function validationRule(
     ? arg3
     : arg2) as ValidationRuleOptions<any, any>
   return {
-    typeof: "ValidationRule",
+    "@type": "ValidationRule",
     name,
     options,
   }

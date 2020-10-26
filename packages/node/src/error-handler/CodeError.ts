@@ -4,12 +4,12 @@
  * what kind of error it is, without checking a dynamic message property.
  */
 export class CodeError extends Error {
-  typeof: "CodeError"
+  "@type": "CodeError"
   code: string
 
   constructor(code: string, message: string) {
     super(message)
-    this.typeof = "CodeError"
+    this["@type"] = "CodeError"
     this.code = code
     Object.setPrototypeOf(this, CodeError.prototype)
   }

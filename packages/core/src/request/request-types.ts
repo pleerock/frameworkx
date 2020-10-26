@@ -1,5 +1,5 @@
 import {
-  Action,
+  AnyAction,
   AnyApplication,
   GraphQLDeclarationItem,
   GraphQLDeclarationList,
@@ -51,7 +51,7 @@ export declare type RequestSelectionSchemaMap<T> = {
  * Selection schema defines what properties of a declaration item model will be selected.
  */
 export type RequestSelectionSchema<
-  Declaration extends GraphQLDeclarationItem
+  Declaration extends GraphQLDeclarationItem<any>
 > = NonNullable<ReturnType<Declaration>> extends Array<infer U>
   ? RequestSelectionSchemaMap<U>
   : NonNullable<ReturnType<Declaration>> extends Object
@@ -62,7 +62,7 @@ export type RequestSelectionSchema<
  * A particular query / mutation / subscription request properties.
  */
 export type RequestGraphQLDeclarationItemOptions<
-  Declaration extends GraphQLDeclarationItem,
+  Declaration extends GraphQLDeclarationItem<any>,
   Selection extends RequestSelectionSchema<Declaration>
 > = Parameters<Declaration> extends []
   ? ReturnType<Declaration> extends object
@@ -81,19 +81,38 @@ export type RequestGraphQLDeclarationItemOptions<
       }
   : never
 
+export type RequestActionItemOptionsInternal<
+  Action extends AnyAction
+> = (Action["query"] extends object ? { query: Action["query"] } : {}) &
+  (Action["params"] extends object ? { params: Action["params"] } : {}) &
+  (Action["headers"] extends object ? { headers: Action["headers"] } : {}) &
+  (Action["cookies"] extends object ? { cookies: Action["cookies"] } : {}) &
+  (Action["body"] extends object ? { body: Action["body"] } : {})
+// {
+//   query: Action["query"] extends never ? never : Action["query"]
+//   params: Action["params"] extends never ? never : Action["params"]
+//   headers: Action["headers"] extends never ? never : Action["headers"]
+//   cookies: Action["cookies"] extends never ? never : Action["cookies"]
+//   body: Action["body"] extends never ? never : Action["body"]
+// } /*[keyof {
+//   query: true
+//   params: true
+//   headers: true
+//   cookies: true
+//   body: true
+// }]*/
+
 /**
  * A particular action request properties.
  */
 export type RequestActionItemOptions<
   App extends AnyApplication,
-  Declaration extends Action
-> = {
-  query: Action["query"] extends never ? never : Action["query"]
-  params: Action["params"] extends never ? never : Action["params"]
-  headers: Action["headers"] extends never ? never : Action["headers"]
-  cookies: Action["cookies"] extends never ? never : Action["cookies"]
-  body: Action["body"] extends never ? never : Action["body"]
-}[keyof { query: true; params: true; headers: true; cookies: true; body: true }]
+  Declaration extends AnyAction
+> = /*keyof RequestActionItemOptionsInternal<App, Declaration> extends never
+  ? never
+  : */ RequestActionItemOptionsInternal<
+  Declaration
+>
 
 // todo: iterate over properties and exclude never, at the end exclude empty object
 
@@ -144,7 +163,7 @@ export type RequestMap = {
  * Request is a named object with list of queries / mutations / subscriptions inside.
  */
 export type Request<Map extends RequestMap | RequestMapForAction> = {
-  typeof: "Request"
+  "@type": "Request"
   name: string
   type?: "query" | "mutation" | "subscription" | "action"
   map: Map

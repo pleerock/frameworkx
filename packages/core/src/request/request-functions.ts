@@ -1,8 +1,7 @@
-import { AnyApplication } from "../application"
+import { AnyApplication, ApplicationActionMethod } from "../application"
 import {
   Request,
   RequestAction,
-  RequestActionItemOptions,
   RequestGraphQLDeclarationItemOptions,
   RequestMap,
   RequestMapForAction,
@@ -20,14 +19,14 @@ export function action<
 >(
   app: App,
   name: ActionKey,
-  options: RequestActionItemOptions<App, App["_options"]["actions"][ActionKey]>,
+  ...args: Parameters<ApplicationActionMethod<App["_options"], ActionKey>>
 ): RequestAction<App, ActionKey, Declaration> {
   return {
     selection: undefined as any,
     model: undefined as any,
     type: "action",
     name,
-    options,
+    options: args[0] || ({} as any),
   }
 }
 
@@ -132,7 +131,7 @@ export function request<T extends RequestMap | RequestMapForAction>(
   maybeMap?: T,
 ): Request<T> {
   return {
-    typeof: "Request",
+    "@type": "Request",
     name: typeof nameOrMap === "string" ? nameOrMap : "",
     map: maybeMap !== undefined ? maybeMap : (nameOrMap as T),
   }

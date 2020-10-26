@@ -4,14 +4,14 @@ import { AnyApplication } from "./application-helper-types"
  * Collection of root queries, mutations and subscriptions.
  */
 export type GraphQLDeclarationList = {
-  [name: string]: GraphQLDeclarationItem
+  [name: string]: GraphQLDeclarationItem<any>
 }
 
 /**
  * Collection of actions (HTTP routes).
  */
 export type ActionList = {
-  [name: string]: Action
+  [name: string]: AnyAction
 }
 
 /**
@@ -43,6 +43,8 @@ export type GraphQLDeclarationItemReturnType =
   | number
   | boolean
   | object
+  | undefined
+  | null
 
 /**
  * A single root query, mutation or subscription declaration.
@@ -52,23 +54,28 @@ export type GraphQLDeclarationItemReturnType =
  *    posts(): Post[]
  *    postsCount(): number
  */
-export type GraphQLDeclarationItem =
-  | ((args: { [key: string]: any }) => GraphQLDeclarationItemReturnType) // example: post(args: { id: number }): Post
+export type GraphQLDeclarationItem<ArgsType extends { [key: string]: any }> =
+  | ((args: ArgsType) => GraphQLDeclarationItemReturnType) // example: post(args: { id: number }): Post
   | (() => GraphQLDeclarationItemReturnType) // example: posts(): Post[]
 
 /**
  * Action is a single HTTP route that serves network requests.
  */
-export type Action = {
-  type: "get" | "post" | "patch" | "put" | "delete" | string
-  return?: any
-  params?: any
-  query?: any
-  headers?: any
-  cookies?: any
-  body?: any
+export type Action<ReturnType, Params, Query, Headers, Cookies, Body> = {
+  // type: "get" | "post" | "patch" | "put" | "delete" | string
+  return?: ReturnType
+  params?: Params
+  query?: Query
+  headers?: Headers
+  cookies?: Cookies
+  body?: Body
   middlewares?: () => any[]
 }
+
+/**
+ * Action with any generic types.
+ */
+export type AnyAction = Action<any, any, any, any, any, any>
 
 /**
  * Model type.
@@ -91,7 +98,7 @@ export type ModelWithArgs<
   Type extends ModelType,
   Args extends ArgsOfModel<Type>
 > = {
-  typeof: "ModelWithArgs"
+  "@type": "ModelWithArgs"
   type: Type
   args: Args
 }

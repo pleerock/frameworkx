@@ -407,7 +407,7 @@ describe("fetcher > standalone requests", () => {
   }, 10000)
 
   test("fetch by request > case #9 (actions, GET)", async () => {
-    const postsRequest = request(action(App, "GET /posts", {}))
+    const postsRequest = request(action(App, "GET /posts"))
 
     const result = await fetcher!.fetch(postsRequest)
     expect(result).toEqual(PostList)

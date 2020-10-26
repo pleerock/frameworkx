@@ -8,7 +8,7 @@ export type ValidationRule<T, Context extends ContextList> = {
   /**
    * Unique model identifier.
    */
-  typeof: "ValidationRule"
+  "@type": "ValidationRule"
 
   /**
    * Model that needs to be validated.

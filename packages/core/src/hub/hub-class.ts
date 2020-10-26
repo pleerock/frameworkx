@@ -7,7 +7,7 @@ export class Hub<Apps extends HubAppList> {
   /**
    * Unique type identifier.
    */
-  readonly typeof: "Hub" = "Hub"
+  readonly "@type": "Hub" = "Hub"
 
   /**
    * Connected apps.

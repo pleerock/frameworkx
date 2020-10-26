@@ -1,4 +1,6 @@
 import {
+  Action,
+  AnyAction,
   AnyApplication,
   Request,
   RequestAction,
@@ -119,7 +121,7 @@ export class Fetcher<App extends AnyApplication = any> {
       )
     }
     const request: Request<any> = {
-      typeof: "Request",
+      "@type": "Request",
       name: name,
       type: "query",
       map: {},
@@ -139,7 +141,7 @@ export class Fetcher<App extends AnyApplication = any> {
       )
     }
     const request: Request<any> = {
-      typeof: "Request",
+      "@type": "Request",
       name: name,
       type: "mutation",
       map: {},
@@ -159,7 +161,7 @@ export class Fetcher<App extends AnyApplication = any> {
       )
     }
     const request: Request<any> = {
-      typeof: "Request",
+      "@type": "Request",
       name: name,
       type: "subscription",
       map: {},
@@ -177,13 +179,14 @@ export class Fetcher<App extends AnyApplication = any> {
       App["_options"]["actions"][ActionKey]
     >,
   ) {
+    // todo: implement it same way as Application.action()
     if (!this.app) {
       throw new Error(
         `In order to execute an action application instance must be set in the fetcher constructor.`,
       )
     }
 
-    return this.fetch(this.app.request(this.app.action(name, options)))
+    return this.fetch(this.app.request((this.app.action as any)(name, options))) // todo: remove any
   }
 
   /**
@@ -258,25 +261,26 @@ export class Fetcher<App extends AnyApplication = any> {
       let [method, path] = requestAction.name.split(" ")
       const headers = await this.buildHeaders()
       let body: any = undefined
-      if (requestAction.options.body) {
-        body = JSON.stringify(requestAction.options.body)
+      const options: AnyAction = requestAction.options
+      if (options.body) {
+        body = JSON.stringify(options.body)
       }
 
-      if (requestAction.options.params) {
+      if (options.params) {
         const toPath = compile(path, { encode: encodeURIComponent })
-        path = toPath(requestAction.options.params)
+        path = toPath(options.params)
       }
 
       let query = ""
-      if (requestAction.options.query) {
+      if (options.query) {
         query =
           "?" +
-          Object.keys(requestAction.options.query)
+          Object.keys(options.query)
             .map(
               (k) =>
                 encodeURIComponent(k) +
                 "=" +
-                encodeURIComponent(requestAction.options.query[k]),
+                encodeURIComponent(options.query[k]),
             )
             .join("&")
       }

@@ -10,15 +10,15 @@ export const DefaultErrorHandler: ErrorHandler = {
   actionError(error: any, event: LogEvent) {
     let status = 500
     let jsonError: any = {}
-    if (typeof error === "object" && error["typeof"] !== undefined) {
-      if (error["typeof"] === "HttpError") {
+    if (typeof error === "object" && error["@type"] !== undefined) {
+      if (error["@type"] === "HttpError") {
         status = error.httpCode
         if (error.code) {
           jsonError["code"] = error.code
         }
         jsonError["message"] = error.message
         jsonError["stack"] = error.stack
-      } else if (error["typeof"] === "CodeError") {
+      } else if (error["@type"] === "CodeError") {
         jsonError["code"] = error.code
         jsonError["message"] = error.message
         jsonError["stack"] = error.stack

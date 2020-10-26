@@ -4,7 +4,7 @@
  * sets 404 HTTP status code in a response.
  */
 export class HttpError extends Error {
-  typeof: "HttpError"
+  "@type": "HttpError"
   httpCode: number
   code?: string
 
@@ -14,7 +14,7 @@ export class HttpError extends Error {
     const message = arguments.length === 3 ? maybeMessage : codeOrMessage
     const code = arguments.length === 3 ? codeOrMessage : undefined
     super(message)
-    this.typeof = "HttpError"
+    this["@type"] = "HttpError"
     this.httpCode = httpCode
     if (code) this.code = code
     Object.setPrototypeOf(this, HttpError.prototype)

@@ -5,7 +5,7 @@ export function extractQueryMetadata(request: Request<any> | string | any) {
   let queryString = ""
   if (typeof request === "string") {
     queryString = request
-  } else if (request["typeof"] === "Request") {
+  } else if (request["@type"] === "Request") {
     queryName = request.name
     queryString = requestToQuery(request as Request<any>)
   } else if (

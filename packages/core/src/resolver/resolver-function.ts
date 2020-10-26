@@ -1,5 +1,12 @@
 import { AnyModel, isModel } from "@microframework/model"
-import { AnyApplication, LiteralOrClass } from "../application"
+import {
+  AnyApplication,
+  AnyApplicationOptions,
+  Application,
+  ContextList,
+  ForcedType,
+  LiteralOrClass,
+} from "../application"
 import {
   ContextResolver,
   ContextResolverMetadata,
@@ -281,7 +288,7 @@ export function resolver(
     // syntax @resolver() class CategoryDeclarationsResolver { ... }
     return function (constructor: any) {
       constructor.prototype.resolver = {
-        typeof: "Resolver",
+        "@type": "Resolver",
         type: "declaration-resolver",
         declarationType: "any",
         resolverFn: new constructor(),
@@ -293,7 +300,7 @@ export function resolver(
     const options = arg0 as { name: string; dataLoader?: boolean }
     return function (constructor: any) {
       constructor.prototype.resolver = {
-        typeof: "Resolver",
+        "@type": "Resolver",
         type: "model-resolver",
         dataLoader: options.dataLoader || false,
         name: options.name,
@@ -306,7 +313,7 @@ export function resolver(
     const name = arg1 as string
     return function (constructor: any) {
       constructor.prototype.resolver = {
-        typeof: "Resolver",
+        "@type": "Resolver",
         type: "model-resolver",
         dataLoader: false,
         name,
@@ -317,7 +324,7 @@ export function resolver(
     // resolves root declarations
     // syntax: resolver(App, class { categories() { ... }, ... })
     return {
-      typeof: "Resolver",
+      "@type": "Resolver",
       type: "declaration-resolver",
       declarationType: "any",
       resolverFn: new (arg1 as any)(),
@@ -327,7 +334,7 @@ export function resolver(
     // syntax: resolver(App, { categories() { ... }, ... })
     const resolverFn = arg1 as DeclarationResolver<any>
     return {
-      typeof: "Resolver",
+      "@type": "Resolver",
       type: "declaration-resolver",
       declarationType: "any",
       resolverFn,
@@ -342,7 +349,7 @@ export function resolver(
     const name = arg1 as string
     const resolverFn = arg2 as (args: any, context: any) => any
     return {
-      typeof: "Resolver",
+      "@type": "Resolver",
       type: "declaration-item-resolver",
       declarationType: "any",
       name,
@@ -359,7 +366,7 @@ export function resolver(
     const name = arg1 as string
     const resolverFn = arg2 as ModelResolver<any>
     return {
-      typeof: "Resolver",
+      "@type": "Resolver",
       type: "model-resolver",
       dataLoader: false,
       name,
@@ -378,7 +385,7 @@ export function resolver(
       ? arg2()
       : arg2) as ModelResolver<any>
     return {
-      typeof: "Resolver",
+      "@type": "Resolver",
       type: "model-resolver",
       name: model.name,
       dataLoader: false,
@@ -404,7 +411,7 @@ export function resolver(
       ? arg2()
       : arg2) as ModelResolver<any>
     return {
-      typeof: "Resolver",
+      "@type": "Resolver",
       type: "model-resolver",
       name: name || "",
       dataLoader: modelOptions.dataLoader || false,
@@ -426,13 +433,18 @@ export function resolver(
  *        }
  *    })
  */
-export function contextResolver<App extends AnyApplication>(
+export function contextResolver<
+  App extends Application<Options>,
+  Options extends AnyApplicationOptions
+>(
   app: App,
-  resolver: LiteralOrClass<ContextResolver<App["_options"]["context"]>>,
+  resolver: LiteralOrClass<
+    ContextResolver<ForcedType<Options["context"], ContextList>>
+  >,
 ): ContextResolverMetadata {
   const resolverFn = typeof resolver === "function" ? new resolver() : resolver
   return {
-    typeof: "Resolver",
+    "@type": "Resolver",
     type: "context",
     resolverFn,
   }

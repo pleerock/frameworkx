@@ -1,153 +1,159 @@
 import {
-  action,
-  mutation,
-  query,
   Request,
-  request,
   RequestAction,
-  RequestActionItemOptions,
+  RequestActionItemOptionsInternal,
   RequestGraphQLDeclarationItemOptions,
   RequestMap,
   RequestMapForAction,
   RequestMapItem,
   RequestSelectionSchema,
-  subscription,
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
-import { ModelOrigin } from "./application-core-types"
+import {
+  ContextList,
+  GraphQLDeclarationItem,
+  GraphQLDeclarationList,
+  ModelOrigin,
+} from "./application-core-types"
 import {
   AnyValidationRule,
   ValidationRule,
-  validationRule,
   ValidationRuleOptions,
 } from "../validation"
 import {
   AnyApplication,
   AnyApplicationOptions,
+  ForcedType,
   LiteralOrClass,
 } from "./application-helper-types"
 import {
-  contextResolver,
   ContextResolver,
+  ContextResolverMetadata,
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
   ResolveKey,
-  resolver,
   ResolverMetadata,
   ResolveStrategy,
 } from "../resolver"
 
 /**
+ * Signature for ".action" method of Application type.
+ */
+export type ApplicationActionMethod<
+  Options extends AnyApplicationOptions,
+  ActionKey extends keyof Options["actions"]
+> = keyof RequestActionItemOptionsInternal<
+  Options["actions"][ActionKey]
+> extends never
+  ? () => void
+  : (
+      options: RequestActionItemOptionsInternal<Options["actions"][ActionKey]>,
+    ) => void
+
+/**
  * Application is a root point of the framework.
  */
-export class Application<Options extends AnyApplicationOptions> {
+export type Application<Options extends AnyApplicationOptions> = {
   /**
    * Unique type identifier.
    */
-  readonly typeof: "Application" = "Application"
+  readonly "@type": "Application"
 
   /**
    * Application options.
+   * Special property used for proper typing.
+   * Don't use it in a runtime, its value is always undefined.
    */
-  readonly _options!: Options
+  readonly _options: Options
 
   /**
-   * Gets application model.
+   * Gets an application model.
    */
-  model<ModelName extends keyof this["_options"]["models"]>(
+  model<ModelName extends keyof Options["models"]>(
     name: ModelName,
-  ): Model<ModelOrigin<this["_options"]["models"][ModelName]>> {
-    return new Model<ModelOrigin<this["_options"]["models"][ModelName]>>(
-      name as string,
-    )
-  }
+  ): Model<ModelOrigin<Options["models"][ModelName]>>
 
   /**
-   * Gets application input.
+   * Gets an application input.
    */
-  input<InputName extends keyof this["_options"]["inputs"]>(
+  input<InputName extends keyof Options["inputs"]>(
     name: InputName,
-  ): Model<this["_options"]["inputs"][InputName]> {
-    return new Model<this["_options"]["inputs"][InputName]>(name as string)
-  }
-
-  /**
-   * Creates a "request action".
-   */
-  action<
-    ActionKey extends keyof this["_options"]["actions"],
-    Declaration extends this["_options"]["actions"][ActionKey]
-  >(
-    name: ActionKey,
-    options: RequestActionItemOptions<
-      this,
-      this["_options"]["actions"][ActionKey]
-    >,
-  ): RequestAction<this, ActionKey, Declaration> {
-    return (action as any)(this, ...arguments)
-  }
+  ): Model<Options["inputs"][InputName]>
 
   /**
    * Creates a "request query".
    */
   query<
-    QueryKey extends keyof this["_options"]["queries"],
-    Declaration extends this["_options"]["queries"][QueryKey],
+    QueryKey extends keyof Options["queries"],
+    Declaration extends Options["queries"][QueryKey],
     Selection extends RequestSelectionSchema<
-      this["_options"]["queries"][QueryKey]
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>
     >
   >(
     name: QueryKey,
     options: RequestGraphQLDeclarationItemOptions<
-      this["_options"]["queries"][QueryKey],
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>,
       Selection
     >,
-  ): RequestMapItem<this["_options"]["queries"], QueryKey, Selection> {
-    return (query as any)(this, ...arguments)
-  }
+  ): RequestMapItem<
+    ForcedType<Options["queries"], GraphQLDeclarationList>,
+    QueryKey,
+    Selection
+  >
 
   /**
    * Creates a "request mutation".
    */
   mutation<
-    MutationKey extends keyof this["_options"]["mutations"],
-    Declaration extends this["_options"]["mutations"][MutationKey],
+    MutationKey extends keyof Options["mutations"],
+    Declaration extends Options["mutations"][MutationKey],
     Selection extends RequestSelectionSchema<
-      this["_options"]["mutations"][MutationKey]
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>
     >
   >(
     name: MutationKey,
     options: RequestGraphQLDeclarationItemOptions<
-      this["_options"]["mutations"][MutationKey],
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>,
       Selection
     >,
-  ): RequestMapItem<this["_options"]["mutations"], MutationKey, Selection> {
-    return (mutation as any)(this, ...arguments)
-  }
+  ): RequestMapItem<
+    ForcedType<Options["mutations"], GraphQLDeclarationList>,
+    MutationKey,
+    Selection
+  >
 
   /**
    * Creates a "request subscription".
    */
   subscription<
-    SubscriptionKey extends keyof this["_options"]["subscriptions"],
-    Declaration extends this["_options"]["subscriptions"][SubscriptionKey],
+    SubscriptionKey extends keyof Options["subscriptions"],
+    Declaration extends Options["subscriptions"][SubscriptionKey],
     Selection extends RequestSelectionSchema<
-      this["_options"]["subscriptions"][SubscriptionKey]
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>
     >
   >(
     name: SubscriptionKey,
     options: RequestGraphQLDeclarationItemOptions<
-      this["_options"]["subscriptions"][SubscriptionKey],
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>,
       Selection
     >,
   ): RequestMapItem<
-    this["_options"]["subscriptions"],
+    ForcedType<Options["subscriptions"], GraphQLDeclarationList>,
     SubscriptionKey,
     Selection
-  > {
-    return (subscription as any)(this, ...arguments)
-  }
+  >
+
+  /**
+   * Creates a "request action".
+   */
+  action<
+    ActionKey extends keyof Options["actions"],
+    Declaration extends Options["actions"][ActionKey]
+  >(
+    name: ActionKey,
+    ...args: Parameters<ApplicationActionMethod<Options, ActionKey>>
+  ): RequestAction<Application<Options>, ActionKey, Declaration>
 
   /**
    * Creates action request.
@@ -162,36 +168,34 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Creates a request.
    */
-  request<T extends RequestMap | RequestMapForAction>(): Request<T> {
-    return (request as any)(...arguments)
-  }
+  request<T extends RequestMap | RequestMapForAction>(): Request<T>
 
   /**
    * Creates a new validation rule for a given App's model.
    */
-  validationRule<Key extends keyof this["_options"]["models"]>(
+  validationRule<Key extends keyof Options["models"]>(
     name: Key,
     options: ValidationRuleOptions<
-      this["_options"]["models"][Key],
-      this["_options"]["context"]
+      Options["models"][Key],
+      ForcedType<Options["context"], ContextList>
     >,
   ): ValidationRule<
-    this["_options"]["models"][Key],
-    this["_options"]["context"]
+    Options["models"][Key],
+    ForcedType<Options["context"], ContextList>
   >
 
   /**
    * Creates a new validation rule for a given App's input.
    */
-  validationRule<Key extends keyof this["_options"]["inputs"]>(
+  validationRule<Key extends keyof Options["inputs"]>(
     name: Key,
     options: ValidationRuleOptions<
-      this["_options"]["inputs"][Key],
-      this["_options"]["context"]
+      Options["inputs"][Key],
+      ForcedType<Options["context"], ContextList>
     >,
   ): ValidationRule<
-    this["_options"]["inputs"][Key],
-    this["_options"]["context"]
+    Options["inputs"][Key],
+    ForcedType<Options["context"], ContextList>
   >
 
   /**
@@ -205,9 +209,7 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Creates a validation rule.
    */
-  validationRule(): AnyValidationRule {
-    return (validationRule as any)(this, ...arguments)
-  }
+  validationRule(): AnyValidationRule
 
   /**
    * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -228,7 +230,7 @@ export class Application<Options extends AnyApplicationOptions> {
    * Class syntax also supported.
    */
   resolver(
-    resolver: LiteralOrClass<DeclarationResolver<this>>,
+    resolver: LiteralOrClass<DeclarationResolver<Application<Options>>>,
   ): ResolverMetadata
 
   /**
@@ -249,9 +251,9 @@ export class Application<Options extends AnyApplicationOptions> {
    *        }
    *    })
    */
-  resolver<Key extends ResolveKey<this["_options"]>>(
+  resolver<Key extends ResolveKey<Options>>(
     name: Key,
-    resolver: ResolveStrategy<this["_options"], Key>,
+    resolver: ResolveStrategy<Options, Key>,
   ): ResolverMetadata
 
   /**
@@ -276,10 +278,16 @@ export class Application<Options extends AnyApplicationOptions> {
     model: Model,
     resolver:
       | LiteralOrClass<
-          ModelResolver<Model["type"], this["_options"]["context"]>
+          ModelResolver<
+            Model["type"],
+            ForcedType<Options["context"], ContextList>
+          >
         >
       | (() => LiteralOrClass<
-          ModelResolver<Model["type"], this["_options"]["context"]>
+          ModelResolver<
+            Model["type"],
+            ForcedType<Options["context"], ContextList>
+          >
         >),
   ): ResolverMetadata
 
@@ -296,19 +304,19 @@ export class Application<Options extends AnyApplicationOptions> {
    *        }
    *    })
    */
-  resolver<Key extends keyof this["_options"]["models"]>(
+  resolver<Key extends keyof Options["models"]>(
     options: { name: Key; dataLoader: true },
     resolver:
       | LiteralOrClass<
           ModelDLResolver<
-            this["_options"]["models"][Key],
-            this["_options"]["context"]
+            Options["models"][Key],
+            ForcedType<Options["context"], ContextList>
           >
         >
       | (() => LiteralOrClass<
           ModelDLResolver<
-            this["_options"]["models"][Key],
-            this["_options"]["context"]
+            Options["models"][Key],
+            ForcedType<Options["context"], ContextList>
           >
         >),
   ): ResolverMetadata
@@ -330,10 +338,16 @@ export class Application<Options extends AnyApplicationOptions> {
     options: { model: Model; dataLoader: true },
     resolver:
       | LiteralOrClass<
-          ModelDLResolver<Model["type"], this["_options"]["context"]>
+          ModelDLResolver<
+            Model["type"],
+            ForcedType<Options["context"], ContextList>
+          >
         >
       | (() => LiteralOrClass<
-          ModelDLResolver<Model["type"], this["_options"]["context"]>
+          ModelDLResolver<
+            Model["type"],
+            ForcedType<Options["context"], ContextList>
+          >
         >),
   ): ResolverMetadata
 
@@ -350,19 +364,19 @@ export class Application<Options extends AnyApplicationOptions> {
    *        }
    *    })
    */
-  resolver<Key extends keyof this["_options"]["models"]>(
+  resolver<Key extends keyof Options["models"]>(
     options: { name: Key; dataLoader?: false },
     resolver:
       | LiteralOrClass<
           ModelResolver<
-            this["_options"]["models"][Key],
-            this["_options"]["context"]
+            Options["models"][Key],
+            ForcedType<Options["context"], ContextList>
           >
         >
       | (() => LiteralOrClass<
           ModelResolver<
-            this["_options"]["models"][Key],
-            this["_options"]["context"]
+            Options["models"][Key],
+            ForcedType<Options["context"], ContextList>
           >
         >),
   ): ResolverMetadata
@@ -393,9 +407,7 @@ export class Application<Options extends AnyApplicationOptions> {
   /**
    * Creates a new resolver metadata to resolve queries, mutations, subscriptions, actions or models.
    */
-  resolver(): ResolverMetadata {
-    return (resolver as any)(this, ...arguments)
-  }
+  resolver(): ResolverMetadata
 
   /**
    * Creates a context resolver.
@@ -409,8 +421,8 @@ export class Application<Options extends AnyApplicationOptions> {
    *    })
    */
   contextResolver(
-    resolver: LiteralOrClass<ContextResolver<this["_options"]["context"]>>,
-  ) {
-    return contextResolver(this, resolver)
-  }
+    resolver: LiteralOrClass<
+      ContextResolver<ForcedType<Options["context"], ContextList>>
+    >,
+  ): ContextResolverMetadata
 }

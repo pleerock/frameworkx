@@ -400,7 +400,7 @@ describe("core > request > app syntax", () => {
   }, 10000)
 
   test("fetch by request > case #9 (actions, GET)", async () => {
-    const postsRequest = App.request(App.action("GET /posts", {}))
+    const postsRequest = App.request(App.action("GET /posts"))
 
     const result = await fetcher!.fetch(postsRequest)
     expect(result).toEqual(PostList)

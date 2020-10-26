@@ -1,4 +1,8 @@
-import { AnyApplication, ApplicationLogger, ApplicationTypeMetadata, } from "@microframework/core"
+import {
+  AnyApplication,
+  ApplicationLogger,
+  ApplicationTypeMetadata,
+} from "@microframework/core"
 import { Express } from "express"
 import { Server as HttpServer } from "http"
 import { Connection } from "typeorm"
@@ -12,7 +16,7 @@ export interface ApplicationServer<App extends AnyApplication> {
   /**
    * Special identifier, indicates type of the object.
    */
-  readonly typeof: "ApplicationServer"
+  readonly "@type": "ApplicationServer"
 
   /**
    * Express instance, which is used for a webserver creation.

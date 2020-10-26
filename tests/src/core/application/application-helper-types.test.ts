@@ -1,8 +1,8 @@
 import {
   AnyApplication,
   AnyApplicationOptions,
-  Application,
-  ApplicationOptions,
+  createApp,
+  ForcedType,
   LiteralOrClass,
   MixedList,
   NonArray,
@@ -46,8 +46,14 @@ describe("core > application > helper types", () => {
       hello: "world",
     }
   })
+  test("ForcedType", async () => {
+    // assigning anything other then string should emit error
+    const onlyString: ForcedType<string, string> = "a"
+    // assigning any value is acceptable because of "undefined" (because casted to "any" now)
+    const alsoUndefined: ForcedType<string | undefined, string> = 1
+  })
   test("AnyApplication", async () => {
-    const app: AnyApplication = new Application()
+    const app: AnyApplication = createApp()
   })
   test("AnyApplicationOptions", async () => {
     const options: AnyApplicationOptions = {

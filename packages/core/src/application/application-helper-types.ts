@@ -1,5 +1,12 @@
-import { Application } from "./application-class"
 import { ApplicationOptions } from "./application-options"
+import {
+  ActionList,
+  ContextList,
+  GraphQLDeclarationList,
+  InputTypeList,
+  ModelList,
+} from "./application-core-types"
+import { Application } from "./application-type"
 
 /**
  * List of T symbols passed as an array or imported using import * as syntax.
@@ -25,6 +32,12 @@ export type ReturnTypeOptional<T> = T extends (...args: any) => any
 export type LiteralOrClass<T> = T | { new (...args: any[]): T }
 
 /**
+ * If given T type is exactly a Desired one, returns just this T type.
+ * Otherwise returns "any". Used to for force typing.
+ */
+export type ForcedType<T, Desired> = T extends Desired ? T : any
+
+/**
  * Handy way of using Application type when its options don't matter.
  */
 export type AnyApplication = Application<any>
@@ -33,11 +46,11 @@ export type AnyApplication = Application<any>
  * Handy way of using ApplicationOptions type when its generics don't matter.
  */
 export type AnyApplicationOptions = ApplicationOptions<
-  any,
-  any,
-  any,
-  any,
-  any,
-  any,
-  any
+  ActionList,
+  GraphQLDeclarationList,
+  GraphQLDeclarationList,
+  GraphQLDeclarationList,
+  ModelList,
+  InputTypeList,
+  ContextList
 >

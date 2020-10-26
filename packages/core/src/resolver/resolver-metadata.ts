@@ -9,7 +9,7 @@ import {
  * Metadata for declaration resolver.
  */
 export type DeclarationResolverMetadata = {
-  typeof: "Resolver"
+  "@type": "Resolver"
   type: "declaration-resolver"
   declarationType: "any" | "query" | "mutation" | "subscription" | "action"
   resolverFn: DeclarationResolver<any>
@@ -19,7 +19,7 @@ export type DeclarationResolverMetadata = {
  * Metadata for declaration item resolver.
  */
 export type DeclarationItemResolverMetadata = {
-  typeof: "Resolver"
+  "@type": "Resolver"
   type: "declaration-item-resolver"
   declarationType: "any" | "query" | "mutation" | "subscription" | "action"
   name: string
@@ -32,7 +32,7 @@ export type DeclarationItemResolverMetadata = {
  * Metadata for model resolver.
  */
 export type ModelResolverMetadata = {
-  typeof: "Resolver"
+  "@type": "Resolver"
   type: "model-resolver"
   name: string
   dataLoader: boolean
@@ -43,7 +43,7 @@ export type ModelResolverMetadata = {
  * Metadata for context resolver.
  */
 export type ContextResolverMetadata = {
-  typeof: "Resolver"
+  "@type": "Resolver"
   type: "context"
   resolverFn: ContextResolver<any>
 }

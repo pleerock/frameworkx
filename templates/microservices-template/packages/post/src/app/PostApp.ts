@@ -43,6 +43,6 @@ export const PostApp = createApp<{
      * Event triggered when a new post was created.
      * Newly created post is emitted.
      */
-    postCreated: Post
+    postCreated(): Post
   }
 }>()

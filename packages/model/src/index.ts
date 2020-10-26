@@ -5,8 +5,8 @@
 export class Model<T> {
   readonly type!: T
   readonly name: string
-  // readonly typeof: "Model" = "Model"
-  // static readonly typeof: "Model" = "Model"
+  // readonly "@type": "Model" = "Model"
+  // static readonly "@type": "Model" = "Model"
   constructor(name: string) {
     this.name = name
   }
@@ -28,5 +28,5 @@ export function model<T = any>(name: string) {
  * Checks if given value is a model.
  */
 export function isModel(value: any): value is Model<any> {
-  return value instanceof Model || value.typeof === "Model"
+  return value instanceof Model || value["@type"] === "Model"
 }

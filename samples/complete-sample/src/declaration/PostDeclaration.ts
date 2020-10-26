@@ -37,6 +37,6 @@ export type PostDeclaration = {
     /**
      * Called when a new post was added.
      */
-    postAdded: Post
+    postAdded(): Post
   }
 }

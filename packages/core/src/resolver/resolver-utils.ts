@@ -23,7 +23,7 @@ export const ResolverUtils = {
         !this.isResolverMetadata(resolver)
       ) {
         return {
-          typeof: "Resolver",
+          "@type": "Resolver",
           type: "declaration-resolver",
           declarationType: "any",
           resolverFn: resolver,
@@ -38,6 +38,6 @@ export const ResolverUtils = {
    * Checks if provided object is resolver metadata.
    */
   isResolverMetadata(obj: any): obj is ResolverMetadata {
-    return obj["typeof"] && obj["typeof"] === "Resolver"
+    return obj["@type"] && obj["@type"] === "Resolver"
   },
 }

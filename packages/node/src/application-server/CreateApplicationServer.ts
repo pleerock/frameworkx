@@ -52,7 +52,7 @@ export function createApplicationServer<App extends AnyApplication>(
     metadata: ApplicationTypeMetadata,
   ): Promise<Connection> => {
     // as usual, we can't rely on "instanceof", so let's just check if its a Connection object
-    // until we have "typeof" property in the next TypeORM version
+    // until we have "@type" property in the next TypeORM version
     if (
       (properties.dataSource as Connection)["name"] &&
       (properties.dataSource as Connection)["options"]
@@ -165,7 +165,7 @@ export function createApplicationServer<App extends AnyApplication>(
 
   // -- returned type --
   return {
-    typeof: "ApplicationServer",
+    "@type": "ApplicationServer",
     express: expressApp,
     properties: properties,
     logger: logger,

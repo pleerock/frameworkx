@@ -28,8 +28,8 @@ export const App = createApp<{
     postRemoveAll(): boolean
   }
   subscriptions: {
-    postCreated: PostType // (args: { ids: number[] }): PostType
-    postRemoved: PostType
+    postCreated(): PostType // (args: { ids: number[] }): PostType
+    postRemoved(): PostType
   }
   actions: {
     "GET /posts": {

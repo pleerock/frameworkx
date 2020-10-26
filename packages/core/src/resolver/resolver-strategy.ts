@@ -1,9 +1,10 @@
 import {
-  Action,
+  AnyAction,
   AnyApplication,
   AnyApplicationOptions,
   ApplicationDeclarations,
   ContextList,
+  ForcedType,
   GraphQLDeclarationItem,
   ModelType,
 } from "../application"
@@ -90,22 +91,37 @@ export type ResolveStrategy<
   Options extends AnyApplicationOptions,
   Key extends ResolveKey<Options>
 > = Key extends keyof Options["queries"]
-  ? QueryMutationItemResolver<Options["queries"][Key], Options["context"]>
+  ? QueryMutationItemResolver<
+      ForcedType<Options["queries"][Key], GraphQLDeclarationItem<any>>,
+      ForcedType<Options["context"], ContextList>
+    >
   : Key extends keyof Options["mutations"]
-  ? QueryMutationItemResolver<Options["mutations"][Key], Options["context"]>
+  ? QueryMutationItemResolver<
+      ForcedType<Options["mutations"][Key], GraphQLDeclarationItem<any>>,
+      ForcedType<Options["context"], ContextList>
+    >
   : Key extends keyof Options["models"]
-  ? ModelResolver<Options["models"][Key], Options["context"]>
+  ? ModelResolver<
+      Options["models"][Key],
+      ForcedType<Options["context"], ContextList>
+    >
   : Key extends keyof Options["subscriptions"]
-  ? SubscriptionItemResolver<Options["subscriptions"][Key], Options["context"]>
+  ? SubscriptionItemResolver<
+      ForcedType<Options["subscriptions"][Key], GraphQLDeclarationItem<any>>,
+      ForcedType<Options["context"], ContextList>
+    >
   : Key extends keyof Options["actions"]
-  ? ActionItemResolver<Options["actions"][Key], Options["context"]>
+  ? ActionItemResolver<
+      ForcedType<Options["actions"][Key], AnyAction>,
+      ForcedType<Options["context"], ContextList>
+    >
   : unknown
 
 /**
  * Defines a query or mutation resolving strategy.
  */
 export type QueryMutationItemResolver<
-  Declaration extends GraphQLDeclarationItem,
+  Declaration extends GraphQLDeclarationItem<any>,
   Context extends ContextList
 > = Parameters<Declaration> extends []
   ?
@@ -126,7 +142,7 @@ export type QueryMutationItemResolver<
  * Defines a subscription resolving strategy.
  */
 export type SubscriptionItemResolver<
-  Declaration extends GraphQLDeclarationItem,
+  Declaration extends GraphQLDeclarationItem<any>,
   Context extends ContextList
 > = Parameters<Declaration> extends []
   ? {
@@ -155,7 +171,7 @@ export type SubscriptionItemResolver<
  * Defines action resolving strategy.
  */
 export type ActionItemResolver<
-  A extends Action,
+  A extends AnyAction,
   Context extends ContextList
 > = (
   args: ActionArgs<A>,
