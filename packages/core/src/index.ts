@@ -1,4 +1,5 @@
 export * from "./application"
+export * from "./hub"
 export * from "./logger"
 export * from "./request"
 export * from "./resolver"

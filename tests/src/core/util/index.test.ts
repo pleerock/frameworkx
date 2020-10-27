@@ -1,7 +1,7 @@
 import { assign, destruct, service } from "@microframework/core"
 
 describe("core > util", () => {
-  describe("assign", () => {
+  test("assign", () => {
     type User = {
       id: number
       firstName: string

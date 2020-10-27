@@ -1,6 +1,8 @@
 /**
  * Helper type to mark non-selected properties as "never".
  */
+import { ForcedType } from "../application"
+
 export type ModelSelectionTruthyKeys<Selection> = {
   [P in keyof Selection]: Selection[P] extends false ? never : P
 }[keyof Selection]
@@ -18,16 +20,33 @@ export type ModelSelectionPick<Model, Selection> = Pick<
 >
 
 /**
- * Returns a subset of a model, new type is based on selection.
+ * Schema for a ModelSelection, used to specify what properties of a Model must be selected.
  */
-export type ModelSelection<Model, Selection> = Model extends Array<infer U>
-  ? ModelSelection<U, Selection>[]
+export type ModelSelectionSchema<Model> = NonNullable<Model> extends Array<
+  infer U
+>
+  ? ModelSelectionSchema<U>
+  : NonNullable<Model> extends object
+  ? {
+      [P in keyof Model]?: NonNullable<Model[P]> extends object
+        ? ModelSelectionSchema<Model[P]>
+        : boolean
+    }
+  : Model
+
+/**
+ * Returns a subset of a model, a new type is based on selection.
+ */
+export type ModelSelection<
+  Model,
+  Selection extends ModelSelectionSchema<Model>
+> = Model extends Array<infer U>
+  ? ModelSelection<U, ForcedType<Selection, ModelSelectionSchema<U>>>[]
   : Model extends object
   ? {
-      [P in keyof ModelSelectionPick<Model, Selection>]: Model[P] extends Array<
-        infer U
+      [P in keyof ModelSelectionPick<Model, Selection>]: ModelSelection<
+        Model[P],
+        Selection[P]
       >
-        ? ModelSelection<U, Selection[P]>[]
-        : Model[P]
     }
-  : never
+  : Model

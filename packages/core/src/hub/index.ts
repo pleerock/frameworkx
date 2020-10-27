@@ -1,3 +1,2 @@
 export * from "./hub-factory"
-export * from "./hub-list-type"
-export * from "./hub-type"
+export * from "./hub-types"

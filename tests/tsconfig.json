@@ -5,10 +5,13 @@
     "rootDir": "src"
   },
   "references": [
+    { "path": "../packages/cli"},
     { "path": "../packages/core"},
-    { "path": "../packages/parser"},
-    { "path": "../packages/node"},
+    { "path": "../packages/fetcher"},
     { "path": "../packages/logger"},
+    { "path": "../packages/model"},
+    { "path": "../packages/node"},
+    { "path": "../packages/parser"},
     { "path": "../packages/validator"}
   ]
 }
