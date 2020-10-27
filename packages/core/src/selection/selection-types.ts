@@ -1,8 +1,8 @@
+import { ForcedType } from "../application"
+
 /**
  * Helper type to mark non-selected properties as "never".
  */
-import { ForcedType } from "../application"
-
 export type ModelSelectionTruthyKeys<Selection> = {
   [P in keyof Selection]: Selection[P] extends false ? never : P
 }[keyof Selection]

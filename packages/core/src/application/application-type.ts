@@ -188,7 +188,7 @@ export type Application<Options extends AnyApplicationOptions> = {
    * Creates a new validation rule for a given model.
    */
   validationRule<T>(
-    name: string | Model<T>,
+    name: Model<T>,
     options: ValidationRuleOptions<T, any>,
   ): ValidationRule<T, any>
 

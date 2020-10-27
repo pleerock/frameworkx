@@ -1,37 +1,38 @@
 import { isModel, Model } from "@microframework/model"
 import { AnyApplication } from "../application"
-import { AnyValidationRule, ValidationRule } from "./ValidationRule"
-import { ValidationRuleOptions } from "./ValidationRuleOptions"
+import {
+  AnyValidationRule,
+  ValidationRule,
+  ValidationRuleOptions,
+} from "./validation-types"
 
 /**
  * Creates a new validation rule for a given App's model.
  */
 export function validationRule<
   App extends AnyApplication,
-  Key extends keyof App["_options"]["models"]
+  Key extends keyof App["_options"]["models"],
+  Model extends App["_options"]["models"][Key],
+  Context extends App["_options"]["context"]
 >(
   app: App,
   name: Key,
-  options: ValidationRuleOptions<
-    App["_options"]["models"][Key],
-    App["_options"]["context"]
-  >,
-): ValidationRule<App["_options"]["models"][Key], App["_options"]["context"]>
+  options: ValidationRuleOptions<Model, Context>,
+): ValidationRule<Model, Context>
 
 /**
  * Creates a new validation rule for a given App's input.
  */
 export function validationRule<
   App extends AnyApplication,
-  Key extends keyof App["_options"]["inputs"]
+  Key extends keyof App["_options"]["inputs"],
+  Input extends App["_options"]["inputs"][Key],
+  Context extends App["_options"]["context"]
 >(
   app: App,
   name: Key,
-  options: ValidationRuleOptions<
-    App["_options"]["inputs"][Key],
-    App["_options"]["context"]
-  >,
-): ValidationRule<App["_options"]["inputs"][Key], App["_options"]["context"]>
+  options: ValidationRuleOptions<Input, Context>,
+): ValidationRule<Input, Context>
 
 /**
  * Creates a new validation rule for a given model.
