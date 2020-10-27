@@ -6,7 +6,7 @@ import {
   RequestMap,
   AnyRequestAction,
   RequestMapItem,
-  RequestSelectionSchema,
+  RequestSelection,
   ActionFnParams,
 } from "./index"
 
@@ -40,7 +40,7 @@ export function query<
   App extends AnyApplication,
   Name extends keyof App["_options"]["queries"],
   Query extends App["_options"]["queries"][Name],
-  Selection extends RequestSelectionSchema<Query>
+  Selection extends RequestSelection<Query>
 >(
   app: App,
   name: Name,
@@ -63,7 +63,7 @@ export function mutation<
   App extends AnyApplication,
   Name extends keyof App["_options"]["mutations"],
   Mutation extends App["_options"]["mutations"][Name],
-  Selection extends RequestSelectionSchema<Mutation>
+  Selection extends RequestSelection<Mutation>
 >(
   app: App,
   name: Name,
@@ -86,7 +86,7 @@ export function subscription<
   App extends AnyApplication,
   Name extends keyof App["_options"]["subscriptions"],
   Subscription extends App["_options"]["subscriptions"][Name],
-  Selection extends RequestSelectionSchema<Subscription>
+  Selection extends RequestSelection<Subscription>
 >(
   app: App,
   name: Name,

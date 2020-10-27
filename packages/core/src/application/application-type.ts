@@ -6,7 +6,7 @@ import {
   RequestMap,
   AnyRequestAction,
   RequestMapItem,
-  RequestSelectionSchema,
+  RequestSelection,
   ActionFnParams,
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
@@ -49,7 +49,7 @@ export type Application<Options extends AnyApplicationOptions> = {
 
   /**
    * Application options.
-   * Typing helper. Don't use it in a runtime, its value is always undefined.
+   * Typing helper. Don't use it in a runtime, its value always undefined.
    */
   readonly _options: Options
 
@@ -73,7 +73,7 @@ export type Application<Options extends AnyApplicationOptions> = {
   query<
     QueryKey extends keyof Options["queries"],
     Declaration extends Options["queries"][QueryKey],
-    Selection extends RequestSelectionSchema<
+    Selection extends RequestSelection<
       ForcedType<Declaration, GraphQLDeclarationItem<any>>
     >
   >(
@@ -94,7 +94,7 @@ export type Application<Options extends AnyApplicationOptions> = {
   mutation<
     MutationKey extends keyof Options["mutations"],
     Declaration extends Options["mutations"][MutationKey],
-    Selection extends RequestSelectionSchema<
+    Selection extends RequestSelection<
       ForcedType<Declaration, GraphQLDeclarationItem<any>>
     >
   >(
@@ -115,7 +115,7 @@ export type Application<Options extends AnyApplicationOptions> = {
   subscription<
     SubscriptionKey extends keyof Options["subscriptions"],
     Declaration extends Options["subscriptions"][SubscriptionKey],
-    Selection extends RequestSelectionSchema<
+    Selection extends RequestSelection<
       ForcedType<Declaration, GraphQLDeclarationItem<any>>
     >
   >(

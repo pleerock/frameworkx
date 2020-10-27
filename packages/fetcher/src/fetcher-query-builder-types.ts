@@ -5,7 +5,7 @@ import {
   RequestMapItem,
   RequestMapOriginType,
   RequestMapReturnType,
-  RequestSelectionSchema,
+  RequestSelection,
   ReturnTypeOptional,
 } from "@microframework/core"
 import Observable from "zen-observable-ts"
@@ -92,7 +92,7 @@ export type FetcherQueryMethods<
     ...args: Parameters<Queries[P]>
   ) => NonArray<NonNullable<ReturnTypeOptional<Queries[P]>>> extends object
     ? {
-        select<Selection extends RequestSelectionSchema<Queries[P]>>(
+        select<Selection extends RequestSelection<Queries[P]>>(
           selection: Selection,
         ): FetcherQueryExecutor<
           Queries,
@@ -124,7 +124,7 @@ export type FetcherMutationMethods<
     ...args: Parameters<Mutations[P]>
   ) => NonArray<NonNullable<ReturnTypeOptional<Mutations[P]>>> extends object
     ? {
-        select<Selection extends RequestSelectionSchema<Mutations[P]>>(
+        select<Selection extends RequestSelection<Mutations[P]>>(
           selection: Selection,
         ): FetcherMutationExecutor<
           Mutations,
@@ -158,7 +158,7 @@ export type FetcherSubscriptionMethods<
     NonNullable<ReturnTypeOptional<Subscriptions[P]>>
   > extends object
     ? {
-        select<Selection extends RequestSelectionSchema<Subscriptions[P]>>(
+        select<Selection extends RequestSelection<Subscriptions[P]>>(
           selection: Selection,
         ): FetcherSubscriptionExecutor<
           Subscriptions,

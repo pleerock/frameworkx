@@ -57,7 +57,7 @@ export type RequestAction<
 
   /**
    * Requested application action.
-   * Typing helper. Don't use it in a runtime, its value is always undefined.
+   * Typing helper. Don't use it in a runtime, its value always undefined.
    */
   _action: Action
 }
