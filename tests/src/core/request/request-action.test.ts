@@ -134,7 +134,7 @@ describe("core > request > action", () => {
       // make sure action returns us a proper RequestAction object
       expect(app.action("GET /users")).toEqual({
         "@type": "RequestAction",
-        _model: undefined,
+        _action: undefined,
         name: "GET /users",
         method: "GET",
         path: "/users",
@@ -150,7 +150,7 @@ describe("core > request > action", () => {
         }),
       ).toEqual({
         "@type": "RequestAction",
-        _model: undefined,
+        _action: undefined,
         name: "GET /users/:id",
         method: "GET",
         path: "/users/:id",

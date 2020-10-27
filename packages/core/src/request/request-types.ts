@@ -60,7 +60,7 @@ export type RequestSelectionSchema<
 /**
  * A particular query / mutation / subscription request properties.
  */
-export type RequestGraphQLDeclarationItemOptions<
+export type RequestMapItemOptions<
   Declaration extends GraphQLDeclarationItem<any>,
   Selection extends RequestSelectionSchema<Declaration>
 > = Parameters<Declaration> extends []
@@ -88,18 +88,49 @@ export type RequestMapItem<
   Key extends keyof Declarations,
   Selection extends RequestSelectionSchema<Declarations[Key]>
 > = {
-  selection: Selection
-  model: ReturnTypeOptional<Declarations[Key]>
+  /**
+   * Unique type identifier.
+   */
+  "@type": "RequestMapItem"
+
+  /**
+   * Request type.
+   */
   type: "query" | "mutation" | "subscription"
+
+  /**
+   * Request map item name.
+   */
   name: Key
-  options: RequestGraphQLDeclarationItemOptions<Declarations[Key], Selection>
+
+  /**
+   * Additional options. Includes selection properties and input data.
+   */
+  options: RequestMapItemOptions<Declarations[Key], Selection>
+
+  /**
+   * Model to be returned by this query / mutation / subscription.
+   * Typing helper. Don't use it in a runtime, its value is always undefined.
+   */
+  _model: ReturnTypeOptional<Declarations[Key]>
+
+  /**
+   * Model's selection partition.
+   * Typing helper. Don't use it in a runtime, its value is always undefined.
+   */
+  _selection: Selection
 }
+
+/**
+ * Any RequestMapItem.
+ */
+export type AnyRequestMapItem = RequestMapItem<any, any, any>
 
 /**
  * List of request items. Each request is a particular query / mutation / subscription.
  */
 export type RequestMap = {
-  [name: string]: RequestMapItem<any, any, any>
+  [name: string]: AnyRequestMapItem
 }
 
 /**
@@ -107,18 +138,34 @@ export type RequestMap = {
  * Request is a named object with list of queries / mutations / subscriptions inside.
  */
 export type Request<Map extends RequestMap | AnyRequestAction> = {
+  /**
+   * Unique type identifier.
+   */
   "@type": "Request"
+
+  /**
+   * Request name.
+   */
   name: string
+
+  /**
+   * Request type.
+   */
   type?: "query" | "mutation" | "subscription" | "action"
+
+  /**
+   * Request items.
+   * Contains different query items, mutation items, subscription items.
+   */
   map: Map
 }
 
 /**
  * Helper type to mark non-selected properties as "never".
  */
-export type RequestSelectionKeys<S> = {
-  [P in keyof S]: S[P] extends false ? never : P
-}[keyof S]
+export type RequestSelectionKeys<Selection> = {
+  [P in keyof Selection]: Selection[P] extends false ? never : P
+}[keyof Selection]
 
 /**
  * Helper type to pick non-never properties of the selection.
@@ -174,7 +221,7 @@ export type RequestOriginType<
 export type RequestMapReturnType<
   T extends RequestMap | AnyRequestAction
 > = T extends AnyRequestAction
-  ? T["_model"]
+  ? T["_action"]["return"]
   : T extends RequestMap
   ? {
       [P in keyof T]: RequestMapItemReturnType<T[P]>
@@ -187,40 +234,40 @@ export type RequestMapReturnType<
 export type RequestMapOriginType<
   T extends RequestMap | AnyRequestAction
 > = T extends AnyRequestAction
-  ? T["_model"]
+  ? T["_action"]["return"]
   : T extends RequestMap
   ? {
-      [P in keyof T]: T[P]["model"]
+      [P in keyof T]: T[P]["_model"]
     }
   : never
 
 /**
  * Type of the RequestMapItem.
  */
-export type RequestMapItemReturnType<
-  T extends RequestMapItem<any, any, any>
-> = NonNullable<T["model"]> extends Array<infer U>
-  ? null extends T["model"]
+export type RequestMapItemReturnType<T extends AnyRequestMapItem> = NonNullable<
+  T["_model"]
+> extends Array<infer U>
+  ? null extends T["_model"]
     ? U extends number
       ? U[] | null
       : U extends string
       ? U[] | null
       : U extends boolean
       ? U[] | null
-      : RequestSelection<U, T["selection"]>[] | null
+      : RequestSelection<U, T["_selection"]>[] | null
     : U extends number
     ? U[]
     : U extends string
     ? U[]
     : U extends boolean
     ? U[]
-    : RequestSelection<U, T["selection"]>[]
-  : NonNullable<T["model"]> extends number
-  ? T["model"]
-  : NonNullable<T["model"]> extends string
-  ? T["model"]
-  : NonNullable<T["model"]> extends boolean
-  ? T["model"]
-  : null extends T["model"]
-  ? RequestSelection<NonNullable<T["model"]>, T["selection"]> | null
-  : RequestSelection<T["model"], T["selection"]>
+    : RequestSelection<U, T["_selection"]>[]
+  : NonNullable<T["_model"]> extends number
+  ? T["_model"]
+  : NonNullable<T["_model"]> extends string
+  ? T["_model"]
+  : NonNullable<T["_model"]> extends boolean
+  ? T["_model"]
+  : null extends T["_model"]
+  ? RequestSelection<NonNullable<T["_model"]>, T["_selection"]> | null
+  : RequestSelection<T["_model"], T["_selection"]>

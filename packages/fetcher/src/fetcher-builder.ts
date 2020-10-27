@@ -1,5 +1,9 @@
 import { Fetcher } from "./index"
-import { Request, RequestMapItem } from "@microframework/core"
+import {
+  AnyRequestMapItem,
+  Request,
+  RequestMapItem,
+} from "@microframework/core"
 
 /**
  * Creates a new universal FetcherQueryBuilder.
@@ -7,7 +11,7 @@ import { Request, RequestMapItem } from "@microframework/core"
 export function createFetcherQueryBuilder(
   fetcher: Fetcher,
   request: Request<any>,
-  builderItem?: RequestMapItem<any, any, any>,
+  builderItem?: AnyRequestMapItem,
 ) {
   return {
     add(name: string) {
@@ -78,13 +82,14 @@ export function createFetcherMethodsProxy(
           }
 
           const item: RequestMapItem<any, any, any> = {
+            "@type": "RequestMapItem",
             name: propKey,
-            selection: undefined,
-            model: undefined,
             type: request.type,
             options: {
               input: args[0],
             },
+            _selection: undefined,
+            _model: undefined,
           }
           request.map[itemName] = item
           return createFetcherQueryBuilder(fetcher, request, item)

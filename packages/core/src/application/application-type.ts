@@ -2,11 +2,12 @@ import {
   Request,
   RequestAction,
   RequestActionOptions,
-  RequestGraphQLDeclarationItemOptions,
+  RequestMapItemOptions,
   RequestMap,
   AnyRequestAction,
   RequestMapItem,
   RequestSelectionSchema,
+  ActionFnParams,
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
 import {
@@ -36,16 +37,6 @@ import {
   ResolverMetadata,
   ResolveStrategy,
 } from "../resolver"
-
-/**
- * Signature for ".action" method of Application type.
- */
-export type ApplicationActionMethod<
-  Options extends AnyApplicationOptions,
-  ActionKey extends keyof Options["actions"]
-> = keyof RequestActionOptions<Options["actions"][ActionKey]> extends never
-  ? () => void
-  : (options: RequestActionOptions<Options["actions"][ActionKey]>) => void
 
 /**
  * Application is a root point of the framework.
@@ -87,7 +78,7 @@ export type Application<Options extends AnyApplicationOptions> = {
     >
   >(
     name: QueryKey,
-    options: RequestGraphQLDeclarationItemOptions<
+    options: RequestMapItemOptions<
       ForcedType<Declaration, GraphQLDeclarationItem<any>>,
       Selection
     >,
@@ -108,7 +99,7 @@ export type Application<Options extends AnyApplicationOptions> = {
     >
   >(
     name: MutationKey,
-    options: RequestGraphQLDeclarationItemOptions<
+    options: RequestMapItemOptions<
       ForcedType<Declaration, GraphQLDeclarationItem<any>>,
       Selection
     >,
@@ -129,7 +120,7 @@ export type Application<Options extends AnyApplicationOptions> = {
     >
   >(
     name: SubscriptionKey,
-    options: RequestGraphQLDeclarationItemOptions<
+    options: RequestMapItemOptions<
       ForcedType<Declaration, GraphQLDeclarationItem<any>>,
       Selection
     >,
@@ -144,11 +135,11 @@ export type Application<Options extends AnyApplicationOptions> = {
    */
   action<
     ActionKey extends keyof Options["actions"],
-    Declaration extends Options["actions"][ActionKey]
+    Action extends Options["actions"][ActionKey]
   >(
     name: ActionKey,
-    ...args: Parameters<ApplicationActionMethod<Options, ActionKey>>
-  ): RequestAction<Application<Options>, ActionKey, Declaration>
+    ...args: ActionFnParams<Action>
+  ): RequestAction<Application<Options>, ActionKey, Action>
 
   /**
    * Creates action request.

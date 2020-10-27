@@ -28,8 +28,8 @@ import { RequestMapOriginType } from "@microframework/core"
  * Fetcher helps to execute network queries.
  */
 export class Fetcher<App extends AnyApplication = any> {
+  app: App | undefined
   private websocketProtocols: string[] = ["graphql-ws"]
-  private app: App | undefined
   private options: FetcherOptions
   private clientId: string
   private ws?: ReconnectingWebSocket

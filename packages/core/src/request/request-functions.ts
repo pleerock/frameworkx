@@ -1,12 +1,13 @@
-import { AnyApplication, ApplicationActionMethod } from "../application"
+import { AnyApplication } from "../application"
 import {
   Request,
   RequestAction,
-  RequestGraphQLDeclarationItemOptions,
+  RequestMapItemOptions,
   RequestMap,
   AnyRequestAction,
   RequestMapItem,
   RequestSelectionSchema,
+  ActionFnParams,
 } from "./index"
 
 /**
@@ -14,21 +15,21 @@ import {
  */
 export function action<
   App extends AnyApplication,
-  ActionKey extends keyof App["_options"]["actions"],
-  Declaration extends App["_options"]["actions"][ActionKey]
+  Name extends keyof App["_options"]["actions"],
+  Action extends App["_options"]["actions"][Name]
 >(
   app: App,
-  name: ActionKey,
-  ...args: Parameters<ApplicationActionMethod<App["_options"], ActionKey>>
-): RequestAction<App, ActionKey, Declaration> {
-  const [method, path] = (name as string).split(" ")
+  name: Name,
+  ...args: ActionFnParams<Action>
+): RequestAction<App, Name, Action> {
+  const [method, ...paths] = (name as string).split(" ")
   return {
     "@type": "RequestAction",
-    _model: undefined,
     name,
     method,
-    path,
+    path: paths.join(" "),
     options: args[0] || ({} as any),
+    _action: undefined as any,
   }
 }
 
@@ -37,23 +38,21 @@ export function action<
  */
 export function query<
   App extends AnyApplication,
-  QueryKey extends keyof App["_options"]["queries"],
-  Declaration extends App["_options"]["queries"][QueryKey],
-  Selection extends RequestSelectionSchema<App["_options"]["queries"][QueryKey]>
+  Name extends keyof App["_options"]["queries"],
+  Query extends App["_options"]["queries"][Name],
+  Selection extends RequestSelectionSchema<Query>
 >(
   app: App,
-  name: QueryKey,
-  options: RequestGraphQLDeclarationItemOptions<
-    App["_options"]["queries"][QueryKey],
-    Selection
-  >,
-): RequestMapItem<App["_options"]["queries"], QueryKey, Selection> {
+  name: Name,
+  options: RequestMapItemOptions<Query, Selection>,
+): RequestMapItem<App["_options"]["queries"], Name, Selection> {
   return {
-    selection: undefined as any,
-    model: undefined as any,
+    "@type": "RequestMapItem",
     type: "query",
     name,
     options,
+    _selection: undefined as any,
+    _model: undefined as any,
   }
 }
 
@@ -62,25 +61,21 @@ export function query<
  */
 export function mutation<
   App extends AnyApplication,
-  MutationKey extends keyof App["_options"]["mutations"],
-  Declaration extends App["_options"]["mutations"][MutationKey],
-  Selection extends RequestSelectionSchema<
-    App["_options"]["mutations"][MutationKey]
-  >
+  Name extends keyof App["_options"]["mutations"],
+  Mutation extends App["_options"]["mutations"][Name],
+  Selection extends RequestSelectionSchema<Mutation>
 >(
   app: App,
-  name: MutationKey,
-  options: RequestGraphQLDeclarationItemOptions<
-    App["_options"]["mutations"][MutationKey],
-    Selection
-  >,
-): RequestMapItem<App["_options"]["mutations"], MutationKey, Selection> {
+  name: Name,
+  options: RequestMapItemOptions<Mutation, Selection>,
+): RequestMapItem<App["_options"]["mutations"], Name, Selection> {
   return {
-    selection: undefined as any,
-    model: undefined as any,
+    "@type": "RequestMapItem",
     type: "mutation",
     name,
     options,
+    _selection: undefined as any,
+    _model: undefined as any,
   }
 }
 
@@ -89,29 +84,21 @@ export function mutation<
  */
 export function subscription<
   App extends AnyApplication,
-  SubscriptionKey extends keyof App["_options"]["subscriptions"],
-  Declaration extends App["_options"]["subscriptions"][SubscriptionKey],
-  Selection extends RequestSelectionSchema<
-    App["_options"]["subscriptions"][SubscriptionKey]
-  >
+  Name extends keyof App["_options"]["subscriptions"],
+  Subscription extends App["_options"]["subscriptions"][Name],
+  Selection extends RequestSelectionSchema<Subscription>
 >(
   app: App,
-  name: SubscriptionKey,
-  options: RequestGraphQLDeclarationItemOptions<
-    App["_options"]["subscriptions"][SubscriptionKey],
-    Selection
-  >,
-): RequestMapItem<
-  App["_options"]["subscriptions"],
-  SubscriptionKey,
-  Selection
-> {
+  name: Name,
+  options: RequestMapItemOptions<Subscription, Selection>,
+): RequestMapItem<App["_options"]["subscriptions"], Name, Selection> {
   return {
-    selection: undefined as any,
-    model: undefined as any,
+    "@type": "RequestMapItem",
     type: "subscription",
     name,
     options,
+    _selection: undefined as any,
+    _model: undefined as any,
   }
 }
 

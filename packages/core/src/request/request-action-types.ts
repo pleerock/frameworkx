@@ -1,7 +1,18 @@
 import { AnyAction, AnyApplication } from "../application"
 
 /**
+ * Returns params for the "action" function,
+ * based on the application's action signature.
+ */
+export type ActionFnParams<Action extends AnyAction> = Parameters<
+  keyof RequestActionOptions<Action> extends never
+    ? () => void
+    : (options: RequestActionOptions<Action>) => void
+>
+
+/**
  * RequestAction options.
+ * Options depend on an application-defined Action.
  */
 export type RequestActionOptions<
   Action extends AnyAction
@@ -12,28 +23,17 @@ export type RequestActionOptions<
   (Action["body"] extends object ? { body: Action["body"] } : {})
 
 /**
- * Any RequestAction.
- */
-export type AnyRequestAction = RequestAction<any, any, any>
-
-/**
  * Request properties for a particular action.
  */
 export type RequestAction<
   App extends AnyApplication,
   Key extends keyof App["_options"]["actions"],
-  Declaration extends App["_options"]["actions"][Key]
+  Action extends App["_options"]["actions"][Key]
 > = {
   /**
    * Unique type identifier.
    */
   "@type": "RequestAction"
-
-  /**
-   * Model returned by an action.
-   * Typing helper. Don't use it in a runtime, its value is always undefined.
-   */
-  _model: Declaration["return"]
 
   /**
    * Action name, e.g. GET /users
@@ -53,5 +53,16 @@ export type RequestAction<
   /**
    * Action options. Things like params, query params, headers, body, etc.
    */
-  options: RequestActionOptions<Declaration>
+  options: RequestActionOptions<Action>
+
+  /**
+   * Requested application action.
+   * Typing helper. Don't use it in a runtime, its value is always undefined.
+   */
+  _action: Action
 }
+
+/**
+ * Any RequestAction.
+ */
+export type AnyRequestAction = RequestAction<any, any, any>
