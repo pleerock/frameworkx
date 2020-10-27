@@ -85,7 +85,6 @@ export type RequestMap = {
 /**
  * Core request type.
  * Request is a named object with list of queries / mutations / subscriptions inside.
- * If request item is an action, map will only contain a single RequestAction.
  */
 export type Request<Map extends RequestMap | AnyRequestAction> = {
   /**
@@ -106,6 +105,7 @@ export type Request<Map extends RequestMap | AnyRequestAction> = {
   /**
    * Request items.
    * Contains different query items, mutation items, subscription items.
+   * If it's an action request, map will only contain a single RequestAction.
    */
   map: Map
 }

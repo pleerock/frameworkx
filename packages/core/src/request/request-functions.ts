@@ -12,6 +12,7 @@ import {
 
 /**
  * Creates a "request action".
+ * This object can be utilized by a Request to execute fetch queries.
  */
 export function action<
   App extends AnyApplication,
@@ -35,6 +36,7 @@ export function action<
 
 /**
  * Creates a "request query".
+ * This object can be utilized by a Request to execute fetch queries.
  */
 export function query<
   App extends AnyApplication,
@@ -58,6 +60,7 @@ export function query<
 
 /**
  * Creates a "request mutation".
+ * This object can be utilized by a Request to execute fetch queries.
  */
 export function mutation<
   App extends AnyApplication,
@@ -81,6 +84,7 @@ export function mutation<
 
 /**
  * Creates a "request subscription".
+ * This object can be utilized by a Request to execute fetch queries.
  */
 export function subscription<
   App extends AnyApplication,
@@ -103,7 +107,7 @@ export function subscription<
 }
 
 /**
- * Creates action request.
+ * Creates an action request.
  */
 export function request<T extends AnyRequestAction>(map: T): Request<T>
 
