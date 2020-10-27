@@ -4,7 +4,7 @@ import {
   RequestAction,
   RequestGraphQLDeclarationItemOptions,
   RequestMap,
-  RequestMapForAction,
+  AnyRequestAction,
   RequestMapItem,
   RequestSelectionSchema,
 } from "./index"
@@ -21,11 +21,13 @@ export function action<
   name: ActionKey,
   ...args: Parameters<ApplicationActionMethod<App["_options"], ActionKey>>
 ): RequestAction<App, ActionKey, Declaration> {
+  const [method, path] = (name as string).split(" ")
   return {
-    selection: undefined as any,
-    model: undefined as any,
-    type: "action",
+    "@type": "RequestAction",
+    _model: undefined,
     name,
+    method,
+    path,
     options: args[0] || ({} as any),
   }
 }
@@ -116,7 +118,7 @@ export function subscription<
 /**
  * Creates action request.
  */
-export function request<T extends RequestMapForAction>(map: T): Request<T>
+export function request<T extends AnyRequestAction>(map: T): Request<T>
 
 /**
  * Creates a graphql request.
@@ -126,7 +128,7 @@ export function request<T extends RequestMap>(name: string, map: T): Request<T>
 /**
  * Creates a request.
  */
-export function request<T extends RequestMap | RequestMapForAction>(
+export function request<T extends RequestMap | AnyRequestAction>(
   nameOrMap: string | T,
   maybeMap?: T,
 ): Request<T> {

@@ -4,9 +4,9 @@ import {
   AnyApplication,
   Request,
   RequestAction,
-  RequestActionItemOptions,
+  RequestActionOptions,
   RequestMap,
-  RequestMapForAction,
+  AnyRequestAction,
   RequestMapReturnType,
 } from "@microframework/core"
 import ReconnectingWebSocket from "reconnecting-websocket"
@@ -174,10 +174,7 @@ export class Fetcher<App extends AnyApplication = any> {
    */
   action<ActionKey extends keyof App["_options"]["actions"]>(
     name: ActionKey,
-    options: RequestActionItemOptions<
-      App,
-      App["_options"]["actions"][ActionKey]
-    >,
+    options: RequestActionOptions<App["_options"]["actions"][ActionKey]>,
   ) {
     // todo: implement it same way as Application.action()
     if (!this.app) {
@@ -193,7 +190,7 @@ export class Fetcher<App extends AnyApplication = any> {
    * Loads data from a server.
    * Returns original type instead of selection.
    */
-  async fetchUnsafe<T extends RequestMapForAction>(
+  async fetchUnsafe<T extends AnyRequestAction>(
     request: Request<T>,
   ): Promise<RequestMapOriginType<T>>
 
@@ -220,7 +217,7 @@ export class Fetcher<App extends AnyApplication = any> {
   /**
    * Loads data from a server.
    */
-  async fetch<T extends RequestMapForAction>(
+  async fetch<T extends AnyRequestAction>(
     request: Request<T>,
   ): Promise<RequestMapReturnType<T>>
 
@@ -257,8 +254,7 @@ export class Fetcher<App extends AnyApplication = any> {
           "`actionEndpoint` must be set in Fetcher options in order to execute requests.",
         )
       }
-      const requestAction: RequestAction<any, any, any> = request.map
-      let [method, path] = requestAction.name.split(" ")
+      const requestAction: AnyRequestAction = request.map
       const headers = await this.buildHeaders()
       let body: any = undefined
       const options: AnyAction = requestAction.options
@@ -266,8 +262,11 @@ export class Fetcher<App extends AnyApplication = any> {
         body = JSON.stringify(options.body)
       }
 
+      let path: string = ""
       if (options.params) {
-        const toPath = compile(path, { encode: encodeURIComponent })
+        const toPath = compile(requestAction.method, {
+          encode: encodeURIComponent,
+        })
         path = toPath(options.params)
       }
 
@@ -287,7 +286,7 @@ export class Fetcher<App extends AnyApplication = any> {
 
       // console.log("executing:", this.options.actionEndpoint + path + query)
       const response = await fetch(this.options.actionEndpoint + path + query, {
-        method: method,
+        method: requestAction.method,
         // todo: send cookies
         headers: headers,
         body,

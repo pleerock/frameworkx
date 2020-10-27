@@ -1,10 +1,10 @@
 import {
   Request,
   RequestAction,
-  RequestActionItemOptionsInternal,
+  RequestActionOptions,
   RequestGraphQLDeclarationItemOptions,
   RequestMap,
-  RequestMapForAction,
+  AnyRequestAction,
   RequestMapItem,
   RequestSelectionSchema,
 } from "../request"
@@ -43,13 +43,9 @@ import {
 export type ApplicationActionMethod<
   Options extends AnyApplicationOptions,
   ActionKey extends keyof Options["actions"]
-> = keyof RequestActionItemOptionsInternal<
-  Options["actions"][ActionKey]
-> extends never
+> = keyof RequestActionOptions<Options["actions"][ActionKey]> extends never
   ? () => void
-  : (
-      options: RequestActionItemOptionsInternal<Options["actions"][ActionKey]>,
-    ) => void
+  : (options: RequestActionOptions<Options["actions"][ActionKey]>) => void
 
 /**
  * Application is a root point of the framework.
@@ -62,8 +58,7 @@ export type Application<Options extends AnyApplicationOptions> = {
 
   /**
    * Application options.
-   * Special property used for proper typing.
-   * Don't use it in a runtime, its value is always undefined.
+   * Typing helper. Don't use it in a runtime, its value is always undefined.
    */
   readonly _options: Options
 
@@ -158,7 +153,7 @@ export type Application<Options extends AnyApplicationOptions> = {
   /**
    * Creates action request.
    */
-  request<T extends RequestMapForAction>(map: T): Request<T>
+  request<T extends AnyRequestAction>(map: T): Request<T>
 
   /**
    * Creates a graphql request.
@@ -168,7 +163,7 @@ export type Application<Options extends AnyApplicationOptions> = {
   /**
    * Creates a request.
    */
-  request<T extends RequestMap | RequestMapForAction>(): Request<T>
+  request<T extends RequestMap | AnyRequestAction>(): Request<T>
 
   /**
    * Creates a new validation rule for a given App's model.

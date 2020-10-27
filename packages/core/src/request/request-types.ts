@@ -1,10 +1,9 @@
 import {
-  AnyAction,
-  AnyApplication,
   GraphQLDeclarationItem,
   GraphQLDeclarationList,
   ReturnTypeOptional,
 } from "../application"
+import { AnyRequestAction } from "./request-action-types"
 
 /**
  * Helper type for RequestSelectionSchema type.
@@ -81,56 +80,6 @@ export type RequestGraphQLDeclarationItemOptions<
       }
   : never
 
-export type RequestActionItemOptionsInternal<
-  Action extends AnyAction
-> = (Action["query"] extends object ? { query: Action["query"] } : {}) &
-  (Action["params"] extends object ? { params: Action["params"] } : {}) &
-  (Action["headers"] extends object ? { headers: Action["headers"] } : {}) &
-  (Action["cookies"] extends object ? { cookies: Action["cookies"] } : {}) &
-  (Action["body"] extends object ? { body: Action["body"] } : {})
-// {
-//   query: Action["query"] extends never ? never : Action["query"]
-//   params: Action["params"] extends never ? never : Action["params"]
-//   headers: Action["headers"] extends never ? never : Action["headers"]
-//   cookies: Action["cookies"] extends never ? never : Action["cookies"]
-//   body: Action["body"] extends never ? never : Action["body"]
-// } /*[keyof {
-//   query: true
-//   params: true
-//   headers: true
-//   cookies: true
-//   body: true
-// }]*/
-
-/**
- * A particular action request properties.
- */
-export type RequestActionItemOptions<
-  App extends AnyApplication,
-  Declaration extends AnyAction
-> = /*keyof RequestActionItemOptionsInternal<App, Declaration> extends never
-  ? never
-  : */ RequestActionItemOptionsInternal<
-  Declaration
->
-
-// todo: iterate over properties and exclude never, at the end exclude empty object
-
-/**
- * Request properties for a particular action.
- */
-export type RequestAction<
-  App extends AnyApplication,
-  Key extends keyof App["_options"]["actions"],
-  Declaration extends App["_options"]["actions"][Key]
-> = {
-  selection: Selection
-  model: App["_options"]["actions"][Key]["return"]
-  type: "action"
-  name: Key
-  options: RequestActionItemOptions<App, Declaration>
-}
-
 /**
  * Helper type to represent request query / mutation / subscription.
  */
@@ -147,11 +96,6 @@ export type RequestMapItem<
 }
 
 /**
- * Request map is different for action.
- */
-export type RequestMapForAction = RequestAction<any, any, any>
-
-/**
  * List of request items. Each request is a particular query / mutation / subscription.
  */
 export type RequestMap = {
@@ -162,7 +106,7 @@ export type RequestMap = {
  * Core request type.
  * Request is a named object with list of queries / mutations / subscriptions inside.
  */
-export type Request<Map extends RequestMap | RequestMapForAction> = {
+export type Request<Map extends RequestMap | AnyRequestAction> = {
   "@type": "Request"
   name: string
   type?: "query" | "mutation" | "subscription" | "action"
@@ -228,9 +172,9 @@ export type RequestOriginType<
  * Returned types of the items from a RequestMap.
  */
 export type RequestMapReturnType<
-  T extends RequestMap | RequestMapForAction
-> = T extends RequestMapForAction
-  ? T["model"]
+  T extends RequestMap | AnyRequestAction
+> = T extends AnyRequestAction
+  ? T["_model"]
   : T extends RequestMap
   ? {
       [P in keyof T]: RequestMapItemReturnType<T[P]>
@@ -241,9 +185,9 @@ export type RequestMapReturnType<
  * Original types of the items from a RequestMap.
  */
 export type RequestMapOriginType<
-  T extends RequestMap | RequestMapForAction
-> = T extends RequestMapForAction
-  ? T["model"]
+  T extends RequestMap | AnyRequestAction
+> = T extends AnyRequestAction
+  ? T["_model"]
   : T extends RequestMap
   ? {
       [P in keyof T]: T[P]["model"]

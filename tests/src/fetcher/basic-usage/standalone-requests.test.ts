@@ -10,9 +10,9 @@ import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import ws from "ws"
 import { obtainPort, sleep } from "../../util/test-common"
-import { App } from ".//app"
-import { AppServer } from ".//server"
-import { PostList } from ".//repositories"
+import { App } from "./app"
+import { AppServer } from "./server"
+import { PostList } from "./repositories"
 
 describe("fetcher > standalone requests", () => {
   let webserverPort: number = 0

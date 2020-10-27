@@ -62,7 +62,6 @@ export type GraphQLDeclarationItem<ArgsType extends { [key: string]: any }> =
  * Action is a single HTTP route that serves network requests.
  */
 export type Action<ReturnType, Params, Query, Headers, Cookies, Body> = {
-  // type: "get" | "post" | "patch" | "put" | "delete" | string
   return?: ReturnType
   params?: Params
   query?: Query
