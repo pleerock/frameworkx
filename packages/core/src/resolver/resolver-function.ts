@@ -14,7 +14,7 @@ import {
   ModelDLResolver,
   ModelResolver,
   ResolveKey,
-  ResolverMetadata,
+  AnyResolver,
   ResolveStrategy,
 } from "./index"
 
@@ -96,10 +96,7 @@ export function resolver<
 export function resolver<
   App extends AnyApplication,
   Key extends ResolveKey<App["_options"]>
->(
-  app: App,
-  resolver: LiteralOrClass<DeclarationResolver<App>>,
-): ResolverMetadata
+>(app: App, resolver: LiteralOrClass<DeclarationResolver<App>>): AnyResolver
 
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -126,7 +123,7 @@ export function resolver<
   app: App,
   name: Key,
   resolver: ResolveStrategy<App["_options"], Key>,
-): ResolverMetadata
+): AnyResolver
 
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -154,7 +151,7 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
     | (() => LiteralOrClass<
         ModelResolver<Model["type"], App["_options"]["context"]>
       >),
-): ResolverMetadata
+): AnyResolver
 
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -188,7 +185,7 @@ export function resolver<
           App["_options"]["context"]
         >
       >),
-): ResolverMetadata
+): AnyResolver
 
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -211,7 +208,7 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
     | (() => LiteralOrClass<
         ModelDLResolver<Model["type"], App["_options"]["context"]>
       >),
-): ResolverMetadata
+): AnyResolver
 
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -245,7 +242,7 @@ export function resolver<
           App["_options"]["context"]
         >
       >),
-): ResolverMetadata
+): AnyResolver
 
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -268,7 +265,7 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
     | (() => LiteralOrClass<
         ModelResolver<Model["type"], App["_options"]["context"]>
       >),
-): ResolverMetadata
+): AnyResolver
 
 /**
  * Creates a new resolver metadata to resolve queries, mutations, subscriptions, actions or models.
@@ -282,7 +279,7 @@ export function resolver(
     | (() => ModelResolver<any, any>)
     | ModelDLResolver<any, any>
     | (() => ModelDLResolver<any, any>),
-): ResolverMetadata | ((object: any) => any) {
+): AnyResolver | ((object: any) => any) {
   if (arguments.length === 0) {
     // resolves decorator for declarations
     // syntax @resolver() class CategoryDeclarationsResolver { ... }

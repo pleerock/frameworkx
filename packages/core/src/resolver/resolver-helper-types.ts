@@ -1,6 +1,6 @@
-import { AnyAction, AnyApplicationOptions } from "../application"
+import { AnyAction, AnyApplicationOptions, DeepPartial } from "../application"
 import { ContextLogger } from "../logger"
-import { ResolverMetadata } from "./resolver-metadata"
+import { AnyResolver } from "./resolver-metadata"
 import { DeclarationResolver } from "./resolver-strategy"
 
 /**
@@ -17,77 +17,94 @@ export type ResolverType =
  * Default framework properties applied to a context.
  */
 export type DefaultContext = {
+  /**
+   * HTTP request.
+   */
   request: any
+
+  /**
+   * HTTP response.
+   */
   response: any
+
+  /**
+   * Contextual logger used to log events during resolve execution.
+   */
   logger: ContextLogger
 }
 
 /**
  * Represents any "key" resolver can resolve (particular query, mutation, action, subscription, model).
- * For example from declaration "{ queries: { posts(): Post[], post(): Post } }" it will take "posts"|"post".
+ * For example from declaration "{ queries: { posts(): Post[] }, mutations: { savePost(): Post } }"
+ * it will take "posts"|"savePost".
  */
-export type ResolveKey<D extends AnyApplicationOptions> =
-  | keyof D["actions"]
-  | keyof D["models"]
-  | keyof D["queries"]
-  | keyof D["mutations"]
-  | keyof D["subscriptions"]
+export type ResolveKey<Options extends AnyApplicationOptions> =
+  | keyof Options["actions"]
+  | keyof Options["models"]
+  | keyof Options["queries"]
+  | keyof Options["mutations"]
+  | keyof Options["subscriptions"]
 
 /**
  * Arguments to be passed to action resolving function.
  */
-export type ActionArgs<A extends AnyAction> = {
-  params: A["params"]
-  query: A["query"]
-  headers: A["headers"]
-  cookies: A["cookies"]
-  body: A["body"]
+export type ActionArgs<Action extends AnyAction> = {
+  /**
+   * Route params received in HTTP request.
+   */
+  params: Action["params"]
+
+  /**
+   * Query params received in HTTP request.
+   */
+  query: Action["query"]
+
+  /**
+   * HTTP headers sent within HTTP request.
+   */
+  headers: Action["headers"]
+
+  /**
+   * Cookies sent within HTTP request.
+   */
+  cookies: Action["cookies"]
+
+  /**
+   * HTTP body sent by a client.
+   */
+  body: Action["body"]
 }
 
 /**
- * Type for a return values of declaration properties.
+ * Resolver possible return value type.
  */
-export type ResolverReturnValue<T> =
-  // T extends ModelWithArgs<infer Type, any> ? DeepPartial<Type> | Promise<DeepPartial<Type>> :
-  // T extends Array<ModelWithArgs<infer Type, any>> ? DeepPartial<Type[]> | Promise<DeepPartial<Type[]>> :
-  T extends Array<infer I>
-    ? I extends boolean
-      ? boolean[] | Promise<boolean[]>
-      : I extends number
-      ? number[] | Promise<number[]>
-      : I extends string
-      ? string[] | Promise<string[]>
-      : I extends Object
-      ? DeepPartial<I>[] | null | Promise<DeepPartial<I>[] | null>
-      : I[] | null | Promise<I[] | null>
-    : T extends boolean
-    ? boolean | Promise<boolean>
-    : T extends number
-    ? number | Promise<number>
-    : T extends string
-    ? string | Promise<string>
-    : null extends T
-    ? null | Promise<null>
-    : // T extends object | null ? DeepPartial<T | null> | Promise<DeepPartial<T> | null> :
-    T extends Object
-    ? DeepPartial<T | null> | Promise<DeepPartial<T> | null>
-    : T | null | Promise<T | null>
-
-/**
- * Like Partial<T>, but deep.
- */
-export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends Array<infer U>
-    ? Array<DeepPartial<U>>
-    : T[P] extends ReadonlyArray<infer U>
-    ? ReadonlyArray<DeepPartial<U>>
-    : DeepPartial<T[P]>
-}
+export type ResolverReturnValue<T> = T extends Array<infer U>
+  ? U extends boolean
+    ? boolean[] | Promise<boolean[]>
+    : U extends number
+    ? number[] | Promise<number[]>
+    : U extends string
+    ? string[] | Promise<string[]>
+    : U extends Object
+    ? DeepPartial<U>[] | null | Promise<DeepPartial<U>[] | null>
+    : U[] | null | Promise<U[] | null>
+  : T extends boolean
+  ? boolean | Promise<boolean>
+  : T extends number
+  ? number | Promise<number>
+  : T extends string
+  ? string | Promise<string>
+  : null extends T
+  ? null | Promise<null>
+  : // T extends object | null ? DeepPartial<T | null> | Promise<DeepPartial<T> | null> :
+  T extends Object
+  ? DeepPartial<T | null> | Promise<DeepPartial<T> | null>
+  : T | null | Promise<T | null>
 
 /**
  * Types or resolvers that can registered in the application.
  */
 export type AppResolverType =
-  | ResolverMetadata
+  | AnyResolver
   | DeclarationResolver<any>
   | { new (...args: any[]): DeclarationResolver<any> }

@@ -2,6 +2,7 @@ import {
   AnyApplication,
   AnyApplicationOptions,
   createApp,
+  DeepPartial,
   FlatMapType,
   ForcedType,
   LiteralOrClass,
@@ -63,6 +64,61 @@ describe("core > application > helper types", () => {
     // we don't expect it to be an array
     // @ts-expect-error
     const expectErrorWhenArrayAssigned: FlatMapType<string[]> = ["a"]
+  })
+  test("DeepPartial", async () => {
+    type User = {
+      id: number
+      name: string
+      photo: {
+        id: number
+        filename: string
+      }
+      albums: {
+        name: string
+      }[]
+    }
+
+    const partial1: DeepPartial<User> = {
+      id: 1,
+    }
+    const partial2: DeepPartial<User> = {
+      id: 1,
+      photo: {
+        id: 1,
+        filename: "photo.jpg",
+      },
+    }
+    const partial3: DeepPartial<User> = {
+      id: 1,
+      photo: {
+        id: 1,
+        filename: "photo.jpg",
+      },
+      albums: [{ name: "cats" }, { name: "animals" }],
+    }
+    const partial4: DeepPartial<User> = {
+      // @ts-expect-error
+      id2: 1,
+      name: "Timber",
+    }
+    const partial5: DeepPartial<User> = {
+      id: 1,
+      photo: {
+        // @ts-expect-error
+        filenamex: "photo.jpg",
+      },
+    }
+    const partial6: DeepPartial<User> = {
+      id: 1,
+      photo: {
+        filename: "photo.jpg",
+      },
+      albums: [
+        // @ts-expect-error
+        { id: 1 },
+        { name: "animals" },
+      ],
+    }
   })
   test("AnyApplication", async () => {
     const app: AnyApplication = createApp()

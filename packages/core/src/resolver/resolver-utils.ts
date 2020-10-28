@@ -1,9 +1,6 @@
 import { ApplicationUtils, MixedList } from "../application"
 import { AppResolverType } from "./resolver-helper-types"
-import {
-  DeclarationResolverMetadata,
-  ResolverMetadata,
-} from "./resolver-metadata"
+import { DeclarationResolverMetadata, AnyResolver } from "./resolver-metadata"
 
 /**
  * Core resolver utility functions.
@@ -14,7 +11,7 @@ export const ResolverUtils = {
    */
   normalizeResolverMetadatas(
     resolvers: MixedList<AppResolverType>,
-  ): ResolverMetadata[] {
+  ): AnyResolver[] {
     return ApplicationUtils.mixedListToArray(resolvers).map((resolver) => {
       if (resolver instanceof Function) {
         return resolver.prototype.resolver
@@ -37,7 +34,7 @@ export const ResolverUtils = {
   /**
    * Checks if provided object is resolver metadata.
    */
-  isResolverMetadata(obj: any): obj is ResolverMetadata {
+  isResolverMetadata(obj: any): obj is AnyResolver {
     return obj["@type"] && obj["@type"] === "Resolver"
   },
 }

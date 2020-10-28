@@ -2,8 +2,8 @@ import {
   AnyValidationRule,
   MixedList,
   Logger,
-  ResolverMetadata,
   Validator,
+  AnyResolver,
 } from "@microframework/core"
 import { CorsOptions } from "cors"
 import { OptionsData } from "express-graphql"
@@ -176,7 +176,7 @@ export type ApplicationServerProperties = {
   /**
    * List of registered resolvers.
    */
-  readonly resolvers: ResolverMetadata[]
+  readonly resolvers: AnyResolver[]
 
   /**
    * List of validation rules to apply.

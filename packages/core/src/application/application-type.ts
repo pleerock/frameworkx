@@ -34,7 +34,7 @@ import {
   ModelDLResolver,
   ModelResolver,
   ResolveKey,
-  ResolverMetadata,
+  AnyResolver,
   ResolveStrategy,
 } from "../resolver"
 
@@ -217,7 +217,7 @@ export type Application<Options extends AnyApplicationOptions> = {
    */
   resolver(
     resolver: LiteralOrClass<DeclarationResolver<Application<Options>>>,
-  ): ResolverMetadata
+  ): AnyResolver
 
   /**
    * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -240,7 +240,7 @@ export type Application<Options extends AnyApplicationOptions> = {
   resolver<Key extends ResolveKey<Options>>(
     name: Key,
     resolver: ResolveStrategy<Options, Key>,
-  ): ResolverMetadata
+  ): AnyResolver
 
   /**
    * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -275,7 +275,7 @@ export type Application<Options extends AnyApplicationOptions> = {
             ForcedType<Options["context"], ContextList>
           >
         >),
-  ): ResolverMetadata
+  ): AnyResolver
 
   /**
    * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -305,7 +305,7 @@ export type Application<Options extends AnyApplicationOptions> = {
             ForcedType<Options["context"], ContextList>
           >
         >),
-  ): ResolverMetadata
+  ): AnyResolver
 
   /**
    * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -335,7 +335,7 @@ export type Application<Options extends AnyApplicationOptions> = {
             ForcedType<Options["context"], ContextList>
           >
         >),
-  ): ResolverMetadata
+  ): AnyResolver
 
   /**
    * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -365,7 +365,7 @@ export type Application<Options extends AnyApplicationOptions> = {
             ForcedType<Options["context"], ContextList>
           >
         >),
-  ): ResolverMetadata
+  ): AnyResolver
 
   /**
    * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
@@ -388,12 +388,12 @@ export type Application<Options extends AnyApplicationOptions> = {
       | (() => LiteralOrClass<
           ModelResolver<Model["type"], App["_options"]["context"]>
         >),
-  ): ResolverMetadata
+  ): AnyResolver
 
   /**
    * Creates a new resolver metadata to resolve queries, mutations, subscriptions, actions or models.
    */
-  resolver(): ResolverMetadata
+  resolver(): AnyResolver
 
   /**
    * Creates a context resolver.

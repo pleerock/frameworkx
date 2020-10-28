@@ -2,7 +2,7 @@ import { action, mutation, query, request, subscription } from "../request"
 import { Model } from "@microframework/model"
 import { AnyValidationRule, validationRule } from "../validation"
 import { AnyApplicationOptions } from "./application-helper-types"
-import { contextResolver, resolver, ResolverMetadata } from "../resolver"
+import { contextResolver, resolver, AnyResolver } from "../resolver"
 import { Application } from "./application-type"
 
 /**
@@ -46,7 +46,7 @@ export function createApp<Options extends AnyApplicationOptions>(): Application<
       return (validationRule as any)(this, ...args)
     },
 
-    resolver(...args: any[]): ResolverMetadata {
+    resolver(...args: any[]): AnyResolver {
       return (resolver as any)(this, ...args)
     },
 

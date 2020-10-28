@@ -49,10 +49,10 @@ export type ContextResolverMetadata = {
 }
 
 /**
- * Resolver metadata - represents what resolver resolves,
- * how its named and what function should be executed on resolve.
+ * Represents any resolver type -
+ * declaration resolver, declaration item resolver, model resolver, context resolver
  */
-export type ResolverMetadata =
+export type AnyResolver =
   | DeclarationResolverMetadata
   | DeclarationItemResolverMetadata
   | ModelResolverMetadata
