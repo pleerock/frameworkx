@@ -1,4 +1,22 @@
-import { LogEvent } from "./LogEvent"
+import { ActionTypeMetadata, TypeMetadata } from "../type-metadata"
+
+/**
+ * Logging event details.
+ */
+export type LogEvent = {
+  request: any
+  response: any
+  typeMetadata?: TypeMetadata
+  actionMetadata?: ActionTypeMetadata
+  modelName?: string
+  propertyName?: string
+  graphQLResolverArgs?: {
+    parent: any
+    args: any
+    context: any
+    info: any
+  }
+}
 
 /**
  * Options provided to the logger interface methods call.
@@ -29,3 +47,8 @@ export type LoggerLogOptions = {
    */
   event?: LogEvent
 }
+
+/**
+ * Logger interface.
+ */
+export type Logger = (options: LoggerLogOptions) => void
