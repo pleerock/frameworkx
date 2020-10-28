@@ -1,4 +1,9 @@
-import { AnyValidationRule, TypeMetadata, TypeMetadataUtils, Validator, } from "@microframework/core"
+import {
+  AnyValidationRule,
+  TypeMetadata,
+  TypeMetadataUtils,
+  Validator,
+} from "@microframework/core"
 
 /**
  * Helper over validation operations.
@@ -66,7 +71,7 @@ export class ValidationHelper {
                 await this.validator({
                   key: property.propertyName!!,
                   value: value[property.propertyName!!],
-                  options: validationSchema,
+                  constraints: validationSchema,
                 })
               }
             }

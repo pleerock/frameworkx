@@ -38,6 +38,12 @@ export type LiteralOrClass<T> = T | { new (...args: any[]): T }
 export type ForcedType<T, Desired> = T extends Desired ? T : any
 
 /**
+ * FlatMap for a type - if given type is an array - returns array's generic type,
+ * otherwise simply returns a type.
+ */
+export type FlatMapType<T> = T extends Array<infer U> ? U : T
+
+/**
  * Handy way of using Application type when its options don't matter.
  */
 export type AnyApplication = Application<any>

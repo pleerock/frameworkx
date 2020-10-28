@@ -2,6 +2,7 @@ import {
   AnyApplication,
   AnyApplicationOptions,
   createApp,
+  FlatMapType,
   ForcedType,
   LiteralOrClass,
   MixedList,
@@ -51,6 +52,17 @@ describe("core > application > helper types", () => {
     const onlyString: ForcedType<string, string> = "a"
     // assigning any value is acceptable because of "undefined" (because casted to "any" now)
     const alsoUndefined: ForcedType<string | undefined, string> = 1
+  })
+  test("FlatMapType", async () => {
+    // string should be assigned to a string
+    const onlyString: FlatMapType<string> = "a"
+
+    // string array must be flatted down to a just string
+    const stringEvenBeingArray: FlatMapType<string[]> = "b"
+
+    // we don't expect it to be an array
+    // @ts-expect-error
+    const expectErrorWhenArrayAssigned: FlatMapType<string[]> = ["a"]
   })
   test("AnyApplication", async () => {
     const app: AnyApplication = createApp()

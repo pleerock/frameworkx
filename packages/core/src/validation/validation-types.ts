@@ -1,9 +1,9 @@
-import { ContextList } from "../application"
+import { ContextList, FlatMapType } from "../application"
 import { StringValidationConstraints } from "./validation-constraints-string"
 import { NumberValidationConstraints } from "./validation-constraints-number"
 
 /**
- * Set of validation rules for a particular model.
+ * Validation rule for a model with a number of constraints.
  */
 export type ValidationRule<Model, Context extends ContextList> = {
   /**
@@ -34,26 +34,26 @@ export type ValidationRuleOptions<Model, Context extends ContextList> = {
   /**
    * Projection-based validation for model properties validation.
    */
-  projection?: ProjectionValidation<Model, Context>
+  projection?: ValidationRuleProjection<Model, Context>
 
   /**
    * Validation function to be executed for this model.
    */
-  validate?: ModelValidationRule<Model, Context>
+  validate?: ValidationRuleFn<Model, Context>
 }
 
 /**
- * Used to define a function that will validate a given model.
+ * Function that handles a model validation logic.
  */
-export type ModelValidationRule<T, Context extends ContextList> = (
-  object: T,
+export type ValidationRuleFn<Model, Context extends ContextList> = (
+  model: Model,
   context: Context,
 ) => void | Promise<void>
 
 /**
- * Used to define a function that will validate a given model's property.
+ * Function that handles a model's property validation logic.
  */
-export type PropertyValidationRule<
+export type ModelPropertyValidationRule<
   Model,
   Property extends keyof Model,
   Context extends ContextList
@@ -64,33 +64,41 @@ export type PropertyValidationRule<
 ) => Model[Property] | Promise<Model[Property] | undefined> | undefined
 
 /**
- * Defines a validation schema for a given model.
+ * If validator validates a model, "model projection" can be used to specify
+ * its properties for validation in a type-safe manner.
  */
-export type ProjectionValidation<T, Context extends ContextList> = {
-  [P in keyof T]?:
-    | PropertyValidationRule<T, P, Context>
-    | (T[P] extends null
-        ? never
-        : T[P] extends undefined
-        ? never
-        : T[P] extends Array<infer I> | null | undefined
-        ? I extends string | null | undefined
-          ? StringValidationConstraints
-          : I extends number | null | undefined
-          ? NumberValidationConstraints
-          : never
-        : T[P] extends string | null | undefined
+export type ValidationRuleProjection<Model, Context extends ContextList> = {
+  [P in keyof Model]?:
+    | ModelPropertyValidationRule<Model, P, Context>
+    | (FlatMapType<NonNullable<Model[P]>> extends string
         ? StringValidationConstraints
-        : T[P] extends number | null | undefined
+        : FlatMapType<NonNullable<Model[P]>> extends number
         ? NumberValidationConstraints
         : never)
 }
 
 /**
+ * Options for a Validator.
+ */
+export type ValidatorOptions = {
+  /**
+   * Property name / identifier of the validated value.
+   * Shown in error message.
+   */
+  key: string
+
+  /**
+   * Value to be validated.
+   */
+  value: any
+
+  /**
+   * Validation constraints for a given value.
+   */
+  constraints: StringValidationConstraints | NumberValidationConstraints
+}
+
+/**
  * Validator implementation should implement this type for framework to execute a validation.
  */
-export type Validator = (options: {
-  key: string
-  value: any
-  options: StringValidationConstraints | NumberValidationConstraints
-}) => void | Promise<void>
+export type Validator = (options: ValidatorOptions) => void | Promise<void>

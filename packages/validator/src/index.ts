@@ -6,12 +6,12 @@ import {
 
 const validatorjs = require("validator")
 
-export const defaultValidator: Validator = ({ key, value, options }) => {
+export const defaultValidator: Validator = ({ key, value, constraints }) => {
   if (typeof value === "string") {
-    options = options as StringValidationConstraints
+    constraints = constraints as StringValidationConstraints
 
-    if (options.maxLength !== undefined) {
-      if (value.length > options.maxLength)
+    if (constraints.maxLength !== undefined) {
+      if (value.length > constraints.maxLength)
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -20,8 +20,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
     }
 
-    if (options.minLength !== undefined) {
-      if (value.length < options.minLength) {
+    if (constraints.minLength !== undefined) {
+      if (value.length < constraints.minLength) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -30,8 +30,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.length !== undefined) {
-      if (value.length !== options.length) {
+    if (constraints.length !== undefined) {
+      if (value.length !== constraints.length) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -40,8 +40,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.contains !== undefined) {
-      if (validatorjs.contains(value, options.contains) === false) {
+    if (constraints.contains !== undefined) {
+      if (validatorjs.contains(value, constraints.contains) === false) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -50,8 +50,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.equals !== undefined) {
-      if (validatorjs.equals(value, options.equals) === false) {
+    if (constraints.equals !== undefined) {
+      if (validatorjs.equals(value, constraints.equals) === false) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -60,7 +60,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isBase32 === true) {
+    if (constraints.isBase32 === true) {
       if (validatorjs.isBase32(value) === false) {
         throw {
           "@type": "HttpError",
@@ -70,7 +70,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isBase64 === true) {
+    if (constraints.isBase64 === true) {
       if (validatorjs.isBase64(value) === false) {
         throw {
           "@type": "HttpError",
@@ -80,7 +80,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isBIC === true) {
+    if (constraints.isBIC === true) {
       if (validatorjs.isBIC(value) === false) {
         throw {
           "@type": "HttpError",
@@ -90,7 +90,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isCreditCard === true) {
+    if (constraints.isCreditCard === true) {
       if (validatorjs.isCreditCard(value) === false) {
         throw {
           "@type": "HttpError",
@@ -100,7 +100,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isCurrency === true) {
+    if (constraints.isCurrency === true) {
       if (validatorjs.isCurrency(value) === false) {
         throw {
           "@type": "HttpError",
@@ -110,7 +110,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isDecimal === true) {
+    if (constraints.isDecimal === true) {
       if (validatorjs.isDecimal(value) === false) {
         throw {
           "@type": "HttpError",
@@ -120,7 +120,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isEmail === true) {
+    if (constraints.isEmail === true) {
       if (validatorjs.isEmail(value) === false) {
         throw {
           "@type": "HttpError",
@@ -130,7 +130,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isEmpty === true) {
+    if (constraints.isEmpty === true) {
       if (validatorjs.isEmpty(value) === false) {
         throw {
           "@type": "HttpError",
@@ -140,7 +140,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isFQDN === true) {
+    if (constraints.isFQDN === true) {
       if (validatorjs.isFQDN(value) === false) {
         throw {
           "@type": "HttpError",
@@ -150,8 +150,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isHash !== undefined) {
-      if (validatorjs.isHash(value, options.isHash) === false) {
+    if (constraints.isHash !== undefined) {
+      if (validatorjs.isHash(value, constraints.isHash) === false) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -160,7 +160,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isHexColor === true) {
+    if (constraints.isHexColor === true) {
       if (validatorjs.isHexColor(value) === false) {
         throw {
           "@type": "HttpError",
@@ -170,7 +170,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isHexadecimal === true) {
+    if (constraints.isHexadecimal === true) {
       if (validatorjs.isHexadecimal(value) === false) {
         throw {
           "@type": "HttpError",
@@ -180,10 +180,11 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isIdentityCard !== undefined) {
-      if (Array.isArray(options.isIdentityCard)) {
+    if (constraints.isIdentityCard !== undefined) {
+      if (Array.isArray(constraints.isIdentityCard)) {
         if (
-          validatorjs.isIdentityCard(value, ...options.isIdentityCard) === false
+          validatorjs.isIdentityCard(value, ...constraints.isIdentityCard) ===
+          false
         ) {
           throw {
             "@type": "HttpError",
@@ -192,7 +193,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isIdentityCard")`,
           }
         }
-      } else if (options.isIdentityCard === true) {
+      } else if (constraints.isIdentityCard === true) {
         if (validatorjs.isIdentityCard(value) === false) {
           throw {
             "@type": "HttpError",
@@ -203,9 +204,9 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isIP !== undefined) {
-      if (typeof options.isIP === "number") {
-        if (validatorjs.isIP(value, options.isIP) === false) {
+    if (constraints.isIP !== undefined) {
+      if (typeof constraints.isIP === "number") {
+        if (validatorjs.isIP(value, constraints.isIP) === false) {
           throw {
             "@type": "HttpError",
             httpCode: 400,
@@ -213,7 +214,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isIP")`,
           }
         }
-      } else if (options.isIP === true) {
+      } else if (constraints.isIP === true) {
         if (validatorjs.isIP(value) === false) {
           throw {
             "@type": "HttpError",
@@ -224,9 +225,9 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isIPRange !== undefined) {
-      if (typeof options.isIPRange === "number") {
-        if (validatorjs.isIPRange(value, options.isIPRange) === false) {
+    if (constraints.isIPRange !== undefined) {
+      if (typeof constraints.isIPRange === "number") {
+        if (validatorjs.isIPRange(value, constraints.isIPRange) === false) {
           throw {
             "@type": "HttpError",
             httpCode: 400,
@@ -234,7 +235,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isIPRange")`,
           }
         }
-      } else if (options.isIPRange === true) {
+      } else if (constraints.isIPRange === true) {
         if (validatorjs.isIPRange(value) === false) {
           throw {
             "@type": "HttpError",
@@ -245,7 +246,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isISBN === true) {
+    if (constraints.isISBN === true) {
       if (validatorjs.isISBN(value) === false) {
         throw {
           "@type": "HttpError",
@@ -255,9 +256,9 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isISSN !== undefined) {
-      if (Array.isArray(options.isISSN)) {
-        if (validatorjs.isISSN(value, ...options.isISSN) === false) {
+    if (constraints.isISSN !== undefined) {
+      if (Array.isArray(constraints.isISSN)) {
+        if (validatorjs.isISSN(value, ...constraints.isISSN) === false) {
           throw {
             "@type": "HttpError",
             httpCode: 400,
@@ -265,7 +266,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isISSN")`,
           }
         }
-      } else if (options.isISSN === true) {
+      } else if (constraints.isISSN === true) {
         if (validatorjs.isISSN(value) === false) {
           throw {
             "@type": "HttpError",
@@ -276,7 +277,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isISIN === true) {
+    if (constraints.isISIN === true) {
       if (validatorjs.isISIN(value) === false) {
         throw {
           "@type": "HttpError",
@@ -286,7 +287,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isISO8601 === true) {
+    if (constraints.isISO8601 === true) {
       if (validatorjs.isISO8601(value) === false) {
         throw {
           "@type": "HttpError",
@@ -296,7 +297,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isRFC3339 === true) {
+    if (constraints.isRFC3339 === true) {
       if (validatorjs.isRFC3339(value) === false) {
         throw {
           "@type": "HttpError",
@@ -306,7 +307,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isISRC === true) {
+    if (constraints.isISRC === true) {
       if (validatorjs.isISRC(value) === false) {
         throw {
           "@type": "HttpError",
@@ -316,8 +317,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isIn !== undefined) {
-      if (validatorjs.isIn(value, options.isIn) === false) {
+    if (constraints.isIn !== undefined) {
+      if (validatorjs.isIn(value, constraints.isIn) === false) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -326,7 +327,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isJSON !== undefined) {
+    if (constraints.isJSON !== undefined) {
       if (validatorjs.isJSON(value) === false) {
         throw {
           "@type": "HttpError",
@@ -336,7 +337,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isJWT === true) {
+    if (constraints.isJWT === true) {
       if (validatorjs.isJWT(value) === false) {
         throw {
           "@type": "HttpError",
@@ -346,7 +347,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isLatLong === true) {
+    if (constraints.isLatLong === true) {
       if (validatorjs.isLatLong(value) === false) {
         throw {
           "@type": "HttpError",
@@ -356,7 +357,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isLowercase === true) {
+    if (constraints.isLowercase === true) {
       if (validatorjs.isLowercase(value) === false) {
         throw {
           "@type": "HttpError",
@@ -366,10 +367,10 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isMACAddress !== undefined) {
-      if (Array.isArray(options.isMACAddress)) {
+    if (constraints.isMACAddress !== undefined) {
+      if (Array.isArray(constraints.isMACAddress)) {
         if (
-          validatorjs.isMACAddress(value, ...options.isMACAddress) === false
+          validatorjs.isMACAddress(value, ...constraints.isMACAddress) === false
         ) {
           throw {
             "@type": "HttpError",
@@ -378,7 +379,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isMACAddress")`,
           }
         }
-      } else if (options.isMACAddress === true) {
+      } else if (constraints.isMACAddress === true) {
         if (validatorjs.isMACAddress(value) === false) {
           throw {
             "@type": "HttpError",
@@ -389,7 +390,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isMD5 === true) {
+    if (constraints.isMD5 === true) {
       if (validatorjs.isMD5(value) === false) {
         throw {
           "@type": "HttpError",
@@ -399,7 +400,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isMimeType === true) {
+    if (constraints.isMimeType === true) {
       if (validatorjs.isMimeType(value) === false) {
         throw {
           "@type": "HttpError",
@@ -409,10 +410,11 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isMobilePhone !== undefined) {
-      if (Array.isArray(options.isMobilePhone)) {
+    if (constraints.isMobilePhone !== undefined) {
+      if (Array.isArray(constraints.isMobilePhone)) {
         if (
-          validatorjs.isMobilePhone(value, ...options.isMobilePhone) === false
+          validatorjs.isMobilePhone(value, ...constraints.isMobilePhone) ===
+          false
         ) {
           throw {
             "@type": "HttpError",
@@ -421,7 +423,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isMobilePhone")`,
           }
         }
-      } else if (options.isMobilePhone === true) {
+      } else if (constraints.isMobilePhone === true) {
         if (validatorjs.isMobilePhone(value) === false) {
           throw {
             "@type": "HttpError",
@@ -432,7 +434,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isMongoId === true) {
+    if (constraints.isMongoId === true) {
       if (validatorjs.isMongoId(value) === false) {
         throw {
           "@type": "HttpError",
@@ -442,9 +444,9 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isNumeric !== undefined) {
-      if (Array.isArray(options.isNumeric)) {
-        if (validatorjs.isNumeric(value, ...options.isNumeric) === false) {
+    if (constraints.isNumeric !== undefined) {
+      if (Array.isArray(constraints.isNumeric)) {
+        if (validatorjs.isNumeric(value, ...constraints.isNumeric) === false) {
           throw {
             "@type": "HttpError",
             httpCode: 400,
@@ -452,7 +454,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isNumeric")`,
           }
         }
-      } else if (options.isNumeric === true) {
+      } else if (constraints.isNumeric === true) {
         if (validatorjs.isNumeric(value) === false) {
           throw {
             "@type": "HttpError",
@@ -463,7 +465,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isPort === true) {
+    if (constraints.isPort === true) {
       if (validatorjs.isPort(value) === false) {
         throw {
           "@type": "HttpError",
@@ -473,10 +475,10 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isPostalCode !== undefined) {
-      if (Array.isArray(options.isPostalCode)) {
+    if (constraints.isPostalCode !== undefined) {
+      if (Array.isArray(constraints.isPostalCode)) {
         if (
-          validatorjs.isPostalCode(value, ...options.isPostalCode) === false
+          validatorjs.isPostalCode(value, ...constraints.isPostalCode) === false
         ) {
           throw {
             "@type": "HttpError",
@@ -485,7 +487,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isPostalCode")`,
           }
         }
-      } else if (options.isPostalCode === true) {
+      } else if (constraints.isPostalCode === true) {
         if (validatorjs.isPostalCode(value) === false) {
           throw {
             "@type": "HttpError",
@@ -496,9 +498,9 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isURL !== undefined) {
-      if (Array.isArray(options.isURL)) {
-        if (validatorjs.isURL(value, ...options.isURL) === false) {
+    if (constraints.isURL !== undefined) {
+      if (Array.isArray(constraints.isURL)) {
+        if (validatorjs.isURL(value, ...constraints.isURL) === false) {
           throw {
             "@type": "HttpError",
             httpCode: 400,
@@ -506,7 +508,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
             message: `Validation error: ${key} ("isURL")`,
           }
         }
-      } else if (options.isURL === true) {
+      } else if (constraints.isURL === true) {
         if (validatorjs.isURL(value) === false) {
           throw {
             "@type": "HttpError",
@@ -517,8 +519,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isUUID !== undefined) {
-      if (validatorjs.isUUID(value, options.isUUID) === false) {
+    if (constraints.isUUID !== undefined) {
+      if (validatorjs.isUUID(value, constraints.isUUID) === false) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -527,7 +529,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isUppercase === true) {
+    if (constraints.isUppercase === true) {
       if (validatorjs.isUppercase(value) === false) {
         throw {
           "@type": "HttpError",
@@ -537,8 +539,10 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.isWhitelisted !== undefined) {
-      if (validatorjs.isWhitelisted(value, options.isWhitelisted) === false) {
+    if (constraints.isWhitelisted !== undefined) {
+      if (
+        validatorjs.isWhitelisted(value, constraints.isWhitelisted) === false
+      ) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -547,8 +551,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
       }
     }
-    if (options.matches !== undefined) {
-      if (validatorjs.matches(value, options.matches) === false) {
+    if (constraints.matches !== undefined) {
+      if (validatorjs.matches(value, constraints.matches) === false) {
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -559,8 +563,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
     }
   } else if (typeof value === "number") {
     // bigint-not-supported options
-    options = options as NumberValidationConstraints
-    if (options.even === true) {
+    constraints = constraints as NumberValidationConstraints
+    if (constraints.even === true) {
       if ((value % 2 === 0) === false)
         throw {
           "@type": "HttpError",
@@ -569,7 +573,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("even")`,
         }
     }
-    if (options.odd === true) {
+    if (constraints.odd === true) {
       if ((Math.abs(value % 2) === 1) === false)
         throw {
           "@type": "HttpError",
@@ -579,9 +583,9 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
         }
     }
   } else if (typeof value === "number" || typeof value === "bigint") {
-    options = options as NumberValidationConstraints
-    if (options.equals !== undefined) {
-      if (value !== options.equals)
+    constraints = constraints as NumberValidationConstraints
+    if (constraints.equals !== undefined) {
+      if (value !== constraints.equals)
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -589,8 +593,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("equals")`,
         }
     }
-    if (options.min !== undefined) {
-      if (value < options.min)
+    if (constraints.min !== undefined) {
+      if (value < constraints.min)
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -598,8 +602,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("min")`,
         }
     }
-    if (options.max !== undefined) {
-      if (value > options.max)
+    if (constraints.max !== undefined) {
+      if (value > constraints.max)
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -607,7 +611,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("max")`,
         }
     }
-    if (options.negative === true) {
+    if (constraints.negative === true) {
       if (value > -1)
         throw {
           "@type": "HttpError",
@@ -616,7 +620,7 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("negative")`,
         }
     }
-    if (options.positive === true) {
+    if (constraints.positive === true) {
       if (value < 0)
         throw {
           "@type": "HttpError",
@@ -625,8 +629,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("positive")`,
         }
     }
-    if (options.between !== undefined) {
-      if (value < options.between[0] || value > options.between[1])
+    if (constraints.between !== undefined) {
+      if (value < constraints.between[0] || value > constraints.between[1])
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -634,8 +638,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("between")`,
         }
     }
-    if (options.lessThan !== undefined) {
-      if (value >= options.lessThan)
+    if (constraints.lessThan !== undefined) {
+      if (value >= constraints.lessThan)
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -643,8 +647,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("lessThan")`,
         }
     }
-    if (options.lessThanOrEqual !== undefined) {
-      if (value > options.lessThanOrEqual)
+    if (constraints.lessThanOrEqual !== undefined) {
+      if (value > constraints.lessThanOrEqual)
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -652,8 +656,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("lessThanOrEqual")`,
         }
     }
-    if (options.greaterThan !== undefined) {
-      if (value <= options.greaterThan)
+    if (constraints.greaterThan !== undefined) {
+      if (value <= constraints.greaterThan)
         throw {
           "@type": "HttpError",
           httpCode: 400,
@@ -661,8 +665,8 @@ export const defaultValidator: Validator = ({ key, value, options }) => {
           message: `Validation error: ${key} ("greaterThan")`,
         }
     }
-    if (options.greaterThanOrEqual !== undefined) {
-      if (value < options.greaterThanOrEqual)
+    if (constraints.greaterThanOrEqual !== undefined) {
+      if (value < constraints.greaterThanOrEqual)
         throw {
           "@type": "HttpError",
           httpCode: 400,
