@@ -1,11 +1,18 @@
 import { TypeMetadata, TypeMetadataKind } from "./type-metadata-types"
 
+/**
+ * Set of utility functions to work with type metadatas.
+ */
 export const TypeMetadataUtils = {
-  createType(
+  /**
+   * Helper function to create a type metadata.
+   */
+  create(
     kind: TypeMetadataKind,
-    type?: Partial<TypeMetadata>,
+    type?: Partial<Omit<TypeMetadata, "kind" | "@type">>,
   ): TypeMetadata {
     return {
+      "@type": "TypeMetadata",
       kind,
       array: false,
       nullable: false,
@@ -15,7 +22,10 @@ export const TypeMetadataUtils = {
     }
   },
 
-  isTypePrimitive(metadata: TypeMetadata) {
+  /**
+   * Checks if given type metadata is primitive.
+   */
+  isPrimitive(metadata: TypeMetadata): boolean {
     return (
       metadata.kind === "string" ||
       metadata.kind === "number" ||
@@ -24,7 +34,10 @@ export const TypeMetadataUtils = {
     )
   },
 
-  isNameValid(name: string) {
-    return name.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/)
+  /**
+   * Checks if given type metadata name is valid.
+   */
+  isNameValid(name: string): boolean {
+    return name.match(/^[_a-zA-Z][_a-zA-Z0-9]*$/) !== null
   },
 }

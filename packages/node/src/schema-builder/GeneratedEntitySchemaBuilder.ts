@@ -267,10 +267,10 @@ export class GeneratedEntitySchemaBuilder {
       const orderArgsProperties: TypeMetadata[] = []
       for (const key in model.properties) {
         const property = model.properties[key]
-        if (TypeMetadataUtils.isTypePrimitive(property)) {
+        if (TypeMetadataUtils.isPrimitive(property)) {
           // todo: yeah make it more complex like with where
           orderArgsProperties.push(
-            TypeMetadataUtils.createType("string", {
+            TypeMetadataUtils.create("string", {
               propertyName: property.propertyName,
               nullable: true,
             }),
@@ -278,26 +278,26 @@ export class GeneratedEntitySchemaBuilder {
         }
       }
 
-      const whereArgs = TypeMetadataUtils.createType("object", {
+      const whereArgs = TypeMetadataUtils.create("object", {
         typeName: namingStrategy.generatedModelInputs.where(model.typeName!!),
         propertyName: "where",
         nullable: true,
         properties: whereArgsProperties,
       })
 
-      const saveArgs = TypeMetadataUtils.createType("object", {
+      const saveArgs = TypeMetadataUtils.create("object", {
         typeName: namingStrategy.generatedModelInputs.save(model.typeName!!),
         properties: saveArgsProperties,
       })
 
-      const orderByArgs = TypeMetadataUtils.createType("object", {
+      const orderByArgs = TypeMetadataUtils.create("object", {
         typeName: namingStrategy.generatedModelInputs.order(model.typeName!!),
         propertyName: "order",
         nullable: true,
         properties: orderArgsProperties,
       })
 
-      const queryArgs = TypeMetadataUtils.createType("object", {
+      const queryArgs = TypeMetadataUtils.create("object", {
         nullable: true,
         properties: [whereArgs, orderByArgs],
       })
@@ -336,7 +336,7 @@ export class GeneratedEntitySchemaBuilder {
         args: queryArgs,
       })
       this.registerQuery({
-        ...TypeMetadataUtils.createType("number"),
+        ...TypeMetadataUtils.create("number"),
         propertyName: namingStrategy.generatedModelDeclarations.count(
           modelName,
         ),
@@ -359,7 +359,7 @@ export class GeneratedEntitySchemaBuilder {
         args: saveArgs,
       })
       this.registerMutation({
-        ...TypeMetadataUtils.createType("boolean"),
+        ...TypeMetadataUtils.create("boolean"),
         propertyName: namingStrategy.generatedModelDeclarations.remove(
           modelName,
         ),
@@ -436,7 +436,7 @@ export class GeneratedEntitySchemaBuilder {
           args: queryArgs,
         })
         this.registerSubscription({
-          ...TypeMetadataUtils.createType("number"),
+          ...TypeMetadataUtils.create("number"),
           propertyName: namingStrategy.generatedModelDeclarations.observeCount(
             modelName,
           ),
@@ -460,13 +460,13 @@ export class GeneratedEntitySchemaBuilder {
     const allTypes: TypeMetadata[] = []
     for (const key in type.properties) {
       const property = type.properties[key]
-      if (TypeMetadataUtils.isTypePrimitive(property) /* or enum? */) {
+      if (TypeMetadataUtils.isPrimitive(property) /* or enum? */) {
         const columnWithSuchProperty = entityMetadata.findColumnsWithPropertyPath(
           property.propertyName!,
         )
         if (columnWithSuchProperty) {
           allTypes.push(
-            TypeMetadataUtils.createType(property.kind, {
+            TypeMetadataUtils.create(property.kind, {
               nullable: true,
               propertyName: property.propertyName,
             }),
@@ -487,7 +487,7 @@ export class GeneratedEntitySchemaBuilder {
             throw new Error(`cannot find a type ${property.typeName}`)
 
           allTypes.push(
-            TypeMetadataUtils.createType("object", {
+            TypeMetadataUtils.create("object", {
               typeName: this.properties.namingStrategy.generatedModelInputs.whereRelation(
                 type.typeName!!,
                 property.propertyName!!,
@@ -519,13 +519,13 @@ export class GeneratedEntitySchemaBuilder {
     const allTypes: TypeMetadata[] = []
     for (const key in type.properties) {
       const property = type.properties[key]
-      if (TypeMetadataUtils.isTypePrimitive(property) /* or enum? */) {
+      if (TypeMetadataUtils.isPrimitive(property) /* or enum? */) {
         const columnWithSuchProperty = entityMetadata.findColumnsWithPropertyPath(
           property.propertyName!,
         )
         if (columnWithSuchProperty) {
           allTypes.push(
-            TypeMetadataUtils.createType(property.kind, {
+            TypeMetadataUtils.create(property.kind, {
               nullable: true,
               propertyName: property.propertyName,
             }),
@@ -550,7 +550,7 @@ export class GeneratedEntitySchemaBuilder {
             relationWithSuchProperty.relationType === "one-to-many"
 
           allTypes.push(
-            TypeMetadataUtils.createType("object", {
+            TypeMetadataUtils.create("object", {
               typeName: this.properties.namingStrategy.generatedModelInputs.saveRelation(
                 type.typeName!!,
                 property.propertyName!!,

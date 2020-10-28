@@ -4,7 +4,7 @@ import {
   Validator,
 } from "@microframework/core"
 
-describe("core > validation > fake validator", () => {
+describe("core > validation > validator", () => {
   describe("Validator (sync)", () => {
     const demoValidator: Validator = (options) => {
       if (typeof options.value === "number") {

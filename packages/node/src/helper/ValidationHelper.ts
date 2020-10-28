@@ -28,7 +28,7 @@ export class ValidationHelper {
     // skip if validator wasn't defined in application bootstrap
     if (!this.validator) return
     if (value === undefined || value === null) return
-    if (TypeMetadataUtils.isTypePrimitive(metadata)) return
+    if (TypeMetadataUtils.isPrimitive(metadata)) return
 
     if (metadata.array === true) {
       for (const subVal of value) {
@@ -79,7 +79,7 @@ export class ValidationHelper {
         }
 
         // if its a sub-object validate nested properties
-        if (TypeMetadataUtils.isTypePrimitive(property) === false) {
+        if (TypeMetadataUtils.isPrimitive(property) === false) {
           await this.validate(property, value[property.propertyName!!], context)
         }
       }

@@ -174,6 +174,7 @@ export function createApplicationServer<App extends AnyApplication>(
     websocketServer: undefined,
     dataSource: undefined,
     metadata: {
+      "@type": "ApplicationTypeMetadata",
       name: "",
       description: "",
       actions: [],

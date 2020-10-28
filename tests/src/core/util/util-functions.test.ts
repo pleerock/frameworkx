@@ -43,6 +43,10 @@ describe("core > util", () => {
       const { id, fullName } = destruct(PersonLiteral)
       expect(id).toEqual(1)
       expect(fullName()).toEqual("Timber Saw")
+
+      // destructing missing properties must lead to errors
+      // @ts-expect-error
+      const { missingProperty } = destruct(PersonLiteral)
     })
     test("class", async () => {
       class PersonCls {
@@ -57,6 +61,10 @@ describe("core > util", () => {
       const { id, fullName } = destruct(new PersonCls())
       expect(id).toEqual(1)
       expect(fullName()).toEqual("Timber Saw")
+
+      // destructing missing properties must lead to errors
+      // @ts-expect-error
+      const { missingProperty } = destruct(new PersonCls())
     })
     test("anonymous class", async () => {
       const PersonCls = class {
@@ -71,6 +79,10 @@ describe("core > util", () => {
       const { id, fullName } = destruct(new PersonCls())
       expect(id).toEqual(1)
       expect(fullName()).toEqual("Timber Saw")
+
+      // destructing missing properties must lead to errors
+      // @ts-expect-error
+      const { missingProperty } = destruct(new PersonCls())
     })
   })
   test("service", () => {

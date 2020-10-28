@@ -26,13 +26,13 @@ export class ModelParser {
     origin: string,
   ): TypeMetadata {
     if (node.kind === ts.SyntaxKind.NumberKeyword) {
-      return TypeMetadataUtils.createType("number")
+      return TypeMetadataUtils.create("number")
     } else if (node.kind === ts.SyntaxKind.BigIntKeyword) {
-      return TypeMetadataUtils.createType("bigint")
+      return TypeMetadataUtils.create("bigint")
     } else if (node.kind === ts.SyntaxKind.StringKeyword) {
-      return TypeMetadataUtils.createType("string")
+      return TypeMetadataUtils.create("string")
     } else if (node.kind === ts.SyntaxKind.BooleanKeyword) {
-      return TypeMetadataUtils.createType("boolean")
+      return TypeMetadataUtils.create("boolean")
     } else if (ts.isTypeAliasDeclaration(node)) {
       return this.parse(
         node.type,
@@ -57,11 +57,11 @@ export class ModelParser {
       type.array = true
       return type
     } else if (ts.isTypeLiteralNode(node)) {
-      return TypeMetadataUtils.createType("object", {
+      return TypeMetadataUtils.create("object", {
         properties: this.parseMembers(node.members, parentName, origin),
       })
     } else if (ts.isEnumDeclaration(node)) {
-      return TypeMetadataUtils.createType("enum", {
+      return TypeMetadataUtils.create("enum", {
         properties: this.parseMembers(node.members, parentName, origin),
       })
     } else if (ts.isIntersectionTypeNode(node)) {
@@ -76,7 +76,7 @@ export class ModelParser {
         properties.push(...parsed.properties)
       })
 
-      return TypeMetadataUtils.createType("object", {
+      return TypeMetadataUtils.create("object", {
         properties,
       })
     } else if (ts.isClassDeclaration(node)) {
@@ -88,7 +88,7 @@ export class ModelParser {
           ? this.parseMembers(node.members, typeName, origin)
           : []
 
-      return TypeMetadataUtils.createType("object", {
+      return TypeMetadataUtils.create("object", {
         typeName,
         properties,
       })
@@ -100,7 +100,10 @@ export class ModelParser {
         !parentName || goDeep
           ? this.parseMembers(node.members, typeName, origin)
           : []
-      return TypeMetadataUtils.createType("object", { typeName, properties })
+      return TypeMetadataUtils.create("object", {
+        typeName,
+        properties,
+      })
     } else if (ts.isUnionTypeNode(node)) {
       // extract information about nullability and undefined-ability
       let nullType = node.types.find(
@@ -161,7 +164,7 @@ export class ModelParser {
         },
       )
       if (allAllNumberLiterals) {
-        return TypeMetadataUtils.createType("number", {
+        return TypeMetadataUtils.create("number", {
           nullable,
           canBeUndefined,
         })
@@ -174,7 +177,7 @@ export class ModelParser {
         },
       )
       if (allAllBigIntLiterals) {
-        return TypeMetadataUtils.createType("bigint", {
+        return TypeMetadataUtils.create("bigint", {
           nullable,
           canBeUndefined,
         })
@@ -191,7 +194,7 @@ export class ModelParser {
         },
       )
       if (allAllBooleanLiterals) {
-        return TypeMetadataUtils.createType("boolean", {
+        return TypeMetadataUtils.create("boolean", {
           nullable,
           canBeUndefined,
         })
@@ -232,12 +235,12 @@ export class ModelParser {
 
         // create enum properties
         const properties = literals.map((literal) => {
-          return TypeMetadataUtils.createType("property", {
+          return TypeMetadataUtils.create("property", {
             propertyName: literal,
           })
         })
 
-        return TypeMetadataUtils.createType("enum", {
+        return TypeMetadataUtils.create("enum", {
           typeName,
           nullable,
           canBeUndefined,
@@ -263,7 +266,7 @@ export class ModelParser {
       const properties = typesWithoutNullAndUndefined.map((type) =>
         this.parse(type, parentName, false, `${origin}.unionTypeNode`),
       )
-      return TypeMetadataUtils.createType("union", {
+      return TypeMetadataUtils.create("union", {
         typeName,
         nullable,
         canBeUndefined,
@@ -297,7 +300,7 @@ export class ModelParser {
         // if this is a nested call (in case we'll have a parent name) -
         // we don't go deeper to prevent recursion for named symbols
         if (parentName && !goDeep) {
-          return TypeMetadataUtils.createType("model", {
+          return TypeMetadataUtils.create("model", {
             modelName,
           })
         }
@@ -334,7 +337,7 @@ export class ModelParser {
         !goDeep &&
         (!resolvedType || !ts.isEnumDeclaration(resolvedType))
       ) {
-        return TypeMetadataUtils.createType("object", {
+        return TypeMetadataUtils.create("object", {
           typeName,
           description,
           deprecated,
@@ -428,7 +431,7 @@ export class ModelParser {
             property.propertyName!,
           )
 
-        modelProperty.args = TypeMetadataUtils.createType(argsModel.kind, {
+        modelProperty.args = TypeMetadataUtils.create(argsModel.kind, {
           typeName: argsModel.typeName,
           propertyName: argsModel.propertyName,
           properties: property.properties,
@@ -508,7 +511,7 @@ export class ModelParser {
         }
 
         properties.push(
-          TypeMetadataUtils.createType("object", {
+          TypeMetadataUtils.create("object", {
             propertyName,
             description,
             deprecated,

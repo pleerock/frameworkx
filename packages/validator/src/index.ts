@@ -6,6 +6,8 @@ import {
 
 const validatorjs = require("validator")
 
+// todo: create Error class here
+
 export const defaultValidator: Validator = ({ key, value, constraints }) => {
   if (typeof value === "string") {
     constraints = constraints as StringValidationConstraints

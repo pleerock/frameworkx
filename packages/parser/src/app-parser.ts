@@ -98,6 +98,7 @@ export function parse(
   }
 
   const result: ApplicationTypeMetadata = {
+    "@type": "ApplicationTypeMetadata",
     name: declaration.name.text,
     description,
     actions: [],
@@ -237,6 +238,7 @@ function parseActions(
     )
 
     return {
+      "@type": "ActionTypeMetadata",
       name: action.propertyName,
       description: action.description,
       return: returning ? { ...returning, propertyName: "" } : undefined,
