@@ -18,6 +18,10 @@ import {
   ResolveStrategy,
 } from "./index"
 
+// todo: here we can add queryResolver(), mutationResolver(), subscriptionResolver() to support specific resolvers
+// todo: we also need to think how we can elegantly made it in decorator
+// todo: also probably need to add class support for context resolvers
+
 /**
  * Resolvers provides some logic on resolving particular query / mutation / subscription / action or model property.
  * This particular function is used as decorator and resolves queries, mutations, subscriptions and actions.
@@ -272,7 +276,7 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
  */
 export function resolver(
   arg0?: AnyApplication | { name: string; dataLoader?: boolean },
-  arg1?: ResolveKey<any> | DeclarationResolver<any> | AnyModel,
+  arg1?: ResolveKey<any> | LiteralOrClass<DeclarationResolver<any>> | AnyModel,
   arg2?:
     | ResolveStrategy<any, any>
     | ModelResolver<any, any>
@@ -446,7 +450,3 @@ export function contextResolver<
     resolverFn,
   }
 }
-
-// todo: here we can add queryResolver(), mutationResolver(), subscriptionResolver() to support specific resolvers
-// todo: we also need to think how we can elegantly made it in decorator
-// todo: also probably need to add class support for context resolvers

@@ -107,4 +107,5 @@ export type ResolverReturnValue<T> = T extends Array<infer U>
 export type AppResolverType =
   | AnyResolver
   | DeclarationResolver<any>
-  | { new (...args: any[]): DeclarationResolver<any> }
+  | { new (...args: any[]): any }
+/* | { new (...args: any[]): DeclarationResolver<any> } // for some reason this doesn't work */

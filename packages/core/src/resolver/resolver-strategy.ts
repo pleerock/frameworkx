@@ -25,7 +25,7 @@ export type ModelResolver<
   [P in keyof Type]?:
     | ((
         parent: Type,
-        args: any,
+        input: any,
         context: Context & DefaultContext,
       ) => ResolverReturnValue<Type[P]>)
     | ResolverReturnValue<Type[P]>
@@ -40,8 +40,8 @@ export type ModelDLResolver<
 > = {
   [P in keyof Type]?:
     | ((
-        parent: Type[],
-        args: any,
+        parents: Type[],
+        input: any,
         context: Context & DefaultContext,
       ) => ResolverReturnValue<Type[P][]>)
     | ResolverReturnValue<Type[P][]>
@@ -52,37 +52,24 @@ export type ModelDLResolver<
  */
 export type ContextResolver<Context extends ContextList> = {
   [P in keyof Context]: (
-    options: DefaultContext,
+    defaultContext: DefaultContext,
   ) => Context[P] | Promise<Context[P]>
 }
 
 /**
  * Type to provide resolvers for declarations (queries, mutations, subscriptions and actions).
  */
-export type DeclarationResolver<
-  App extends AnyApplication | AnyApplicationOptions
-> = App extends AnyApplication
-  ? {
-      [P in
-        | keyof App["_options"]["actions"]
-        | keyof App["_options"]["models"]
-        | keyof App["_options"]["queries"]
-        | keyof App["_options"]["mutations"]
-        | keyof App["_options"]["subscriptions"]]?: ResolveStrategy<
-        App["_options"],
-        P
-      >
-    }
-  : App extends AnyApplicationOptions
-  ? {
-      [P in
-        | keyof App["actions"]
-        | keyof App["models"]
-        | keyof App["queries"]
-        | keyof App["mutations"]
-        | keyof App["subscriptions"]]?: ResolveStrategy<App, P>
-    }
-  : unknown
+export type DeclarationResolver<App extends AnyApplication> = {
+  [P in
+    | keyof App["_options"]["actions"]
+    | keyof App["_options"]["models"]
+    | keyof App["_options"]["queries"]
+    | keyof App["_options"]["mutations"]
+    | keyof App["_options"]["subscriptions"]]?: ResolveStrategy<
+    App["_options"],
+    P
+  >
+}
 
 /**
  * Maps to a resolving strategy of a particular app's declaration.
@@ -129,10 +116,10 @@ export type QueryMutationItemResolver<
           context: Context & DefaultContext,
         ) => ResolverReturnValue<ReturnType<Declaration>>)
       | ResolverReturnValue<ReturnType<Declaration>>
-  : Declaration extends (args: infer Args) => infer Return
+  : Declaration extends (input: infer Input) => infer Return
   ?
       | ((
-          args: Args,
+          input: Input,
           context: Context & DefaultContext,
         ) => ResolverReturnValue<Return>)
       | ResolverReturnValue<Return>
@@ -154,16 +141,16 @@ export type SubscriptionItemResolver<
       onSubscribe?: (context: Context & DefaultContext) => any
       onUnsubscribe?: (context: Context & DefaultContext) => any
     }
-  : Declaration extends (args: infer Args) => infer Return
+  : Declaration extends (input: infer Input) => infer Return
   ? {
       triggers: string | string[]
       filter?: (
         payload: any,
-        args: Args,
+        input: Input,
         context: Context & DefaultContext,
       ) => boolean | Promise<boolean>
-      onSubscribe?: (args: Args, context: Context & DefaultContext) => any
-      onUnsubscribe?: (args: Args, context: Context & DefaultContext) => any
+      onSubscribe?: (input: Input, context: Context & DefaultContext) => any
+      onUnsubscribe?: (input: Input, context: Context & DefaultContext) => any
     }
   : unknown
 
@@ -179,7 +166,7 @@ export type ActionItemResolver<
 ) => A["return"] | Promise<A["return"]>
 
 /**
- * Gets args (input) for a given application declaration.
+ * Helper type to get input args of a given declaration.
  */
 export type DeclarationArgs<
   App extends AnyApplication,
@@ -188,7 +175,7 @@ export type DeclarationArgs<
   ? App["_options"]["mutations"][Method] extends never
     ? App["_options"]["subscriptions"][Method] extends never
       ? App["_options"]["actions"][Method] extends never
-        ? never
+        ? unknown
         : Parameters<App["_options"]["actions"][Method]>[0]
       : Parameters<App["_options"]["subscriptions"][Method]>[0]
     : Parameters<App["_options"]["mutations"][Method]>[0]
