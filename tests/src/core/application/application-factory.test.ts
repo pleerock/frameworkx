@@ -1,5 +1,5 @@
 import * as requestFns from "@microframework/core/_/request/request-functions"
-import * as validationFns from "@microframework/core/_/validation/validation-rule-function"
+import * as validationFns from "@microframework/core/_/validation/validation-functions"
 import * as resolverFns from "@microframework/core/_/resolver/resolver-function"
 import {
   action,

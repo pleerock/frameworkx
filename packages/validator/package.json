@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@microframework/core": "*",
-    "validator": "^13.1.1"
+    "validator": "^13.1.17"
   },
   "devDependencies": {
     "@types/node": "^14.0.14",

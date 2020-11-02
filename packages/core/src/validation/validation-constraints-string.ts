@@ -2,7 +2,6 @@
  * String validation constraints.
  */
 export type StringValidationConstraints = {
-
   /**
    * Checks if the string not longer than given length.
    */
@@ -76,7 +75,20 @@ export type StringValidationConstraints = {
   /**
    * Checks if the string is a hash of type algorithm.
    */
-  isHash?: 'md4' | 'md5' | 'sha1' | 'sha256' | 'sha384' | 'sha512' | 'ripemd128' | 'ripemd160' | 'tiger128' | 'tiger160' | 'tiger192' | 'crc32' | 'crc32b'
+  isHash?:
+    | "md4"
+    | "md5"
+    | "sha1"
+    | "sha256"
+    | "sha384"
+    | "sha512"
+    | "ripemd128"
+    | "ripemd160"
+    | "tiger128"
+    | "tiger160"
+    | "tiger192"
+    | "crc32"
+    | "crc32b"
 
   /**
    * Checks if the string is a hexadecimal color.
@@ -111,7 +123,7 @@ export type StringValidationConstraints = {
   /**
    * Checks if the string is an ISSN.
    */
-    isISSN?: boolean | any[]
+  isISSN?: boolean | any[]
 
   /**
    * Checks if the string is an ISIN (stock/security identifier).
@@ -134,9 +146,9 @@ export type StringValidationConstraints = {
   isISRC?: boolean
 
   /**
-   * Check if the string is in a array of allowed values.
+   * Check if the string or array of strings is in a array of allowed values.
    */
-  isIn?: string[]
+  isIn?: string | string[]
 
   /**
    * Checks if the string is valid JSON.
@@ -222,5 +234,4 @@ export type StringValidationConstraints = {
    * Checks if string matches the pattern.
    */
   matches?: RegExp
-
 }

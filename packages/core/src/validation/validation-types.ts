@@ -100,5 +100,6 @@ export type ValidatorOptions = {
 
 /**
  * Validator implementation should implement this type for framework to execute a validation.
+ * If validation of a given value is not successful this function must throw an error.
  */
 export type Validator = (options: ValidatorOptions) => void | Promise<void>

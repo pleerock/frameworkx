@@ -18,6 +18,13 @@ export const DefaultErrorHandler: ErrorHandler = {
         }
         jsonError["message"] = error.message
         jsonError["stack"] = error.stack
+      } else if (error["@type"] === "ValidationError") {
+        status = 400
+        if (error.code) {
+          jsonError["code"] = error.code
+        }
+        jsonError["message"] = error.message
+        jsonError["stack"] = error.stack
       } else if (error["@type"] === "CodeError") {
         jsonError["code"] = error.code
         jsonError["message"] = error.message
