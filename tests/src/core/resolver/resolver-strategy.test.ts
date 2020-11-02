@@ -1,7 +1,6 @@
 import {
   Application,
   ContextResolver,
-  createApp,
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
@@ -508,7 +507,7 @@ describe("core > resolver > strategy", () => {
           // @ts-expect-error
           removeUser() {
             return 1
-          }
+          },
         }
       })
       test("in queries / mutations / subscriptions return type can be partial", () => {
@@ -520,7 +519,7 @@ describe("core > resolver > strategy", () => {
             return {
               id: 1,
             }
-          }
+          },
         }
       })
       test("it should be possible to return null for nullable queries / mutations", () => {
@@ -542,6 +541,7 @@ describe("core > resolver > strategy", () => {
       })
       test("if query / mutation isn't nullable we should not be able to return null", () => {
         const resolver1: DeclarationResolver<UserApp> = {
+          // @ts-expect-error
           users() {
             return null
           },

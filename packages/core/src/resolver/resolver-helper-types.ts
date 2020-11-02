@@ -76,30 +76,78 @@ export type ActionArgs<Action extends AnyAction> = {
 }
 
 /**
+ * Checks if given type is nullable and returns "true" literal type if it is.
+ */
+export type IsNullable<T> = null extends T ? true : false
+
+/**
  * Resolver possible return value type.
  */
-export type ResolverReturnValue<T> = T extends Array<infer U>
+export type ResolverReturnValue<T> = IsNullable<T> extends true
+  ? NonNullable<T> extends Array<infer U>
+    ? U extends boolean
+      ?
+          | boolean[]
+          | null
+          | Promise<boolean[]>
+          | Promise<boolean[] | null>
+          | Promise<null>
+      : U extends number
+      ?
+          | number[]
+          | null
+          | Promise<number[]>
+          | Promise<number[] | null>
+          | Promise<null>
+      : U extends string
+      ?
+          | string[]
+          | null
+          | Promise<string[]>
+          | Promise<string[] | null>
+          | Promise<null>
+      :
+          | U[]
+          | DeepPartial<U>[]
+          | null
+          | Promise<U[]>
+          | Promise<U[] | null>
+          | Promise<DeepPartial<U>[]>
+          | Promise<DeepPartial<U>[] | null>
+          | Promise<null>
+    : NonNullable<T> extends boolean
+    ? boolean | null | Promise<boolean> | Promise<boolean | null>
+    : NonNullable<T> extends number
+    ? number | null | Promise<number> | Promise<number | null>
+    : NonNullable<T> extends string
+    ? string | null | Promise<string> | Promise<string | null>
+    : NonNullable<T> extends Object
+    ?
+        | T
+        | DeepPartial<T>
+        | null
+        | Promise<T | null>
+        | Promise<DeepPartial<T> | null>
+        | Promise<null>
+    : unknown
+  : T extends Array<infer U>
   ? U extends boolean
     ? boolean[] | Promise<boolean[]>
     : U extends number
     ? number[] | Promise<number[]>
     : U extends string
     ? string[] | Promise<string[]>
-    : U extends Object
-    ? DeepPartial<U>[] | null | Promise<DeepPartial<U>[] | null>
-    : U[] | null | Promise<U[] | null>
+    : U[] | DeepPartial<U>[] | Promise<U[]> | Promise<DeepPartial<U>[]>
   : T extends boolean
   ? boolean | Promise<boolean>
   : T extends number
   ? number | Promise<number>
   : T extends string
   ? string | Promise<string>
-  : null extends T
-  ? null | Promise<null>
-  : // T extends object | null ? DeepPartial<T | null> | Promise<DeepPartial<T> | null> :
-  T extends Object
-  ? DeepPartial<T | null> | Promise<DeepPartial<T> | null>
-  : T | null | Promise<T | null>
+  : T | DeepPartial<T> | Promise<T> | Promise<DeepPartial<T>>
+
+// todo: tests like this
+// const a: ResolverReturnValue<{ id: number } | null> = Promise.resolve(null)
 
 /**
  * Types or resolvers that can registered in the application.
