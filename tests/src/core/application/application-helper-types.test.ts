@@ -5,6 +5,7 @@ import {
   DeepPartial,
   FlatMapType,
   ForcedType,
+  IsNullable,
   LiteralOrClass,
   MixedList,
   NonArray,
@@ -119,6 +120,20 @@ describe("core > application > helper types", () => {
         { name: "animals" },
       ],
     }
+  })
+  test("IsNullable", async () => {
+    type User = {
+      id: number
+      name: string
+    }
+    const check1: IsNullable<User> = false
+    const check2: IsNullable<User | null> = true
+
+    // @ts-expect-error
+    const check3: IsNullable<User> = true
+
+    // @ts-expect-error
+    const check4: IsNullable<User | null> = false
   })
   test("AnyApplication", async () => {
     const app: AnyApplication = createApp()

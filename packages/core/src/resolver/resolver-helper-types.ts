@@ -1,4 +1,9 @@
-import { AnyAction, AnyApplicationOptions, DeepPartial } from "../application"
+import {
+  AnyAction,
+  AnyApplicationOptions,
+  DeepPartial,
+  IsNullable,
+} from "../application"
 import { ContextLogger } from "../logger"
 import { AnyResolver } from "./resolver-metadata"
 import { DeclarationResolver } from "./resolver-strategy"
@@ -76,11 +81,6 @@ export type ActionArgs<Action extends AnyAction> = {
 }
 
 /**
- * Checks if given type is nullable and returns "true" literal type if it is.
- */
-export type IsNullable<T> = null extends T ? true : false
-
-/**
  * Resolver possible return value type.
  */
 export type ResolverReturnValue<T> = IsNullable<T> extends true
@@ -95,8 +95,7 @@ export type ResolverReturnValue<T> = IsNullable<T> extends true
           | U[]
           | DeepPartial<U>[]
           | null
-          | Promise<U[] | null | undefined>
-          | Promise<DeepPartial<U>[] | null | undefined>
+          | Promise<U[] | DeepPartial<U>[] | null | undefined>
     : NonNullable<T> extends boolean
     ? boolean | null | Promise<boolean> | Promise<boolean | null>
     : NonNullable<T> extends number
@@ -109,8 +108,7 @@ export type ResolverReturnValue<T> = IsNullable<T> extends true
         | DeepPartial<T>
         | null
         | undefined
-        | Promise<T | null | undefined>
-        | Promise<DeepPartial<T> | null | undefined>
+        | Promise<T | DeepPartial<T> | null | undefined>
     : unknown
   : T extends Array<infer U>
   ? U extends boolean

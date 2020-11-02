@@ -44,6 +44,11 @@ export type ForcedType<T, Desired> = T extends Desired ? T : any
 export type FlatMapType<T> = T extends Array<infer U> ? U : T
 
 /**
+ * Checks if given type is nullable and returns "true" literal type if it is.
+ */
+export type IsNullable<T> = null extends T ? true : false
+
+/**
  * Like Partial<T>, but deep.
  */
 export type DeepPartial<T> = {
