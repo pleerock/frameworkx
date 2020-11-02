@@ -459,25 +459,26 @@ export const defaultValidator: Validator = ({ key, value, constraints }) => {
         )
       }
     }
-  } else if (typeof value === "number") {
-    // bigint-not-supported options
-    constraints = constraints as NumberValidationConstraints
-    if (constraints.even === true) {
-      if ((value % 2 === 0) === false)
-        throw new ValidationError(
-          "VALIDATION_EVEN",
-          `Validation error: ${key} ("even")`,
-        )
-    }
-    if (constraints.odd === true) {
-      if ((Math.abs(value % 2) === 1) === false)
-        throw new ValidationError(
-          "VALIDATION_ODD",
-          `Validation error: ${key} ("odd")`,
-        )
-    }
   } else if (typeof value === "number" || typeof value === "bigint") {
     constraints = constraints as NumberValidationConstraints
+    if (typeof value !== "bigint") {
+      // bigint-not-supported options
+      if (constraints.even === true) {
+        if ((value % 2 === 0) === false)
+          throw new ValidationError(
+            "VALIDATION_EVEN",
+            `Validation error: ${key} ("even")`,
+          )
+      }
+      if (constraints.odd === true) {
+        if ((Math.abs(value % 2) === 1) === false)
+          throw new ValidationError(
+            "VALIDATION_ODD",
+            `Validation error: ${key} ("odd")`,
+          )
+      }
+    }
+
     if (constraints.equals !== undefined) {
       if (value !== constraints.equals)
         throw new ValidationError(

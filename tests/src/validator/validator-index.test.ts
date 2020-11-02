@@ -1,7 +1,7 @@
 import { defaultValidator } from "@microframework/validator"
 import { ValidationError } from "@microframework/core"
 
-describe.only("validator > defaultValidator", () => {
+describe("validator > defaultValidator", () => {
   describe("StringValidationConstraints", () => {
     test("maxLength", () => {
       expect(() =>
@@ -1143,6 +1143,320 @@ describe.only("validator > defaultValidator", () => {
           value: "abc",
           constraints: {
             matches: /abc/,
+          },
+        }),
+      ).not.toThrowError()
+    })
+  })
+
+  describe("NumberValidationConstraints", () => {
+    test("equals", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 123,
+          constraints: {
+            equals: 12345,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_EQUALS",
+          `Validation error: someProperty ("equals")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 12345,
+          constraints: {
+            equals: 12345,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("min", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 5,
+          constraints: {
+            min: 10,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_MIN",
+          `Validation error: someProperty ("min")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 20,
+          constraints: {
+            min: 10,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("max", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 20,
+          constraints: {
+            max: 10,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_MAX",
+          `Validation error: someProperty ("max")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 5,
+          constraints: {
+            max: 10,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("negative", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 10,
+          constraints: {
+            negative: true,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_NEGATIVE",
+          `Validation error: someProperty ("negative")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: -10,
+          constraints: {
+            negative: true,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("positive", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: -10,
+          constraints: {
+            positive: true,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_POSITIVE",
+          `Validation error: someProperty ("positive")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 10,
+          constraints: {
+            positive: true,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("between", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 1,
+          constraints: {
+            between: [5, 10],
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_BETWEEN",
+          `Validation error: someProperty ("between")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 8,
+          constraints: {
+            between: [5, 10],
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("lessThan", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 15,
+          constraints: {
+            lessThan: 10,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_LESS_THAN",
+          `Validation error: someProperty ("lessThan")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 5,
+          constraints: {
+            lessThan: 10,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("lessThanOrEqual", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 15,
+          constraints: {
+            lessThanOrEqual: 10,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_LESS_THAN_OR_EQUAL",
+          `Validation error: someProperty ("lessThanOrEqual")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 10,
+          constraints: {
+            lessThanOrEqual: 10,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("greaterThan", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 10,
+          constraints: {
+            greaterThan: 20,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_GREATER_THAN",
+          `Validation error: someProperty ("greaterThan")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 30,
+          constraints: {
+            greaterThan: 20,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("greaterThanOrEqual", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 10,
+          constraints: {
+            greaterThanOrEqual: 20,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_GREATER_THAN_OR_EQUAL",
+          `Validation error: someProperty ("greaterThanOrEqual")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 20,
+          constraints: {
+            greaterThanOrEqual: 20,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("even", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 5,
+          constraints: {
+            even: true,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_EVEN",
+          `Validation error: someProperty ("even")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 10,
+          constraints: {
+            even: true,
+          },
+        }),
+      ).not.toThrowError()
+    })
+
+    test("odd", () => {
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 10,
+          constraints: {
+            odd: true,
+          },
+        }),
+      ).toThrowError(
+        new ValidationError(
+          "VALIDATION_ODD",
+          `Validation error: someProperty ("odd")`,
+        ),
+      )
+      expect(() =>
+        defaultValidator({
+          key: "someProperty",
+          value: 5,
+          constraints: {
+            odd: true,
           },
         }),
       ).not.toThrowError()
