@@ -12,6 +12,7 @@ import {
 import { AnyModel, Model } from "@microframework/model"
 import {
   ContextList,
+  DeclarationKeys,
   GraphQLDeclarationItem,
   GraphQLDeclarationList,
   ModelOrigin,
@@ -33,7 +34,6 @@ import {
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
-  ResolveKey,
   AnyResolver,
   ResolveStrategy,
 } from "../resolver"
@@ -237,7 +237,7 @@ export type Application<Options extends AnyApplicationOptions> = {
    *        }
    *    })
    */
-  resolver<Key extends ResolveKey<Options>>(
+  resolver<Key extends DeclarationKeys<Options>>(
     name: Key,
     resolver: ResolveStrategy<Options, Key>,
   ): AnyResolver

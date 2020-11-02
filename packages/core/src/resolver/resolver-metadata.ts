@@ -2,11 +2,11 @@ import {
   ContextResolver,
   DeclarationResolver,
   ModelResolver,
-  SubscriptionItemResolver,
+  SubscriptionDeclarationItemResolver,
 } from "./resolver-strategy"
 
 /**
- * Metadata for declaration resolver.
+ * Metadata for declaration object resolver.
  */
 export type DeclarationResolverMetadata = {
   "@type": "Resolver"
@@ -16,7 +16,7 @@ export type DeclarationResolverMetadata = {
 }
 
 /**
- * Metadata for declaration item resolver.
+ * Metadata for declaration single item resolver.
  */
 export type DeclarationItemResolverMetadata = {
   "@type": "Resolver"
@@ -25,7 +25,7 @@ export type DeclarationItemResolverMetadata = {
   name: string
   resolverFn:
     | ((args: any, context: any) => any)
-    | SubscriptionItemResolver<any, any>
+    | SubscriptionDeclarationItemResolver<any, any>
 }
 
 /**

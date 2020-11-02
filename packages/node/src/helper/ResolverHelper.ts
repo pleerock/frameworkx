@@ -1,10 +1,10 @@
 import {
-  ActionItemResolver,
+  ActionDeclarationItemResolver,
   ActionTypeMetadata,
   DefaultContext,
   LogEvent,
-  QueryMutationItemResolver,
-  SubscriptionItemResolver,
+  QueryMutationDeclarationItemResolver,
+  SubscriptionDeclarationItemResolver,
   TypeMetadata,
 } from "@microframework/core"
 import DataLoader from "dataloader"
@@ -32,7 +32,9 @@ export class ResolverHelper {
     )
   }
 
-  findAction(name: string): ActionItemResolver<any, any> | undefined {
+  findAction(
+    name: string,
+  ): ActionDeclarationItemResolver<any, any> | undefined {
     for (let resolver of this.properties.resolvers) {
       if (resolver.type === "declaration-resolver") {
         if (
@@ -49,7 +51,10 @@ export class ResolverHelper {
           resolver.declarationType === "action"
         ) {
           if (resolver.name === name) {
-            return resolver.resolverFn as ActionItemResolver<any, any>
+            return resolver.resolverFn as ActionDeclarationItemResolver<
+              any,
+              any
+            >
           }
         }
       }
@@ -81,7 +86,10 @@ export class ResolverHelper {
           resolver.declarationType === "subscription"
         ) {
           if (resolver.name === name) {
-            return resolver.resolverFn as SubscriptionItemResolver<any, any>
+            return resolver.resolverFn as SubscriptionDeclarationItemResolver<
+              any,
+              any
+            >
           }
         }
       }
@@ -517,7 +525,7 @@ export class ResolverHelper {
 
   findDataLoaderResolver(modelName: string, propertyName: string) {
     let dataLoaderResolverFn:
-      | QueryMutationItemResolver<any, any>
+      | QueryMutationDeclarationItemResolver<any, any>
       | undefined = undefined
     for (let resolver of this.properties.resolvers) {
       if (
@@ -605,7 +613,7 @@ export class ResolverHelper {
   ) {
     if (type === "query" || type === "mutation") {
       let resolverFn:
-        | QueryMutationItemResolver<any, any>
+        | QueryMutationDeclarationItemResolver<any, any>
         | undefined = undefined
       for (let resolver of this.properties.resolvers) {
         if (resolver.type === "declaration-resolver") {
@@ -633,7 +641,7 @@ export class ResolverHelper {
             resolver.declarationType === type
           ) {
             if (resolver.name === name) {
-              resolverFn = resolver.resolverFn // as SubscriptionItemResolver<any, any>
+              resolverFn = resolver.resolverFn // as SubscriptionDeclarationItemResolver<any, any>
               resolverFn = this.applyRateLimitOptions(
                 resolver.declarationType,
                 name,
@@ -649,7 +657,7 @@ export class ResolverHelper {
       return resolverFn
     } else if (type === "model") {
       let resolverFn:
-        | QueryMutationItemResolver<any, any>
+        | QueryMutationDeclarationItemResolver<any, any>
         | undefined = undefined
       for (let resolver of this.properties.resolvers) {
         if (

@@ -1,8 +1,4 @@
-import {
-  ApplicationUtils,
-  ResolverUtils,
-  TypeMetadata,
-} from "@microframework/core"
+import { ApplicationUtils, TypeMetadata } from "@microframework/core"
 import { debugLogger } from "@microframework/logger"
 import { parse } from "@microframework/parser"
 import { defaultValidator } from "@microframework/validator"
@@ -13,6 +9,7 @@ import { DefaultErrorHandler } from "../error-handler"
 import { DefaultNamingStrategy } from "../naming-strategy"
 import { ApplicationServerOptions } from "./ApplicationServerOptions"
 import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { ResolverUtils } from "../helper/resolver-utils"
 
 /**
  * Application Server utility functions.

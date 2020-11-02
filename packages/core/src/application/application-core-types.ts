@@ -1,4 +1,7 @@
-import { AnyApplication } from "./application-helper-types"
+import {
+  AnyApplication,
+  AnyApplicationOptions,
+} from "./application-helper-types"
 
 /**
  * Collection of root queries, mutations and subscriptions.
@@ -120,11 +123,13 @@ export type ModelOrigin<
 export type InputType = any
 
 /**
- * All application declarations in a single type.
+ * Represents any "key" resolver can resolve (particular query, mutation, action, subscription, model).
+ * For example from declaration "{ queries: { posts(): Post[] }, mutations: { savePost(): Post } }"
+ * it will take "posts"|"savePost".
  */
-export type ApplicationDeclarations<
-  App extends AnyApplication
-> = App["_options"]["queries"] &
-  App["_options"]["mutations"] &
-  App["_options"]["subscriptions"] &
-  App["_options"]["actions"]
+export type DeclarationKeys<Options extends AnyApplicationOptions> =
+  | keyof Options["actions"]
+  | keyof Options["models"]
+  | keyof Options["queries"]
+  | keyof Options["mutations"]
+  | keyof Options["subscriptions"]

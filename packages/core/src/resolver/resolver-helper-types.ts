@@ -1,6 +1,8 @@
 import {
   AnyAction,
+  AnyApplication,
   AnyApplicationOptions,
+  DeclarationKeys,
   DeepPartial,
   IsNullable,
 } from "../application"
@@ -39,46 +41,28 @@ export type DefaultContext = {
 }
 
 /**
- * Represents any "key" resolver can resolve (particular query, mutation, action, subscription, model).
- * For example from declaration "{ queries: { posts(): Post[] }, mutations: { savePost(): Post } }"
- * it will take "posts"|"savePost".
- */
-export type ResolveKey<Options extends AnyApplicationOptions> =
-  | keyof Options["actions"]
-  | keyof Options["models"]
-  | keyof Options["queries"]
-  | keyof Options["mutations"]
-  | keyof Options["subscriptions"]
-
-/**
  * Arguments to be passed to action resolving function.
  */
-export type ActionArgs<Action extends AnyAction> = {
-  /**
-   * Route params received in HTTP request.
-   */
-  params: Action["params"]
+export type ActionArgs<Action extends AnyAction> = Pick<
+  Action,
+  "params" | "query" | "headers" | "cookies" | "body"
+>
 
-  /**
-   * Query params received in HTTP request.
-   */
-  query: Action["query"]
-
-  /**
-   * HTTP headers sent within HTTP request.
-   */
-  headers: Action["headers"]
-
-  /**
-   * Cookies sent within HTTP request.
-   */
-  cookies: Action["cookies"]
-
-  /**
-   * HTTP body sent by a client.
-   */
-  body: Action["body"]
-}
+/**
+ * Helper type to get input args of a given declaration.
+ */
+export type InputOf<
+  App extends AnyApplication,
+  Method extends DeclarationKeys<App["_options"]>
+> = App["_options"]["queries"][Method] extends Function
+  ? Parameters<App["_options"]["queries"][Method]>[0]
+  : App["_options"]["mutations"][Method] extends Function
+  ? Parameters<App["_options"]["mutations"][Method]>[0]
+  : App["_options"]["subscriptions"][Method] extends Function
+  ? Parameters<App["_options"]["subscriptions"][Method]>[0]
+  : App["_options"]["actions"][Method] extends Function
+  ? Parameters<App["_options"]["actions"][Method]>[0]
+  : unknown
 
 /**
  * Resolver possible return value type.
@@ -86,22 +70,38 @@ export type ActionArgs<Action extends AnyAction> = {
 export type ResolverReturnValue<T> = IsNullable<T> extends true
   ? NonNullable<T> extends Array<infer U>
     ? U extends boolean
-      ? boolean[] | null | Promise<boolean[] | null | undefined>
+      ? boolean[] | null | undefined | Promise<boolean[] | null | undefined>
       : U extends number
-      ? number[] | null | Promise<number[] | null | undefined>
+      ? number[] | null | undefined | Promise<number[] | null | undefined>
       : U extends string
-      ? string[] | null | Promise<string[] | null | undefined>
+      ? string[] | null | undefined | Promise<string[] | null | undefined>
       :
           | U[]
           | DeepPartial<U>[]
           | null
+          | undefined
           | Promise<U[] | DeepPartial<U>[] | null | undefined>
     : NonNullable<T> extends boolean
-    ? boolean | null | Promise<boolean> | Promise<boolean | null>
+    ?
+        | boolean
+        | null
+        | undefined
+        | Promise<boolean>
+        | Promise<boolean | null | undefined>
     : NonNullable<T> extends number
-    ? number | null | Promise<number> | Promise<number | null>
+    ?
+        | number
+        | null
+        | undefined
+        | Promise<number>
+        | Promise<number | null | undefined>
     : NonNullable<T> extends string
-    ? string | null | Promise<string> | Promise<string | null>
+    ?
+        | string
+        | null
+        | undefined
+        | Promise<string>
+        | Promise<string | null | undefined>
     : NonNullable<T> extends Object
     ?
         | T
@@ -125,9 +125,6 @@ export type ResolverReturnValue<T> = IsNullable<T> extends true
   : T extends string
   ? string | Promise<string>
   : T | DeepPartial<T> | Promise<T> | Promise<DeepPartial<T>>
-
-// todo: tests like this
-// const a: ResolverReturnValue<{ id: number } | null> = Promise.resolve(null)
 
 /**
  * Types or resolvers that can registered in the application.

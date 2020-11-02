@@ -467,6 +467,9 @@ describe("core > resolver > strategy", () => {
           saveUser(input: UserInput): User
           removeUser(input: { id: number }): boolean
         }
+        subscriptions: {
+          onUserSave(): User
+        }
         actions: {
           "POST /login": {
             return: User
@@ -539,11 +542,76 @@ describe("core > resolver > strategy", () => {
           },
         }
       })
+      test("it should be possible to return undefined for nullable queries / mutations", () => {
+        const resolver1: DeclarationResolver<UserApp> = {
+          user() {
+            return undefined
+          },
+        }
+        const resolver2: DeclarationResolver<UserApp> = {
+          async user() {
+            return undefined
+          },
+        }
+        const resolver3: DeclarationResolver<UserApp> = {
+          async user() {
+            return { name: "Timber" }
+          },
+        }
+      })
       test("if query / mutation isn't nullable we should not be able to return null", () => {
         const resolver1: DeclarationResolver<UserApp> = {
           // @ts-expect-error
           users() {
             return null
+          },
+        }
+      })
+      test("if query / mutation isn't nullable we should not be able to return undefined", () => {
+        const resolver1: DeclarationResolver<UserApp> = {
+          // @ts-expect-error
+          users() {
+            return undefined
+          },
+        }
+      })
+      test("actions should be typed", () => {
+        const resolver1: DeclarationResolver<UserApp> = {
+          // @ts-expect-error
+          ["POST /login"]() {
+            return {
+              id: 1,
+              name: "Timber",
+            }
+          },
+        }
+      })
+      test("complete usage", () => {
+        const resolver1: DeclarationResolver<UserApp> = {
+          users() {
+            return [
+              { id: 1, name: "Timber", isOnline: true },
+              { id: 2, name: "Nature's", isOnline: true },
+            ]
+          },
+          async user() {
+            return { name: "Timber" }
+          },
+          saveUser(input) {
+            return {
+              id: 0,
+              name: input.name,
+            }
+          },
+          ["POST /login"]() {
+            return {
+              id: 1,
+              name: "Timber",
+              isOnline: false,
+            }
+          },
+          onUserSave: {
+            triggers: ["ON_USER_SAVE"],
           },
         }
       })

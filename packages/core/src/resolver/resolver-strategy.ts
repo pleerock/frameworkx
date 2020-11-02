@@ -2,18 +2,13 @@ import {
   AnyAction,
   AnyApplication,
   AnyApplicationOptions,
-  ApplicationDeclarations,
   ContextList,
+  DeclarationKeys,
   ForcedType,
   GraphQLDeclarationItem,
   ModelType,
 } from "../application"
-import {
-  ActionArgs,
-  DefaultContext,
-  ResolveKey,
-  ResolverReturnValue,
-} from "./index"
+import { ActionArgs, DefaultContext, ResolverReturnValue } from "./index"
 
 /**
  * Defines a model resolving strategy.
@@ -25,7 +20,7 @@ export type ModelResolver<
   [P in keyof Type]?:
     | ((
         parent: Type,
-        input: any,
+        input: any, // input can have a type when ModelWithArgs will be properly implemented
         context: Context & DefaultContext,
       ) => ResolverReturnValue<Type[P]>)
     | ResolverReturnValue<Type[P]>
@@ -41,7 +36,7 @@ export type ModelDLResolver<
   [P in keyof Type]?:
     | ((
         parents: Type[],
-        input: any,
+        input: any, // input can have a type when ModelWithArgs will be properly implemented
         context: Context & DefaultContext,
       ) => ResolverReturnValue<Type[P][]>)
     | ResolverReturnValue<Type[P][]>
@@ -55,6 +50,67 @@ export type ContextResolver<Context extends ContextList> = {
     defaultContext: DefaultContext,
   ) => Context[P] | Promise<Context[P]>
 }
+
+/**
+ * Defines a query or mutation resolving strategy.
+ */
+export type QueryMutationDeclarationItemResolver<
+  Declaration extends GraphQLDeclarationItem<any>,
+  Context extends ContextList
+> = Parameters<Declaration> extends []
+  ?
+      | ((
+          context: Context & DefaultContext,
+        ) => ResolverReturnValue<ReturnType<Declaration>>)
+      | ResolverReturnValue<ReturnType<Declaration>>
+  : Declaration extends (input: infer Input) => infer Return
+  ?
+      | ((
+          input: Input,
+          context: Context & DefaultContext,
+        ) => ResolverReturnValue<Return>)
+      | ResolverReturnValue<Return>
+  : unknown
+
+/**
+ * Defines a subscription resolving strategy.
+ */
+export type SubscriptionDeclarationItemResolver<
+  Declaration extends GraphQLDeclarationItem<any>,
+  Context extends ContextList
+> = Parameters<Declaration> extends []
+  ? {
+      triggers: string | string[]
+      filter?: (
+        payload: ReturnType<Declaration>,
+        context: Context & DefaultContext,
+      ) => boolean | Promise<boolean>
+      onSubscribe?: (context: Context & DefaultContext) => any
+      onUnsubscribe?: (context: Context & DefaultContext) => any
+    }
+  : Declaration extends (input: infer Input) => infer Return
+  ? {
+      triggers: string | string[]
+      filter?: (
+        payload: Return,
+        input: Input,
+        context: Context & DefaultContext,
+      ) => boolean | Promise<boolean>
+      onSubscribe?: (input: Input, context: Context & DefaultContext) => any
+      onUnsubscribe?: (input: Input, context: Context & DefaultContext) => any
+    }
+  : unknown
+
+/**
+ * Defines action resolving strategy.
+ */
+export type ActionDeclarationItemResolver<
+  A extends AnyAction,
+  Context extends ContextList
+> = (
+  args: ActionArgs<A>,
+  context: Context & DefaultContext,
+) => A["return"] | Promise<A["return"]>
 
 /**
  * Type to provide resolvers for declarations (queries, mutations, subscriptions and actions).
@@ -76,14 +132,14 @@ export type DeclarationResolver<App extends AnyApplication> = {
  */
 export type ResolveStrategy<
   Options extends AnyApplicationOptions,
-  Key extends ResolveKey<Options>
+  Key extends DeclarationKeys<Options>
 > = Key extends keyof Options["queries"]
-  ? QueryMutationItemResolver<
+  ? QueryMutationDeclarationItemResolver<
       ForcedType<Options["queries"][Key], GraphQLDeclarationItem<any>>,
       ForcedType<Options["context"], ContextList>
     >
   : Key extends keyof Options["mutations"]
-  ? QueryMutationItemResolver<
+  ? QueryMutationDeclarationItemResolver<
       ForcedType<Options["mutations"][Key], GraphQLDeclarationItem<any>>,
       ForcedType<Options["context"], ContextList>
     >
@@ -93,90 +149,13 @@ export type ResolveStrategy<
       ForcedType<Options["context"], ContextList>
     >
   : Key extends keyof Options["subscriptions"]
-  ? SubscriptionItemResolver<
+  ? SubscriptionDeclarationItemResolver<
       ForcedType<Options["subscriptions"][Key], GraphQLDeclarationItem<any>>,
       ForcedType<Options["context"], ContextList>
     >
   : Key extends keyof Options["actions"]
-  ? ActionItemResolver<
+  ? ActionDeclarationItemResolver<
       ForcedType<Options["actions"][Key], AnyAction>,
       ForcedType<Options["context"], ContextList>
     >
   : unknown
-
-/**
- * Defines a query or mutation resolving strategy.
- */
-export type QueryMutationItemResolver<
-  Declaration extends GraphQLDeclarationItem<any>,
-  Context extends ContextList
-> = Parameters<Declaration> extends []
-  ?
-      | ((
-          context: Context & DefaultContext,
-        ) => ResolverReturnValue<ReturnType<Declaration>>)
-      | ResolverReturnValue<ReturnType<Declaration>>
-  : Declaration extends (input: infer Input) => infer Return
-  ?
-      | ((
-          input: Input,
-          context: Context & DefaultContext,
-        ) => ResolverReturnValue<Return>)
-      | ResolverReturnValue<Return>
-  : unknown
-
-/**
- * Defines a subscription resolving strategy.
- */
-export type SubscriptionItemResolver<
-  Declaration extends GraphQLDeclarationItem<any>,
-  Context extends ContextList
-> = Parameters<Declaration> extends []
-  ? {
-      triggers: string | string[]
-      filter?: (
-        payload: any,
-        context: Context & DefaultContext,
-      ) => boolean | Promise<boolean>
-      onSubscribe?: (context: Context & DefaultContext) => any
-      onUnsubscribe?: (context: Context & DefaultContext) => any
-    }
-  : Declaration extends (input: infer Input) => infer Return
-  ? {
-      triggers: string | string[]
-      filter?: (
-        payload: any,
-        input: Input,
-        context: Context & DefaultContext,
-      ) => boolean | Promise<boolean>
-      onSubscribe?: (input: Input, context: Context & DefaultContext) => any
-      onUnsubscribe?: (input: Input, context: Context & DefaultContext) => any
-    }
-  : unknown
-
-/**
- * Defines action resolving strategy.
- */
-export type ActionItemResolver<
-  A extends AnyAction,
-  Context extends ContextList
-> = (
-  args: ActionArgs<A>,
-  context: Context & DefaultContext,
-) => A["return"] | Promise<A["return"]>
-
-/**
- * Helper type to get input args of a given declaration.
- */
-export type DeclarationArgs<
-  App extends AnyApplication,
-  Method extends keyof ApplicationDeclarations<App>
-> = App["_options"]["queries"][Method] extends never
-  ? App["_options"]["mutations"][Method] extends never
-    ? App["_options"]["subscriptions"][Method] extends never
-      ? App["_options"]["actions"][Method] extends never
-        ? unknown
-        : Parameters<App["_options"]["actions"][Method]>[0]
-      : Parameters<App["_options"]["subscriptions"][Method]>[0]
-    : Parameters<App["_options"]["mutations"][Method]>[0]
-  : Parameters<App["_options"]["queries"][Method]>[0]

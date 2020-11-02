@@ -4,6 +4,7 @@ import {
   AnyApplicationOptions,
   Application,
   ContextList,
+  DeclarationKeys,
   ForcedType,
   LiteralOrClass,
 } from "../application"
@@ -13,7 +14,6 @@ import {
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
-  ResolveKey,
   AnyResolver,
   ResolveStrategy,
 } from "./index"
@@ -99,7 +99,7 @@ export function resolver<
  */
 export function resolver<
   App extends AnyApplication,
-  Key extends ResolveKey<App["_options"]>
+  Key extends DeclarationKeys<App["_options"]>
 >(app: App, resolver: LiteralOrClass<DeclarationResolver<App>>): AnyResolver
 
 /**
@@ -122,7 +122,7 @@ export function resolver<
  */
 export function resolver<
   App extends AnyApplication,
-  Key extends ResolveKey<App["_options"]>
+  Key extends DeclarationKeys<App["_options"]>
 >(
   app: App,
   name: Key,
@@ -276,7 +276,10 @@ export function resolver<App extends AnyApplication, Model extends AnyModel>(
  */
 export function resolver(
   arg0?: AnyApplication | { name: string; dataLoader?: boolean },
-  arg1?: ResolveKey<any> | LiteralOrClass<DeclarationResolver<any>> | AnyModel,
+  arg1?:
+    | DeclarationKeys<any>
+    | LiteralOrClass<DeclarationResolver<any>>
+    | AnyModel,
   arg2?:
     | ResolveStrategy<any, any>
     | ModelResolver<any, any>

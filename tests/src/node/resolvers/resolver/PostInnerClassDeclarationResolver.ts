@@ -1,6 +1,6 @@
 import { DeclarationResolver, resolver } from "@microframework/core"
 import { App } from "../app"
-import { DeclarationArgs } from "@microframework/core"
+import { InputOf } from "@microframework/core"
 
 export const PostInnerClassDeclarationResolver = resolver(
   App,
@@ -11,7 +11,7 @@ export const PostInnerClassDeclarationResolver = resolver(
         { id: 2, title: "Post #2" },
       ]
     }
-    post({ id }: DeclarationArgs<typeof App, "post">) {
+    post({ id }: InputOf<typeof App, "post">) {
       return { id, title: "Post #" + id }
     }
   },
