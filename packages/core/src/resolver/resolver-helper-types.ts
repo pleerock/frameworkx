@@ -86,35 +86,17 @@ export type IsNullable<T> = null extends T ? true : false
 export type ResolverReturnValue<T> = IsNullable<T> extends true
   ? NonNullable<T> extends Array<infer U>
     ? U extends boolean
-      ?
-          | boolean[]
-          | null
-          | Promise<boolean[]>
-          | Promise<boolean[] | null>
-          | Promise<null>
+      ? boolean[] | null | Promise<boolean[] | null | undefined>
       : U extends number
-      ?
-          | number[]
-          | null
-          | Promise<number[]>
-          | Promise<number[] | null>
-          | Promise<null>
+      ? number[] | null | Promise<number[] | null | undefined>
       : U extends string
-      ?
-          | string[]
-          | null
-          | Promise<string[]>
-          | Promise<string[] | null>
-          | Promise<null>
+      ? string[] | null | Promise<string[] | null | undefined>
       :
           | U[]
           | DeepPartial<U>[]
           | null
-          | Promise<U[]>
-          | Promise<U[] | null>
-          | Promise<DeepPartial<U>[]>
-          | Promise<DeepPartial<U>[] | null>
-          | Promise<null>
+          | Promise<U[] | null | undefined>
+          | Promise<DeepPartial<U>[] | null | undefined>
     : NonNullable<T> extends boolean
     ? boolean | null | Promise<boolean> | Promise<boolean | null>
     : NonNullable<T> extends number
@@ -126,9 +108,9 @@ export type ResolverReturnValue<T> = IsNullable<T> extends true
         | T
         | DeepPartial<T>
         | null
-        | Promise<T | null>
-        | Promise<DeepPartial<T> | null>
-        | Promise<null>
+        | undefined
+        | Promise<T | null | undefined>
+        | Promise<DeepPartial<T> | null | undefined>
     : unknown
   : T extends Array<infer U>
   ? U extends boolean

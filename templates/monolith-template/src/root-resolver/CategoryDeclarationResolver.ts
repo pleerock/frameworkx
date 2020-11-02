@@ -7,8 +7,7 @@ import { CategoryRepository } from "../repository"
  */
 export const CategoryDeclarationResolver = App.resolver({
   async category(input) {
-    const category = await CategoryRepository.findOne(input.id)
-    return category ? category : null
+    return await CategoryRepository.findOne(input.id)
   },
 
   async categorySave(input): Promise<Category> {
