@@ -1,15 +1,31 @@
-import { createApp } from "@microframework/core"
+import { createApp, ModelWithArgs } from "@microframework/core"
 
 export const App = createApp<{
   models: {
-    PersonIntersectionType: PersonIntersectionType
+    PostModel: PostModel
+  }
+  inputs: {
+    PersonIntersectionInputType: PersonIntersectionInputType
   }
 }>()
 
 /**
+ * Simple model for testing purposes.
+ */
+type PostModel = ModelWithArgs<PostType, any>
+
+/**
+ * Type for a PostModel.
+ */
+type PostType = {
+  id: number
+  name: string
+}
+
+/**
  * This way we are testing intersection type.
  */
-type PersonIntersectionType = { id: number; name: string } & {
+type PersonIntersectionInputType = { id: number; name: string } & {
   aboutMe: string
   photoUrl: string
 } & PersonEducationType &
@@ -35,7 +51,7 @@ interface PersonCareerInterface {
 /**
  * Part of Person - skill information.
  */
-class PersonSkillClass {
+export class PersonSkillClass {
   english!: boolean
   tajik!: boolean
 }

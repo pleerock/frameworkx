@@ -9,7 +9,7 @@ export const App = createApp<{
 /**
  * This way we are testing type support.
  */
-export type AlbumType = {
+type AlbumType = {
   id: number
   name: string
   stars: number[]
@@ -19,4 +19,4 @@ export type AlbumType = {
 /**
  * This way we are testing type support.
  */
-export type AlbumStatusType = "active" | "inactive"
+type AlbumStatusType = "active" | "inactive"

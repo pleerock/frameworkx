@@ -12,12 +12,12 @@ export const App = createApp<{
  * but in the case when user wants a consistency and use Model everywhere,
  * even where he doesn't need args, he can omit this argument.
  */
-export type PostModelNoArgs = ModelWithArgs<PostNoArgsType, any>
+type PostModelNoArgs = ModelWithArgs<PostNoArgsType, any>
 
 /**
  * Type for a PostModel.
  */
-export type PostNoArgsType = {
+type PostNoArgsType = {
   id: number
   name: string
 }

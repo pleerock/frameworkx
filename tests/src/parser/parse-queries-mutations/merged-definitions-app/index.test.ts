@@ -1,0 +1,141 @@
+import { parse } from "@microframework/parser"
+
+describe("parse queries", () => {
+  test("merged definitions", () => {
+    const result = parse(__dirname + "/merged-definitions-app.ts")
+    // console.log(JSON.stringify(result, undefined, 2))
+    expect(result).toEqual({
+      "@type": "ApplicationTypeMetadata",
+      name: "App",
+      description: "",
+      actions: [],
+      models: [
+        {
+          "@type": "TypeMetadata",
+          kind: "object",
+          array: false,
+          nullable: false,
+          canBeUndefined: false,
+          properties: [
+            {
+              "@type": "TypeMetadata",
+              kind: "number",
+              array: false,
+              nullable: false,
+              canBeUndefined: false,
+              properties: [],
+              propertyName: "id",
+            },
+            {
+              "@type": "TypeMetadata",
+              kind: "string",
+              array: false,
+              nullable: false,
+              canBeUndefined: false,
+              properties: [],
+              propertyName: "name",
+              args: {
+                "@type": "TypeMetadata",
+                kind: "object",
+                array: false,
+                nullable: false,
+                canBeUndefined: false,
+                properties: [
+                  {
+                    "@type": "TypeMetadata",
+                    kind: "string",
+                    array: false,
+                    nullable: false,
+                    canBeUndefined: false,
+                    properties: [],
+                    propertyName: "keyword",
+                  },
+                ],
+              },
+            },
+          ],
+          modelName: "PostModel",
+          description: "Type for a PostModel.",
+        },
+        {
+          "@type": "TypeMetadata",
+          kind: "object",
+          array: false,
+          nullable: false,
+          canBeUndefined: false,
+          properties: [
+            {
+              "@type": "TypeMetadata",
+              kind: "number",
+              array: false,
+              nullable: false,
+              canBeUndefined: false,
+              properties: [],
+              propertyName: "id",
+            },
+            {
+              "@type": "TypeMetadata",
+              kind: "string",
+              array: false,
+              nullable: false,
+              canBeUndefined: false,
+              properties: [],
+              propertyName: "name",
+            },
+          ],
+          typeName: "CategoryType",
+          description: "Dummy type.",
+        },
+      ],
+      inputs: [],
+      queries: [
+        {
+          "@type": "TypeMetadata",
+          kind: "model",
+          array: false,
+          nullable: false,
+          canBeUndefined: false,
+          properties: [],
+          modelName: "PostModel",
+          propertyName: "post",
+          description: "",
+        },
+        {
+          "@type": "TypeMetadata",
+          kind: "model",
+          array: true,
+          nullable: false,
+          canBeUndefined: false,
+          properties: [],
+          modelName: "PostModel",
+          propertyName: "posts",
+          description: "",
+        },
+        {
+          "@type": "TypeMetadata",
+          kind: "object",
+          array: false,
+          nullable: false,
+          canBeUndefined: false,
+          properties: [],
+          typeName: "CategoryType",
+          description: "",
+          propertyName: "category",
+        },
+        {
+          "@type": "TypeMetadata",
+          kind: "object",
+          array: true,
+          nullable: false,
+          canBeUndefined: false,
+          properties: [],
+          typeName: "CategoryType",
+          description: "",
+          propertyName: "categories",
+        },
+      ],
+      mutations: [],
+      subscriptions: [],
+    })
+  })
+})

@@ -2,8 +2,10 @@ import { createApp, ModelWithArgs } from "@microframework/core"
 
 export const App = createApp<{
   models: {
-    PostModel: PostModel
+    PostType: PostModel
+    CategoryType: CategoryType
   }
+  queries: PostQueries & CategoryQueries
 }>()
 
 /**
@@ -26,4 +28,22 @@ type PostArgs = {
   name: {
     keyword: string
   }
+}
+
+/**
+ * Dummy type.
+ */
+type CategoryType = {
+  id: number
+  name: string
+}
+
+type PostQueries = {
+  post(): PostModel
+  posts(): PostModel[]
+}
+
+type CategoryQueries = {
+  category(): CategoryType
+  categories(): CategoryType[]
 }

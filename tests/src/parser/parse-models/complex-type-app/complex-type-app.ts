@@ -10,12 +10,12 @@ export const App = createApp<{
 /**
  * Simple model for testing purposes.
  */
-export type PostModel = ModelWithArgs<PostType, PostArgs>
+type PostModel = ModelWithArgs<PostType, PostArgs>
 
 /**
  * Type for a PostModel.
  */
-export type PostType = {
+type PostType = {
   id: number
   name: string
 }
@@ -23,7 +23,7 @@ export type PostType = {
 /**
  * Args for a PostModel.
  */
-export type PostArgs = {
+type PostArgs = {
   name: {
     keyword: string
   }
@@ -32,7 +32,7 @@ export type PostArgs = {
 /**
  * Complex type support test.
  */
-export type PersonComplexType = {
+type PersonComplexType = {
   id: number
   firstName: string
   lastName: string
@@ -65,12 +65,12 @@ export type PersonComplexType = {
 /**
  * This way we are testing interface support.
  */
-export interface PhotoInterface {
+interface PhotoInterface {
   id: number
   filename: string
 }
 
-export enum StatusEnum {
+enum StatusEnum {
   active = "active",
   inactive = "inactive",
 }

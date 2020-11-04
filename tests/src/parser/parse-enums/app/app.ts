@@ -1,6 +1,4 @@
 import { createApp } from "@microframework/core"
-import { PostStatusType } from "../model/PostStatusType"
-import { PostType } from "../model/PostType"
 
 export const App = createApp<{
   models: {
@@ -8,3 +6,17 @@ export const App = createApp<{
     PostStatusType: PostStatusType
   }
 }>()
+
+/**
+ * Type for a PostStatus.
+ */
+type PostStatusType = "draft" | "published"
+
+/**
+ * Type for a PostType.
+ */
+type PostType = {
+  id: number
+  name: string
+  status: PostStatusType
+}

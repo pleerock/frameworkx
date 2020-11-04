@@ -4,12 +4,15 @@ export const App = createApp<{
   models: {
     PostModel: PostModel
   }
+  inputs: {
+    PostInputInterface: PostInputInterface
+  }
 }>()
 
 /**
  * Simple model for testing purposes.
  */
-type PostModel = ModelWithArgs<PostType, PostArgs>
+type PostModel = ModelWithArgs<PostType, any>
 
 /**
  * Type for a PostModel.
@@ -20,10 +23,9 @@ type PostType = {
 }
 
 /**
- * Args for a PostModel.
+ * This way we are testing interface support.
  */
-type PostArgs = {
-  name: {
-    keyword: string
-  }
+interface PostInputInterface {
+  id: number
+  name: string
 }

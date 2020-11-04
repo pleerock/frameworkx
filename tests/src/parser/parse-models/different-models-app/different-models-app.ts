@@ -12,22 +12,22 @@ export const App = createApp<{
 /**
  * This way we are testing "Model" support with a regular type.
  */
-export type PostTypeModel = ModelWithArgs<PostType, PostTypeArgs>
+type PostTypeModel = ModelWithArgs<PostType, PostTypeArgs>
 
 /**
  * This way we are testing "Model" support with a regular type.
  */
-export type PostClassModel = ModelWithArgs<PostClass, PostClassArgs>
+type PostClassModel = ModelWithArgs<PostClass, PostClassArgs>
 
 /**
  * This way we are testing "Model" support with a regular type.
  */
-export type PostInterfaceModel = ModelWithArgs<PostInterface, PostInterfaceArgs>
+type PostInterfaceModel = ModelWithArgs<PostInterface, PostInterfaceArgs>
 
 /**
  * This way we are testing "Model" support with a literal type.
  */
-export type PostLiteralModel = ModelWithArgs<
+type PostLiteralModel = ModelWithArgs<
   { id: number; name: string },
   { name: { keyword: string } }
 >
@@ -35,7 +35,7 @@ export type PostLiteralModel = ModelWithArgs<
 /**
  * Type for a PostTypeModel.
  */
-export type PostType = {
+type PostType = {
   id: number
   name: string
 }
@@ -43,7 +43,7 @@ export type PostType = {
 /**
  * Args for a PostTypeModel.
  */
-export type PostTypeArgs = {
+type PostTypeArgs = {
   name: {
     keyword: string
   }
@@ -52,7 +52,7 @@ export type PostTypeArgs = {
 /**
  * Class for a PostClassModel.
  */
-export class PostClass {
+class PostClass {
   id!: number
   name!: string
 }
@@ -60,7 +60,7 @@ export class PostClass {
 /**
  * Interface for a PostModel.
  */
-export interface PostInterface {
+interface PostInterface {
   id: number
   name: string
 }
@@ -68,7 +68,7 @@ export interface PostInterface {
 /**
  * Args for a PostClassModel.
  */
-export class PostClassArgs {
+class PostClassArgs {
   name!: {
     keyword: string
   }
@@ -77,7 +77,7 @@ export class PostClassArgs {
 /**
  * Args for a PostInterfaceModel.
  */
-export interface PostInterfaceArgs {
+interface PostInterfaceArgs {
   name: {
     keyword: string
   }

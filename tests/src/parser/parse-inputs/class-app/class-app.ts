@@ -4,12 +4,15 @@ export const App = createApp<{
   models: {
     PostModel: PostModel
   }
+  inputs: {
+    PostInputClass: PostInputClass
+  }
 }>()
 
 /**
  * Simple model for testing purposes.
  */
-type PostModel = ModelWithArgs<PostType, PostArgs>
+type PostModel = ModelWithArgs<PostType, any>
 
 /**
  * Type for a PostModel.
@@ -20,10 +23,9 @@ type PostType = {
 }
 
 /**
- * Args for a PostModel.
+ * This way we are testing class support.
  */
-type PostArgs = {
-  name: {
-    keyword: string
-  }
+class PostInputClass {
+  id!: number
+  name!: string
 }

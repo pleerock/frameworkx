@@ -1,8 +1,8 @@
 import { parse } from "@microframework/parser"
 
-describe("parser > parse enums", () => {
-  test("input defined as a type", () => {
-    const result = parse(__dirname + "/app/app.ts")
+describe("parse inputs > class app", () => {
+  test("input defined as a class", () => {
+    const result = parse(__dirname + "/class-app.ts")
     // console.log(JSON.stringify(result, undefined, 2))
     expect(result).toEqual({
       "@type": "ApplicationTypeMetadata",
@@ -35,52 +35,42 @@ describe("parser > parse enums", () => {
               properties: [],
               propertyName: "name",
             },
-            {
-              "@type": "TypeMetadata",
-              kind: "object",
-              array: false,
-              nullable: false,
-              canBeUndefined: false,
-              properties: [],
-              typeName: "PostStatusType",
-              description: "Type for a PostStatus.",
-              propertyName: "status",
-            },
           ],
-          typeName: "PostType",
-          description: "Type for a PostType.",
+          modelName: "PostModel",
+          description: "Type for a PostModel.",
         },
+      ],
+      inputs: [
         {
           "@type": "TypeMetadata",
-          kind: "enum",
+          kind: "object",
           array: false,
           nullable: false,
           canBeUndefined: false,
           properties: [
             {
               "@type": "TypeMetadata",
-              kind: "property",
+              kind: "number",
               array: false,
               nullable: false,
               canBeUndefined: false,
               properties: [],
-              propertyName: "draft",
+              propertyName: "id",
             },
             {
               "@type": "TypeMetadata",
-              kind: "property",
+              kind: "string",
               array: false,
               nullable: false,
               canBeUndefined: false,
               properties: [],
-              propertyName: "published",
+              propertyName: "name",
             },
           ],
-          typeName: "PostStatusType",
-          description: "Type for a PostStatus.",
+          typeName: "PostInputClass",
+          description: "This way we are testing class support.",
         },
       ],
-      inputs: [],
       queries: [],
       mutations: [],
       subscriptions: [],
