@@ -1,4 +1,10 @@
-import { ModelWithArgs } from "@microframework/core"
+import { createApp, ModelWithArgs } from "@microframework/core"
+
+export const App = createApp<{
+  models: {
+    PostModelNoArgs: PostModelNoArgs
+  }
+}>()
 
 /**
  * This way we are testing "Model" support.

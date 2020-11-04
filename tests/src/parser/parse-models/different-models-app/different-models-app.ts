@@ -1,4 +1,13 @@
-import { ModelWithArgs } from "@microframework/core"
+import { createApp, ModelWithArgs } from "@microframework/core"
+
+export const App = createApp<{
+  models: {
+    PostType: PostTypeModel
+    PostClass: PostClassModel
+    PostInterface: PostInterfaceModel
+    PostLiteralModel: PostLiteralModel
+  }
+}>()
 
 /**
  * This way we are testing "Model" support with a regular type.
@@ -32,6 +41,15 @@ export type PostType = {
 }
 
 /**
+ * Args for a PostTypeModel.
+ */
+export type PostTypeArgs = {
+  name: {
+    keyword: string
+  }
+}
+
+/**
  * Class for a PostClassModel.
  */
 export class PostClass {
@@ -45,15 +63,6 @@ export class PostClass {
 export interface PostInterface {
   id: number
   name: string
-}
-
-/**
- * Args for a PostTypeModel.
- */
-export type PostTypeArgs = {
-  name: {
-    keyword: string
-  }
 }
 
 /**

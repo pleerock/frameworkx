@@ -1,8 +1,12 @@
 import { createApp } from "@microframework/core"
-import { PhotoInterface } from "../model/PhotoInterface"
 
 export const App = createApp<{
   models: {
-    PhotoInterface: PhotoInterface
+    UserClass: UserClass
   }
 }>()
+
+class UserClass {
+  id!: number
+  name!: string
+}
