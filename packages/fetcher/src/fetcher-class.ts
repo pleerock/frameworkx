@@ -247,7 +247,7 @@ export class Fetcher<App extends AnyApplication = any> {
     if (
       typeof request === "object" &&
       request.map &&
-      request.map.type === "action"
+      request.map["@type"] === "RequestAction"
     ) {
       if (!this.options.actionEndpoint) {
         throw new Error(
@@ -262,9 +262,9 @@ export class Fetcher<App extends AnyApplication = any> {
         body = JSON.stringify(options.body)
       }
 
-      let path: string = ""
+      let path: string = requestAction.path
       if (options.params) {
-        const toPath = compile(requestAction.method, {
+        const toPath = compile(path, {
           encode: encodeURIComponent,
         })
         path = toPath(options.params)
