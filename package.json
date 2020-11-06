@@ -11,8 +11,10 @@
     "docker": "docker-compose up",
     "format": "prettier",
     "watch": "tsc -b -w",
-    "clean": "sh clean.sh",
-    "clean-hard": "sh clean.sh --hard",
+    "clean": "sh scripts/clean.sh",
+    "clean-hard": "sh scripts/clean.sh --hard",
+    "publish-packages": "sh scripts/publish.sh",
+    "generate-sandbox-samples": "sh scripts/generate-sandbox-samples.sh",
     "class-sample": "node samples/complete-sample/_/index.js"
   }
 }

@@ -76,6 +76,47 @@ export const Errors = {
       `"inputs" inside application options must contain at least one model, e.g. { UserInput: UserInput, ... }.`,
     )
   },
+  appQueriesDuplicate(properties: string[]) {
+    throw new Error(
+      `"queries" inside application options contains duplicated properties [${properties.join(
+        ", ",
+      )}]`,
+    )
+  },
+  appMutationsDuplicate(properties: string[]) {
+    throw new Error(
+      `"mutations" inside application options contains duplicated properties [${properties.join(
+        ", ",
+      )}]`,
+    )
+  },
+  appSubscriptionsDuplicate(properties: string[]) {
+    throw new Error(
+      `"subscriptions" inside application options contains duplicated properties [${properties.join(
+        ", ",
+      )}]`,
+    )
+  },
+  appMissingModelType(
+    type: "queries" | "mutations" | "subscriptions" | "actions",
+    missingTypes: string[],
+  ) {
+    throw new Error(
+      `Types [${missingTypes.join(
+        ", ",
+      )}] must be defined in "models" section in order to using ${type}.`,
+    )
+  },
+  appMissingInputType(
+    type: "queries" | "mutations" | "subscriptions" | "actions",
+    missingTypes: string[],
+  ) {
+    throw new Error(
+      `Types [${missingTypes.join(
+        ", ",
+      )}] must be defined in "inputs" section in order to using ${type}.`,
+    )
+  },
 
   // errors on app actions
   appActionsInvalidSignature(node: ts.Node) {
