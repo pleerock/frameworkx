@@ -31,7 +31,7 @@
     "sqlite3": "^5.0.0",
     "ts-jest": "^26.1.1",
     "typeorm": "^0.3.0-rc.21",
-    "typescript": "^4.1.0-dev.20201022",
+    "typescript": "^4.1.1-rc",
     "ws": "^7.3.1"
   },
   "devDependencies": {

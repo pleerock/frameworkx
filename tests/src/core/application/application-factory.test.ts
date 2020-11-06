@@ -1,7 +1,7 @@
 import * as requestFns from "@microframework/core/_/request/request-functions"
 import * as validationFns from "@microframework/core/_/validation/validation-functions"
 import * as resolverFns from "@microframework/core/_/resolver/resolver-functions"
-import { createApp, RequestMap, } from "@microframework/core"
+import { createApp, RequestMap } from "@microframework/core"
 
 describe("core > application > factory", () => {
   describe("createApp", () => {

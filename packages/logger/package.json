@@ -1,6 +1,6 @@
 {
   "name": "@microframework/logger",
-  "version": "0.1.24",
+  "version": "0.1.26",
   "description": "Microframework logger",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "url": "https://github.com/pleerock/frameworkx/issues"
   },
   "repository": {
-    "type" : "git",
+    "type": "git",
     "url": "git@github.com:pleerock/frameworkx.git",
     "directory": "packages/logger"
   },
