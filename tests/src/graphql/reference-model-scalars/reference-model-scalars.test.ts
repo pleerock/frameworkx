@@ -1,10 +1,8 @@
 import { parse } from "@microframework/parser"
 import {
-  ApplicationServerUtils,
-  GraphQLSchemaBuilder,
-  LoggerHelper,
-} from "@microframework/node"
-import { debugLogger } from "@microframework/logger"
+  buildGraphQLSchema,
+  defaultNamingStrategy,
+} from "@microframework/graphql"
 import {
   isNonNullType,
   isNullableType,
@@ -14,32 +12,13 @@ import {
 
 describe("graphql > schema builder", () => {
   test("model (referenced type) with scalar properties", () => {
-    const result = parse(__dirname + "/reference-model-scalars-app.ts")
-    const loggerHelper = new LoggerHelper(debugLogger)
-    const options = {
-      appPath: __dirname + "/App",
-      webserver: {
-        port: 4000,
-        cors: true,
-      },
-      websocket: {
-        host: "localhost",
-        port: 5000,
-      },
-      graphql: {
-        graphiql: true,
-        playground: true,
-      },
-      resolvers: {},
-    }
-    const builder = new GraphQLSchemaBuilder(
-      loggerHelper,
-      result,
-      ApplicationServerUtils.optionsToProperties(options),
-      undefined,
-    )
-
-    const schema = builder.build()
+    const appMetadata = parse(__dirname + "/reference-model-scalars-app.ts")
+    const schema = buildGraphQLSchema({
+      appMetadata: appMetadata,
+      namingStrategy: defaultNamingStrategy,
+      resolveFactory() {},
+      subscribeFactory() {},
+    })
     const postType = schema.getType("PostType")
     expect(postType).not.toBe(undefined)
 
