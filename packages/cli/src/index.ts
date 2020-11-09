@@ -13,11 +13,12 @@ program
 program
   .command("init <name>")
   .description("creates a boilerplate for a given project scale")
-  .requiredOption(
+  .option(
     "-d, --destination <items>",
     "destination directory where project needs to be created",
+    "",
   )
-  .requiredOption(
+  .option(
     "-t, --type <items>",
     "project type",
     "monolith,monorepo,microservices",

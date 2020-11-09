@@ -5,9 +5,13 @@
     * Install dependencies
     * Run the project
 * Manual installation
-    * Setup package manager
+    * Create a new project
     * Setup TypeScript compiler
-    * 
+    * Basic application structure
+    * Create a basic model and input
+    * Create basic queries and mutations
+    * Create basic resolvers
+    * Run the project
 
 ## Using CLI
 
@@ -22,9 +26,9 @@ npx @microframework/core init my-project
 
 There are 3 types of project skeletons you can generate:
 
-* monolith []
-* monorepo []
-* microservices []
+* [monolith]()
+* [monorepo]()
+* [microservices]()
 
 By default `init` command generates a monolith skeleton.
 You can use a `--type` option to generate a different skeleton, e.g.
@@ -45,7 +49,6 @@ cd my-project
 npm install
 ```
 
-
 ### Run the project
 
 To run the project just run `npm start`.
@@ -57,9 +60,9 @@ favorite code editor and [start tweaking things](./project-structure.md).
 
 ## Manual installation
 
-### Setup package manager
+### Create a new project
 
-Create an empty directory for a new project:
+Create a new directory for new project:
 
 ```shell script
 mkdir my-project
@@ -94,7 +97,7 @@ And put following content inside:
 }
 ```
 
-Now you can install all required dependencies:
+Now you can install required dependencies:
 
 ```shell script
 npm install
@@ -108,7 +111,7 @@ Create a `tsconfig.json` file:
 touch tsconfig.json
 ```
 
-And put a following basic TypeScript compiler configuration:
+And put a following basic configuration:
 
 ```json
 {
@@ -128,7 +131,7 @@ And put a following basic TypeScript compiler configuration:
 It's important to enable `declaration` flag in `compilerOptions`, 
 because framework heavily rely on this option.
 
-Now you'll be able to compile your source code by using a following command:
+Now you'll be able to compile a source code by using a following command:
 
 ```shell script
 npm run watch
@@ -153,21 +156,19 @@ First let's create `src/app.ts` file with application declaration inside:
 ```ts
 // src/app.ts
 import { createApp } from "@microframework/core"
-import { Post } from "../model"
-import { CategorySaveInput, PostSaveInput } from "../input"
 
 export const App = createApp<{
   models: {
-    // we'll register our models here
+    // we'll register our models later here
   }
   inputs: {
-    // we'll register our inputs here
+    // we'll register our inputs later here
   }
   queries: {
-    // we'll register our queries here
+    // we'll register our queries later here
   }
   mutations: {
-    // we'll register our mutations here
+    // we'll register our mutations later here
   }
 }>()
 ```
@@ -182,7 +183,7 @@ Next, create a `src/server.ts` file with server configuration:
 ```ts
 // src/server.ts
 import { createApplicationServer } from "@microframework/node"
-import { App } from "./App"
+import { App } from "./app"
 
 export const AppServer = createApplicationServer(App, {
   appPath: __dirname + "/app",
@@ -194,18 +195,18 @@ export const AppServer = createApplicationServer(App, {
     graphiql: true,
     playground: true,
   },
-  resolvers: {
+  resolvers: [
     // we'll register resolvers later here
-  },
+  ],
 })
 ```
 
 Server configuration file used to set up a server launch options,
-it also connects your server to [application declaration]() and registers
+connect the server to [application declaration]() and registers
 [resolvers]() (controllers) that are going to serve all incoming HTTP queries.
 In this configuration `appPath` is super important option - it must contain a file system
 path to a TypeScript file (`.ts` or `.d.ts`) with [application declaration]() inside.
-Name should not contain an extension. In our example project it is a reference to `src/app.ts` file. 
+Name should not contain an extension. In our example project it is a reference to a `src/app.ts` file. 
 
 
 Next, create a `src/index.ts` file:
@@ -232,7 +233,8 @@ Your `my-project` application is now running on http://localhost:4000.
 
 ### Create a basic model and input
 
-Let's suppose we have a `Post` model, it's purpose is to 
+Let's suppose we have a `Post` model, an interface representation of a website post.
+Create a `src/models.ts` file and put our first model in there:
 
 ```ts
 // src/models.ts
@@ -262,7 +264,9 @@ export type Post = {
 }
 ```
 
-Let's suppose we have a `PostSaveInput` input.
+On our website we also have a functionality to create and save our posts.
+In order for our backend to be able to receive a [user input](), let's create a 
+`src/inputs.ts` file with `PostSaveInput` type inside:
 
 ```ts
 // src/inputs.ts
@@ -271,7 +275,6 @@ Let's suppose we have a `PostSaveInput` input.
  */
 export type PostSaveInput = {
   /**
-   * Updating post id.
    * If id isn't specified, it means this input tries to create a new post.
    */
   id?: number | null
@@ -288,16 +291,19 @@ export type PostSaveInput = {
 }
 ```
 
-Note: beside `type` declaration, you can also use a `class` or an `interface`.
+Beside `type` declaration, you can also use a `class` or an `interface`.
 We suggest using a `type` because it's the most powerful way to create a declaration.
+
+Also, in a real-world projects you most likely to separate different models in a different files,
+under the `model` directory of your project. See [structuring best practices guide]().
 
 Next, we must register newly created models and inputs in the [application declaration]() file.
 
 ```ts
 // src/app.ts
 import { createApp } from "@microframework/core"
-import { Post } from "../model"
-import { CategorySaveInput, PostFilterInput, PostSaveInput } from "../input"
+import { Post } from "./models"
+import { PostSaveInput } from "./inputs"
 
 export const App = createApp<{
   models: {
@@ -311,11 +317,22 @@ export const App = createApp<{
 
 ### Create basic queries and mutations
 
+Now, we need to "register" what kind of queries and mutations client is able to execute.
+We want to be able to execute the following operations:
+
+* load all posts
+* get a single post by its id
+* save a post
+* remove post
+
+Any load operations called [query](), and any operation implying a user state change called [mutation]().
+Let's register in our application declarations `posts`, `post` queries and `postSave`, `postRemove` mutations:
+
 ```ts
 // src/app.ts
 import { createApp } from "@microframework/core"
-import { Post } from "../model"
-import { CategorySaveInput, PostFilterInput, PostSaveInput } from "../input"
+import { Post } from "./models"
+import { PostSaveInput } from "./inputs"
 
 /**
  * Main application declarations file.
@@ -324,11 +341,9 @@ export const App = createApp<{
   models: {
     Post: Post
   }
-
   inputs: {
     PostSaveInput: PostSaveInput
   }
-
   queries: {
 
     /**
@@ -343,8 +358,8 @@ export const App = createApp<{
     post(input: { id: number }): Post | null
 
   }
-
   mutations: {
+
     /**
      * Saves a post.
      *
@@ -358,22 +373,32 @@ export const App = createApp<{
      * Returns false if post with a given id was not found.
      */
     postRemove(input: { id: number }): boolean
+
   }
 }>()
 ```
 
 ### Create basic resolvers
 
+Now when we have all declarations in place, 
+it's time to provide actual logic that will **resolve** all the data we want.
+We'll put this logic into the resolver.
+**Resolver** is the same as *controller* from MVC world.
+
+There are [many ways]() how we can define a resolver, 
+we'll just use a single object resolver with resolvers for all queries and mutations we have.  
+Create a `src/resolvers.ts` file:
+
 ```ts
-import { In } from "typeorm"
-import { App, AppPubSub } from "../app"
-import { PostFilterInput, PostSaveInput } from "../input"
-import { CategoryRepository, PostRepository } from "../repository"
+// src/resolvers.ts
+import { App } from "./app"
+import { Post } from "./models"
 
 /**
  * Resolver for post declarations.
  */
 export const PostDeclarationResolver = App.resolver({
+
   async post({ id }) {
     // todo: load post from a database by it's id, e.g.
     //       await PostRepository.findOne({ id })
@@ -382,31 +407,63 @@ export const PostDeclarationResolver = App.resolver({
       title: "Demo post"
     }
   },
-  async posts(input: PostFilterInput) {
-    return PostRepository.findAllPosts(input.skip, input.take)
+
+  async posts() {
+    // todo: load posts from a database, e.g.
+    //       await PostRepository.find()
+    return [
+      { id: 1, title: "First post", text: "About first post" },
+      { id: 2, title: "Second post", text: "About second post" },
+      { id: 3, title: "Third post", text: "About third post" },
+    ]
   },
 
-  async postSave(input: PostSaveInput) {
-    const post = await PostRepository.save({
+  async postSave(input) {
+    const post: Post = {
       id: input.id || undefined,
       title: input.title,
       text: input.text,
-    })
-
-    if (input.categoryIds) {
-      const categories = await CategoryRepository.find({
-        id: In(input.categoryIds),
-      })
-      await PostRepository.save({
-        id: post.id,
-        categories,
-      })
     }
-
-    if (!input.id) {
-      await AppPubSub.publish("POST_CREATED", post)
-    }
+    // todo: save the post in the database, e.g.
+    //       await PostRepository.save(post)
     return post
   },
+
+  async postRemove({ id }) {
+    // todo: remove the post from the database, e.g.
+    //       await PostRepository.remove({ id })
+    return true
+  },
+
 })
 ```
+
+We must register a newly created resolver in application server:
+
+```ts
+// src/server.ts
+import { createApplicationServer } from "@microframework/node"
+import { App } from "./app"
+import { PostDeclarationResolver } from "./resolvers"
+
+export const AppServer = createApplicationServer(App, {
+  appPath: __dirname + "/app",
+  webserver: {
+    port: 4000,
+    cors: true,
+  },
+  graphql: {
+    graphiql: true,
+    playground: true,
+  },
+  resolvers: [
+    PostDeclarationResolver
+  ],
+})
+```
+
+### Run the project
+
+To run the project just run `npm start`.
+Once it gets start open http://localhost:4000/graphql in your browser
+and start writing GraphQL queries.
