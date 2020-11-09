@@ -14,6 +14,7 @@ describe("graphql > schema builder", () => {
   test("input (referenced type) with scalar properties", () => {
     const appMetadata = parse(__dirname + "/reference-input-scalars-app.ts")
     const schema = buildGraphQLSchema({
+      assert: false,
       appMetadata: appMetadata,
       namingStrategy: DefaultNamingStrategy,
       resolveFactory: () => undefined,

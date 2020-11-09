@@ -23,85 +23,32 @@ import { GraphQLSchemaBuilderOptions } from "./GraphQLSchemaBuilderOptions"
 /**
  * Builds a GraphQL schema for a provided application metadata.
  */
-export class GraphQLSchemaBuilder {
-  private options: GraphQLSchemaBuilderOptions
-  private objectTypes: GraphQLObjectType[] = []
-  private inputTypes: GraphQLInputObjectType[] = []
-  private enumTypes: GraphQLEnumType[] = []
-  private unionTypes: GraphQLUnionType[] = []
+export function buildGraphQLSchema(
+  options: GraphQLSchemaBuilderOptions,
+): GraphQLSchema {
+  // -- private properties --
+  const objectTypes: GraphQLObjectType[] = []
+  const inputTypes: GraphQLInputObjectType[] = []
+  const enumTypes: GraphQLEnumType[] = []
+  const unionTypes: GraphQLUnionType[] = []
 
-  constructor(options: GraphQLSchemaBuilderOptions) {
-    this.options = options
-  }
-
-  /**
-   * Checks if application metadata have queries / mutations / subscriptions to build schema from.
-   */
-  canHaveSchema() {
-    return (
-      Object.keys(this.options.appMetadata.queries).length > 0 ||
-      Object.keys(this.options.appMetadata.mutations).length > 0 ||
-      Object.keys(this.options.appMetadata.subscriptions).length > 0
-    )
-  }
-
-  /**
-   * Builds a complete GraphQL schema based on a given type metadata and resolvers.
-   */
-  build(): GraphQLSchema {
-    for (let model of this.options.appMetadata.models) {
-      // todo: can't we simply call resolveGraphQLType method here?
-      if (model.kind === "enum") {
-        this.createGraphQLEnumType(model)
-      } else if (model.kind === "union") {
-        this.createGraphQLUnionType(model)
-      } else if (model.kind === "object" || model.kind === "model") {
-        this.createGraphQLObjectType(model)
-      }
-    }
-
-    for (let input of this.options.appMetadata.inputs) {
-      // todo: can't we simply call resolveGraphQLType method here?
-      this.createGraphQLInputType(input)
-    }
-
-    const schema = new GraphQLSchema({
-      types: [...this.objectTypes, ...this.inputTypes],
-      query: this.createRootGraphQLObjectType(
-        "query",
-        this.options.appMetadata.queries,
-      ),
-      mutation: this.createRootGraphQLObjectType(
-        "mutation",
-        this.options.appMetadata.mutations,
-      ),
-      subscription: this.createRootGraphQLObjectType(
-        "subscription",
-        this.options.appMetadata.subscriptions,
-      ),
-    })
-
-    // make sure schema is valid
-    assertValidSchema(schema)
-
-    return schema
-  }
+  // -- private functions --
 
   /**
    * Resolves a final GraphQL input / object / union / enum type for a given type metadata.
    */
-  private resolveGraphQLType(
+  function resolveGraphQLType(
     mode: "input" | "object",
     type: TypeMetadata,
   ): any {
     if (!type.nullable && !type.canBeUndefined) {
-      const subConverted = this.resolveGraphQLType(mode, {
+      const subConverted = resolveGraphQLType(mode, {
         ...type,
         nullable: true,
       })
       return GraphQLNonNull(subConverted)
     } else if (type.array) {
-      const subConverted = this.resolveGraphQLType(mode, {
+      const subConverted = resolveGraphQLType(mode, {
         ...type,
         array: false,
       })
@@ -125,14 +72,14 @@ export class GraphQLSchemaBuilder {
     } else if (type.typeName === "DateTime") {
       return GraphQLDateTime
     } else if (type.kind === "enum") {
-      return this.createGraphQLEnumType(type)
+      return createGraphQLEnumType(type)
     } else if (type.kind === "union") {
-      return this.createGraphQLUnionType(type)
+      return createGraphQLUnionType(type)
     } else {
       if (mode === "input") {
-        return this.createGraphQLInputType(type)
+        return createGraphQLInputType(type)
       } else {
-        return this.createGraphQLObjectType(type)
+        return createGraphQLObjectType(type)
       }
     }
   }
@@ -141,32 +88,32 @@ export class GraphQLSchemaBuilder {
    * Creates GraphQLInputObjectType for a given type metadata.
    * If such type was already created, it returns its instance.
    */
-  private createGraphQLInputType(
+  function createGraphQLInputType(
     metadata: TypeMetadata,
   ): GraphQLInputObjectType {
     // check if we already have a type with such name
-    const existType = this.inputTypes.find(
+    const existType = inputTypes.find(
       (inputType) => inputType.name === metadata.typeName,
     )
     if (existType) return existType
 
     // create a new type and return it back
     const newType = new GraphQLInputObjectType({
-      name: metadata.typeName || this.options.namingStrategy.namelessInput(),
+      name: metadata.typeName || options.namingStrategy.namelessInput(),
       description: metadata.description,
       fields: () => {
         const fields: GraphQLInputFieldConfigMap = {}
         for (const property of metadata.properties) {
           if (!property.propertyName) continue
           fields[property.propertyName] = {
-            type: this.resolveGraphQLType("input", property),
+            type: resolveGraphQLType("input", property),
             description: property.description,
           }
         }
         return fields
       },
     })
-    this.inputTypes.push(newType)
+    inputTypes.push(newType)
     return newType
   }
 
@@ -174,11 +121,9 @@ export class GraphQLSchemaBuilder {
    * Creates a GraphQLEnumType for a given type metadata.
    * If such type was already created, it returns its instance.
    */
-  private createGraphQLEnumType(metadata: TypeMetadata): GraphQLEnumType {
+  function createGraphQLEnumType(metadata: TypeMetadata): GraphQLEnumType {
     // check if we already have enum with such name
-    const existEnum = this.enumTypes.find(
-      (type) => type.name === metadata.typeName,
-    )
+    const existEnum = enumTypes.find((type) => type.name === metadata.typeName)
     if (existEnum) return existEnum
 
     // if we don't have such enum yet, create a new one
@@ -202,7 +147,7 @@ export class GraphQLSchemaBuilder {
       values: values,
     })
 
-    this.enumTypes.push(newEnum)
+    enumTypes.push(newEnum)
     return newEnum
   }
 
@@ -210,9 +155,9 @@ export class GraphQLSchemaBuilder {
    * Creates GraphQLUnionType for the given type metadata.
    * If such type was already created, it returns its instance.
    */
-  private createGraphQLUnionType(metadata: TypeMetadata): GraphQLUnionType {
+  function createGraphQLUnionType(metadata: TypeMetadata): GraphQLUnionType {
     // check if we already have union with such name
-    const existUnion = this.unionTypes.find(
+    const existUnion = unionTypes.find(
       (type) => type.name === metadata.typeName,
     )
     if (existUnion) return existUnion
@@ -226,7 +171,7 @@ export class GraphQLSchemaBuilder {
       description: metadata.description,
       types: () => {
         return metadata.properties.map((property) => {
-          const type = this.objectTypes.find(
+          const type = objectTypes.find(
             (type) => type.name === property.typeName,
           )
           if (!type) {
@@ -245,7 +190,7 @@ export class GraphQLSchemaBuilder {
       // todo: later we need to add __typename support into TypeORM core
     })
 
-    this.unionTypes.push(newUnion)
+    unionTypes.push(newUnion)
     return newUnion
   }
 
@@ -253,7 +198,7 @@ export class GraphQLSchemaBuilder {
    * Creates GraphQLObjectType for the given type metadata.
    * If such type was already created, it returns its instance.
    */
-  private createGraphQLObjectType(metadata: TypeMetadata): GraphQLObjectType {
+  function createGraphQLObjectType(metadata: TypeMetadata): GraphQLObjectType {
     let typeName = metadata.typeName
     if (!typeName) {
       // console.log(metadata)
@@ -261,7 +206,7 @@ export class GraphQLSchemaBuilder {
     }
 
     // check if we already have a type with such name
-    const existType = this.objectTypes.find((type) => type.name === typeName)
+    const existType = objectTypes.find((type) => type.name === typeName)
     if (existType) return existType
 
     // create a new type and return it back
@@ -281,53 +226,51 @@ export class GraphQLSchemaBuilder {
           }
 
           fields[property.propertyName] = {
-            type: this.resolveGraphQLType("object", property),
+            type: resolveGraphQLType("object", property),
             description: property.description,
             deprecationReason: deprecationReason,
-            resolve: this.options.resolveFactory("model", property, typeName!!),
+            resolve: options.resolveFactory("model", property, typeName!!),
           }
           if (property.args) {
-            const argsInput = this.resolveGraphQLType("input", property.args)
-            fields[property.propertyName].args = this.destructGraphQLType(
-              argsInput,
-            )
+            const argsInput = resolveGraphQLType("input", property.args)
+            fields[property.propertyName].args = destructGraphQLType(argsInput)
           }
         }
         return fields
       },
     })
-    this.objectTypes.push(newType)
+    objectTypes.push(newType)
     return newType
   }
 
   /**
    * Converts a given query, mutation or subscription declaration into GraphQLObjectType.
    */
-  private createRootGraphQLObjectType(
+  function createRootGraphQLObjectType(
     type: "query" | "mutation" | "subscription",
     metadatas: TypeMetadata[],
   ): GraphQLObjectType | undefined {
     if (!metadatas.length) return undefined
 
-    const name = this.options.namingStrategy.defaultTypeName(type)
-    const description = this.options.namingStrategy.defaultTypeDescription(type)
+    const name = options.namingStrategy.defaultTypeName(type)
+    const description = options.namingStrategy.defaultTypeDescription(type)
     const fields: GraphQLFieldConfigMap<any, any> = {}
     for (let metadata of metadatas) {
       if (!metadata.propertyName) continue
 
       fields[metadata.propertyName] = {
-        type: this.resolveGraphQLTypeBasedOnTypeReference(metadata),
+        type: resolveGraphQLTypeBasedOnTypeReference(metadata),
         description: metadata.description,
-        resolve: this.options.resolveFactory(type, metadata),
+        resolve: options.resolveFactory(type, metadata),
       }
 
       if (metadata.args) {
-        const inputType = this.resolveGraphQLType("input", metadata.args)
-        fields[metadata.propertyName].args = this.destructGraphQLType(inputType)
+        const inputType = resolveGraphQLType("input", metadata.args)
+        fields[metadata.propertyName].args = destructGraphQLType(inputType)
       }
 
       if (type === "subscription") {
-        const subscribe = this.options.subscribeFactory(metadata)
+        const subscribe = options.subscribeFactory(metadata)
         if (subscribe) {
           // todo: check if really need this if, I think graphql is graceful
           fields[metadata.propertyName].subscribe = subscribe
@@ -343,11 +286,11 @@ export class GraphQLSchemaBuilder {
    * Otherwise just returns a value (we expect it to be a primitive).
    * This method is used to spread input arguments for root declaration arguments.
    */
-  private destructGraphQLType(inputType: any): any {
+  function destructGraphQLType(inputType: any): any {
     if (inputType instanceof GraphQLNonNull) {
-      return this.destructGraphQLType(inputType.ofType)
+      return destructGraphQLType(inputType.ofType)
     } else if (inputType instanceof GraphQLList) {
-      return this.destructGraphQLType(inputType.ofType)
+      return destructGraphQLType(inputType.ofType)
     } else if (inputType instanceof GraphQLInputObjectType) {
       return inputType.getFields()
     } else if (inputType instanceof GraphQLObjectType) {
@@ -363,24 +306,24 @@ export class GraphQLSchemaBuilder {
    * we mostly can see a type references,
    * and we need to find a real GraphQLObjectType for these references.
    */
-  private resolveGraphQLTypeBasedOnTypeReference(metadata: TypeMetadata) {
+  function resolveGraphQLTypeBasedOnTypeReference(metadata: TypeMetadata) {
     if (!metadata.typeName && metadata.modelName) {
-      const metadataModel = this.options.appMetadata.models.find((model) => {
+      const metadataModel = options.appMetadata.models.find((model) => {
         return model.modelName === metadata.modelName
       })
       if (metadataModel) {
-        return this.resolveGraphQLType("object", {
+        return resolveGraphQLType("object", {
           ...metadata,
           typeName: metadataModel.typeName,
         })
       }
     }
     if (metadata.typeName) {
-      const metadataModel = this.options.appMetadata.models.find(
+      const metadataModel = options.appMetadata.models.find(
         (model) => model.typeName === metadata.typeName,
       )
       if (metadataModel) {
-        return this.resolveGraphQLType("object", {
+        return resolveGraphQLType("object", {
           ...metadata,
           kind: metadataModel.kind,
         })
@@ -391,14 +334,52 @@ export class GraphQLSchemaBuilder {
         metadata.typeName === "Time" ||
         metadata.typeName === "DateTime"
       ) {
-        return this.resolveGraphQLType("object", metadata)
+        return resolveGraphQLType("object", metadata)
       }
     } else {
-      return this.resolveGraphQLType("object", metadata)
+      return resolveGraphQLType("object", metadata)
     }
 
     throw new Error(
       `Cannot resolve GraphQL type for ${JSON.stringify(metadata)}`,
     )
   }
+
+  // -- returned type --
+
+  for (let model of options.appMetadata.models) {
+    // todo: can't we simply call resolveGraphQLType method here?
+    if (model.kind === "enum") {
+      createGraphQLEnumType(model)
+    } else if (model.kind === "union") {
+      createGraphQLUnionType(model)
+    } else if (model.kind === "object" || model.kind === "model") {
+      createGraphQLObjectType(model)
+    }
+  }
+
+  for (let input of options.appMetadata.inputs) {
+    // todo: can't we simply call resolveGraphQLType method here?
+    createGraphQLInputType(input)
+  }
+
+  const schema = new GraphQLSchema({
+    types: [...objectTypes, ...inputTypes],
+    query: createRootGraphQLObjectType("query", options.appMetadata.queries),
+    mutation: createRootGraphQLObjectType(
+      "mutation",
+      options.appMetadata.mutations,
+    ),
+    subscription: createRootGraphQLObjectType(
+      "subscription",
+      options.appMetadata.subscriptions,
+    ),
+  })
+
+  // make sure schema is valid
+  if (options.assert) {
+    assertValidSchema(schema)
+  }
+
+  return schema
 }

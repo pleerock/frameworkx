@@ -223,17 +223,23 @@ export function createApplicationServer<App extends AnyApplication>(
       )
 
       // setup GraphQL
-      const schema = buildGraphQLSchema({
-        appMetadata: metadata!,
-        namingStrategy: this.properties.namingStrategy.graphqlSchema,
-        resolveFactory: resolverHelper.createRootDeclarationResolverFn.bind(
-          resolverHelper,
-        ) as any,
-        subscribeFactory: resolverHelper.createRootSubscriptionResolver.bind(
-          resolverHelper,
-        ) as any,
-      })
-      if (schema) {
+      if (
+        Object.keys(metadata.queries).length > 0 ||
+        Object.keys(metadata.mutations).length > 0 ||
+        Object.keys(metadata.subscriptions).length > 0
+      ) {
+        const schema = buildGraphQLSchema({
+          assert: true,
+          appMetadata: metadata!,
+          namingStrategy: this.properties.namingStrategy.graphqlSchema,
+          resolveFactory: resolverHelper.createRootDeclarationResolverFn.bind(
+            resolverHelper,
+          ) as any,
+          subscribeFactory: resolverHelper.createRootSubscriptionResolver.bind(
+            resolverHelper,
+          ) as any,
+        })
+
         // setup a GraphQL route
         expressApp.use(
           properties.graphql.route,
@@ -248,12 +254,12 @@ export function createApplicationServer<App extends AnyApplication>(
               : "/playground"
           expressApp.get(route, createPlaygroundMiddleware())
         }
-      }
 
-      // setup websocket server
-      if (properties.websocket.port) {
-        const websocketServer = createWebsocketServer(schema)
-        assign(this, { websocketServer } as Partial<ApplicationServer<any>>)
+        // setup websocket server
+        if (properties.websocket.port) {
+          const websocketServer = createWebsocketServer(schema)
+          assign(this, { websocketServer } as Partial<ApplicationServer<any>>)
+        }
       }
 
       // register action routes in express app

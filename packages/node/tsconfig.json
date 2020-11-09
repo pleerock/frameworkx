@@ -8,6 +8,7 @@
     { "path": "../core" },
     { "path": "../parser" },
     { "path": "../model" },
+    { "path": "../graphql" },
     { "path": "../validator" },
     { "path": "../logger" }
   ]

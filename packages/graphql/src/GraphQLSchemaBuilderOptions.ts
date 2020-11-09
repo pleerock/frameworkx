@@ -7,6 +7,11 @@ import { GraphQLSchemaBuilderNamingStrategy } from "./GraphQLSchemaBuilderNaming
  */
 export type GraphQLSchemaBuilderOptions = {
   /**
+   * Assert schema after build.
+   */
+  assert: boolean
+
+  /**
    * The whole application metadata that needs to be built.
    */
   appMetadata: ApplicationTypeMetadata
