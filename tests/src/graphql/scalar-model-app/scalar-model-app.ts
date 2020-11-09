@@ -11,8 +11,8 @@ export const App = createApp<{
  */
 type PostType = {
   number: number
-  numberUndefined: number
-  numberNullable: number
+  numberUndefined: number | undefined
+  numberNullable: number | null
 
   string: string
   stringUndefined: string | undefined
