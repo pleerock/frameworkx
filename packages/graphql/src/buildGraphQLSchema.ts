@@ -364,7 +364,7 @@ export function buildGraphQLSchema(
   }
 
   const schema = new GraphQLSchema({
-    types: [...objectTypes, ...inputTypes],
+    types: [...objectTypes, ...inputTypes, ...unionTypes],
     query: createRootGraphQLObjectType("query", options.appMetadata.queries),
     mutation: createRootGraphQLObjectType(
       "mutation",
