@@ -17,8 +17,8 @@ import {
   GraphQLUnionType,
 } from "graphql"
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
-import { GraphQLBigInt } from "./BigIntScalar"
-import { GraphQLSchemaBuilderOptions } from "./GraphQLSchemaBuilderOptions"
+import { GraphQLBigInt } from "./scalars"
+import { GraphQLSchemaBuilderOptions } from "./build-graphql-schema-fn-options"
 
 /**
  * Builds a GraphQL schema for a provided application metadata.

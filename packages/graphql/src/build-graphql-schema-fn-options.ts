@@ -1,6 +1,6 @@
 import { ApplicationTypeMetadata, TypeMetadata } from "@microframework/core"
 import { GraphQLFieldResolver } from "graphql/type/definition"
-import { GraphQLSchemaBuilderNamingStrategy } from "./GraphQLSchemaBuilderNamingStrategy"
+import { GraphQLSchemaBuilderNamingStrategy } from "./naming-strategy"
 
 /**
  * GraphQLSchemaBuilder options.
