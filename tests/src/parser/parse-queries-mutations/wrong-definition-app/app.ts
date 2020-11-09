@@ -21,7 +21,6 @@ export const App = createApp<{
   }
   subscriptions: {
     postCreated(): PostType
-    postCreated(): CategoryType
   }
   actions: {
     "GET /posts": {
