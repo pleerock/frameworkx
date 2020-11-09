@@ -1,43 +1,14 @@
+import { DefaultNamingStrategy as GraphQLSchemaDefaultNamingStrategy } from "@microframework/graphql"
 import { NamingStrategy } from "./NamingStrategy"
 import { NamingStrategyUtils } from "./NamingStrategyUtils"
 
-const { capitalize, randomString, smallize, camelize } = NamingStrategyUtils
+const { capitalize, smallize, camelize } = NamingStrategyUtils
 
 /**
  * Default framework naming strategy.
  */
 export const DefaultNamingStrategy: NamingStrategy = {
-  graphqlSchema: {
-    namelessInput() {
-      return randomString(10) + "Input"
-    },
-
-    namelessModel() {
-      return randomString(10) + "Model"
-    },
-
-    defaultTypeName(type: "query" | "mutation" | "subscription"): string {
-      return type === "query"
-        ? "Query"
-        : type === "mutation"
-        ? "Mutation"
-        : type === "subscription"
-        ? "Subscription"
-        : ""
-    },
-
-    defaultTypeDescription(
-      type: "query" | "mutation" | "subscription",
-    ): string {
-      return type === "query"
-        ? "Root queries."
-        : type === "mutation"
-        ? "Root mutations."
-        : type === "subscription"
-        ? "Root subscriptions."
-        : ""
-    },
-  },
+  graphqlSchema: GraphQLSchemaDefaultNamingStrategy,
 
   generatedModelDeclarations: {
     one(modelName: string) {

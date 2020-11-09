@@ -5,6 +5,7 @@ import { GraphQLSchema } from "graphql"
 export * from "./BigIntScalar"
 export * from "./GraphQLSchemaBuilder"
 export * from "./GraphQLSchemaBuilderNamingStrategy"
+export * from "./default-naming-strategy"
 
 export function buildGraphQLSchema(
   options: GraphQLSchemaBuilderOptions,

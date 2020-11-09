@@ -1,7 +1,7 @@
 import { parse } from "@microframework/parser"
 import {
   buildGraphQLSchema,
-  defaultNamingStrategy,
+  DefaultNamingStrategy,
 } from "@microframework/graphql"
 import {
   isNonNullType,
@@ -15,10 +15,11 @@ describe("graphql > schema builder", () => {
     const appMetadata = parse(__dirname + "/reference-model-scalars-app.ts")
     const schema = buildGraphQLSchema({
       appMetadata: appMetadata,
-      namingStrategy: defaultNamingStrategy,
-      resolveFactory() {},
-      subscribeFactory() {},
+      namingStrategy: DefaultNamingStrategy,
+      resolveFactory: () => undefined,
+      subscribeFactory: () => undefined,
     })
+    if (!schema) fail("Schema built failed")
     const postType = schema.getType("PostType")
     expect(postType).not.toBe(undefined)
 

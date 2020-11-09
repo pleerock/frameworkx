@@ -7,6 +7,7 @@
   "main": "_/index.js",
   "dependencies": {
     "@microframework/cli": "*",
+    "@microframework/graphql": "*",
     "@microframework/core": "*",
     "@microframework/fetcher": "*",
     "@microframework/logger": "*",
