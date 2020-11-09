@@ -1,10 +1,10 @@
-import { ApplicationTypeMetadata, TypeMetadata } from "@microframework/core"
+import { TypeMetadata } from "@microframework/core"
 import {
+  assertValidSchema,
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfigMap,
-  GraphQLFieldResolver,
   GraphQLFloat,
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
@@ -17,36 +17,21 @@ import {
   GraphQLUnionType,
 } from "graphql"
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
-import { Connection } from "typeorm"
-import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
-import { GraphQLBigInt } from "../scalar/BigIntScalar"
-import { LoggerHelper } from "../helper/LoggerHelper"
-import { ResolverHelper } from "../helper/ResolverHelper"
-import { Errors } from "../error"
+import { GraphQLBigInt } from "./BigIntScalar"
+import { GraphQLSchemaBuilderOptions } from "./GraphQLSchemaBuilderOptions"
 
 /**
  * Builds a GraphQL schema for a provided application metadata.
  */
 export class GraphQLSchemaBuilder {
-  private appMetadata: ApplicationTypeMetadata
-  private properties: ApplicationServerProperties
-  private dataSource?: Connection
-  private resolverHelper: ResolverHelper
+  private options: GraphQLSchemaBuilderOptions
   private objectTypes: GraphQLObjectType[] = []
   private inputTypes: GraphQLInputObjectType[] = []
   private enumTypes: GraphQLEnumType[] = []
   private unionTypes: GraphQLUnionType[] = []
 
-  constructor(
-    loggerHelper: LoggerHelper,
-    appMetadata: ApplicationTypeMetadata,
-    properties: ApplicationServerProperties,
-    dataSource: Connection | undefined,
-  ) {
-    this.appMetadata = appMetadata
-    this.properties = properties
-    this.dataSource = dataSource
-    this.resolverHelper = new ResolverHelper(loggerHelper, properties)
+  constructor(options: GraphQLSchemaBuilderOptions) {
+    this.options = options
   }
 
   /**
@@ -54,9 +39,9 @@ export class GraphQLSchemaBuilder {
    */
   canHaveSchema() {
     return (
-      Object.keys(this.appMetadata.queries).length > 0 ||
-      Object.keys(this.appMetadata.mutations).length > 0 ||
-      Object.keys(this.appMetadata.subscriptions).length > 0
+      Object.keys(this.options.appMetadata.queries).length > 0 ||
+      Object.keys(this.options.appMetadata.mutations).length > 0 ||
+      Object.keys(this.options.appMetadata.subscriptions).length > 0
     )
   }
 
@@ -64,7 +49,7 @@ export class GraphQLSchemaBuilder {
    * Builds a complete GraphQL schema based on a given type metadata and resolvers.
    */
   build(): GraphQLSchema {
-    for (let model of this.appMetadata.models) {
+    for (let model of this.options.appMetadata.models) {
       // todo: can't we simply call resolveGraphQLType method here?
       if (model.kind === "enum") {
         this.createGraphQLEnumType(model)
@@ -75,26 +60,31 @@ export class GraphQLSchemaBuilder {
       }
     }
 
-    for (let input of this.appMetadata.inputs) {
+    for (let input of this.options.appMetadata.inputs) {
       // todo: can't we simply call resolveGraphQLType method here?
       this.createGraphQLInputType(input)
     }
 
-    return new GraphQLSchema({
-      types: this.objectTypes,
+    const schema = new GraphQLSchema({
+      types: [...this.objectTypes, ...this.inputTypes],
       query: this.createRootGraphQLObjectType(
         "query",
-        this.appMetadata.queries,
+        this.options.appMetadata.queries,
       ),
       mutation: this.createRootGraphQLObjectType(
         "mutation",
-        this.appMetadata.mutations,
+        this.options.appMetadata.mutations,
       ),
       subscription: this.createRootGraphQLObjectType(
         "subscription",
-        this.appMetadata.subscriptions,
+        this.options.appMetadata.subscriptions,
       ),
     })
+
+    // make sure schema is valid
+    assertValidSchema(schema)
+
+    return schema
   }
 
   /**
@@ -162,7 +152,7 @@ export class GraphQLSchemaBuilder {
 
     // create a new type and return it back
     const newType = new GraphQLInputObjectType({
-      name: metadata.typeName || this.properties.namingStrategy.namelessInput(),
+      name: metadata.typeName || this.options.namingStrategy.namelessInput(),
       description: metadata.description,
       fields: () => {
         const fields: GraphQLInputFieldConfigMap = {}
@@ -294,11 +284,7 @@ export class GraphQLSchemaBuilder {
             type: this.resolveGraphQLType("object", property),
             description: property.description,
             deprecationReason: deprecationReason,
-            resolve: this.createRootDeclarationResolverFn(
-              "model",
-              property,
-              typeName!!,
-            ),
+            resolve: this.options.resolveFactory("model", property, typeName!!),
           }
           if (property.args) {
             const argsInput = this.resolveGraphQLType("input", property.args)
@@ -323,10 +309,8 @@ export class GraphQLSchemaBuilder {
   ): GraphQLObjectType | undefined {
     if (!metadatas.length) return undefined
 
-    const name = this.properties.namingStrategy.defaultTypeName(type)
-    const description = this.properties.namingStrategy.defaultTypeDescription(
-      type,
-    )
+    const name = this.options.namingStrategy.defaultTypeName(type)
+    const description = this.options.namingStrategy.defaultTypeDescription(type)
     const fields: GraphQLFieldConfigMap<any, any> = {}
     for (let metadata of metadatas) {
       if (!metadata.propertyName) continue
@@ -334,7 +318,7 @@ export class GraphQLSchemaBuilder {
       fields[metadata.propertyName] = {
         type: this.resolveGraphQLTypeBasedOnTypeReference(metadata),
         description: metadata.description,
-        resolve: this.createRootDeclarationResolverFn(type, metadata),
+        resolve: this.options.resolveFactory(type, metadata),
       }
 
       if (metadata.args) {
@@ -343,20 +327,10 @@ export class GraphQLSchemaBuilder {
       }
 
       if (type === "subscription") {
-        const subscriptionResolverFn = this.resolverHelper.findSubscriptionResolver(
-          metadata.propertyName,
-        )
-
-        if (subscriptionResolverFn) {
-          if (!this.properties.websocket.pubSub) throw Errors.pubSubNotDefined()
-
-          fields[
-            metadata.propertyName
-          ].subscribe = this.resolverHelper.createSubscribeResolver({
-            pubSub: this.properties.websocket.pubSub,
-            hasArgs: metadata.args !== undefined,
-            subscriptionResolverFn,
-          })
+        const subscribe = this.options.subscribeFactory(metadata)
+        if (subscribe) {
+          // todo: check if really need this if, I think graphql is graceful
+          fields[metadata.propertyName].subscribe = subscribe
         }
       }
     }
@@ -391,7 +365,7 @@ export class GraphQLSchemaBuilder {
    */
   private resolveGraphQLTypeBasedOnTypeReference(metadata: TypeMetadata) {
     if (!metadata.typeName && metadata.modelName) {
-      const metadataModel = this.appMetadata.models.find((model) => {
+      const metadataModel = this.options.appMetadata.models.find((model) => {
         return model.modelName === metadata.modelName
       })
       if (metadataModel) {
@@ -402,7 +376,7 @@ export class GraphQLSchemaBuilder {
       }
     }
     if (metadata.typeName) {
-      const metadataModel = this.appMetadata.models.find(
+      const metadataModel = this.options.appMetadata.models.find(
         (model) => model.typeName === metadata.typeName,
       )
       if (metadataModel) {
@@ -426,76 +400,5 @@ export class GraphQLSchemaBuilder {
     throw new Error(
       `Cannot resolve GraphQL type for ${JSON.stringify(metadata)}`,
     )
-  }
-
-  /**
-   * Creates a resolver function for a given root declaration.
-   */
-  private createRootDeclarationResolverFn(
-    type: "query" | "mutation" | "subscription" | "model",
-    metadata: TypeMetadata,
-    parentTypeName?: string,
-  ): GraphQLFieldResolver<any, any, any> | undefined {
-    if (!metadata.propertyName) throw new Error("No name in metadata")
-
-    // for subscription we just return a dummy resolver
-    // (in the future maybe we should use a custom resolver here, based on user demands)
-    if (type === "subscription") return (val: any) => val
-
-    // find a user defined resolver function
-    const resolverFn = this.resolverHelper.findGraphQLDeclaration(
-      type,
-      metadata.propertyName,
-      parentTypeName,
-      metadata.args ? true : false,
-    )
-    if (resolverFn) {
-      return this.resolverHelper.createGraphQLTypeResolver(
-        type,
-        metadata,
-        resolverFn,
-        parentTypeName,
-      )
-    }
-
-    // for model resolvers we have few more options
-    if (type === "model" && parentTypeName) {
-      // try data-loader resolver if we have registered one
-      const dataLoaderResolverFn = this.resolverHelper.findDataLoaderResolver(
-        parentTypeName,
-        metadata.propertyName,
-      )
-      if (dataLoaderResolverFn) {
-        return this.resolverHelper.createGraphQLTypeDataLoaderResolver(
-          metadata,
-          dataLoaderResolverFn,
-          parentTypeName,
-        )
-      }
-
-      // try generated relation resolver if we have a data source setup
-      if (this.dataSource && this.dataSource.hasMetadata(parentTypeName)) {
-        const entityRelation = this.dataSource
-          .getMetadata(parentTypeName)
-          .relations.find(
-            (relation) => relation.propertyName === metadata.propertyName!!,
-          )
-        if (entityRelation) {
-          const entityRelationResolverFn = (parents: any[]) => {
-            return this.dataSource!.relationIdLoader.loadManyToManyRelationIdsAndGroup(
-              entityRelation,
-              parents,
-            ).then((groups) => groups.map((group) => group.related))
-          }
-          return this.resolverHelper.createGraphQLTypeGeneratedRelationResolver(
-            metadata,
-            entityRelationResolverFn,
-            parentTypeName,
-          )
-        }
-      }
-    }
-
-    return undefined
   }
 }

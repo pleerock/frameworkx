@@ -104,7 +104,7 @@ export const Errors = {
     throw new Error(
       `Types [${missingTypes.join(
         ", ",
-      )}] must be defined in "models" section in order to using ${type}.`,
+      )}] must be defined in "models" section in order to use ${type}.`,
     )
   },
   appMissingInputType(
@@ -114,7 +114,7 @@ export const Errors = {
     throw new Error(
       `Types [${missingTypes.join(
         ", ",
-      )}] must be defined in "inputs" section in order to using ${type}.`,
+      )}] must be defined in "inputs" section in order to use ${type}.`,
     )
   },
 

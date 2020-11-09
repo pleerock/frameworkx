@@ -1,26 +1,13 @@
+import { GraphQLSchemaBuilderNamingStrategy } from "@microframework/graphql"
+
 /**
  * Strategy on how to name a special identifiers.
  */
 export type NamingStrategy = {
   /**
-   * What name should be used for Inputs without name defined.
+   * GraphQL schema generation naming strategy.
    */
-  namelessInput(): string
-
-  /**
-   * What name should be used for Models without name defined.
-   */
-  namelessModel(): string
-
-  /**
-   * Names for root types - for Query, Mutation and Subscription.
-   */
-  defaultTypeName(type: "query" | "mutation" | "subscription"): string
-
-  /**
-   * Descriptions for root types - for Query, Mutation and Subscription.
-   */
-  defaultTypeDescription(type: "query" | "mutation" | "subscription"): string
+  graphqlSchema: GraphQLSchemaBuilderNamingStrategy
 
   /**
    * Defines names of the generated model declarations.

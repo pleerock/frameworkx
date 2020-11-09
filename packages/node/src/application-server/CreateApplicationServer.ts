@@ -3,25 +3,16 @@ import {
   ApplicationTypeMetadata,
   assign,
 } from "@microframework/core"
+import { LoggerHelper } from "@microframework/logger"
+import { buildGraphQLSchema } from "@microframework/graphql"
 import cors from "cors"
 import express, { Request, Response } from "express"
 import { graphqlHTTP } from "express-graphql"
-import {
-  assertValidSchema,
-  execute,
-  GraphQLError,
-  GraphQLSchema,
-  subscribe,
-} from "graphql"
+import { execute, GraphQLError, GraphQLSchema, subscribe } from "graphql"
 import { SubscriptionServer } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions } from "typeorm"
 import { Server as WebsocketServer } from "ws"
-import {
-  GeneratedEntitySchemaBuilder,
-  GraphQLSchemaBuilder,
-  LoggerHelper,
-  ResolverHelper,
-} from ".."
+import { GeneratedEntitySchemaBuilder, ResolverHelper } from ".."
 import { ApplicationServer } from "./ApplicationServer"
 import { ApplicationServerOptions } from "./ApplicationServerOptions"
 import { ApplicationServerUtils } from "./ApplicationServerUtils"
@@ -38,7 +29,6 @@ export function createApplicationServer<App extends AnyApplication>(
   let subscriptionServer: SubscriptionServer | undefined = undefined
   const properties = ApplicationServerUtils.optionsToProperties(options)
   const loggerHelper = new LoggerHelper(properties.logger)
-  const resolverHelper = new ResolverHelper(loggerHelper, properties)
   const logger = loggerHelper.createApplicationLogger()
 
   // -- private functions --
@@ -226,21 +216,24 @@ export function createApplicationServer<App extends AnyApplication>(
         expressApp.use(corsMiddleware)
       }
 
-      // setup GraphQL
-      let schema: GraphQLSchema | undefined = undefined
-      const typeRegistry = new GraphQLSchemaBuilder(
+      const resolverHelper = new ResolverHelper(
         loggerHelper,
-        metadata!,
         properties,
         this.dataSource,
       )
-      if (typeRegistry.canHaveSchema()) {
-        // create a GraphQL schema
-        schema = typeRegistry.build()
 
-        // make sure schema is valid
-        assertValidSchema(schema)
-
+      // setup GraphQL
+      const schema = buildGraphQLSchema({
+        appMetadata: metadata!,
+        namingStrategy: this.properties.namingStrategy.graphqlSchema,
+        resolveFactory: resolverHelper.createRootDeclarationResolverFn.bind(
+          resolverHelper,
+        ) as any,
+        subscribeFactory: resolverHelper.createRootSubscriptionResolver.bind(
+          resolverHelper,
+        ) as any,
+      })
+      if (schema) {
         // setup a GraphQL route
         expressApp.use(
           properties.graphql.route,

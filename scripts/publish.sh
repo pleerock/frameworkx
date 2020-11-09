@@ -3,6 +3,7 @@ declare -a projectDirs=(
   "./packages/cli"
   "./packages/core"
   "./packages/fetcher"
+  "./packages/graphql"
   "./packages/logger"
   "./packages/model"
   "./packages/node"

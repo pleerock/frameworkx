@@ -44,16 +44,19 @@ export type TypeMetadata = {
 
   /**
    * Model name.
-   */ modelName?: string // todo: provide a descriptive description with examples
+   */
+  modelName?: string // todo: provide a descriptive description with examples
 
   /**
    * Type name.
-   */ typeName?: string // todo: provide a descriptive description with examples
+   */
+  typeName?: string // todo: provide a descriptive description with examples
 
   /**
    * If this TypeMetadata is some other type's property,
    * propertyName will be set to that type's property name.
-   */ propertyName?: string
+   */
+  propertyName?: string
 
   /**
    * Type description.

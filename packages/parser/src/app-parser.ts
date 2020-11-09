@@ -323,16 +323,16 @@ export function parse(
   }
 
   // ---------------------------------------------------------
-  // Check if subscriptions input types are defined in 'input'
+  // Check if subscriptions input types are defined in 'app.inputs'
   // ---------------------------------------------------------
 
   const subscriptionInputTypes = result.subscriptions
-    .filter((it) => it.args && it.args.typeName)
-    .map((it) => it.args!.typeName!)
+    .filter((subscription) => subscription.args && subscription.args.typeName)
+    .map((subscription) => subscription.args!.typeName!)
     .filter(onlyUnique)
 
   const missingSubscriptionInputTypes = subscriptionInputTypes.filter(
-    (it) => inputTypes.indexOf(it) === -1,
+    (subscriptionInputType) => inputTypes.indexOf(subscriptionInputType) === -1,
   )
 
   if (missingSubscriptionInputTypes.length) {

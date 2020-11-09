@@ -27,7 +27,7 @@ describe("parse queries > wrong definition", () => {
     expect(() =>
       parse(__dirname + "/missing-models-in-queries-app.ts"),
     ).toThrowError(
-      `Types [PostType] must be defined in "models" section in order to using queries.`,
+      `Types [PostType] must be defined in "models" section in order to use queries.`,
     )
   })
 
@@ -35,7 +35,7 @@ describe("parse queries > wrong definition", () => {
     expect(() =>
       parse(__dirname + "/missing-models-in-mutations-app.ts"),
     ).toThrowError(
-      `Types [PostType] must be defined in "models" section in order to using mutations.`,
+      `Types [PostType] must be defined in "models" section in order to use mutations.`,
     )
   })
 
@@ -43,7 +43,7 @@ describe("parse queries > wrong definition", () => {
     expect(() =>
       parse(__dirname + "/missing-models-in-subscriptions-app.ts"),
     ).toThrowError(
-      `Types [PostType] must be defined in "models" section in order to using subscriptions.`,
+      `Types [PostType] must be defined in "models" section in order to use subscriptions.`,
     )
   })
 
@@ -51,7 +51,7 @@ describe("parse queries > wrong definition", () => {
     expect(() =>
       parse(__dirname + "/missing-models-in-actions-app.ts"),
     ).toThrowError(
-      `Types [PostType] must be defined in "models" section in order to using actions.`,
+      `Types [PostType] must be defined in "models" section in order to use actions.`,
     )
   })
 
@@ -59,7 +59,7 @@ describe("parse queries > wrong definition", () => {
     expect(() =>
       parse(__dirname + "/missing-inputs-in-queries-app.ts"),
     ).toThrowError(
-      `Types [PostInput] must be defined in "inputs" section in order to using queries.`,
+      `Types [PostInput] must be defined in "inputs" section in order to use queries.`,
     )
   })
 
@@ -67,7 +67,7 @@ describe("parse queries > wrong definition", () => {
     expect(() =>
       parse(__dirname + "/missing-inputs-in-mutations-app.ts"),
     ).toThrowError(
-      `Types [PostInput] must be defined in "inputs" section in order to using mutations.`,
+      `Types [PostInput] must be defined in "inputs" section in order to use mutations.`,
     )
   })
 
@@ -75,7 +75,7 @@ describe("parse queries > wrong definition", () => {
     expect(() =>
       parse(__dirname + "/missing-inputs-in-subscriptions-app.ts"),
     ).toThrowError(
-      `Types [PostInput] must be defined in "inputs" section in order to using subscriptions.`,
+      `Types [PostInput] must be defined in "inputs" section in order to use subscriptions.`,
     )
   })
 })

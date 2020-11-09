@@ -10,10 +10,12 @@ import {
 import DataLoader from "dataloader"
 import { withFilter } from "graphql-subscriptions"
 import { GraphQLFieldResolver } from "graphql/type/definition"
-import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
-import { LoggerHelper } from "./LoggerHelper"
+import { ApplicationServerProperties } from "../application-server"
+import { LoggerHelper } from "@microframework/logger"
 import { RateLimitItemOptions } from "../rate-limit"
 import { ValidationHelper } from "./ValidationHelper"
+import { Connection } from "typeorm"
+import { Errors } from "../error"
 
 /**
  * Helper over resolving operations.
@@ -22,14 +24,120 @@ export class ResolverHelper {
   private loggerHelper: LoggerHelper
   private validator: ValidationHelper
   private properties: ApplicationServerProperties
+  private dataSource: Connection | undefined
 
-  constructor(logger: LoggerHelper, properties: ApplicationServerProperties) {
+  constructor(
+    logger: LoggerHelper,
+    properties: ApplicationServerProperties,
+    dataSource: Connection | undefined,
+  ) {
     this.loggerHelper = logger
     this.properties = properties
+    this.dataSource = dataSource
     this.validator = new ValidationHelper(
       properties.validator,
       properties.validationRules,
     )
+  }
+
+  createRootSubscriptionResolver(
+    metadata: TypeMetadata,
+  ): GraphQLFieldResolver<any, any, any> | undefined {
+    const subscriptionResolverFn = this.findSubscriptionResolver(
+      metadata.propertyName!,
+    )
+
+    if (subscriptionResolverFn) {
+      if (!this.properties.websocket.pubSub) throw Errors.pubSubNotDefined()
+      return this.createSubscribeResolver({
+        pubSub: this.properties.websocket.pubSub,
+        hasArgs: metadata.args !== undefined,
+        subscriptionResolverFn,
+      })
+    }
+
+    return undefined
+  }
+
+  /**
+   * Creates a resolver function for a given root declaration.
+   */
+  createRootDeclarationResolverFn(
+    type: "query" | "mutation" | "subscription" | "model",
+    metadata: TypeMetadata,
+    parentTypeName?: string,
+  ): GraphQLFieldResolver<any, any, any> | undefined {
+    if (!metadata.propertyName) throw new Error("No name in metadata")
+
+    // for subscription we just return a dummy resolver
+    // (in the future maybe we should use a custom resolver here, based on user demands)
+    if (type === "subscription") return (val: any) => val
+
+    // find a user defined resolver function
+    const resolverFn = this.findGraphQLDeclaration(
+      type,
+      metadata.propertyName,
+      parentTypeName,
+      metadata.args ? true : false,
+    )
+    if (resolverFn) {
+      return this.createGraphQLTypeResolver(
+        type,
+        metadata,
+        resolverFn,
+        parentTypeName,
+      )
+    }
+
+    // for model resolvers we have few more options
+    if (type === "model" && parentTypeName) {
+      // try data-loader resolver if we have registered one
+      const dataLoaderResolverFn = this.findDataLoaderResolver(
+        parentTypeName,
+        metadata.propertyName,
+      )
+      if (dataLoaderResolverFn) {
+        return this.createGraphQLTypeDataLoaderResolver(
+          metadata,
+          dataLoaderResolverFn,
+          parentTypeName,
+        )
+      }
+
+      // try generated relation resolver if we have a data source setup
+      const generatedRelationResolver = this.generateRelationResolver(
+        metadata,
+        parentTypeName,
+      )
+      if (generatedRelationResolver) {
+        return generatedRelationResolver
+      }
+    }
+
+    return undefined
+  }
+
+  generateRelationResolver(metadata: TypeMetadata, name: string) {
+    if (this.dataSource && this.dataSource.hasMetadata(name)) {
+      const entityRelation = this.dataSource
+        .getMetadata(name)
+        .relations.find(
+          (relation) => relation.propertyName === metadata.propertyName!!,
+        )
+      if (entityRelation) {
+        const entityRelationResolverFn = (parents: any[]) => {
+          return this.dataSource!.relationIdLoader.loadManyToManyRelationIdsAndGroup(
+            entityRelation,
+            parents,
+          ).then((groups) => groups.map((group) => group.related))
+        }
+        return this.createGraphQLTypeGeneratedRelationResolver(
+          metadata,
+          entityRelationResolverFn,
+          name,
+        )
+      }
+    }
   }
 
   findAction(
@@ -290,7 +398,7 @@ export class ResolverHelper {
     }
   }
 
-  createGraphQLTypeGeneratedRelationResolver(
+  private createGraphQLTypeGeneratedRelationResolver(
     metadata: TypeMetadata,
     resolverFn: any,
     modelName: string,

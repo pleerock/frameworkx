@@ -7,32 +7,36 @@ const { capitalize, randomString, smallize, camelize } = NamingStrategyUtils
  * Default framework naming strategy.
  */
 export const DefaultNamingStrategy: NamingStrategy = {
-  namelessInput() {
-    return randomString(10) + "Input"
-  },
+  graphqlSchema: {
+    namelessInput() {
+      return randomString(10) + "Input"
+    },
 
-  namelessModel() {
-    return randomString(10) + "Model"
-  },
+    namelessModel() {
+      return randomString(10) + "Model"
+    },
 
-  defaultTypeName(type: "query" | "mutation" | "subscription"): string {
-    return type === "query"
-      ? "Query"
-      : type === "mutation"
-      ? "Mutation"
-      : type === "subscription"
-      ? "Subscription"
-      : ""
-  },
+    defaultTypeName(type: "query" | "mutation" | "subscription"): string {
+      return type === "query"
+        ? "Query"
+        : type === "mutation"
+        ? "Mutation"
+        : type === "subscription"
+        ? "Subscription"
+        : ""
+    },
 
-  defaultTypeDescription(type: "query" | "mutation" | "subscription"): string {
-    return type === "query"
-      ? "Root queries."
-      : type === "mutation"
-      ? "Root mutations."
-      : type === "subscription"
-      ? "Root subscriptions."
-      : ""
+    defaultTypeDescription(
+      type: "query" | "mutation" | "subscription",
+    ): string {
+      return type === "query"
+        ? "Root queries."
+        : type === "mutation"
+        ? "Root mutations."
+        : type === "subscription"
+        ? "Root subscriptions."
+        : ""
+    },
   },
 
   generatedModelDeclarations: {
