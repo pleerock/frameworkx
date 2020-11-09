@@ -3,6 +3,7 @@ import { createApp } from "@microframework/core"
 export const App = createApp<{
   models: {
     PersonIntersectionType: PersonIntersectionType
+    PersonEducationType: PersonEducationType & { type: string }
   }
 }>()
 
@@ -10,8 +11,8 @@ export const App = createApp<{
  * This way we are testing intersection type.
  */
 type PersonIntersectionType = { id: number; name: string } & {
-  aboutMe: string
-  photoUrl: string
+  aboutMe: string | undefined
+  photoUrl: string | null
 } & PersonEducationType &
   PersonCareerInterface &
   PersonSkillClass
