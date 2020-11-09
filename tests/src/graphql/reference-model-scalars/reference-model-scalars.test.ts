@@ -12,9 +12,9 @@ import {
   isScalarType,
 } from "graphql"
 
-describe("graphql > scalar model app", () => {
-  test("model defined with a scalar type properties", () => {
-    const result = parse(__dirname + "/scalar-model-app.ts")
+describe("graphql > schema builder", () => {
+  test("model (referenced type) with scalar properties", () => {
+    const result = parse(__dirname + "/reference-model-scalars-app.ts")
     const loggerHelper = new LoggerHelper(debugLogger)
     const options = {
       appPath: __dirname + "/App",
