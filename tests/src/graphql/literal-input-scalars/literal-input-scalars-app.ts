@@ -2,6 +2,9 @@ import { createApp, Float, DateTime, Time } from "@microframework/core"
 
 export const App = createApp<{
   inputs: {
+    /**
+     * This way we are testing type support.
+     */
     PostInput: {
       number: number
       numberUndefined: number | undefined

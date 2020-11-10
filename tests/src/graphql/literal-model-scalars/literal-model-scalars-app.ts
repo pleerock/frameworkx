@@ -2,6 +2,9 @@ import { createApp, Float, DateTime, Time } from "@microframework/core"
 
 export const App = createApp<{
   models: {
+    /**
+     * This way we are testing type support.
+     */
     PostType: {
       number: number
       numberArray: number[]

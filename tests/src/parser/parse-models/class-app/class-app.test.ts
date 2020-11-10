@@ -16,6 +16,7 @@ describe("parse models > class app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -23,6 +24,8 @@ describe("parse models > class app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -32,6 +35,8 @@ describe("parse models > class app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",

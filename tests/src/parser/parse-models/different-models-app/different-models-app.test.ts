@@ -16,6 +16,7 @@ describe("parse models > different model app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -23,6 +24,8 @@ describe("parse models > different model app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -32,6 +35,8 @@ describe("parse models > different model app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",
@@ -40,6 +45,8 @@ describe("parse models > different model app", () => {
                 kind: "object",
                 array: false,
                 nullable: false,
+                deprecated: false,
+                description: "",
                 canBeUndefined: false,
                 properties: [
                   {
@@ -47,6 +54,8 @@ describe("parse models > different model app", () => {
                     kind: "string",
                     array: false,
                     nullable: false,
+                    deprecated: false,
+                    description: "",
                     canBeUndefined: false,
                     properties: [],
                     propertyName: "keyword",
@@ -63,6 +72,7 @@ describe("parse models > different model app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -70,6 +80,8 @@ describe("parse models > different model app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -79,6 +91,8 @@ describe("parse models > different model app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",
@@ -93,6 +107,7 @@ describe("parse models > different model app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -100,6 +115,8 @@ describe("parse models > different model app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -109,6 +126,8 @@ describe("parse models > different model app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",
@@ -123,6 +142,7 @@ describe("parse models > different model app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -130,6 +150,8 @@ describe("parse models > different model app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -139,6 +161,8 @@ describe("parse models > different model app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",
@@ -147,6 +171,8 @@ describe("parse models > different model app", () => {
                 kind: "object",
                 array: false,
                 nullable: false,
+                deprecated: false,
+                description: "",
                 canBeUndefined: false,
                 properties: [
                   {
@@ -154,6 +180,8 @@ describe("parse models > different model app", () => {
                     kind: "string",
                     array: false,
                     nullable: false,
+                    deprecated: false,
+                    description: "",
                     canBeUndefined: false,
                     properties: [],
                     propertyName: "keyword",

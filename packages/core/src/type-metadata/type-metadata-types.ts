@@ -61,13 +61,13 @@ export type TypeMetadata = {
   /**
    * Type description.
    */
-  description?: string
+  description: string
 
   /**
    * Indicates if type is deprecated.
    * If set to string, it means property is deprecated and there is a string reason for that.
    */
-  deprecated?: boolean | string
+  deprecated: boolean | string
 
   /**
    * If type is an object signature for example, it will contain it's properties.

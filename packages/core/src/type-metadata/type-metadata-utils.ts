@@ -17,6 +17,8 @@ export const TypeMetadataUtils = {
       array: false,
       nullable: false,
       canBeUndefined: false,
+      deprecated: false,
+      description: "",
       properties: [],
       ...(type || {}),
     }

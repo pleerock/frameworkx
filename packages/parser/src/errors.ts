@@ -54,11 +54,6 @@ export const Errors = {
   },
 
   // errors on app models
-  appModelsInvalidSignature(node: ts.Node) {
-    throw new Error(
-      `"models" inside application options must be an object with models inside, e.g. "models: { User: UserModel, ... }" (kind: ${node.kind}).`,
-    )
-  },
   appModelsEmptyObject() {
     throw new Error(
       `"models" inside application options must contain at least one model, e.g. { User: UserModel, ... }.`,
@@ -224,6 +219,46 @@ export const Errors = {
   modelArgPropertyInvalid(typeName: string, argPropertyName: string) {
     return new Error(
       `Model Arg "${argPropertyName}" is invalid, because property with such name is missing in "${typeName}".`,
+    )
+  },
+
+  /**
+   * Thrown when there are issues on parsing a "models" / "inputs" definition.
+   */
+  modelInputInvalidSignature(
+    type: "inputs" | "models",
+    node: ts.Node | undefined,
+  ) {
+    const kindMessage = node ? ` (received kind: ${node.kind})` : ``
+    throw new Error(
+      `"${type}" inside application options must be a literal object with ${type} inside, ` +
+        `e.g. "models: { User: UserModel, ... }"${kindMessage}.`,
+    )
+  },
+
+  /**
+   * Thrown in unknown cases when its not possible to parse a "models" / "inputs" object members.
+   */
+  modelInputMemberInvalidDefinition(type: "inputs" | "models") {
+    return new Error(`Application's "${type}" definition is invalid.`)
+  },
+
+  /**
+   * Thrown when model / input name mismatches the referenced type name.
+   * This check is needed to prevent a confusion, when user creates a type and expects
+   * to use it's name in methods like "app.resolver(TypeName)" when what he actually must
+   * use is a model / input name defined as a key in declaration.
+   */
+  modelInputKeyNameAndTypeNameMismatch(
+    type: "inputs" | "models",
+    keyName: string,
+    typeReferenceName: string,
+  ) {
+    const definitionName = type === "models" ? "model" : "input"
+    return new Error(
+      `App's ${definitionName} "${keyName}" is referenced to a type with a ` +
+        `different name("${typeReferenceName}"). In order to prevent a confusion and bugs, ` +
+        `please make sure to name both model and referenced type names match.`,
     )
   },
 }

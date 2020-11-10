@@ -15,6 +15,7 @@ describe("parse inputs > type app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -22,6 +23,8 @@ describe("parse inputs > type app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -31,6 +34,8 @@ describe("parse inputs > type app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",
@@ -46,6 +51,7 @@ describe("parse inputs > type app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -53,6 +59,8 @@ describe("parse inputs > type app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -62,6 +70,8 @@ describe("parse inputs > type app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",

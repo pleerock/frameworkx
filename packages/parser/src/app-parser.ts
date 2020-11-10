@@ -8,7 +8,7 @@ import { Errors } from "./errors"
 import { ModelParser } from "./models-parser"
 import { DefaultParserNamingStrategy } from "./naming-strategy"
 import { ParserOptions } from "./options"
-import { findTypeLiteralProperty, isNodeExported } from "./utils"
+import { isNodeExported, ParserUtils } from "./utils"
 
 export function parse(
   appFileName: string,
@@ -352,8 +352,8 @@ function parseAppDefinition(
 ) {
   return {
     actions: parseActions(program, type, options),
-    models: parseModels(program, type, options),
-    inputs: parseInputs(program, type, options),
+    models: parseModelsInputs("models", program, type, options),
+    inputs: parseModelsInputs("inputs", program, type, options),
     queries: parseQueries(program, type, options),
     mutations: parseMutations(program, type, options),
     subscriptions: parseSubscriptions(program, type, options),
@@ -365,7 +365,10 @@ function parseActions(
   appDefOptions: ts.TypeLiteralNode,
   options: ParserOptions,
 ): ActionTypeMetadata[] {
-  const actionsMember = findTypeLiteralProperty(appDefOptions, "actions")
+  const actionsMember = ParserUtils.findTypeLiteralProperty(
+    appDefOptions,
+    "actions",
+  )
 
   if (!actionsMember) return []
 
@@ -423,49 +426,75 @@ function parseActions(
   })
 }
 
-function parseModels(
+/**
+ * Parses "models" or "inputs" section of the app.
+ */
+function parseModelsInputs(
+  type: "models" | "inputs",
   program: ts.Program,
   appDefOptions: ts.TypeLiteralNode,
   options: ParserOptions,
 ): TypeMetadata[] {
-  const modelsMember = findTypeLiteralProperty(appDefOptions, "models")
-
+  const modelsMember = ParserUtils.findTypeLiteralProperty(appDefOptions, type)
   if (!modelsMember) return []
 
-  if (!modelsMember.type) throw new Error("no type")
-
+  // make sure signature is supported
   if (!modelsMember.type || !ts.isTypeLiteralNode(modelsMember.type))
-    throw Errors.appModelsInvalidSignature(modelsMember.type)
+    throw Errors.modelInputInvalidSignature(type, modelsMember.type)
 
-  if (!modelsMember.type.members.length) throw Errors.appModelsEmptyObject()
+  // no members - not a problem, user can add them on demand
+  if (!modelsMember.type.members.length) return []
 
+  // parse members
+  const typeChecker = program.getTypeChecker()
   const modelParser = new ModelParser(program, options)
-  return modelsMember.type.members.map((member) =>
-    modelParser.parse(member, "", false, "app.models"),
-  )
-}
+  return modelsMember.type.members.map((member) => {
+    // extract a model name and make sure its correct
+    if (!member.name) throw Errors.modelInputMemberInvalidDefinition(type)
+    const memberName = member.name.getText()
+    if (!memberName || typeof memberName !== "string")
+      throw Errors.modelInputMemberInvalidDefinition(type)
 
-function parseInputs(
-  program: ts.Program,
-  appDefOptions: ts.TypeLiteralNode,
-  options: ParserOptions,
-): TypeMetadata[] {
-  const modelsMember = findTypeLiteralProperty(appDefOptions, "inputs")
+    // parse model metadata
+    const modelMetadata = modelParser.parse(member, "", false, `app.${type}`)
 
-  if (!modelsMember) return []
-  // throw Errors.appModelsInvalidSignature()
+    // if model is a ModelWithArgs, we just return things as they are
+    // (at least for now, until all ModelWithArgs cases be covered)
+    if (modelMetadata.modelName) {
+      // todo: make it's a good idea to introduce a flag inside modelMetadata
+      //       instead of checking for a modelName here? (maybe we can use ".args"?)
+      return modelMetadata
+    }
 
-  if (!modelsMember.type) throw new Error("no type")
+    // if there is a "typeName" in the model, it means type was referenced to some type/class/interface/etc.
+    // but if there's no type name, it most likely means a literal type was used
+    // in this case, we'll use a memberName (model's "name" defined in { models: { [name]: { ... } } })
+    // as a model typeName
+    if (!modelMetadata.typeName) {
+      const description = ParserUtils.getDescription(typeChecker, member)
+      const deprecated = ParserUtils.getDeprecation(member)
 
-  if (!ts.isTypeLiteralNode(modelsMember.type))
-    throw Errors.appInputsInvalidSignature(modelsMember.type)
+      return {
+        ...modelMetadata,
+        typeName: memberName,
+        description,
+        deprecated,
+      } as TypeMetadata
+    }
 
-  if (!modelsMember.type.members.length) throw Errors.appInputsEmptyObject()
+    // otherwise if there is a "typeName" in the model, we need to make sure its name matches
+    // the name defined as a memberName (model's "name" defined in { models: { [name]: TypeName } })
+    // if they don't match, we just throw an error
+    if (modelMetadata.typeName !== memberName) {
+      throw Errors.modelInputKeyNameAndTypeNameMismatch(
+        type,
+        memberName,
+        modelMetadata.typeName,
+      )
+    }
 
-  const modelParser = new ModelParser(program, options)
-  return modelsMember.type.members.map((member) =>
-    modelParser.parse(member, "", false, "app.inputs"),
-  )
+    return modelMetadata
+  })
 }
 
 // todo: use same approach as in "actions"
@@ -474,7 +503,10 @@ function parseQueries(
   appDefOptions: ts.TypeLiteralNode,
   options: ParserOptions,
 ): TypeMetadata[] {
-  const modelsMember = findTypeLiteralProperty(appDefOptions, "queries")
+  const modelsMember = ParserUtils.findTypeLiteralProperty(
+    appDefOptions,
+    "queries",
+  )
 
   if (!modelsMember) return []
 
@@ -489,7 +521,10 @@ function parseMutations(
   appDefOptions: ts.TypeLiteralNode,
   options: ParserOptions,
 ): TypeMetadata[] {
-  const modelsMember = findTypeLiteralProperty(appDefOptions, "mutations")
+  const modelsMember = ParserUtils.findTypeLiteralProperty(
+    appDefOptions,
+    "mutations",
+  )
 
   if (!modelsMember) return []
   // throw Errors.appModelsInvalidSignature()
@@ -503,7 +538,10 @@ function parseSubscriptions(
   appDefOptions: ts.TypeLiteralNode,
   options: ParserOptions,
 ): TypeMetadata[] {
-  const modelsMember = findTypeLiteralProperty(appDefOptions, "subscriptions")
+  const modelsMember = ParserUtils.findTypeLiteralProperty(
+    appDefOptions,
+    "subscriptions",
+  )
 
   if (!modelsMember) return []
   // throw Errors.appModelsInvalidSignature()

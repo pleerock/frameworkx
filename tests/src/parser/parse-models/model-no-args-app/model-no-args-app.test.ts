@@ -15,6 +15,7 @@ describe("parse models > model no args app", () => {
           kind: "object",
           array: false,
           nullable: false,
+          deprecated: false,
           canBeUndefined: false,
           properties: [
             {
@@ -22,6 +23,8 @@ describe("parse models > model no args app", () => {
               kind: "number",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "id",
@@ -31,6 +34,8 @@ describe("parse models > model no args app", () => {
               kind: "string",
               array: false,
               nullable: false,
+              deprecated: false,
+              description: "",
               canBeUndefined: false,
               properties: [],
               propertyName: "name",

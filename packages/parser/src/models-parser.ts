@@ -312,8 +312,11 @@ export class ModelParser {
           argsType,
           origin,
         )
-        model.description = this.extractDescription(modelSymbol)
-        model.deprecated = this.extractDeprecation(modelSymbol)
+        model.description = ParserUtils.getDescription(
+          this.typeChecker,
+          modelSymbol,
+        )
+        model.deprecated = ParserUtils.getDeprecation(modelSymbol)
         return model
       }
 
@@ -322,12 +325,12 @@ export class ModelParser {
       const symbol = referencedType.aliasSymbol || referencedType.symbol
 
       let resolvedType = undefined
-      let description: string | undefined = undefined
-      let deprecated: string | boolean | undefined = undefined
+      let description: string = ""
+      let deprecated: string | boolean = false
       if (symbol) {
         resolvedType = symbol.declarations[0]
-        description = this.extractDescription(symbol)
-        deprecated = this.extractDeprecation(symbol)
+        description = ParserUtils.getDescription(this.typeChecker, symbol)
+        deprecated = ParserUtils.getDeprecation(symbol)
       }
 
       // if this is a nested call (this case we'll have a parent name) -
@@ -387,8 +390,11 @@ export class ModelParser {
       }
 
       const model = this.parseModel("", "", modelType, argsType, origin)
-      model.description = this.extractDescription(modelSymbol.symbol)
-      model.deprecated = this.extractDeprecation(modelSymbol.symbol)
+      model.description = ParserUtils.getDescription(
+        this.typeChecker,
+        modelSymbol.symbol,
+      )
+      model.deprecated = ParserUtils.getDeprecation(modelSymbol.symbol)
       return model
     }
 
@@ -462,14 +468,8 @@ export class ModelParser {
       if (!member.name) continue
 
       // get property description
-      let description = undefined
-      let deprecated: string | boolean | undefined = undefined
-
-      if ((member as any).symbol) {
-        // todo: need to find a way to properly check if member has a documentation
-        description = this.extractDescription((member as any).symbol)
-        deprecated = this.extractDeprecation((member as any).symbol)
-      }
+      const description = ParserUtils.getDescription(this.typeChecker, member)
+      const deprecated = ParserUtils.getDeprecation(member)
 
       // get property name
       let propertyName = ParserUtils.normalizeTextSymbol(member.name.getText())
@@ -558,24 +558,5 @@ export class ModelParser {
       }
     }
     return properties
-  }
-  extractDeprecation(symbol: ts.Symbol) {
-    let deprecated: string | boolean | undefined = undefined
-    const jsDocTags = symbol.getJsDocTags()
-    const deprecatedJsDocTag = jsDocTags.find(
-      (tag) => tag.name === "deprecated",
-    )
-    if (deprecatedJsDocTag) {
-      deprecated = true
-      if (deprecatedJsDocTag.text) {
-        deprecated = deprecatedJsDocTag.text
-      }
-    }
-    return deprecated
-  }
-  extractDescription(symbol: ts.Symbol) {
-    return ts.displayPartsToString(
-      symbol.getDocumentationComment(this.typeChecker),
-    )
   }
 }

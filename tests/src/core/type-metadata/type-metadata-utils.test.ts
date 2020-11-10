@@ -10,6 +10,7 @@ describe("core > type-metadata > utils", () => {
       "@type": "TypeMetadata",
       kind: "number",
       description: "type about a number",
+      deprecated: false,
       array: false,
       nullable: false,
       canBeUndefined: false,
