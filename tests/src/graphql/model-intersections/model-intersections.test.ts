@@ -6,10 +6,8 @@ import {
 import { isNonNullType, isObjectType, isScalarType } from "graphql"
 
 describe("graphql > schema builder", () => {
-  test("model (referenced type) with literal intersection type", () => {
-    const appMetadata = parse(
-      __dirname + "/reference-model-literal-intersections-app.ts",
-    )
+  test("model with intersection type", () => {
+    const appMetadata = parse(__dirname + "/model-intersections-app.ts")
     const schema = buildGraphQLSchema({
       assert: false,
       appMetadata: appMetadata,
@@ -18,6 +16,9 @@ describe("graphql > schema builder", () => {
       subscribeFactory: () => undefined,
     })
     if (!schema) fail("Schema built failed")
+
+    // ------------------------------------------------
+
     const postType = schema.getType("PostType")
     expect(postType).not.toBe(undefined)
 
@@ -41,5 +42,10 @@ describe("graphql > schema builder", () => {
     if (!isNonNullType(rating.type)) fail(`"rating" is nullable`)
     expect(isScalarType(rating.type.ofType)).toBe(true)
     expect(rating.type.ofType.name).toBe("Int")
+
+    // ------------------------------------------------
+
+    // TODO: make other checks after Umed's fixes
+    fail()
   })
 })
