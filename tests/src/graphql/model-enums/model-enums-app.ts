@@ -3,14 +3,19 @@ import { createApp } from "@microframework/core"
 export const App = createApp<{
   models: {
     PostType: PostType
-    PostStatusType: PostStatusType
+    QuestionType: {
+      id: number
+      status: StatusEnum & BanStatusEnum // TODO
+      category: QuestionCategoryEnum
+      type: "common" | "bounced"
+    }
   }
 }>()
 
 /**
- * Type for a PostStatus.
+ * This is StatusEnum.
  */
-enum PostStatusType {
+enum StatusEnum {
   /**
    * Post is on draft.
    */
@@ -35,10 +40,26 @@ enum PostStatusType {
 }
 
 /**
+ * This is PostCategoryEnum.
+ */
+type PostCategoryEnum = "animals" | "cars"
+
+type QuestionCategoryEnum = "medicine" | "programming"
+
+enum BanStatusEnum {
+  /**
+   * Post is banned.
+   */
+  banned = "banned",
+}
+
+/**
  * Type for a PostType.
  */
 type PostType = {
   id: number
   name: string
-  status: PostStatusType
+  status: StatusEnum
+  category: PostCategoryEnum
+  type: "blog" | "news"
 }
