@@ -4,6 +4,8 @@ import {
   DefaultNamingStrategy,
 } from "@microframework/graphql"
 import {
+  GraphQLField,
+  isListType,
   isNonNullType,
   isNullableType,
   isObjectType,
@@ -36,6 +38,13 @@ describe("graphql > schema builder", () => {
     expect(isScalarType(number.type.ofType)).toBe(true)
     expect(number.type.ofType.name).toBe("Int")
 
+    const numberArray = postType.getFields()["numberArray"]
+    expect(numberArray).not.toBe(undefined)
+    if (!isNonNullType(numberArray.type)) fail(`"number" is nullable`)
+    expect(isListType(numberArray.type.ofType)).toBe(true)
+    expect(isScalarType(numberArray.type.ofType.ofType)).toBe(true)
+    expect(numberArray.type.ofType.ofType.name).toBe("Int")
+
     const numberUndefined = postType.getFields()["numberUndefined"]
     expect(numberUndefined).not.toBe(undefined)
     if (!isNullableType(numberUndefined.type))
@@ -59,6 +68,13 @@ describe("graphql > schema builder", () => {
     if (!isNonNullType(string.type)) fail(`"string" is nullable`)
     expect(isScalarType(string.type.ofType)).toBe(true)
     expect(string.type.ofType.name).toBe("String")
+
+    const stringArray = postType.getFields()["stringArray"]
+    expect(stringArray).not.toBe(undefined)
+    if (!isNonNullType(stringArray.type)) fail(`"stringArray" is nullable`)
+    expect(isListType(stringArray.type.ofType)).toBe(true)
+    expect(isScalarType(stringArray.type.ofType.ofType)).toBe(true)
+    expect(stringArray.type.ofType.ofType.name).toBe("String")
 
     const stringUndefined = postType.getFields()["stringUndefined"]
     expect(stringUndefined).not.toBe(undefined)
@@ -84,6 +100,13 @@ describe("graphql > schema builder", () => {
     expect(isScalarType(boolean.type.ofType)).toBe(true)
     expect(boolean.type.ofType.name).toBe("Boolean")
 
+    const booleanArray = postType.getFields()["booleanArray"]
+    expect(booleanArray).not.toBe(undefined)
+    if (!isNonNullType(booleanArray.type)) fail(`"booleanArray" is nullable`)
+    expect(isListType(booleanArray.type.ofType)).toBe(true)
+    expect(isScalarType(booleanArray.type.ofType.ofType)).toBe(true)
+    expect(booleanArray.type.ofType.ofType.name).toBe("Boolean")
+
     const booleanUndefined = postType.getFields()["booleanUndefined"]
     expect(booleanUndefined).not.toBe(undefined)
     if (!isNullableType(booleanUndefined.type))
@@ -108,6 +131,13 @@ describe("graphql > schema builder", () => {
     expect(isScalarType(float.type.ofType)).toBe(true)
     expect(float.type.ofType.name).toBe("Float")
 
+    const floatArray = postType.getFields()["floatArray"]
+    expect(floatArray).not.toBe(undefined)
+    if (!isNonNullType(floatArray.type)) fail(`"floatArray" is nullable`)
+    expect(isListType(floatArray.type.ofType)).toBe(true)
+    expect(isScalarType(floatArray.type.ofType.ofType)).toBe(true)
+    expect(floatArray.type.ofType.ofType.name).toBe("Float")
+
     const floatUndefined = postType.getFields()["floatUndefined"]
     expect(floatUndefined).not.toBe(undefined)
     if (!isNullableType(floatUndefined.type))
@@ -130,6 +160,13 @@ describe("graphql > schema builder", () => {
     if (!isNonNullType(bigint.type)) fail(`"bigint" is nullable`)
     expect(isScalarType(bigint.type.ofType)).toBe(true)
     expect(bigint.type.ofType.name).toBe("BigInt")
+
+    const bigintArray = postType.getFields()["bigintArray"]
+    expect(bigintArray).not.toBe(undefined)
+    if (!isNonNullType(bigintArray.type)) fail(`"bigintArray" is nullable`)
+    expect(isListType(bigintArray.type.ofType)).toBe(true)
+    expect(isScalarType(bigintArray.type.ofType.ofType)).toBe(true)
+    expect(bigintArray.type.ofType.ofType.name).toBe("BigInt")
 
     const bigintUndefined = postType.getFields()["bigintUndefined"]
     expect(bigintUndefined).not.toBe(undefined)
@@ -155,6 +192,14 @@ describe("graphql > schema builder", () => {
     expect(isScalarType(bigintObj.type.ofType)).toBe(true)
     expect(bigintObj.type.ofType.name).toBe("BigInt")
 
+    const bigintObjArray = postType.getFields()["bigintObjArray"]
+    expect(bigintObjArray).not.toBe(undefined)
+    if (!isNonNullType(bigintObjArray.type))
+      fail(`"bigintObjArray" is nullable`)
+    expect(isListType(bigintObjArray.type.ofType)).toBe(true)
+    expect(isScalarType(bigintObjArray.type.ofType.ofType)).toBe(true)
+    expect(bigintObjArray.type.ofType.ofType.name).toBe("BigInt")
+
     const bigintObjUndefined = postType.getFields()["bigintObjUndefined"]
     expect(bigintObjUndefined).not.toBe(undefined)
     if (!isNullableType(bigintObjUndefined.type))
@@ -179,6 +224,13 @@ describe("graphql > schema builder", () => {
     expect(isScalarType(date.type.ofType)).toBe(true)
     expect(date.type.ofType.name).toBe("Date")
 
+    const dateArray = postType.getFields()["dateArray"]
+    expect(dateArray).not.toBe(undefined)
+    if (!isNonNullType(dateArray.type)) fail(`"dateArray" is nullable`)
+    expect(isListType(dateArray.type.ofType)).toBe(true)
+    expect(isScalarType(dateArray.type.ofType.ofType)).toBe(true)
+    expect(dateArray.type.ofType.ofType.name).toBe("Date")
+
     const dateUndefined = postType.getFields()["dateUndefined"]
     expect(dateUndefined).not.toBe(undefined)
     if (!isNullableType(dateUndefined.type))
@@ -200,6 +252,13 @@ describe("graphql > schema builder", () => {
     if (!isNonNullType(dateTime.type)) fail(`"dateTime" is nullable`)
     expect(isScalarType(dateTime.type.ofType)).toBe(true)
     expect(dateTime.type.ofType.name).toBe("DateTime")
+
+    const dateTimeArray = postType.getFields()["dateTimeArray"]
+    expect(dateTimeArray).not.toBe(undefined)
+    if (!isNonNullType(dateTimeArray.type)) fail(`"dateTimeArray" is nullable`)
+    expect(isListType(dateTimeArray.type.ofType)).toBe(true)
+    expect(isScalarType(dateTimeArray.type.ofType.ofType)).toBe(true)
+    expect(dateTimeArray.type.ofType.ofType.name).toBe("DateTime")
 
     const dateTimeUndefined = postType.getFields()["dateTimeUndefined"]
     expect(dateTimeUndefined).not.toBe(undefined)
@@ -225,6 +284,13 @@ describe("graphql > schema builder", () => {
     expect(isScalarType(time.type.ofType)).toBe(true)
     expect(time.type.ofType.name).toBe("Time")
 
+    const timeArray = postType.getFields()["timeArray"]
+    expect(timeArray).not.toBe(undefined)
+    if (!isNonNullType(timeArray.type)) fail(`"timeArray" is nullable`)
+    expect(isListType(timeArray.type.ofType)).toBe(true)
+    expect(isScalarType(timeArray.type.ofType.ofType)).toBe(true)
+    expect(timeArray.type.ofType.ofType.name).toBe("Time")
+
     const timeUndefined = postType.getFields()["timeUndefined"]
     expect(timeUndefined).not.toBe(undefined)
     if (!isNullableType(timeUndefined.type))
@@ -238,5 +304,23 @@ describe("graphql > schema builder", () => {
       fail(`"timeNullable" is not nullable`)
     if (!isScalarType(timeNullable.type)) fail(`"timeNullable" is not scalar`)
     expect(timeNullable.type.name).toBe("Time")
+
+    // ------------------------------------------------
+
+    const postTypeDeprecated = schema.getType("PostTypeDeprecated")
+    expect(postTypeDeprecated).not.toBe(undefined)
+    if (!isObjectType(postTypeDeprecated))
+      fail("PostTypeDeprecated is not an object")
+    expect(postTypeDeprecated.name).toBe("PostTypeDeprecated")
+    expect(postTypeDeprecated.description).toBe("This type is deprecated.")
+
+    const id = postTypeDeprecated.getFields()["id"]
+    expect((id as GraphQLField<any, any>).isDeprecated).toBe(true)
+    expect(id.deprecationReason).toBe(" ")
+
+    const name = postTypeDeprecated.getFields()["name"]
+    expect(name.description).toBe("This property is deprecated")
+    expect((name as GraphQLField<any, any>).isDeprecated).toBe(true)
+    expect(name.deprecationReason).toBe("Does not need anymore")
   })
 })
