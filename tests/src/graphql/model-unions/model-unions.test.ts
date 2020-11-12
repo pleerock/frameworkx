@@ -6,8 +6,8 @@ import {
 import { isUnionType } from "graphql"
 
 describe("graphql > schema builder", () => {
-  test("model (referenced type) with union type", () => {
-    const appMetadata = parse(__dirname + "/reference-model-unions-app.ts")
+  test("model with union type", () => {
+    const appMetadata = parse(__dirname + "/model-unions-app.ts")
     const schema = buildGraphQLSchema({
       assert: false,
       appMetadata: appMetadata,
@@ -24,5 +24,7 @@ describe("graphql > schema builder", () => {
     expect(postType.getTypes().length).toBe(2)
     expect(postType.getTypes()[0].name).toBe("BlogPostType")
     expect(postType.getTypes()[1].name).toBe("NewsPostType")
+
+    // TODO: test all cases
   })
 })

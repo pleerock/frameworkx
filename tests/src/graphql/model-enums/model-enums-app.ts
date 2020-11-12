@@ -5,7 +5,7 @@ export const App = createApp<{
     PostType: PostType
     QuestionType: {
       id: number
-      status: StatusEnum & BanStatusEnum // TODO
+      // status: StatusEnum & BanStatusEnum // TODO
       category: QuestionCategoryEnum
       type: "common" | "bounced"
     }
