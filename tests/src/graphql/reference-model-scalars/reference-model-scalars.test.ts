@@ -10,7 +10,6 @@ import {
   isNullableType,
   isObjectType,
   isScalarType,
-  isType,
 } from "graphql"
 
 describe("graphql > schema builder", () => {
