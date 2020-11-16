@@ -24,3 +24,19 @@ export function sleep(ms: number): Promise<void> {
     }, ms)
   })
 }
+
+export function getRealTypes(types: string[]): string[] {
+  const excluded = [
+    "Int",
+    "String",
+    "Boolean",
+    "Model",
+    "Input",
+    "Query",
+    "Mutation",
+    "Subscription",
+  ]
+  return types.filter((type) => {
+    return excluded.indexOf(type) === -1 && type.indexOf("__") === -1
+  })
+}

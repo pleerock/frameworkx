@@ -4,6 +4,7 @@ import {
   DefaultNamingStrategy,
 } from "@microframework/graphql"
 import { isNonNullType, isObjectType, isScalarType } from "graphql"
+import { getRealTypes } from "../../util/test-common"
 
 describe("graphql > schema builder", () => {
   test("app with intersection input and output types", () => {
@@ -18,9 +19,11 @@ describe("graphql > schema builder", () => {
     })
     if (!schema) fail("Schema built failed")
 
-    // ------------------------------------------------
+    const types = getRealTypes(
+      Object.keys(schema.getTypeMap()).map((key) => key),
+    )
 
-    // TODO: make checks after Umed's fixes
-    // fail()
+    console.log(types)
+    expect(types.length).toBe(10)
   })
 })

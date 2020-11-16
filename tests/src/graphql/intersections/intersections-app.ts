@@ -67,7 +67,7 @@ export const App = createApp<{
 type PostType = PostGeneralType & PostMetaType
 type QuestionType = QuestionGeneralType & QuestionMetaType
 
-type PostInput = PostGeneralType & PostMetaType // & { hm: string }
+type PostInput = PostGeneralType & PostMetaType
 type QuestionInput = QuestionGeneralType & QuestionMetaType
 
 type PostGeneralType = {
