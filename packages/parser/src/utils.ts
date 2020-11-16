@@ -37,6 +37,13 @@ export const ParserUtils = {
   },
 
   /**
+   * Checks a given string joined by a "." how many items has.
+   */
+  parentDeepness(str: string) {
+    return str.split(".").length
+  },
+
+  /**
    * Gets a deprecation status.
    */
   getDeprecation(nodeOrSymbol: ts.Node | ts.Symbol): string | boolean {

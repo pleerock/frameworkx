@@ -11,6 +11,16 @@ export const TypeMetadataUtils = {
     kind: TypeMetadataKind,
     type?: Partial<Omit<TypeMetadata, "kind" | "@type">>,
   ): TypeMetadata {
+    let newType: Partial<TypeMetadata> = {}
+    if (type) {
+      newType = { ...type }
+      if (newType["@type"] !== undefined) {
+        delete newType["@type"]
+      }
+      if (newType.kind !== undefined) {
+        delete newType.kind
+      }
+    }
     return {
       "@type": "TypeMetadata",
       kind,
@@ -19,7 +29,9 @@ export const TypeMetadataUtils = {
       canBeUndefined: false,
       deprecated: false,
       description: "",
+      propertyPath: "",
       properties: [],
+      args: [],
       ...(type || {}),
     }
   },

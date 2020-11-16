@@ -2,7 +2,7 @@ import { createApp, ModelWithArgs } from "@microframework/core"
 
 export const App = createApp<{
   models: {
-    PostModel: PostModel
+    PostType: PostModel
   }
   inputs: {
     PersonIntersectionInputType: PersonIntersectionInputType

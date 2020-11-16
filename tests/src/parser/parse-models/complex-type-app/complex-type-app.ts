@@ -2,7 +2,8 @@ import { createApp, ModelWithArgs, Float } from "@microframework/core"
 
 export const App = createApp<{
   models: {
-    PostModel: PostModel
+    PhotoInterface: PhotoInterface
+    PostType: PostModel
     PersonComplexType: PersonComplexType
   }
 }>()
@@ -54,7 +55,7 @@ type PersonComplexType = {
   }[]
   mainPhoto: PhotoInterface
   photos: PhotoInterface[]
-  posts: PostModel[]
+  posts: PostType[]
 
   rating: Float
   status: StatusEnum

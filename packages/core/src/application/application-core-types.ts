@@ -133,3 +133,14 @@ export type DeclarationKeys<Options extends AnyApplicationOptions> =
   | keyof Options["queries"]
   | keyof Options["mutations"]
   | keyof Options["subscriptions"]
+
+/**
+ * Possible declaration types.
+ */
+export type DeclarationTypes =
+  | "inputs"
+  | "models"
+  | "queries"
+  | "mutations"
+  | "subscriptions"
+  | "actions"

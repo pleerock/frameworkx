@@ -262,15 +262,15 @@ export class ResolverHelper {
         const userContext = await this.buildContext(defaultContext)
 
         // validate args
-        if (metadata.args)
-          await this.validator.validate(metadata.args, args, userContext)
+        if (metadata.args.length)
+          await this.validator.validate(metadata.args[0], args, userContext)
 
         // execute the resolver and get the value it returns
         let result: any
         if (resolverFn instanceof Function) {
           const resolveArgs = []
           if (type === "model") resolveArgs.push(parent)
-          if (metadata.args) resolveArgs.push(args)
+          if (metadata.args.length) resolveArgs.push(args)
           resolveArgs.push(userContext)
           result = await resolverFn(...resolveArgs)
         } else {
@@ -333,9 +333,9 @@ export class ResolverHelper {
                 const userContext = await this.buildContext(defaultContext)
 
                 // validate args
-                if (metadata.args)
+                if (metadata.args.length)
                   await this.validator.validate(
-                    metadata.args,
+                    metadata.args[0],
                     args,
                     userContext,
                   )
@@ -344,7 +344,7 @@ export class ResolverHelper {
                 let result: any
                 if (resolverFn instanceof Function) {
                   const resolveArgs = [entities]
-                  if (metadata.args) resolveArgs.push(args)
+                  if (metadata.args.length) resolveArgs.push(args)
                   result = await resolverFn(...resolveArgs, userContext)
                 } else {
                   result = resolverFn
@@ -440,9 +440,9 @@ export class ResolverHelper {
                 const userContext = await this.buildContext(defaultContext)
 
                 // validate args
-                if (metadata.args)
+                if (metadata.args.length)
                   await this.validator.validate(
-                    metadata.args,
+                    metadata.args[0],
                     args,
                     userContext,
                   )
@@ -451,7 +451,7 @@ export class ResolverHelper {
                 let result: any
                 if (resolverFn instanceof Function) {
                   const resolveArgs = [entities]
-                  if (metadata.args) resolveArgs.push(args)
+                  if (metadata.args.length) resolveArgs.push(args)
                   result = await resolverFn(...resolveArgs, userContext)
                 } else {
                   result = resolverFn

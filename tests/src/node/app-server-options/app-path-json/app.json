@@ -4,11 +4,12 @@
     {
       "name": "get /posts",
       "return": {
-        "kind": "object",
+        "kind": "reference",
         "array": true,
         "nullable": false,
         "canBeUndefined": false,
         "properties": [],
+        "args": [],
         "typeName": "PostType",
         "description": "",
         "propertyName": ""
@@ -28,7 +29,9 @@
           "nullable": false,
           "canBeUndefined": false,
           "properties": [],
-          "propertyName": "id"
+          "args": [],
+          "propertyName": "id",
+          "propertyPath": "PostType.id"
         },
         {
           "kind": "string",
@@ -36,10 +39,14 @@
           "nullable": false,
           "canBeUndefined": false,
           "properties": [],
-          "propertyName": "title"
+          "args": [],
+          "propertyName": "title",
+          "propertyPath": "PostType.title"
         }
       ],
+      "args": [],
       "typeName": "PostType",
+      "propertyPath": "PostType",
       "description": ""
     }
   ],
@@ -54,11 +61,13 @@
       "typeName": "PostType",
       "description": "",
       "propertyName": "post",
-      "args": {
+      "propertyPath": "post",
+      "args": [{
         "kind": "object",
         "array": false,
         "nullable": false,
         "canBeUndefined": false,
+        "propertyPath": "post.Args",
         "properties": [
           {
             "kind": "number",
@@ -66,10 +75,13 @@
             "nullable": false,
             "canBeUndefined": false,
             "properties": [],
-            "propertyName": "id"
+            "args": [],
+            "propertyName": "id",
+            "propertyPath": "post.Args.id"
           }
-        ]
-      }
+        ],
+        "args": []
+      }]
     }
   ],
   "mutations": [
@@ -80,12 +92,14 @@
       "canBeUndefined": false,
       "properties": [],
       "propertyName": "postSave",
+      "propertyPath": "postSave",
       "description": "",
-      "args": {
+      "args": [{
         "kind": "object",
         "array": false,
         "nullable": false,
         "canBeUndefined": false,
+        "propertyPath": "postSave.Args",
         "properties": [
           {
             "kind": "number",
@@ -93,10 +107,13 @@
             "nullable": false,
             "canBeUndefined": false,
             "properties": [],
-            "propertyName": "id"
+            "args": [],
+            "propertyName": "id",
+            "propertyPath": "postSave.Args.id"
           }
-        ]
-      }
+        ],
+        "args": []
+      }]
     }
   ],
   "subscriptions": []

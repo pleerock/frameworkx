@@ -51,6 +51,9 @@ export const App = createApp<{
       timeUndefined: Time | undefined
       timeNullable: Time | null
     }
+    /**
+     * This type is deprecated.
+     */
     PostTypeDeprecated: {
       /**
        * @deprecated

@@ -14,7 +14,9 @@ describe("core > type-metadata > utils", () => {
       array: false,
       nullable: false,
       canBeUndefined: false,
+      propertyPath: "",
       properties: [],
+      args: [],
     })
   })
   test("isPrimitive", () => {
@@ -35,9 +37,6 @@ describe("core > type-metadata > utils", () => {
     ).toEqual(false)
     expect(
       TypeMetadataUtils.isPrimitive(TypeMetadataUtils.create("union")),
-    ).toEqual(false)
-    expect(
-      TypeMetadataUtils.isPrimitive(TypeMetadataUtils.create("model")),
     ).toEqual(false)
     expect(
       TypeMetadataUtils.isPrimitive(TypeMetadataUtils.create("object")),

@@ -8,9 +8,9 @@ export type TypeMetadataKind =
   | "boolean"
   | "enum"
   | "union"
-  | "model"
   | "object"
   | "property"
+  | "reference"
 
 /**
  * TypeMetadata contains information about specific type and its properties.
@@ -29,6 +29,8 @@ export type TypeMetadata = {
 
   /**
    * Indicates if type is an array.
+   *
+   * @deprecated move "array" to kind?
    */
   array: boolean
 
@@ -59,6 +61,11 @@ export type TypeMetadata = {
   propertyName?: string
 
   /**
+   * Full parsed path to a type / property.
+   */
+  propertyPath: string
+
+  /**
    * Type description.
    */
   description: string
@@ -75,10 +82,9 @@ export type TypeMetadata = {
   properties: TypeMetadata[]
 
   /**
-   * If type is a GraphQL query / mutation / subscription,
-   * it's input will be set here.
+   * If type is a method, it's arguments will be there.
    */
-  args?: TypeMetadata // todo: rename to "input"
+  args: TypeMetadata[] // todo: ideally this should be an array (but we'll use first item anyway)
 }
 
 /**

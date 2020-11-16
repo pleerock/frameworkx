@@ -11,14 +11,14 @@ export const App = createApp<{
     CategoryInput: CategoryInput
   }
   queries: {
-    posts(args: PostFilterInput): PostModel[]
-    post(args: { id: number }): PostModel
+    posts(args: PostFilterInput): PostType[]
+    post(args: { id: number }): PostType
     category(): CategoryType
     categories(): CategoryType[]
     categoryCount(): number
   }
   mutations: {
-    postSave(args: PostInput): PostModel
+    postSave(args: PostInput): PostType
     postRemove(args: { id: number }): boolean
     categoriesSave(args: CategoryInput[]): { id: number }[]
   }

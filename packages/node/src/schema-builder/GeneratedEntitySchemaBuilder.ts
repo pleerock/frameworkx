@@ -313,7 +313,7 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.one(
           modelName,
         ),
-        args: queryArgs,
+        args: [queryArgs],
       })
       this.registerQuery({
         ...model,
@@ -324,7 +324,7 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.oneNotNull(
           modelName,
         ),
-        args: queryArgs,
+        args: [queryArgs],
       })
       this.registerQuery({
         ...model,
@@ -333,7 +333,7 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.many(
           modelName,
         ),
-        args: queryArgs,
+        args: [queryArgs],
       })
       this.registerQuery({
         ...TypeMetadataUtils.create("number"),
@@ -343,7 +343,7 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.count(
           modelName,
         ),
-        args: whereArgs,
+        args: [whereArgs],
       })
 
       // ------------------------------------------------------------
@@ -356,7 +356,7 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.save(
           modelName,
         ),
-        args: saveArgs,
+        args: [saveArgs],
       })
       this.registerMutation({
         ...TypeMetadataUtils.create("boolean"),
@@ -366,7 +366,7 @@ export class GeneratedEntitySchemaBuilder {
         description: namingStrategy.generatedModelDeclarationDescriptions.remove(
           modelName,
         ),
-        args: whereArgs,
+        args: [whereArgs],
       })
 
       // ------------------------------------------------------------
@@ -422,7 +422,7 @@ export class GeneratedEntitySchemaBuilder {
           description: namingStrategy.generatedModelDeclarationDescriptions.observeOne(
             modelName,
           ),
-          args: whereArgs,
+          args: [whereArgs],
         })
         this.registerSubscription({
           ...model,
@@ -433,7 +433,7 @@ export class GeneratedEntitySchemaBuilder {
           description: namingStrategy.generatedModelDeclarationDescriptions.observeMany(
             modelName,
           ),
-          args: queryArgs,
+          args: [queryArgs],
         })
         this.registerSubscription({
           ...TypeMetadataUtils.create("number"),
@@ -443,7 +443,7 @@ export class GeneratedEntitySchemaBuilder {
           description: namingStrategy.generatedModelDeclarationDescriptions.observeCount(
             modelName,
           ),
-          args: whereArgs,
+          args: [whereArgs],
         })
       }
     }

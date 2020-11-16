@@ -1,4 +1,5 @@
 import * as ts from "typescript"
+import { DeclarationTypes } from "@microframework/core"
 
 /**
  * Errors thrown in the app.
@@ -223,23 +224,34 @@ export const Errors = {
   },
 
   /**
-   * Thrown when there are issues on parsing a "models" / "inputs" definition.
+   * Thrown when there are issues on parsing a specific application declaration.
    */
-  modelInputInvalidSignature(
-    type: "inputs" | "models",
-    node: ts.Node | undefined,
-  ) {
+  appItemInvalidSignature(type: DeclarationTypes, node: ts.Node | undefined) {
     const kindMessage = node ? ` (received kind: ${node.kind})` : ``
+    let example = ""
+    if (type === "models") {
+      example = `{ "models": { User: User, ... } }`
+    } else if (type === "inputs") {
+      example = `{ "inputs": { UserInput: UserInput, ... } }`
+    } else if (type === "queries") {
+      example = `{ "queries": { users(): User[], ... } }`
+    } else if (type === "mutations") {
+      example = `{ "mutations": { userSave(input: UserSaveInput): boolean, ... } }`
+    } else if (type === "subscriptions") {
+      example = `{ "subscriptions": { onUserRegister(): User, ... } }`
+    } else if (type === "actions") {
+      example = `{ "actions": { "GET /users": { return: User[] }, ... } }`
+    }
     throw new Error(
       `"${type}" inside application options must be a literal object with ${type} inside, ` +
-        `e.g. "models: { User: UserModel, ... }"${kindMessage}.`,
+        `e.g. "${example}"${kindMessage}.`,
     )
   },
 
   /**
-   * Thrown in unknown cases when its not possible to parse a "models" / "inputs" object members.
+   * Thrown in unknown cases when its not possible to parse application declaration type's object members.
    */
-  modelInputMemberInvalidDefinition(type: "inputs" | "models") {
+  appDeclarationItemInvalidDefinition(type: DeclarationTypes) {
     return new Error(`Application's "${type}" definition is invalid.`)
   },
 

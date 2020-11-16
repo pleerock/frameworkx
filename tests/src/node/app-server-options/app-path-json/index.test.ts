@@ -1,6 +1,5 @@
 import { createApplicationServer } from "@microframework/node"
 import { obtainPort } from "../../../util/test-common"
-import { Fetcher } from "@microframework/fetcher"
 import { App } from "./app"
 import { PostActionResolver } from "./resolvers"
 

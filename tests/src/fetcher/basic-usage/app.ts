@@ -8,10 +8,6 @@ import {
 } from "./models"
 
 export const App = createApp<{
-  inputs: {
-    PostFilterInput: PostFilterInput
-    PostSearchInput: PostSearchInput
-  }
   models: {
     PostType: PostType
     CategoryType: CategoryType

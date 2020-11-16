@@ -3,5 +3,9 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "_"
-  }
+  },
+  "references": [
+    { "path": "../core"},
+    { "path": "../parser"}
+  ]
 }

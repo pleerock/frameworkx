@@ -21,6 +21,7 @@ describe("graphql > schema builder", () => {
       subscribeFactory: () => undefined,
     })
     if (!schema) fail("Schema built failed")
+    console.log(schema.getTypeMap())
     const postInput = schema.getType("PostInput")
     expect(postInput).not.toBe(undefined)
 

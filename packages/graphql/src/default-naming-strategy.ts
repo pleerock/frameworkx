@@ -1,3 +1,4 @@
+import { TypeMetadata } from "@microframework/core"
 /**
  * Generates a random string of a given length.
  */
@@ -12,6 +13,20 @@ function randomString(length: number) {
 }
 
 /**
+ * Transforms given string into camelCase.
+ */
+function camelize(str: string) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
+    if (+match === 0) return "" // or if (/\s+/.test(match)) for white spaces
+    return index === 0 ? match.toLowerCase() : match.toUpperCase()
+  })
+}
+
+function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+/**
  * Default naming strategy.
  */
 export const DefaultNamingStrategy = {
@@ -21,6 +36,46 @@ export const DefaultNamingStrategy = {
 
   namelessModel() {
     return randomString(10) + "Model"
+  },
+
+  /**
+   * Generates a model name for a nameless TypeMetadata.
+   */
+  modelTypeName(type: TypeMetadata) {
+    if (type.propertyPath === type.propertyName) {
+      return type.propertyPath
+    }
+    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Model"
+  },
+
+  /**
+   * Generates an input name for a nameless TypeMetadata.
+   */
+  inputTypeName(type: TypeMetadata) {
+    if (type.propertyPath === type.propertyName) {
+      return type.propertyPath
+    }
+    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Input"
+  },
+
+  /**
+   * Generates an enum name for a nameless TypeMetadata.
+   */
+  enumTypeName(type: TypeMetadata) {
+    if (type.propertyPath === type.propertyName) {
+      return type.propertyPath
+    }
+    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Enum"
+  },
+
+  /**
+   * Generates union name for a nameless TypeMetadata.
+   */
+  unionTypeName(type: TypeMetadata) {
+    if (type.propertyPath === type.propertyName) {
+      return type.propertyPath
+    }
+    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Union"
   },
 
   defaultTypeName(type: "query" | "mutation" | "subscription"): string {
