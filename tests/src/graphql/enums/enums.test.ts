@@ -3,10 +3,10 @@ import {
   buildGraphQLSchema,
   DefaultNamingStrategy,
 } from "@microframework/graphql"
-import { isEnumType, isInputObjectType } from "graphql"
+import { isEnumType, isObjectType } from "graphql"
 
 describe("graphql > schema builder", () => {
-  const appMetadata = parse(__dirname + "/input-enums-app.ts")
+  const appMetadata = parse(__dirname + "/enums-app.ts")
   const schema = buildGraphQLSchema({
     assert: false,
     appMetadata: appMetadata,
@@ -16,12 +16,12 @@ describe("graphql > schema builder", () => {
   })
   if (!schema) fail("Schema built failed")
 
-  test("input with referenced enum type", () => {
-    const postInput = schema.getType("PostInput")
-    expect(postInput).not.toBe(undefined)
+  test("model with referenced enum type", () => {
+    const postType = schema.getType("PostType")
+    expect(postType).not.toBe(undefined)
 
-    if (!isInputObjectType(postInput)) fail("PostInput is not an object type")
-    expect(postInput.name).toBe("PostInput")
+    if (!isObjectType(postType)) fail("PostType is not an object type")
+    expect(postType.name).toBe("PostType")
 
     // ------------------------------------------------
 

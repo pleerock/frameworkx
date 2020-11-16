@@ -6,8 +6,8 @@ import {
 import { isNonNullType, isObjectType, isScalarType } from "graphql"
 
 describe("graphql > schema builder", () => {
-  test("mutations with intersection input and output types", () => {
-    const appMetadata = parse(__dirname + "/mutations-intersections-app.ts")
+  test("app with intersection input and output types", () => {
+    const appMetadata = parse(__dirname + "/intersections-app.ts")
     const schema = buildGraphQLSchema({
       assert: false,
       appMetadata: appMetadata,
