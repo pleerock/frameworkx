@@ -11,6 +11,7 @@ import {
 } from "swagger-schema-official"
 
 function typeMetadataToDefinitionProperty(
+  appMetadata: ApplicationTypeMetadata,
   metadata: TypeMetadata,
   root: boolean,
 ): Schema {
@@ -18,6 +19,7 @@ function typeMetadataToDefinitionProperty(
     return {
       type: "array",
       items: typeMetadataToDefinitionProperty(
+        appMetadata,
         {
           ...metadata,
           array: false,
@@ -31,7 +33,7 @@ function typeMetadataToDefinitionProperty(
     return {
       // todo: replace to oneOf once available
       allOf: metadata.properties.map((property) => {
-        return typeMetadataToDefinitionProperty(property, false)
+        return typeMetadataToDefinitionProperty(appMetadata, property, false)
       }),
     }
   }
@@ -39,6 +41,22 @@ function typeMetadataToDefinitionProperty(
   if (metadata.kind === "object" && metadata.typeName && !root) {
     return {
       $ref: "#/definitions/" + metadata.typeName, // todo: or modelName ?
+    }
+  }
+
+  if (metadata.kind === "reference") {
+    const referencedMetadata = appMetadata.models.find(
+      (model) => model.typeName === metadata.typeName,
+    )
+    if (!referencedMetadata) {
+      throw new Error(
+        `Referenced metadata ${metadata.typeName} was not found registered in the models.`,
+      )
+    }
+
+    metadata = {
+      ...referencedMetadata,
+      array: metadata.array, // todo check
     }
   }
 
@@ -51,6 +69,7 @@ function typeMetadataToDefinitionProperty(
           return {
             ...properties,
             [property.propertyName]: typeMetadataToDefinitionProperty(
+              appMetadata,
               property,
               false,
             ),
@@ -68,6 +87,7 @@ function typeMetadataToDefinitionProperty(
         .map((property) => property.propertyName!),
     }
   }
+
   let type: ParameterType | undefined = undefined
   switch (metadata.kind) {
     case "number":
@@ -118,7 +138,11 @@ export function generateSwaggerDocumentation(
 
     return {
       ...definitions,
-      [model.typeName]: typeMetadataToDefinitionProperty(model, true),
+      [model.typeName]: typeMetadataToDefinitionProperty(
+        appMetadata,
+        model,
+        true,
+      ),
     }
   }, {} as Spec["definitions"])
 
@@ -141,7 +165,11 @@ export function generateSwaggerDocumentation(
         "200": {
           description: "", // action.return,
           schema: action.return
-            ? typeMetadataToDefinitionProperty(action.return, false)
+            ? typeMetadataToDefinitionProperty(
+                appMetadata,
+                action.return,
+                false,
+              )
             : undefined,
           // headers: todo
         },

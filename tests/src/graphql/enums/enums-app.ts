@@ -5,7 +5,7 @@ export const App = createApp<{
     PostType: PostType
     QuestionType: {
       id: number
-      status: StatusEnum & BanStatusEnum
+      status: StatusEnum | BanStatusEnum
       category: QuestionCategoryEnum
       type: "common" | "bounced"
     }
@@ -13,7 +13,7 @@ export const App = createApp<{
       PostInput: PostInput
       QuestionInput: {
         id: number
-        status: StatusEnum & BanStatusEnum
+        status: StatusEnum | BanStatusEnum
         category: QuestionCategoryEnum
         type: "common" | "bounced"
       }
@@ -23,7 +23,7 @@ export const App = createApp<{
       postStatus(): StatusEnum
       question(): {
         id: number
-        status: StatusEnum & BanStatusEnum
+        status: StatusEnum | BanStatusEnum
         category: QuestionCategoryEnum
         type: "common" | "bounced"
       }
@@ -33,12 +33,12 @@ export const App = createApp<{
       postsSave(args: { posts: PostInput[] }): PostType[]
       questionSave(args: {
         id: number
-        status: StatusEnum & BanStatusEnum
+        status: StatusEnum | BanStatusEnum
         category: QuestionCategoryEnum
         type: "common" | "bounced"
       }): {
         id: number
-        status: StatusEnum & BanStatusEnum
+        status: StatusEnum | BanStatusEnum
         category: QuestionCategoryEnum
         type: "common" | "bounced"
       }

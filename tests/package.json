@@ -19,7 +19,7 @@
     "express": "^4.17.1",
     "express-graphql": "^0.11.0",
     "find-free-port": "^2.0.0",
-    "graphql": "^15.3.0",
+    "graphql": "^15.4.0",
     "graphql-redis-subscriptions": "^2.2.2",
     "graphql-subscriptions": "^1.1.0",
     "graphql-tag": "^2.10.3",
