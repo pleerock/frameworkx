@@ -20,8 +20,8 @@ export const App = createApp<{
     }
   }
   queries: {
-    post(): PostType
-    postStatus(): StatusEnum
+    post(input: PostInput): PostType
+    postStatus(input: { status: StatusEnum }): StatusEnum
     question(): {
       id: number
       status: StatusEnum | BanStatusEnum
