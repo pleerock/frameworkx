@@ -10,9 +10,12 @@ import {
   isObjectType,
 } from "graphql"
 import { getRealTypes } from "../../util/test-common"
+import { TypeMetadataUtils } from "@microframework/core"
 
 describe("graphql > schema builder", () => {
   const appMetadata = parse(__dirname + "/enums-app.ts")
+  TypeMetadataUtils.print(appMetadata)
+
   const schema = buildGraphQLSchema({
     assert: false,
     appMetadata: appMetadata,

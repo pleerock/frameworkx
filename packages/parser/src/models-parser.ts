@@ -425,9 +425,9 @@ export class ModelParser {
       })
       if (areAllPropertiesEnums) {
         const enumPropertiesFromAllEnums: TypeMetadata[] = []
-        properties.forEach((property) => [
-          enumPropertiesFromAllEnums.push(...property.properties),
-        ])
+        properties.forEach((property) => {
+          enumPropertiesFromAllEnums.push(...property.properties)
+        })
 
         return this.appendType(
           parentName,
@@ -435,7 +435,7 @@ export class ModelParser {
             // typeName,
             nullable,
             canBeUndefined,
-            properties,
+            properties: enumPropertiesFromAllEnums,
             propertyPath: parentName,
           }),
           false,
