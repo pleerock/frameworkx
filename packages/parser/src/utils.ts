@@ -39,8 +39,20 @@ export const ParserUtils = {
   /**
    * Checks a given string joined by a "." how many items has.
    */
-  parentDeepness(str: string) {
-    return str.split(".").length
+  checkPathDeepness(
+    str: string,
+    deepness: {
+      regular: number
+      args: number
+    },
+  ): boolean {
+    const argsIndex = str.indexOf(".Args.")
+    if (argsIndex !== -1) {
+      str = str.substr(argsIndex + ".Args.".length)
+      return str.split(".").length >= deepness.args
+    }
+
+    return str.split(".").length >= deepness.regular
   },
 
   /**

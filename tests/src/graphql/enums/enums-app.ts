@@ -9,39 +9,39 @@ export const App = createApp<{
       category: QuestionCategoryEnum
       type: "common" | "bounced"
     }
-    inputs: {
-      PostInput: PostInput
-      QuestionInput: {
-        id: number
-        status: StatusEnum | BanStatusEnum
-        category: QuestionCategoryEnum
-        type: "common" | "bounced"
-      }
+  }
+  inputs: {
+    PostInput: PostInput
+    QuestionInput: {
+      id: number
+      status: StatusEnum | BanStatusEnum
+      category: QuestionCategoryEnum
+      type: "common" | "bounced"
     }
-    queries: {
-      post(): PostType
-      postStatus(): StatusEnum
-      question(): {
-        id: number
-        status: StatusEnum | BanStatusEnum
-        category: QuestionCategoryEnum
-        type: "common" | "bounced"
-      }
+  }
+  queries: {
+    post(): PostType
+    postStatus(): StatusEnum
+    question(): {
+      id: number
+      status: StatusEnum | BanStatusEnum
+      category: QuestionCategoryEnum
+      type: "common" | "bounced"
     }
-    mutations: {
-      postSave(args: PostInput): PostType
-      postsSave(args: { posts: PostInput[] }): PostType[]
-      questionSave(args: {
-        id: number
-        status: StatusEnum | BanStatusEnum
-        category: QuestionCategoryEnum
-        type: "common" | "bounced"
-      }): {
-        id: number
-        status: StatusEnum | BanStatusEnum
-        category: QuestionCategoryEnum
-        type: "common" | "bounced"
-      }
+  }
+  mutations: {
+    postSave(args: PostInput): PostType
+    postsSave(args: { posts: PostInput[] }): PostType[]
+    questionSave(args: {
+      id: number
+      status: StatusEnum | BanStatusEnum
+      category: QuestionCategoryEnum
+      type: "common" | "bounced"
+    }): {
+      id: number
+      status: StatusEnum | BanStatusEnum
+      category: QuestionCategoryEnum
+      type: "common" | "bounced"
     }
   }
 }>()
@@ -85,6 +85,10 @@ enum BanStatusEnum {
    * Post is banned.
    */
   banned = "banned",
+  /**
+   * Post is temporary blocked.
+   */
+  temporaryBlocked = "temporaryBlocked",
 }
 
 /**

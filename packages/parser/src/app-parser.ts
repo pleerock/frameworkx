@@ -99,6 +99,8 @@ export function parse(
       // false,
       "app.actions",
       // false,
+
+      false,
     )
     return actions.properties.map((action) => {
       if (!action.propertyName)
@@ -162,7 +164,7 @@ export function parse(
     )
     if (!declaration2) return []
 
-    const models = modelParser.parse(declaration2, "", `app`)
+    const models = modelParser.parse(declaration2, "", `app`, false)
     // console.log("models", models)
 
     return models.properties
@@ -233,7 +235,7 @@ export function parse(
     if (!declaration) return []
 
     const modelParser = new ModelParser(program, options, modelsAndInputs, 1)
-    const type = modelParser.parse(declaration, "", "app.queries")
+    const type = modelParser.parse(declaration, "", "app.queries", false)
     // console.log(JSON.stringify(type, undefined, 2))
     return type.properties
   }
@@ -248,7 +250,8 @@ export function parse(
     // throw Errors.appModelsInvalidSignature()
 
     const modelParser = new ModelParser(program, options, modelsAndInputs, 1)
-    return modelParser.parse(modelsMember, "", "app.mutations").properties
+    return modelParser.parse(modelsMember, "", "app.mutations", false)
+      .properties
   }
 
   function parseSubscriptions(
@@ -269,6 +272,7 @@ export function parse(
       // false,
       "app.subscriptions",
       // false,
+      false,
     ).properties
   }
 
@@ -464,55 +468,55 @@ export function parse(
   // Check if queries return types are defined in 'model'
   // -----------------------------------------------------
 
-  const queryReturnTypes = result.queries
-    .filter((it) => it.typeName)
-    .map((it) => it.typeName!)
-    .filter(onlyUnique)
-
-  const missingQueryReturnTypes = queryReturnTypes.filter(
-    (it) => modelTypes.indexOf(it) === -1,
-  )
-
-  if (missingQueryReturnTypes.length) {
-    throw Errors.appMissingModelType("queries", missingQueryReturnTypes)
-  }
+  // const queryReturnTypes = result.queries
+  //   .filter((it) => it.typeName)
+  //   .map((it) => it.typeName!)
+  //   .filter(onlyUnique)
+  //
+  // const missingQueryReturnTypes = queryReturnTypes.filter(
+  //   (it) => modelTypes.indexOf(it) === -1,
+  // )
+  //
+  // if (missingQueryReturnTypes.length) {
+  //   throw Errors.appMissingModelType("queries", missingQueryReturnTypes)
+  // }
 
   // ------------------------------------------------------
   // Check if mutations return types are defined in 'model'
   // ------------------------------------------------------
 
-  const mutationReturnTypes = result.mutations
-    .filter((it) => it.typeName)
-    .map((it) => it.typeName!)
-    .filter(onlyUnique)
-
-  const missingMutationReturnTypes = mutationReturnTypes.filter(
-    (it) => modelTypes.indexOf(it) === -1,
-  )
-
-  if (missingMutationReturnTypes.length) {
-    throw Errors.appMissingModelType("mutations", missingMutationReturnTypes)
-  }
+  // const mutationReturnTypes = result.mutations
+  //   .filter((it) => it.typeName)
+  //   .map((it) => it.typeName!)
+  //   .filter(onlyUnique)
+  //
+  // const missingMutationReturnTypes = mutationReturnTypes.filter(
+  //   (it) => modelTypes.indexOf(it) === -1,
+  // )
+  //
+  // if (missingMutationReturnTypes.length) {
+  //   throw Errors.appMissingModelType("mutations", missingMutationReturnTypes)
+  // }
 
   // ----------------------------------------------------------
   // Check if subscriptions return types are defined in 'model'
   // ----------------------------------------------------------
 
-  const subscriptionReturnTypes = result.subscriptions
-    .filter((it) => it.typeName)
-    .map((it) => it.typeName!)
-    .filter(onlyUnique)
-
-  const missingSubscriptionReturnTypes = subscriptionReturnTypes.filter(
-    (it) => modelTypes.indexOf(it) === -1,
-  )
-
-  if (missingSubscriptionReturnTypes.length) {
-    throw Errors.appMissingModelType(
-      "subscriptions",
-      missingSubscriptionReturnTypes,
-    )
-  }
+  // const subscriptionReturnTypes = result.subscriptions
+  //   .filter((it) => it.typeName)
+  //   .map((it) => it.typeName!)
+  //   .filter(onlyUnique)
+  //
+  // const missingSubscriptionReturnTypes = subscriptionReturnTypes.filter(
+  //   (it) => modelTypes.indexOf(it) === -1,
+  // )
+  //
+  // if (missingSubscriptionReturnTypes.length) {
+  //   throw Errors.appMissingModelType(
+  //     "subscriptions",
+  //     missingSubscriptionReturnTypes,
+  //   )
+  // }
 
   // ------------------------------------------------------
   // Check if actions return types are defined in 'model'

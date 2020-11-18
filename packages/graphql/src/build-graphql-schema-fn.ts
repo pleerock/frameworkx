@@ -252,6 +252,7 @@ export function buildGraphQLSchema(
             (type) => type.name === property.typeName,
           )
           if (!type) {
+            // console.log(metadata)
             throw new Error(
               `Cannot find type "${property.typeName}" from union type. Did you forget to register type in the app?`,
             )
@@ -334,10 +335,17 @@ export function buildGraphQLSchema(
     const description = options.namingStrategy.defaultTypeDescription(type)
     const fields: GraphQLFieldConfigMap<any, any> = {}
     for (let metadata of metadatas) {
-      if (!metadata.propertyName) continue
+      if (metadata.kind !== "function")
+        throw new Error(
+          `Root declaration can only be a method definition, e.g. users(): User[].`,
+        )
+      if (!metadata.propertyName)
+        throw new Error(`Missing property name in root declaration.`)
+      if (!metadata.returnType)
+        throw new Error(`Root declaration must have a return type.`)
 
       fields[metadata.propertyName] = {
-        type: resolveGraphQLTypeBasedOnTypeReference(metadata),
+        type: resolveGraphQLTypeBasedOnTypeReference(metadata.returnType),
         description: metadata.description,
         resolve: options.resolveFactory(type, metadata),
       }
@@ -437,6 +445,7 @@ export function buildGraphQLSchema(
 
   // console.log([...objectTypes, ...inputTypes, ...enumTypes, ...unionTypes])
   // console.log(JSON.stringify(options.appMetadata, undefined, 2))
+  // console.log(options.appMetadata.queries)
 
   const schema = new GraphQLSchema({
     types: [...objectTypes, ...inputTypes, ...enumTypes, ...unionTypes],

@@ -45,7 +45,7 @@ export const DefaultNamingStrategy = {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
     }
-    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Model"
+    return capitalize(camelize(type.propertyPath.replace(/\./g, " "))) + "Model"
   },
 
   /**
@@ -55,7 +55,7 @@ export const DefaultNamingStrategy = {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
     }
-    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Input"
+    return capitalize(camelize(type.propertyPath.replace(/\./g, " "))) + "Input"
   },
 
   /**
@@ -65,7 +65,7 @@ export const DefaultNamingStrategy = {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
     }
-    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Enum"
+    return capitalize(camelize(type.propertyPath.replace(/\./g, " "))) + "Enum"
   },
 
   /**
@@ -75,7 +75,7 @@ export const DefaultNamingStrategy = {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
     }
-    return capitalize(camelize(type.propertyPath.replace(/\./g, "_"))) + "Union"
+    return capitalize(camelize(type.propertyPath.replace(/\./g, " "))) + "Union"
   },
 
   defaultTypeName(type: "query" | "mutation" | "subscription"): string {

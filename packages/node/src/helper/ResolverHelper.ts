@@ -239,6 +239,8 @@ export class ResolverHelper {
     modelName?: string,
   ): GraphQLFieldResolver<any, any, any> | undefined {
     return async (parent: any, args: any, context: any, info: any) => {
+      const returnType =
+        metadata.kind === "function" ? metadata.returnType! : metadata
       const logEvent: LogEvent = {
         request: context.request,
         response: context.response,
@@ -278,7 +280,7 @@ export class ResolverHelper {
         }
 
         // perform returning value model validation
-        await this.validator.validate(metadata, result, context)
+        await this.validator.validate(returnType, result, context)
 
         // log once again after resolver execution is finished
         logger.log(`return(${JSON.stringify(result)})`) // this.logger.logGraphQLResponse({ ...logInfo, content: result })

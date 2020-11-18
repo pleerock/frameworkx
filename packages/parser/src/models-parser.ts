@@ -24,20 +24,28 @@ export class ModelParser {
     this.typeChecker = program.getTypeChecker()
   }
 
-  private appendType(parentName: string, type: TypeMetadata) {
+  private appendType(
+    parentName: string,
+    type: TypeMetadata,
+    noReferences: boolean,
+  ) {
+    if (noReferences) return type
+
     // return type
     const existType = this.types.find(
       (existType) => existType === type.typeName,
     )
     if (
-      ParserUtils.parentDeepness(parentName) >=
-        this.replaceReferencesOnParentDeepnessLevel &&
+      ParserUtils.checkPathDeepness(parentName, {
+        regular: this.replaceReferencesOnParentDeepnessLevel,
+        args: 1,
+      }) &&
       existType
     ) {
       // console.log("PARENT NAME", parentName)
       return TypeMetadataUtils.create("reference", {
         typeName: existType,
-        propertyPath: parentName,
+        propertyPath: ParserUtils.joinStrings(parentName), //, existType),
       })
     } else {
       // this.types.push(type)
@@ -49,8 +57,13 @@ export class ModelParser {
    * If "goDeep" is set to true, parse doesn't go down deeper for object properties.
    * "origin" is used for debug purposes to understand where method call come from.
    */
-  parse(node: ts.Node, parentName: string = "", origin: string): TypeMetadata {
-    console.log("coming from:", origin)
+  parse(
+    node: ts.Node,
+    parentName: string = "",
+    origin: string,
+    noReferences: boolean,
+  ): TypeMetadata {
+    // console.log("coming from:", origin)
     if (node.kind === ts.SyntaxKind.NumberKeyword) {
       return TypeMetadataUtils.create("number", {
         propertyPath: parentName,
@@ -72,13 +85,16 @@ export class ModelParser {
         node.type,
         parentName,
         `${origin}.typeAlias(${node.name.text})`,
+        noReferences,
       )
       // in type aliases type is declared as:
       // type User = { ... }
       // here, we have everything parsed from { ... }, but we don't really have a type name
       // that's why we append it here
       if (!type.typeName) {
-        type.typeName = node.name.text
+        if (this.types.includes(node.name.text)) {
+          type.typeName = node.name.text
+        }
 
         // if this is a second-level node, e.g. { models: { User: User } }
         //                                      first level ^     ^ second level
@@ -87,8 +103,12 @@ export class ModelParser {
         // in cases where second level is a literal, everything is fine, we accept such case
         // and use a first-level name as a typeName
         if (
+          type.typeName &&
           !type.propertyPath &&
-          ParserUtils.parentDeepness(parentName) === 1
+          ParserUtils.checkPathDeepness(parentName, {
+            regular: 1,
+            args: 1,
+          })
         ) {
           type.propertyPath = ParserUtils.joinStrings(
             type.propertyPath,
@@ -107,22 +127,33 @@ export class ModelParser {
         node.type,
         ParserUtils.joinStrings(parentName),
         `${origin}.propertySignature(${(node.name as ts.ComputedPropertyName).getText()})`,
+        noReferences,
       )
     } else if (ts.isParenthesizedTypeNode(node)) {
-      return this.parse(node.type, parentName, `${origin}.parenthesized`)
+      return this.parse(
+        node.type,
+        parentName,
+        `${origin}.parenthesized`,
+        noReferences,
+      )
     } else if (ts.isArrayTypeNode(node)) {
       return TypeMetadataUtils.create("object", {
-        ...this.parse(node.elementType, parentName, `${origin}.arrayTypeNode`),
+        ...this.parse(
+          node.elementType,
+          parentName,
+          `${origin}.arrayTypeNode`,
+          noReferences,
+        ),
         array: true,
       })
     } else if (ts.isTypeLiteralNode(node)) {
       return TypeMetadataUtils.create("object", {
-        properties: this.parseMembers(node.members, parentName, origin),
+        properties: this.parseMembers(node.members, parentName, origin, false),
         propertyPath: parentName,
       })
     } else if (ts.isEnumDeclaration(node)) {
       return TypeMetadataUtils.create("enum", {
-        properties: this.parseMembers(node.members, parentName, origin),
+        properties: this.parseMembers(node.members, parentName, origin, false),
         propertyPath: parentName,
       })
     } else if (ts.isIntersectionTypeNode(node)) {
@@ -130,21 +161,33 @@ export class ModelParser {
       node.types.forEach((type) => {
         const parsed = this.parse(
           type,
-          ParserUtils.joinStrings(parentName),
+          ParserUtils.joinStrings(parentName), // todo: nothing is joining?
           `${origin}.intersectionTypeNode`,
+          true,
         )
         properties.push(...parsed.properties)
       })
 
       return TypeMetadataUtils.create("object", {
         properties,
+        propertyPath: parentName,
       })
     } else if (ts.isClassDeclaration(node)) {
       if (!node.name) throw Errors.modelClassNoName(parentName)
 
-      const typeName = node.name.text
+      let typeName: string | undefined = undefined
+      if (this.types.includes(node.name.text)) {
+        typeName = node.name.text
+      }
       let propertyPath = parentName
-      if (!propertyPath && ParserUtils.parentDeepness(parentName) === 1) {
+      if (
+        typeName &&
+        !propertyPath &&
+        ParserUtils.checkPathDeepness(parentName, {
+          regular: 1,
+          args: 1,
+        })
+      ) {
         propertyPath = ParserUtils.joinStrings(propertyPath, typeName)
       }
 
@@ -153,15 +196,31 @@ export class ModelParser {
         TypeMetadataUtils.create("object", {
           typeName,
           propertyPath,
-          properties: this.parseMembers(node.members, propertyPath, origin),
+          properties: this.parseMembers(
+            node.members,
+            propertyPath,
+            origin,
+            false,
+          ),
         }),
+        noReferences,
       )
     } else if (ts.isInterfaceDeclaration(node)) {
       if (!node.name) throw Errors.modelInterfaceNoName(parentName)
 
-      const typeName = node.name.text
+      let typeName: string | undefined = undefined
+      if (this.types.includes(node.name.text)) {
+        typeName = node.name.text
+      }
       let propertyPath = parentName
-      if (!propertyPath && ParserUtils.parentDeepness(parentName) === 1) {
+      if (
+        typeName &&
+        !propertyPath &&
+        ParserUtils.checkPathDeepness(parentName, {
+          regular: 1,
+          args: 1,
+        })
+      ) {
         propertyPath = ParserUtils.joinStrings(propertyPath, typeName)
       }
 
@@ -170,8 +229,14 @@ export class ModelParser {
         TypeMetadataUtils.create("object", {
           typeName,
           propertyPath,
-          properties: this.parseMembers(node.members, propertyPath, origin),
+          properties: this.parseMembers(
+            node.members,
+            propertyPath,
+            origin,
+            false,
+          ),
         }),
+        noReferences,
       )
     } else if (ts.isUnionTypeNode(node)) {
       // extract information about nullability and undefined-ability
@@ -219,6 +284,7 @@ export class ModelParser {
           typesWithoutNullAndUndefined[0],
           parentName,
           `${origin}.unionTypeNode`,
+          noReferences,
         )
         metadata.nullable = nullable
         metadata.canBeUndefined = canBeUndefined
@@ -324,13 +390,16 @@ export class ModelParser {
             properties,
             propertyPath: parentName,
           }),
+          false,
         )
       }
 
-      const typeName = this.options.namingStrategy?.unionNameFromStringLiteralUnion(
-        parentName,
-      )
-      if (!typeName) throw Errors.emptyGeneratedUnionName(parentName)
+      // check if types inside are
+
+      // const typeName = this.options.namingStrategy?.unionNameFromStringLiteralUnion(
+      //   parentName,
+      // ) // todo: move naming strategy into graphql
+      // if (!typeName) throw Errors.emptyGeneratedUnionName(parentName)
 
       // make sure every type in the union is reference to some other type
       const allAllTypeReferences = typesWithoutNullAndUndefined.every(
@@ -341,19 +410,67 @@ export class ModelParser {
       if (!allAllTypeReferences)
         throw Errors.unionTypeFormatNotSupported(parentName)
 
+      // console.log("typesWithoutNullAndUndefined", typesWithoutNullAndUndefined)
+
       // finally create a union type for type references
-      const properties = typesWithoutNullAndUndefined.map((type) =>
-        this.parse(type, parentName, `${origin}.unionTypeNode`),
-      )
+      const properties = typesWithoutNullAndUndefined.map((type) => {
+        return this.parse(type, parentName, `${origin}.unionTypeNode`, false)
+      })
+
+      // in the case if all properties are "enums", user declared a unioned enums, e.g.
+      // status: PostUserStatuses | PostAdminStatuses
+      // we create a enum with merged properties instead of union
+      const areAllPropertiesEnums = properties.every((metadata) => {
+        return metadata.kind === "enum"
+      })
+      if (areAllPropertiesEnums) {
+        const enumPropertiesFromAllEnums: TypeMetadata[] = []
+        properties.forEach((property) => [
+          enumPropertiesFromAllEnums.push(...property.properties),
+        ])
+
+        return this.appendType(
+          parentName,
+          TypeMetadataUtils.create("enum", {
+            // typeName,
+            nullable,
+            canBeUndefined,
+            properties,
+            propertyPath: parentName,
+          }),
+          false,
+        )
+      }
+
       return this.appendType(
         parentName,
         TypeMetadataUtils.create("union", {
-          typeName,
+          // typeName,
           nullable,
           canBeUndefined,
           properties,
           propertyPath: parentName,
         }),
+        false,
+      )
+    } else if (ts.isEnumMember(node)) {
+      if (!node.initializer) {
+        throw Errors.enumPropertyInvalid(parentName, "")
+      }
+
+      const initializerName = node.initializer.getText().trim()
+      const propertyName = ParserUtils.normalizeTextSymbol(initializerName)
+
+      return this.appendType(
+        parentName,
+        TypeMetadataUtils.create("object", {
+          propertyName,
+          // description,
+          // deprecated,
+          propertyPath: ParserUtils.joinStrings(parentName, propertyName),
+        }),
+
+        noReferences,
       )
     } else if (ts.isTypeReferenceNode(node)) {
       const referencedType = this.typeChecker.getTypeAtLocation(node)
@@ -402,12 +519,11 @@ export class ModelParser {
           modelSymbol,
         )
         model.deprecated = ParserUtils.getDeprecation(modelSymbol)
-        return this.appendType(parentName, model)
+        return this.appendType(parentName, model, noReferences)
       }
 
       // extract information out of type reference
       const typeName = node.typeName.text
-      // console.log("THIS IS REFERENCE", typeName, node as any)
 
       // if there is no parent name here, it means this is a root models and inputs
       // and we must create a type out of it, we cannot have a root objects as references
@@ -416,17 +532,16 @@ export class ModelParser {
       // that's why we have a check for parentName here
       const existType = this.types.find((type) => type === typeName)
       if (
-        ParserUtils.parentDeepness(parentName) >=
-          this.replaceReferencesOnParentDeepnessLevel &&
+        noReferences === false &&
+        ParserUtils.checkPathDeepness(parentName, {
+          regular: this.replaceReferencesOnParentDeepnessLevel,
+          args: 1,
+        }) &&
         existType
       ) {
-        // console.log("PARENT NAME", parentName)
-        // console.log("origin", origin)
-        // console.log("parentName", parentName, parentName.length)
-        // console.log("typeName", typeName)
         return TypeMetadataUtils.create("reference", {
           typeName,
-          propertyPath: parentName,
+          propertyPath: ParserUtils.joinStrings(parentName), // , typeName),
         })
       }
 
@@ -436,47 +551,12 @@ export class ModelParser {
       let description: string = ""
       let deprecated: string | boolean = false
       if (symbol) {
-        // console.log(
-        //   origin,
-        //   // referencedType,
-        //   referencedType.aliasSymbol,
-        //   referencedType.aliasSymbol!.declarations[0] as any,
-        //   referencedType.symbol,
-        // )
         resolvedType = symbol.declarations[0]
         description = ParserUtils.getDescription(this.typeChecker, symbol)
         deprecated = ParserUtils.getDeprecation(symbol)
       }
 
-      // if this is a nested call (this case we'll have a parent name) -
-      // we don't go deeper to prevent recursion for named symbols
-      /*if (
-        parentName &&
-        !goDeep &&
-        (!resolvedType || !ts.isEnumDeclaration(resolvedType))
-      ) {
-        return TypeMetadataUtils.create("object", {
-          typeName,
-          description,
-          deprecated,
-        })
-      }*/
-      // todo
-      // if (!resolvedType || !ts.isEnumDeclaration(resolvedType)) {
-      //   // todo: not sure about this check
-      //
-      //   // typeName or resolvedType ?
-      //   const existType = this.types.find((type) => type.typeName === typeName)
-      //   if (existType) {
-      //     return TypeMetadataUtils.create("object", {
-      //       typeName,
-      //       // description,
-      //       // deprecated,
-      //     })
-      //   }
-      // }
-
-      //
+      // check if it's a reference to a default scalars we have
       if (
         typeName === "Float" ||
         typeName === "BigInt" ||
@@ -493,25 +573,23 @@ export class ModelParser {
       }
 
       if (!resolvedType) {
-        // console.log(referencedType)
         throw Errors.cannotResolveTypeReference(typeName, parentName)
       }
 
-      // console.log("RESOLVED TYPE", resolvedType.kind)
       const type = this.parse(
         resolvedType,
-        parentName, // ParserUtils.joinStrings(parentName, typeName),
+        parentName,
         `${origin}.typeReferenceNode(${node.typeName.getText()})`,
+        noReferences,
       )
-      // console.log(type)
 
       // in type aliases type is declared as:
       // class User { ... }
       // here, we have everything parsed from { ... }, but we don't really have a type name
       // that's why we append it here
-      // if (!type.typeName) {
-      type.typeName = typeName
-      // }
+      if (this.types.includes(typeName)) {
+        type.typeName = typeName
+      }
 
       // todo: suspicious logic, check if we need it
       if (!type.description) {
@@ -522,19 +600,6 @@ export class ModelParser {
       }
 
       return type
-
-      // return this.appendType({
-      //   ...this.parse(
-      //     resolvedType,
-      //     ParserUtils.joinStrings(parentName, typeName),
-      //     // true, // if you want to change it, then revisit how it works because change will lead to bugs
-      //     `${origin}.typeReferenceNode(${node.typeName.getText()})`,
-      //     // goFirstMembersDeep,
-      //   ),
-      //   typeName,
-      //   description,
-      //   deprecated,
-      // })
     } else if (ts.isImportTypeNode(node)) {
       // check if we can handle this import
       if (!node.qualifier || !ts.isIdentifier(node.qualifier))
@@ -585,8 +650,9 @@ export class ModelParser {
     // create a model with a type
     const model = this.parse(
       modelType,
-      parentName, // ParserUtils.joinStrings(parentName /*, typeName*/),
+      parentName,
       `${origin}.parseModel(${modelName})`,
+      false,
     )
     model.modelName = modelName
 
@@ -596,6 +662,7 @@ export class ModelParser {
         argsType,
         ParserUtils.joinStrings(parentName, /*typeName, */ "Args"),
         `${origin}.parseModel(args)(${modelName})`,
+        false, // true?
       )
       // console.log(parentName)
       // console.log("!", model.typeName + ".Args", argsModel)
@@ -634,6 +701,7 @@ export class ModelParser {
     members: ts.NodeArray<ts.Node>,
     parentName: string,
     origin: string,
+    noReferences: boolean,
   ): TypeMetadata[] {
     const properties: TypeMetadata[] = []
     for (let member of members) {
@@ -653,59 +721,55 @@ export class ModelParser {
       const propertyName = ParserUtils.normalizeTextSymbol(rawMemberName)
       const description = ParserUtils.getDescription(this.typeChecker, member)
       const deprecated = ParserUtils.getDeprecation(member)
+      let result: TypeMetadata | undefined = undefined
 
       // "parseMembers" is called not only for a object literal properties or class properties,
       // but also for an enum, that's why we need this isEnumMember check here.
       if (ts.isEnumMember(member)) {
-        if (!member.initializer) {
-          throw Errors.enumPropertyInvalid(parentName, propertyName)
-        }
-
-        const initializerName = member.initializer.getText().trim()
-        const value = ParserUtils.normalizeTextSymbol(initializerName)
-        if (propertyName !== value) {
+        const parsed = this.parse(member, parentName, origin, noReferences)
+        if (propertyName !== parsed.propertyName) {
           throw Errors.enumPropertyMustMatchValue(parentName, propertyName)
         }
 
-        // todo: why parse method doesn't do it?
-        properties.push(
-          TypeMetadataUtils.create("object", {
-            propertyName,
-            description,
-            deprecated,
-            propertyPath: ParserUtils.joinStrings(parentName, propertyName),
-          }),
-        )
+        result = { ...parsed }
       } else {
         if (!member.type)
           throw Errors.methodNoReturningType(parentName, propertyName)
 
-        // console.log("checking parentName", parentName)
-        // console.log(`[LOG] parsing member(${member.type.kind})`)
-        // console.log("member.initializer", member.type)
-        const result: TypeMetadata = {
-          ...this.parse(
-            member.type,
-            ParserUtils.joinStrings(parentName, propertyName),
-            `${origin}.parseMembers(${member.name.getText()})`,
-          ),
-          propertyName,
-        }
-        // console.log("RESULT", result)
-
-        // if property is a method, we also parse its arguments
-        // todo: what if property is a function?
+        // if property is a method (e.g. posts(args: {...})), we also parse its arguments
         if (ts.isMethodSignature(member)) {
-          result.args = member.parameters.map((parameter) => {
-            if (!ts.isParameter(parameter) || !parameter.type)
-              throw new Error(`Method parameter ${propertyName} isn't valid.`)
+          result = TypeMetadataUtils.create("function", {
+            propertyName,
+            propertyPath: ParserUtils.joinStrings(parentName, propertyName),
+            returnType: this.parse(
+              member.type,
+              ParserUtils.joinStrings(parentName, propertyName, "Return"),
+              `${origin}.parseMembers(${propertyName})(Return)`,
+              noReferences,
+            ),
+            args: member.parameters.map((parameter) => {
+              if (!ts.isParameter(parameter) || !parameter.type)
+                throw new Error(`Method parameter ${propertyName} isn't valid.`)
 
-            return this.parse(
-              parameter.type,
-              ParserUtils.joinStrings(parentName, propertyName, "Args"),
-              `${origin}.parseMembers(${propertyName})`, // todo: maybe use more effective name here like .[]
-            )
+              return this.parse(
+                parameter.type,
+                ParserUtils.joinStrings(parentName, propertyName, "Args"),
+                `${origin}.parseMembers(${propertyName})(Args)`,
+                false,
+              )
+            }),
           })
+        } else {
+          // otherwise it's just a property, e.g. { id: number }
+          result = {
+            ...this.parse(
+              member.type,
+              ParserUtils.joinStrings(parentName, propertyName),
+              `${origin}.parseMembers(${propertyName})`,
+              noReferences,
+            ),
+            propertyName,
+          }
         }
         if (member.questionToken) {
           result.canBeUndefined = true
@@ -716,8 +780,9 @@ export class ModelParser {
         if (deprecated) {
           result.deprecated = deprecated
         }
-        properties.push(result)
       }
+
+      properties.push(result)
     }
     return properties
   }

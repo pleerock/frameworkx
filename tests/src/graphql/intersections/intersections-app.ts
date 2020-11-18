@@ -47,10 +47,10 @@ export const App = createApp<{
     categoryBulkSave(
       args: (CategoryGeneralType & CategoryMetaType)[],
     ): (CategoryGeneralType & CategoryMetaType)[]
-    question(
+    questionSave(
       args: QuestionInput & { isWatched: boolean },
     ): QuestionType & { answer: string }
-    answer(
+    answerSave(
       args: { id: number | undefined } & { name: string | null },
     ): { id: number | undefined } & { name: string | null }
   }

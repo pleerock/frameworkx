@@ -11,6 +11,7 @@ export type TypeMetadataKind =
   | "object"
   | "property"
   | "reference"
+  | "function"
 
 /**
  * TypeMetadata contains information about specific type and its properties.
@@ -29,8 +30,6 @@ export type TypeMetadata = {
 
   /**
    * Indicates if type is an array.
-   *
-   * @deprecated move "array" to kind?
    */
   array: boolean
 
@@ -84,7 +83,12 @@ export type TypeMetadata = {
   /**
    * If type is a method, it's arguments will be there.
    */
-  args: TypeMetadata[] // todo: ideally this should be an array (but we'll use first item anyway)
+  args: TypeMetadata[]
+
+  /**
+   * Returned type, in the case if kind is a "function".
+   */
+  returnType?: TypeMetadata
 }
 
 /**

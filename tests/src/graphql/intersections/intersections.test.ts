@@ -10,11 +10,13 @@ import {
   isScalarType,
 } from "graphql"
 import { getRealTypes } from "../../util/test-common"
+import { TypeMetadataUtils } from "@microframework/core"
 
 describe("graphql > schema builder", () => {
   test("app with intersection input and output types", () => {
     const appMetadata = parse(__dirname + "/intersections-app.ts")
-    // console.log(appMetadata)
+    // console.log("appMetadata", JSON.stringify(appMetadata, undefined, 2))
+    // TypeMetadataUtils.print(appMetadata)
     const schema = buildGraphQLSchema({
       assert: false,
       appMetadata: appMetadata,

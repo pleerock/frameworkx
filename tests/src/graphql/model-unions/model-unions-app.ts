@@ -5,9 +5,9 @@ export const App = createApp<{
     PostType: PostType
     PostExtendedType:
       | PostType
-      | { id: number; text: string; isWatched: boolean }
+      | { id: number; text: string; isWatched: boolean } // todo: this signature can't be supported
     CategoryType: PostCategory | QuestionCategory
-    QuestionType: { id: number; name: string } | { id: number; title: string }
+    QuestionType: { id: number; name: string } | { id: number; title: string } // todo: this signature can't be supported
   }
 }>()
 
