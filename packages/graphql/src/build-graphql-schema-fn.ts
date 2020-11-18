@@ -209,6 +209,12 @@ export function buildGraphQLSchema(
       values[property.propertyName] = {
         description: property.description,
         value: property.propertyName,
+        deprecationReason:
+          typeof property.deprecated === "string"
+            ? property.deprecated
+            : property.deprecated === true
+            ? ""
+            : undefined,
       }
     }
 

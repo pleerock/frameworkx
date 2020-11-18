@@ -179,6 +179,7 @@ describe("graphql > schema builder", () => {
       if (!isEnumType(statusEnum)) fail("PostTypeStatusEnum is not a enum type")
 
       expect(statusEnum.name).toBe("PostTypeStatusEnum")
+      expect(statusEnum.description).toBe("This is StatusEnum.")
       expect(statusEnum.getValues().length).toBe(4)
 
       expect(statusEnum.getValues()[0].name).toBe("draft")
@@ -193,7 +194,7 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Post is removed.")
       expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
-      expect(statusEnum.getValues()[2].deprecationReason).toBe(undefined)
+      expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")

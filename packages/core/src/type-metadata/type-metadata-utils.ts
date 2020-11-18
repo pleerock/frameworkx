@@ -73,6 +73,8 @@ export const TypeMetadataUtils = {
         propertyPath: type.propertyPath,
         nullable: type.nullable,
         canBeUndefined: type.canBeUndefined,
+        description: type.description,
+        deprecated: type.deprecated,
         returnType: type.returnType ? recursive(type.returnType) : undefined,
         properties: type.properties.map((property) => recursive(property)),
         args: type.args.map((arg) => recursive(arg)),

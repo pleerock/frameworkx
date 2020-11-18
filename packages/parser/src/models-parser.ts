@@ -783,12 +783,12 @@ export class ModelParser {
         if (member.questionToken) {
           result.canBeUndefined = true
         }
-        if (description) {
-          result.description = description
-        }
-        if (deprecated) {
-          result.deprecated = deprecated
-        }
+      }
+      if (description) {
+        result.description = description
+      }
+      if (deprecated) {
+        result.deprecated = deprecated
       }
 
       properties.push(result)
