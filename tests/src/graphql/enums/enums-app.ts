@@ -51,23 +51,23 @@ export const App = createApp<{
  */
 enum StatusEnum {
   /**
-   * Post is on draft.
+   * Is on draft.
    */
   draft = "draft",
 
   /**
-   * Post is published.
+   * Is published.
    */
   published = "published",
 
   /**
-   * Post is removed.
+   * Is removed.
    * @deprecated
    */
   removed = "removed",
 
   /**
-   * Post is watched.
+   * Is watched.
    * @deprecated this status is not used anymore.
    */
   watched = "watched",
