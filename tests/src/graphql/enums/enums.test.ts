@@ -46,6 +46,8 @@ describe("graphql > schema builder", () => {
     "QuestionReturnCategoryEnum",
   )
   const questionReturnTypeEnum = schema.getType("QuestionReturnTypeEnum")
+  const postsSaveReturnEnum = schema.getType("PostsSaveReturnEnum")
+  const postsSaveArgsStatusEnum = schema.getType("PostsSaveArgsStatusEnum")
   const questionSaveReturnModel = schema.getType("QuestionSaveReturnModel")
   const questionSaveReturnStatusEnum = schema.getType(
     "QuestionSaveReturnStatusEnum",
@@ -92,6 +94,8 @@ describe("graphql > schema builder", () => {
         "QuestionReturnStatusEnum",
         "QuestionReturnCategoryEnum",
         "QuestionReturnTypeEnum",
+        "PostsSaveReturnEnum",
+        "PostsSaveArgsStatusEnum",
         "QuestionSaveReturnModel",
         "QuestionSaveReturnStatusEnum",
         "QuestionSaveReturnCategoryEnum",
@@ -251,6 +255,20 @@ describe("graphql > schema builder", () => {
       if (!isEnumType(questionReturnTypeEnum))
         fail("QuestionReturnTypeEnum is not a enum type")
       expect(questionReturnTypeEnum.name).toBe("QuestionReturnTypeEnum")
+
+      // ------------------------------------------------
+
+      expect(postsSaveReturnEnum).not.toBe(undefined)
+      if (!isEnumType(postsSaveReturnEnum))
+        fail("PostsSaveReturnEnum is not a enum type")
+      expect(postsSaveReturnEnum.name).toBe("PostsSaveReturnEnum")
+
+      // ------------------------------------------------
+
+      expect(postsSaveArgsStatusEnum).not.toBe(undefined)
+      if (!isEnumType(postsSaveArgsStatusEnum))
+        fail("PostsSaveArgsStatusEnum is not a enum type")
+      expect(postsSaveArgsStatusEnum.name).toBe("PostsSaveArgsStatusEnum")
 
       // ------------------------------------------------
 
@@ -829,6 +847,305 @@ describe("graphql > schema builder", () => {
         fail("QuestionReturnTypeEnum is not a enum type")
 
       expect(typeEnum.name).toBe("QuestionReturnTypeEnum")
+      expect(typeEnum.getValues().length).toBe(2)
+
+      expect(typeEnum.getValues()[0].name).toBe("common")
+      expect(typeEnum.getValues()[0].value).toBe("common")
+
+      expect(typeEnum.getValues()[1].name).toBe("bounced")
+      expect(typeEnum.getValues()[1].value).toBe("bounced")
+    })
+
+    test("enum in mutations - case #1", () => {
+      const mutation = schema.getMutationType()
+      expect(mutation).not.toBe(undefined)
+
+      const postField = mutation!.getFields()["postSave"]
+      if (!isNonNullType(postField.type)) fail("PostType is nullable")
+      expect(postField.type.ofType.name).toBe("PostType")
+      expect(postField.args.length).toBe(5)
+
+      // ------------------------------------------------
+
+      const status = postField.args.find((it) => it.name === "status")
+      expect(status).not.toBe(undefined)
+
+      if (!isNonNullType(status!.type)) fail("PostInputStatusEnum is nullable")
+      const statusEnum = status!.type.ofType
+      if (!isEnumType(statusEnum))
+        fail("PostInputStatusEnum is not a enum type")
+
+      expect(statusEnum.name).toBe("PostInputStatusEnum")
+      expect(statusEnum.description).toBe("This is StatusEnum.")
+      expect(statusEnum.getValues().length).toBe(4)
+
+      expect(statusEnum.getValues()[0].name).toBe("draft")
+      expect(statusEnum.getValues()[0].value).toBe("draft")
+      expect(statusEnum.getValues()[0].description).toBe("Is on draft.")
+
+      expect(statusEnum.getValues()[1].name).toBe("published")
+      expect(statusEnum.getValues()[1].value).toBe("published")
+      expect(statusEnum.getValues()[1].description).toBe("Is published.")
+
+      expect(statusEnum.getValues()[2].name).toBe("removed")
+      expect(statusEnum.getValues()[2].value).toBe("removed")
+      expect(statusEnum.getValues()[2].description).toBe("Is removed.")
+      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
+      expect(statusEnum.getValues()[2].deprecationReason).toBe("")
+
+      expect(statusEnum.getValues()[3].name).toBe("watched")
+      expect(statusEnum.getValues()[3].value).toBe("watched")
+      expect(statusEnum.getValues()[3].description).toBe("Is watched.")
+      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
+      expect(statusEnum.getValues()[3].deprecationReason).toBe(
+        "this status is not used anymore.",
+      )
+
+      // ------------------------------------------------
+
+      const category = postField.args.find((it) => it.name === "category")
+      expect(category).not.toBe(undefined)
+      if (!isNonNullType(category!.type))
+        fail("PostInputCategoryEnum is nullable")
+      const categoryEnum = category!.type.ofType
+      if (!isEnumType(categoryEnum))
+        fail("PostInputCategoryEnum is not a enum type")
+
+      expect(categoryEnum.name).toBe("PostInputCategoryEnum")
+      expect(categoryEnum.description).toBe("This is PostCategoryEnum.")
+      expect(categoryEnum.getValues().length).toBe(2)
+
+      expect(categoryEnum.getValues()[0].name).toBe("animals")
+      expect(categoryEnum.getValues()[0].value).toBe("animals")
+
+      expect(categoryEnum.getValues()[1].name).toBe("cars")
+      expect(categoryEnum.getValues()[1].value).toBe("cars")
+
+      // ------------------------------------------------
+
+      const type = postField.args.find((it) => it.name === "type")
+      expect(type).not.toBe(undefined)
+      if (!isNonNullType(type!.type)) fail("PostInputTypeEnum is nullable")
+      const typeEnum = type!.type.ofType
+      if (!isEnumType(typeEnum)) fail("PostInputTypeEnum is not a enum type")
+
+      expect(typeEnum.name).toBe("PostInputTypeEnum")
+      expect(typeEnum.getValues().length).toBe(2)
+
+      expect(typeEnum.getValues()[0].name).toBe("blog")
+      expect(typeEnum.getValues()[0].value).toBe("blog")
+
+      expect(typeEnum.getValues()[1].name).toBe("news")
+      expect(typeEnum.getValues()[1].value).toBe("news")
+    })
+
+    test("enum in mutations - case #2", () => {
+      const mutation = schema.getMutationType()
+      expect(mutation).not.toBe(undefined)
+
+      const postStatusField = mutation!.getFields()["postsSave"]
+      if (!isNonNullType(postStatusField.type))
+        fail("PostsSaveReturnEnum is nullable")
+      expect(postStatusField.type.ofType.name).toBe("PostsSaveReturnEnum")
+      expect(postStatusField.args.length).toBe(1)
+
+      // ------------------------------------------------
+
+      const status = postStatusField.args.find((it) => it.name === "status")
+      expect(status).not.toBe(undefined)
+
+      if (!isNonNullType(status!.type))
+        fail("PostStatusArgsStatusEnum is nullable")
+      const statusEnum = status!.type.ofType
+      if (!isEnumType(statusEnum))
+        fail("PostStatusArgsStatusEnum is not a enum type")
+
+      expect(statusEnum.name).toBe("PostsSaveArgsStatusEnum")
+      expect(statusEnum.description).toBe("This is StatusEnum.")
+      expect(statusEnum.getValues().length).toBe(4)
+
+      expect(statusEnum.getValues()[0].name).toBe("draft")
+      expect(statusEnum.getValues()[0].value).toBe("draft")
+      expect(statusEnum.getValues()[0].description).toBe("Is on draft.")
+
+      expect(statusEnum.getValues()[1].name).toBe("published")
+      expect(statusEnum.getValues()[1].value).toBe("published")
+      expect(statusEnum.getValues()[1].description).toBe("Is published.")
+
+      expect(statusEnum.getValues()[2].name).toBe("removed")
+      expect(statusEnum.getValues()[2].value).toBe("removed")
+      expect(statusEnum.getValues()[2].description).toBe("Is removed.")
+      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
+      expect(statusEnum.getValues()[2].deprecationReason).toBe("")
+
+      expect(statusEnum.getValues()[3].name).toBe("watched")
+      expect(statusEnum.getValues()[3].value).toBe("watched")
+      expect(statusEnum.getValues()[3].description).toBe("Is watched.")
+      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
+      expect(statusEnum.getValues()[3].deprecationReason).toBe(
+        "this status is not used anymore.",
+      )
+    })
+
+    test("enum in mutations - case #3", () => {
+      const mutation = schema.getMutationType()
+      expect(mutation).not.toBe(undefined)
+
+      const questionField = mutation!.getFields()["questionSave"]
+      if (!isNonNullType(questionField.type))
+        fail("QuestionSaveReturnModel is nullable")
+
+      expect(questionField.args.length).toBe(4)
+
+      // ------------------------------------------------
+
+      const argsStatus = questionField.args.find((it) => it.name === "status")
+      expect(argsStatus).not.toBe(undefined)
+
+      if (!isNonNullType(argsStatus!.type))
+        fail("QuestionSaveArgsStatusEnum is nullable")
+      const argsStatusEnum = argsStatus!.type.ofType
+      if (!isEnumType(argsStatusEnum))
+        fail("QuestionSaveArgsStatusEnum is not a enum type")
+
+      expect(argsStatusEnum.name).toBe("QuestionSaveArgsStatusEnum")
+      expect(argsStatusEnum.description).toBe("")
+      expect(argsStatusEnum.getValues().length).toBe(6)
+
+      expect(argsStatusEnum.getValues()[0].name).toBe("draft")
+      expect(argsStatusEnum.getValues()[0].value).toBe("draft")
+      expect(argsStatusEnum.getValues()[0].description).toBe("Is on draft.")
+
+      expect(argsStatusEnum.getValues()[1].name).toBe("published")
+      expect(argsStatusEnum.getValues()[1].value).toBe("published")
+      expect(argsStatusEnum.getValues()[1].description).toBe("Is published.")
+
+      expect(argsStatusEnum.getValues()[2].name).toBe("removed")
+      expect(argsStatusEnum.getValues()[2].value).toBe("removed")
+      expect(argsStatusEnum.getValues()[2].description).toBe("Is removed.")
+      expect(argsStatusEnum.getValues()[2].isDeprecated).toBe(true)
+      expect(argsStatusEnum.getValues()[2].deprecationReason).toBe("")
+
+      expect(argsStatusEnum.getValues()[3].name).toBe("watched")
+      expect(argsStatusEnum.getValues()[3].value).toBe("watched")
+      expect(argsStatusEnum.getValues()[3].description).toBe("Is watched.")
+      expect(argsStatusEnum.getValues()[3].isDeprecated).toBe(true)
+      expect(argsStatusEnum.getValues()[3].deprecationReason).toBe(
+        "this status is not used anymore.",
+      )
+
+      // ------------------------------------------------
+
+      const argsCategory = questionField.args.find(
+        (it) => it.name === "category",
+      )
+      expect(argsCategory).not.toBe(undefined)
+      if (!isNonNullType(argsCategory!.type))
+        fail("QuestionSaveArgsCategoryEnum is nullable")
+      const argsCategoryEnum = argsCategory!.type.ofType
+      if (!isEnumType(argsCategoryEnum))
+        fail("QuestionSaveArgsCategoryEnum is not a enum type")
+
+      expect(argsCategoryEnum.name).toBe("QuestionSaveArgsCategoryEnum")
+      expect(argsCategoryEnum.description).toBe("")
+      expect(argsCategoryEnum.getValues().length).toBe(2)
+
+      expect(argsCategoryEnum.getValues()[0].name).toBe("medicine")
+      expect(argsCategoryEnum.getValues()[0].value).toBe("medicine")
+
+      expect(argsCategoryEnum.getValues()[1].name).toBe("programming")
+      expect(argsCategoryEnum.getValues()[1].value).toBe("programming")
+
+      // ------------------------------------------------
+
+      const argsType = questionField.args.find((it) => it.name === "type")
+      expect(argsType).not.toBe(undefined)
+      if (!isNonNullType(argsType!.type))
+        fail("QuestionSaveArgsTypeEnum is nullable")
+      const argsTypeEnum = argsType!.type.ofType
+      if (!isEnumType(argsTypeEnum))
+        fail("QuestionSaveArgsTypeEnum is not a enum type")
+
+      expect(argsTypeEnum.name).toBe("QuestionSaveArgsTypeEnum")
+      expect(argsTypeEnum.getValues().length).toBe(2)
+
+      expect(argsTypeEnum.getValues()[0].name).toBe("common")
+      expect(argsTypeEnum.getValues()[0].value).toBe("common")
+
+      expect(argsTypeEnum.getValues()[1].name).toBe("bounced")
+      expect(argsTypeEnum.getValues()[1].value).toBe("bounced")
+
+      // ------------------------------------------------
+
+      const returnType = questionField.type.ofType
+      expect(returnType.name).toBe("QuestionSaveReturnModel")
+      const fields = returnType.getFields()
+
+      // ------------------------------------------------
+
+      const status = fields["status"]
+      expect(status).not.toBe(undefined)
+      if (!isNonNullType(status.type))
+        fail("QuestionSaveReturnStatusEnum is nullable")
+      const statusEnum = status.type.ofType
+      if (!isEnumType(statusEnum))
+        fail("QuestionSaveReturnStatusEnum is not a enum type")
+
+      expect(statusEnum.name).toBe("QuestionSaveReturnStatusEnum")
+      expect(statusEnum.getValues().length).toBe(6)
+
+      expect(statusEnum.getValues()[0].name).toBe("draft")
+      expect(statusEnum.getValues()[0].value).toBe("draft")
+      expect(statusEnum.getValues()[0].description).toBe("Is on draft.")
+
+      expect(statusEnum.getValues()[1].name).toBe("published")
+      expect(statusEnum.getValues()[1].value).toBe("published")
+      expect(statusEnum.getValues()[1].description).toBe("Is published.")
+
+      expect(statusEnum.getValues()[2].name).toBe("removed")
+      expect(statusEnum.getValues()[2].value).toBe("removed")
+      expect(statusEnum.getValues()[2].description).toBe("Is removed.")
+      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
+      expect(statusEnum.getValues()[2].deprecationReason).toBe("")
+
+      expect(statusEnum.getValues()[3].name).toBe("watched")
+      expect(statusEnum.getValues()[3].value).toBe("watched")
+      expect(statusEnum.getValues()[3].description).toBe("Is watched.")
+      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
+      expect(statusEnum.getValues()[3].deprecationReason).toBe(
+        "this status is not used anymore.",
+      )
+
+      // ------------------------------------------------
+
+      const category = fields["category"]
+      expect(category).not.toBe(undefined)
+      if (!isNonNullType(category.type))
+        fail("QuestionSaveReturnCategoryEnum is nullable")
+      const categoryEnum = category.type.ofType
+      if (!isEnumType(categoryEnum))
+        fail("QuestionSaveReturnCategoryEnum is not a enum type")
+
+      expect(categoryEnum.name).toBe("QuestionSaveReturnCategoryEnum")
+      expect(categoryEnum.getValues().length).toBe(2)
+
+      expect(categoryEnum.getValues()[0].name).toBe("medicine")
+      expect(categoryEnum.getValues()[0].value).toBe("medicine")
+
+      expect(categoryEnum.getValues()[1].name).toBe("programming")
+      expect(categoryEnum.getValues()[1].value).toBe("programming")
+
+      // ------------------------------------------------
+
+      const type = fields["type"]
+      expect(type).not.toBe(undefined)
+      if (!isNonNullType(type.type))
+        fail("QuestionSaveReturnTypeEnum is nullable")
+      const typeEnum = type.type.ofType
+      if (!isEnumType(typeEnum))
+        fail("QuestionSaveReturnTypeEnum is not a enum type")
+
+      expect(typeEnum.name).toBe("QuestionSaveReturnTypeEnum")
       expect(typeEnum.getValues().length).toBe(2)
 
       expect(typeEnum.getValues()[0].name).toBe("common")

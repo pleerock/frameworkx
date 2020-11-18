@@ -31,7 +31,7 @@ export const App = createApp<{
   }
   mutations: {
     postSave(args: PostInput): PostType
-    postsSave(args: { posts: StatusEnum }): StatusEnum
+    postsSave(args: { status: StatusEnum }): StatusEnum
     questionSave(args: {
       id: number
       status: StatusEnum | BanStatusEnum
