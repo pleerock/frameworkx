@@ -3,7 +3,7 @@ import { parse } from "@microframework/parser"
 describe("parser > parse actions", () => {
   test("actions defined with an intersections", () => {
     const appMetadata = parse(__dirname + "/intersections-app.ts")
-    expect(appMetadata).toStrictEqual({
+    expect(appMetadata).toEqual({
       "@type": "ApplicationTypeMetadata",
       actions: [
         {

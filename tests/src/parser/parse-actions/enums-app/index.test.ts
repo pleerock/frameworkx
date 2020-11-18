@@ -3,7 +3,7 @@ import { parse } from "@microframework/parser"
 describe("parser > parse actions", () => {
   test("actions defined with a enums", () => {
     const appMetadata = parse(__dirname + "/enums-app.ts")
-    expect(appMetadata).toStrictEqual({
+    expect(appMetadata).toEqual({
       "@type": "ApplicationTypeMetadata",
       actions: [
         {

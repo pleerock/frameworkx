@@ -71,7 +71,7 @@ describe("graphql > schema builder", () => {
       const types = getRealTypes(
         Object.keys(schema.getTypeMap()).map((key) => key),
       )
-      expect(types).toStrictEqual([
+      expect(types).toEqual([
         "PostType",
         "PostTypeStatusEnum",
         "PostTypeCategoryEnum",

@@ -6,7 +6,7 @@ describe("swagger > generate documentation", () => {
     const appMetadata = parse(__dirname + "/model-app.ts")
     const swaggerOutput = generateSwaggerDocumentation(appMetadata)
     // console.log(JSON.stringify(swaggerOutput.definitions, undefined, 2))
-    expect(swaggerOutput).toStrictEqual({
+    expect(swaggerOutput).toEqual({
       consumes: ["application/json"],
       definitions: {},
       info: {

@@ -5,6 +5,24 @@ import { DeclarationTypes } from "@microframework/core"
  * Errors thrown in the app.
  */
 export const Errors = {
+  /**
+   * Error thrown on miscellaneous property signature errors.
+   */
+  propertySignatureInvalid(path: string, debugPath: string) {
+    return new Error(
+      `Property signature is invalid at ${path} (debug path: ${debugPath})`,
+    )
+  },
+
+  /**
+   * Error thrown when class is nameless.
+   */
+  modelClassNoName(path: string, debugPath: string) {
+    return new Error(
+      `Class declaration must have a name at ${path} (${debugPath}).`,
+    )
+  },
+
   // errors on app file parsing
   appFileInvalid(fileName: string) {
     return new Error(
@@ -154,11 +172,6 @@ export const Errors = {
   unionTypeFormatNotSupported(parent: string) {
     return new Error(
       `Union type definition is not supported at "${parent}". Only type references are allowed.`,
-    )
-  },
-  modelClassNoName(parent: string) {
-    return new Error(
-      `Class does not have a name${parent ? ` at "${parent}"` : ""}.`,
     )
   },
   modelInterfaceNoName(parent: string) {

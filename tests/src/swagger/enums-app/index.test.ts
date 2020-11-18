@@ -5,7 +5,7 @@ describe("swagger > generate documentation", () => {
   test("actions defined with a enums", () => {
     const appMetadata = parse(__dirname + "/enums-app.ts")
     const swaggerOutput = generateSwaggerDocumentation(appMetadata)
-    expect(swaggerOutput).toStrictEqual({
+    expect(swaggerOutput).toEqual({
       consumes: ["application/json"],
       definitions: {},
       info: {

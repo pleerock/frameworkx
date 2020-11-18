@@ -3,7 +3,7 @@ import { parse } from "@microframework/parser"
 describe("parser > parse actions", () => {
   test("actions defined with a literal types", () => {
     const appMetadata = parse(__dirname + "/literal-app.ts")
-    expect(appMetadata).toStrictEqual({
+    expect(appMetadata).toEqual({
       "@type": "ApplicationTypeMetadata",
       actions: [
         {

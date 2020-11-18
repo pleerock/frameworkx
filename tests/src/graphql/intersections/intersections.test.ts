@@ -15,8 +15,6 @@ import { TypeMetadataUtils } from "@microframework/core"
 describe("graphql > schema builder", () => {
   test("app with intersection input and output types", () => {
     const appMetadata = parse(__dirname + "/intersections-app.ts")
-    // console.log("appMetadata", JSON.stringify(appMetadata, undefined, 2))
-    // TypeMetadataUtils.print(appMetadata)
     const schema = buildGraphQLSchema({
       assert: false,
       appMetadata: appMetadata,
@@ -29,7 +27,6 @@ describe("graphql > schema builder", () => {
     const types = getRealTypes(
       Object.keys(schema.getTypeMap()).map((key) => key),
     )
-    console.log(types)
 
     // ------------------------------------------------
 
