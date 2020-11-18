@@ -36,7 +36,37 @@ describe("swagger > generate documentation", () => {
               "200": {
                 description: "",
                 schema: {
-                  $ref: "#/definitions/Category",
+                  properties: {
+                    id: {
+                      type: "integer",
+                    },
+                    name: {
+                      type: "string",
+                    },
+                    posts: {
+                      items: {
+                        properties: {
+                          categoryCount: {
+                            type: "integer",
+                          },
+                          id: {
+                            type: "integer",
+                          },
+                          status: {
+                            type: "object",
+                          },
+                          title: {
+                            type: "string",
+                          },
+                        },
+                        required: ["id", "title", "categoryCount", "status"],
+                        type: "object",
+                      },
+                      type: "array",
+                    },
+                  },
+                  required: ["id"],
+                  type: "object",
                 },
               },
             },
@@ -84,7 +114,37 @@ describe("swagger > generate documentation", () => {
               "200": {
                 description: "",
                 schema: {
-                  $ref: "#/definitions/Category",
+                  properties: {
+                    id: {
+                      type: "integer",
+                    },
+                    name: {
+                      type: "string",
+                    },
+                    posts: {
+                      items: {
+                        properties: {
+                          categoryCount: {
+                            type: "integer",
+                          },
+                          id: {
+                            type: "integer",
+                          },
+                          status: {
+                            type: "object",
+                          },
+                          title: {
+                            type: "string",
+                          },
+                        },
+                        required: ["id", "title", "categoryCount", "status"],
+                        type: "object",
+                      },
+                      type: "array",
+                    },
+                  },
+                  required: ["id"],
+                  type: "object",
                 },
               },
             },

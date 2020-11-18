@@ -53,13 +53,12 @@
   "inputs": [],
   "queries": [
     {
-      "kind": "object",
+      "kind": "function",
       "array": false,
       "nullable": false,
       "canBeUndefined": false,
-      "properties": [],
-      "typeName": "PostType",
       "description": "",
+      "properties": [],
       "propertyName": "post",
       "propertyPath": "post",
       "args": [{
@@ -81,19 +80,29 @@
           }
         ],
         "args": []
-      }]
+      }],
+      "returnType": {
+        "kind": "reference",
+        "typeName": "PostType",
+        "array": false,
+        "nullable": false,
+        "canBeUndefined": false,
+        "properties": [],
+        "args": [],
+        "propertyPath": "post.PostType"
+      }
     }
   ],
   "mutations": [
     {
-      "kind": "boolean",
+      "kind": "function",
       "array": false,
       "nullable": false,
       "canBeUndefined": false,
+      "description": "",
       "properties": [],
       "propertyName": "postSave",
       "propertyPath": "postSave",
-      "description": "",
       "args": [{
         "kind": "object",
         "array": false,
@@ -113,7 +122,17 @@
           }
         ],
         "args": []
-      }]
+      }],
+      "returnType": {
+        "kind": "reference",
+        "typeName": "PostType",
+        "array": false,
+        "nullable": false,
+        "canBeUndefined": false,
+        "properties": [],
+        "args": [],
+        "propertyPath": "postSave.PostType"
+      }
     }
   ],
   "subscriptions": []

@@ -106,7 +106,6 @@ describe("parser > parse actions", () => {
             ],
             propertyName: "",
             propertyPath: "GET /api/category/:id.return",
-            typeName: "StatusEnum",
           },
         },
         {
@@ -222,7 +221,6 @@ describe("parser > parse actions", () => {
             ],
             propertyName: "",
             propertyPath: "POST /api/category.return",
-            typeName: "StatusEnum",
           },
         },
         {
@@ -338,7 +336,6 @@ describe("parser > parse actions", () => {
                 ],
                 propertyName: "status",
                 propertyPath: "DELETE /api/category/:id.return.status",
-                typeName: "StatusEnum",
               },
             ],
             propertyName: "",

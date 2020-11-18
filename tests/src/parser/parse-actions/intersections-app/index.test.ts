@@ -8,10 +8,7 @@ describe("parser > parse actions", () => {
       actions: [
         {
           "@type": "ActionTypeMetadata",
-          body: undefined,
-          cookies: undefined,
           description: "Loads a single category by its id.",
-          headers: undefined,
           name: "GET /api/category/:id",
           params: {
             "@type": "TypeMetadata",
@@ -40,7 +37,6 @@ describe("parser > parse actions", () => {
             propertyName: "params",
             propertyPath: "GET /api/category/:id.params",
           },
-          query: undefined,
           return: {
             "@type": "TypeMetadata",
             args: [],
@@ -168,7 +164,6 @@ describe("parser > parse actions", () => {
                     ],
                     propertyName: "status",
                     propertyPath: "GET /api/category/:id.return.posts.status",
-                    typeName: "PostStatus",
                   },
                   {
                     "@type": "TypeMetadata",
@@ -199,20 +194,17 @@ describe("parser > parse actions", () => {
                   },
                 ],
                 propertyName: "posts",
-                propertyPath: "",
+                propertyPath: "GET /api/category/:id.return.posts",
               },
             ],
             propertyName: "",
-            propertyPath: "",
+            propertyPath: "GET /api/category/:id.return",
           },
         },
         {
           "@type": "ActionTypeMetadata",
-          body: undefined,
-          cookies: undefined,
           description:
             "Loads a single category and a single post by their ids.",
-          headers: undefined,
           name: "GET /api/category-post/:id",
           params: {
             "@type": "TypeMetadata",
@@ -270,7 +262,6 @@ describe("parser > parse actions", () => {
             propertyName: "params",
             propertyPath: "GET /api/category-post/:id.params",
           },
-          query: undefined,
           return: {
             "@type": "TypeMetadata",
             args: [],
@@ -414,7 +405,6 @@ describe("parser > parse actions", () => {
                         propertyName: "status",
                         propertyPath:
                           "GET /api/category-post/:id.return.category.posts.status",
-                        typeName: "PostStatus",
                       },
                       {
                         "@type": "TypeMetadata",
@@ -446,11 +436,12 @@ describe("parser > parse actions", () => {
                       },
                     ],
                     propertyName: "posts",
-                    propertyPath: "",
+                    propertyPath:
+                      "GET /api/category-post/:id.return.category.posts",
                   },
                 ],
                 propertyName: "category",
-                propertyPath: "",
+                propertyPath: "GET /api/category-post/:id.return.category",
               },
               {
                 "@type": "TypeMetadata",
@@ -545,7 +536,6 @@ describe("parser > parse actions", () => {
                     propertyName: "status",
                     propertyPath:
                       "GET /api/category-post/:id.return.post.status",
-                    typeName: "PostStatus",
                   },
                   {
                     "@type": "TypeMetadata",
@@ -577,7 +567,7 @@ describe("parser > parse actions", () => {
                   },
                 ],
                 propertyName: "post",
-                propertyPath: "",
+                propertyPath: "GET /api/category-post/:id.return.post",
               },
             ],
             propertyName: "",
@@ -637,14 +627,10 @@ describe("parser > parse actions", () => {
               },
             ],
             propertyName: "body",
-            propertyPath: "",
+            propertyPath: "POST /api/category.body",
           },
-          cookies: undefined,
           description: "Saves a category.",
-          headers: undefined,
           name: "POST /api/category",
-          params: undefined,
-          query: undefined,
           return: {
             "@type": "TypeMetadata",
             args: [],
@@ -772,7 +758,6 @@ describe("parser > parse actions", () => {
                     ],
                     propertyName: "status",
                     propertyPath: "POST /api/category.return.posts.status",
-                    typeName: "PostStatus",
                   },
                   {
                     "@type": "TypeMetadata",
@@ -803,19 +788,16 @@ describe("parser > parse actions", () => {
                   },
                 ],
                 propertyName: "posts",
-                propertyPath: "",
+                propertyPath: "POST /api/category.return.posts",
               },
             ],
             propertyName: "",
-            propertyPath: "",
+            propertyPath: "POST /api/category.return",
           },
         },
         {
           "@type": "ActionTypeMetadata",
-          body: undefined,
-          cookies: undefined,
           description: "Removes a category.",
-          headers: undefined,
           name: "DELETE /api/category/:id",
           params: {
             "@type": "TypeMetadata",
@@ -844,7 +826,6 @@ describe("parser > parse actions", () => {
             propertyName: "params",
             propertyPath: "DELETE /api/category/:id.params",
           },
-          query: undefined,
           return: {
             "@type": "TypeMetadata",
             args: [],
