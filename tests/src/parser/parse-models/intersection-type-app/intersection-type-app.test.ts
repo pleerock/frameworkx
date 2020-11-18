@@ -3,7 +3,6 @@ import { parse } from "@microframework/parser"
 describe("parse models > intersection type app", () => {
   test("model defined as intersection type", () => {
     const result = parse(__dirname + "/intersection-type-app.ts")
-    console.log(JSON.stringify(result, undefined, 2))
     const intersectionType = result.models.find(
       (it) => it.typeName === "PersonIntersectionType",
     )

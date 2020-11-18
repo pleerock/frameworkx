@@ -67,7 +67,7 @@ type PostInput = {
  */
 type PostFilterInput = {
   id: number
-  name: string
+  name: string | undefined
 }
 
 /**
@@ -75,5 +75,5 @@ type PostFilterInput = {
  */
 type CategoryInput = {
   id: number
-  name: string
+  name: string | null
 }

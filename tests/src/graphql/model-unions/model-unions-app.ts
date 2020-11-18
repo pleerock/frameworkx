@@ -2,16 +2,22 @@ import { createApp } from "@microframework/core"
 
 export const App = createApp<{
   models: {
+    BlogPostType: BlogPostType
+    NewsPostType: NewsPostType
     PostType: PostType
-    PostExtendedType:
-      | PostType
-      | { id: number; text: string; isWatched: boolean } // todo: this signature can't be supported
-    CategoryType: PostCategory | QuestionCategory
-    QuestionType: { id: number; name: string } | { id: number; title: string } // todo: this signature can't be supported
+    PostWatchedType: PostWatchedType
+    // PostExtendedType: PostType | PostWatchedType
   }
 }>()
 
 type PostType = BlogPostType | NewsPostType
+
+type PostWatchedType = {
+  id: number
+  text: string
+  watched: boolean
+  watchCount: number
+}
 
 type BlogPostType = {
   id: number
@@ -19,16 +25,6 @@ type BlogPostType = {
 }
 
 type NewsPostType = {
-  id: number
-  title: string
-}
-
-type PostCategory = {
-  id: number
-  title: string
-}
-
-type QuestionCategory = {
   id: number
   title: string
 }

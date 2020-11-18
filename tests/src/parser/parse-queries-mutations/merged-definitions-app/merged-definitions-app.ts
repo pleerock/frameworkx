@@ -26,7 +26,7 @@ type PostType = {
  */
 type PostArgs = {
   name: {
-    keyword: string
+    keyword: string | undefined
   }
 }
 

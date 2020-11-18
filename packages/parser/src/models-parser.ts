@@ -402,12 +402,12 @@ export class ModelParser {
       // if (!typeName) throw Errors.emptyGeneratedUnionName(parentName)
 
       // make sure every type in the union is reference to some other type
-      const allAllTypeReferences = typesWithoutNullAndUndefined.every(
+      const areAllTypeReferences = typesWithoutNullAndUndefined.every(
         (type) => {
           return ts.isTypeReferenceNode(type)
         },
       )
-      if (!allAllTypeReferences)
+      if (!areAllTypeReferences)
         throw Errors.unionTypeFormatNotSupported(parentName)
 
       // console.log("typesWithoutNullAndUndefined", typesWithoutNullAndUndefined)
@@ -440,6 +440,15 @@ export class ModelParser {
           }),
           false,
         )
+      }
+
+      // also make sure each referenced type is a "model" registered
+      const areAllReferencedTypesModels = properties.every((metadata) => {
+        return metadata.typeName && this.types.includes(metadata.typeName)
+      })
+      if (!areAllReferencedTypesModels) {
+        // todo: also list names not registered in the error
+        throw Errors.unionTypeFormatNotSupported(parentName)
       }
 
       return this.appendType(

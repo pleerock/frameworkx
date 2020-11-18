@@ -69,7 +69,6 @@ describe("parse models > model app", () => {
                     },
                   ],
                   propertyPath: "PostType.Args.name",
-                  typeName: "PostArgs",
                 },
               ],
             },

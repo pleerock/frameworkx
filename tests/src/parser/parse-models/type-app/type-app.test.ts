@@ -97,7 +97,6 @@ describe("parse models > type app", () => {
               ],
               propertyName: "status",
               propertyPath: "AlbumType.status",
-              typeName: "AlbumStatusType",
             },
           ],
           typeName: "AlbumType",

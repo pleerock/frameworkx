@@ -252,7 +252,7 @@ export function buildGraphQLSchema(
             (type) => type.name === property.typeName,
           )
           if (!type) {
-            // console.log(metadata)
+            console.log(metadata)
             throw new Error(
               `Cannot find type "${property.typeName}" from union type. Did you forget to register type in the app?`,
             )

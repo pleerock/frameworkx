@@ -38,8 +38,9 @@ describe("parse queries > nullable-undefined", () => {
 
   test("queries", () => {
     const postA = result.queries.find((it) => it.propertyName === "postA")!
-    expect(postA.nullable).toBe(false)
-    expect(postA.canBeUndefined).toBe(true)
+    expect(postA.returnType).not.toBe(undefined)
+    expect(postA.returnType!.nullable).toBe(false)
+    expect(postA.returnType!.canBeUndefined).toBe(true)
 
     const postAInputId = postA.args[0].properties.find(
       (it) => it.propertyName === "id",
@@ -48,8 +49,9 @@ describe("parse queries > nullable-undefined", () => {
     expect(postAInputId.canBeUndefined).toBe(false)
 
     const postB = result.queries.find((it) => it.propertyName === "postB")!
-    expect(postB.nullable).toBe(true)
-    expect(postB.canBeUndefined).toBe(false)
+    expect(postB.returnType).not.toBe(undefined)
+    expect(postB.returnType!.nullable).toBe(true)
+    expect(postB.returnType!.canBeUndefined).toBe(false)
 
     const postBInputId = postB.args[0].properties.find(
       (it) => it.propertyName === "id",
@@ -58,8 +60,9 @@ describe("parse queries > nullable-undefined", () => {
     expect(postBInputId.canBeUndefined).toBe(true)
 
     const postC = result.queries.find((it) => it.propertyName === "postC")!
-    expect(postC.nullable).toBe(true)
-    expect(postC.canBeUndefined).toBe(true)
+    expect(postC.returnType).not.toBe(undefined)
+    expect(postC.returnType!.nullable).toBe(true)
+    expect(postC.returnType!.canBeUndefined).toBe(true)
 
     const postCInputId = postC.args[0].properties.find(
       (it) => it.propertyName === "id",
@@ -70,29 +73,36 @@ describe("parse queries > nullable-undefined", () => {
 
   test("input type", () => {
     const postsA = result.queries.find((it) => it.propertyName === "postsA")!
-    expect(postsA.nullable).toBe(false)
-    expect(postsA.canBeUndefined).toBe(false)
+    expect(postsA.returnType).not.toBe(undefined)
+    expect(postsA.returnType!.nullable).toBe(false)
+    expect(postsA.returnType!.canBeUndefined).toBe(false)
 
     expect(postsA.args[0].nullable).toBe(false)
     expect(postsA.args[0].canBeUndefined).toBe(false)
 
     const postsB = result.queries.find((it) => it.propertyName === "postsB")!
-    expect(postsB.nullable).toBe(false)
-    expect(postsB.canBeUndefined).toBe(true)
+    expect(postsB.returnType).not.toBe(undefined)
+    expect(postsB.returnType!.nullable).toBe(false)
+    expect(postsB.returnType!.canBeUndefined).toBe(true)
+    expect(postsB.returnType!.array).toBe(true)
 
     expect(postsB.args[0].nullable).toBe(false)
     expect(postsB.args[0].canBeUndefined).toBe(true)
 
     const postsC = result.queries.find((it) => it.propertyName === "postsC")!
-    expect(postsC.nullable).toBe(true)
-    expect(postsC.canBeUndefined).toBe(false)
+    expect(postsC.returnType).not.toBe(undefined)
+    expect(postsC.returnType!.nullable).toBe(true)
+    expect(postsC.returnType!.canBeUndefined).toBe(false)
+    expect(postsC.returnType!.array).toBe(true)
 
     expect(postsC.args[0].nullable).toBe(true)
     expect(postsC.args[0].canBeUndefined).toBe(false)
 
     const postsD = result.queries.find((it) => it.propertyName === "postsD")!
-    expect(postsD.nullable).toBe(true)
-    expect(postsD.canBeUndefined).toBe(true)
+    expect(postsD.returnType).not.toBe(undefined)
+    expect(postsD.returnType!.nullable).toBe(true)
+    expect(postsD.returnType!.canBeUndefined).toBe(true)
+    expect(postsD.returnType!.array).toBe(true)
 
     expect(postsD.args[0].nullable).toBe(true)
     expect(postsD.args[0].canBeUndefined).toBe(true)
