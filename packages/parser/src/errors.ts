@@ -15,11 +15,74 @@ export const Errors = {
   },
 
   /**
+   * Error thrown on miscellaneous enum member signature errors.
+   */
+  enumMemberInvalid(path: string, debugPath: string) {
+    return new Error(
+      `Enum member signature is invalid at ${path} (debug path: ${debugPath})`,
+    )
+  },
+
+  /**
+   * Error thrown on miscellaneous enum member signature errors.
+   */
+  enumMemberNameMismatch(
+    propertyName: string,
+    path: string,
+    _debugPath: string,
+  ) {
+    return new Error(
+      `Invalid enum value ${propertyName} at ${path}. ` +
+        `Enum value must be initialized and value must be equal to a property name. ` +
+        `Try to set it to ${propertyName} = "${propertyName}".`,
+    )
+  },
+
+  /**
    * Error thrown when class is nameless.
    */
-  modelClassNoName(path: string, debugPath: string) {
+  classNameless(path: string, debugPath: string) {
     return new Error(
       `Class declaration must have a name at ${path} (${debugPath}).`,
+    )
+  },
+
+  /**
+   * Error thrown when interface is nameless.
+   */
+  interfaceNameless(path: string, debugPath: string) {
+    return new Error(
+      `Interface declaration must have a name at ${path} (${debugPath}).`,
+    )
+  },
+
+  /**
+   * Thrown in the cases when union is defined like { age: null | undefined }.
+   */
+  unionDoesNotContainTypes(path: string) {
+    return new Error(
+      `Type "${path}" does not contain any real type. Most probably you didn't specified anything other than "null" and "undefined" in its type.`,
+    )
+  },
+
+  /**
+   * Thrown when string literal value isn't acceptable for union creation.
+   */
+  stringLiteralValueForEnumNameInvalid(path: string, literal: string) {
+    return new Error(
+      `String literal "${literal}" in ${path} is invalid. Name should match /^[_a-zA-Z][_a-zA-Z0-9]*$/.`,
+    )
+  },
+
+  /**
+   * Thrown when union declaration isn't supported.
+   */
+  unionDeclarationNotSupported(path: string, missingPropertyNames: string[]) {
+    const missingPropertyNamesMsg = missingPropertyNames.length
+      ? `Check following properties: ${missingPropertyNames.join(", ")}.`
+      : ``
+    return new Error(
+      `Union type definition is not supported at "${path}". Only type references are allowed.${missingPropertyNamesMsg}`,
     )
   },
 
@@ -149,11 +212,6 @@ export const Errors = {
     // console.log(node)
     return new Error(`Signature not supported (kind ${node.kind}).`)
   },
-  unionTypeDoesNotContainTypes(parent: string) {
-    return new Error(
-      `Type "${parent}" does not contain any real type. Most probably you didn't specified anything other than "null" and "undefined" in its type.`,
-    )
-  },
   emptyGeneratedEnumNameFromStringLiterals(parent: string, literals: string[]) {
     return new Error(
       `Generated enum name for a string literal "${literals.join(
@@ -161,23 +219,8 @@ export const Errors = {
       )}" in "${parent}" is empty.`,
     )
   },
-  invalidStringLiteralValueForEnumName(parent: string, literal: string) {
-    return new Error(
-      `String literal "${literal}" in ${parent} is not valid. It should match /^[_a-zA-Z][_a-zA-Z0-9]*$/.`,
-    )
-  },
   emptyGeneratedUnionName(parent: string) {
     return new Error(`Generated union name in "${parent}" is empty.`)
-  },
-  unionTypeFormatNotSupported(parent: string) {
-    return new Error(
-      `Union type definition is not supported at "${parent}". Only type references are allowed.`,
-    )
-  },
-  modelInterfaceNoName(parent: string) {
-    return new Error(
-      `Interface does not have a name${parent ? ` at "${parent}"` : ""}.`,
-    )
   },
   typeReferenceInvalidName(parent: string) {
     return new Error(
@@ -194,16 +237,6 @@ export const Errors = {
   cannotResolveTypeReference(typeName: string, parent: string) {
     return new Error(
       `Cannot resolve type of ${typeName}${parent ? ` at "${parent}"` : ""}.`,
-    )
-  },
-  enumPropertyInvalid(parent: string, propertyName: string) {
-    return new Error(
-      `Invalid enum value ${propertyName} at ${parent}. Enum value must be initialized and initialized value must be equal to property name. Try to set it to ${propertyName} = "${propertyName}".`,
-    )
-  },
-  enumPropertyMustMatchValue(parent: string, propertyName: string) {
-    return new Error(
-      `Invalid enum value ${propertyName} at ${parent}. Enum value must match its property name. Try to set it to ${propertyName} = "${propertyName}".`,
     )
   },
   methodNoReturningType(parent: string, propertyName: string) {

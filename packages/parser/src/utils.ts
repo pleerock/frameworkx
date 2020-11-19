@@ -1,27 +1,15 @@
 import * as ts from "typescript"
 
-/**
- * Checks if given node is exported or not.
- */
-export function isNodeExported(node: ts.Node): boolean {
-  return (
-    ts.ModifierFlags.Export !== 0 ||
-    (!!node.parent && node.parent.kind === ts.SyntaxKind.SourceFile)
-  )
-}
-
-export function camelize(str: string) {
-  return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
-    if (+match === 0) return "" // or if (/\s+/.test(match)) for white spaces
-    return index == 0 ? match.toLowerCase() : match.toUpperCase()
-  })
-}
-
-export function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
 export const ParserUtils = {
+  /**
+   * Checks if given node is exported or not.
+   */
+  isNodeExported(node: ts.Node): boolean {
+    return (
+      ts.ModifierFlags.Export !== 0 ||
+      (!!node.parent && node.parent.kind === ts.SyntaxKind.SourceFile)
+    )
+  },
   normalizeTextSymbol(symbol: string): string {
     if (symbol.substr(0, 1) === `"`) {
       symbol = symbol.substr(1)

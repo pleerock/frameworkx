@@ -7,19 +7,9 @@ import {
 import * as ts from "typescript"
 import { Errors } from "./errors"
 import { ModelParser } from "./models-parser"
-import { DefaultParserNamingStrategy } from "./naming-strategy"
-import { ParserOptions } from "./options"
-import { isNodeExported, ParserUtils } from "./utils"
+import { ParserUtils } from "./utils"
 
-export function parse(
-  appFileName: string,
-  options: ParserOptions = {},
-): ApplicationTypeMetadata {
-  // -- private properties --
-  if (!options.namingStrategy) {
-    options.namingStrategy = DefaultParserNamingStrategy
-  }
-
+export function parse(appFileName: string): ApplicationTypeMetadata {
   // create a TypeScript program
   const program = ts.createProgram([appFileName], {
     target: ts.ScriptTarget.ES5,
@@ -92,7 +82,7 @@ export function parse(
     if (!declaration) return []
 
     // parse members
-    const modelParser = new ModelParser(program, options, modelsAndInputs, 1)
+    const modelParser = new ModelParser(program, modelsAndInputs, 1)
     const actions = modelParser.parse(
       declaration,
       "",
@@ -156,7 +146,7 @@ export function parse(
 
     // parse members
     // const typeChecker = program.getTypeChecker()
-    const modelParser = new ModelParser(program, options, modelsAndInputs, 2)
+    const modelParser = new ModelParser(program, modelsAndInputs, 2)
 
     const declaration2 = ParserUtils.findTypeLiteralProperty(
       appDefOptions,
@@ -234,7 +224,7 @@ export function parse(
     )
     if (!declaration) return []
 
-    const modelParser = new ModelParser(program, options, modelsAndInputs, 1)
+    const modelParser = new ModelParser(program, modelsAndInputs, 1)
     const type = modelParser.parse(declaration, "", "app.queries", false)
     // console.log(JSON.stringify(type, undefined, 2))
     return type.properties
@@ -249,7 +239,7 @@ export function parse(
     if (!modelsMember) return []
     // throw Errors.appModelsInvalidSignature()
 
-    const modelParser = new ModelParser(program, options, modelsAndInputs, 1)
+    const modelParser = new ModelParser(program, modelsAndInputs, 1)
     return modelParser.parse(modelsMember, "", "app.mutations", false)
       .properties
   }
@@ -265,7 +255,7 @@ export function parse(
     if (!modelsMember) return []
     // throw Errors.appModelsInvalidSignature()
 
-    const modelParser = new ModelParser(program, options, modelsAndInputs, 1)
+    const modelParser = new ModelParser(program, modelsAndInputs, 1)
     return modelParser.parse(
       modelsMember,
       "",
@@ -287,7 +277,9 @@ export function parse(
 
   // find all exported nodes from app file
   const exportedNodes = appSourceFile.statements.filter((statement) => {
-    return isNodeExported(statement) && ts.isVariableStatement(statement)
+    return (
+      ParserUtils.isNodeExported(statement) && ts.isVariableStatement(statement)
+    )
   })
 
   // validate app file content
