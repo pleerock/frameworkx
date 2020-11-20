@@ -44,6 +44,21 @@ export const App = createApp<{
       type: "common" | "bounced"
     }
   }
+  subscriptions: {
+    onPostSave(args: PostInput): PostType
+    onPostsSave(args: { status: StatusEnum }): StatusEnum
+    onQuestionSave(args: {
+      id: number
+      status: StatusEnum | BanStatusEnum
+      category: QuestionCategoryEnum
+      type: "common" | "bounced"
+    }): {
+      id: number
+      status: StatusEnum | BanStatusEnum
+      category: QuestionCategoryEnum
+      type: "common" | "bounced"
+    }
+  }
 }>()
 
 /**
