@@ -2,117 +2,93 @@ import { createApp } from "@microframework/core"
 
 export const App = createApp<{
   models: {
-    PostSimpleType: PostSimpleType[]
     PostType: PostType
-    CategoryType: CategoryGeneralType[] & CategoryMetaType[]
-    PostCategoryType: {
-      post: PostType[]
-      category: (CategoryGeneralType & CategoryMetaType)[]
+    QuestionType: {
+      id: number
+      names: string[]
+      categories: CategoryType[]
     }
-    QuestionType: QuestionType[] & { answers: string }[]
-    AnswerType: ({ id: number } & { names: string[] })[]
+    QuestionAnswerType: QuestionAnswerType
+    PostCategoryType: {
+      posts: PostType[]
+      categories: (CategoryType & CountersType)[]
+    }
   }
   inputs: {
-    PostSimpleInput: PostSimpleInput[]
-    PostInput: PostInput[]
-    CategoryInput: CategoryGeneralType[] & CategoryMetaType[]
-    PostCategoryInput: {
-      post: PostInput[]
-      category: (CategoryGeneralType & CategoryMetaType)[]
-    }
-    QuestionInput: QuestionInput[] & { answer: string }[]
-    AnswerInput: ({ id: number } & { names: string[] })[]
+    PostInput: PostInput
+    CategoryInput: CategoryInput
   }
   queries: {
-    postSimple(args: PostSimpleInput[]): PostSimpleType[]
-    post(args: PostInput[]): PostType[]
-    posts(args: { posts: PostInput[] }): { posts: PostType[] }[]
-    category(
-      args: CategoryGeneralType[] & CategoryMetaType[],
-    ): CategoryGeneralType[] & CategoryMetaType[]
-    categories(
-      args: (CategoryGeneralType & CategoryMetaType)[],
-    ): (CategoryGeneralType & CategoryMetaType)[]
-    question(
-      args: QuestionInput[] & { isWatched: boolean }[],
-    ): QuestionType[] & { answers: string[] }
-    answer(
-      args: { id: number | undefined } & { names: string[] | null },
-    ): ({ id: number | undefined } & { names: string[] | null })[]
+    post(args: PostInput): PostType
+    posts(args: { posts: PostInput[] }): PostType[]
+    categories(args: {
+      categories: (CategoryInput & CountersType)[]
+    }): (CategoryType & CountersType)[]
+    // questions(args: {
+    //   questions: QuestionType[] | QuestionAnswerType[]
+    // }): QuestionType[] | QuestionAnswerType[]
+    // mixedQuestions(args: {
+    //   questions: (QuestionType | QuestionAnswerType)[]
+    // }): (QuestionType | QuestionAnswerType)[]
   }
   mutations: {
     postSave(args: PostInput): PostType
-    postsSave(args: { post: PostInput }): { post: PostType }[]
-    postsBulkSave(args: { post: PostInput[] }[]): { post: PostType[] }[]
-    categorySave(
-      args: CategoryGeneralType & CategoryMetaType,
-    ): CategoryGeneralType & CategoryMetaType
-    categoryBulkSave(
-      args: (CategoryGeneralType & CategoryMetaType)[],
-    ): (CategoryGeneralType & CategoryMetaType)[]
-    questionSave(
-      args: QuestionInput & { isWatched: boolean },
-    ): QuestionType & { answer: string }
-    answerSave(
-      args: { id: number | undefined } & { name: string[] | null },
-    ): ({ id: number | undefined } & { name: string[] | null })[]
-  }
-  subscriptions: {
-    onSimplePostSave(): PostSimpleType[]
-    onPostSave(): PostType[]
-    onPostsSave(): { posts: PostType[] }[]
-    onCategorySave(): CategoryGeneralType[] & CategoryMetaType[]
-    onCategoryBulkSave(): (CategoryGeneralType & CategoryMetaType)[]
-    onQuestionSave(): QuestionType[] & { answers: string[] }
-    onAnswerSave(): ({ id: number } & { names: string[] })[]
+    postsSave(args: { ids: number[] }): PostType[]
+    categoriesSave(): (CategoryType & CountersType)[]
+    // questionsSave(): QuestionType[] | QuestionAnswerType[]
+    // mixedQuestionsSave(args: {
+    //   ids: number[]
+    // }): (QuestionType | QuestionAnswerType)[]
   }
 }>()
 
-type PostSimpleType = {
+// ------------------------------------------------
+
+type PostType = {
   id: number
-  titles: string[]
-}
-type PostType = { id: number }
-
-type PostSimpleInput = {
-  id: number
-  titles: string[]
-}
-type PostInput = PostGeneralType & PostMetaType
-
-type QuestionType = QuestionGeneralType & QuestionMetaType
-
-type QuestionInput = QuestionGeneralType & QuestionMetaType
-
-type PostGeneralType = {
-  id: number
-  titles: string[] | undefined
-}
-
-type PostMetaType = {
-  ratings: number[] | null
+  tags: string[]
+  watches: boolean[]
+  categories: CategoryType[]
   statuses: StatusEnum[]
 }
 
-type CategoryGeneralType = {
+class CategoryType {
+  id!: number
+  names!: string[]
+  posts!: PostType[]
+}
+
+interface CountersType {
+  votes: bigint[]
+  comments: number[]
+}
+
+type QuestionAnswerType = {
+  id: string
+  answers: (AnswerType & CountersType)[] | undefined
+}
+
+interface AnswerType {
+  text: string
+}
+
+// ------------------------------------------------
+
+type PostInput = {
   id: number
-  titles: string[]
-  posts: PostType[]
+  tags: string[]
+  watches: boolean[]
+  categories: CategoryInput[]
+  statuses: StatusEnum[]
 }
 
-type CategoryMetaType = {
-  ratings: bigint[]
+class CategoryInput {
+  id!: number
+  names!: string[]
+  posts!: PostInput[]
 }
 
-type QuestionGeneralType = {
-  id: number
-  title: string
-}
-
-type QuestionMetaType = {
-  ratings: number[]
-  isAnswered: boolean[]
-}
+// ------------------------------------------------
 
 enum StatusEnum {
   /**

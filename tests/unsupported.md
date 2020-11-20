@@ -6,7 +6,8 @@ export const App = createApp<{
   }
   queries: {
     post(args: PostInput[]): PostType & PostType2[]
-    post(args: PostInput[]): PostType[] & PostType2[]
+    post(): PostType[] & PostType2[]
+    post(args: PostInput | PostInput2)
   }
   mutations: {
   }

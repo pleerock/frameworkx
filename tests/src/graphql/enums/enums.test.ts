@@ -66,7 +66,7 @@ describe("graphql > schema builder", () => {
   )
   const questionSaveArgsTypeEnum = schema.getType("QuestionSaveArgsTypeEnum")
 
-  describe("model with referenced enum type", () => {
+  describe("enum types", () => {
     test("should properly create all GraphQL types", () => {
       const types = getRealTypes(
         Object.keys(schema.getTypeMap()).map((key) => key),
