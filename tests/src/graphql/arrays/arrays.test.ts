@@ -444,5 +444,134 @@ describe("graphql > schema builder", () => {
       expect(isScalarType(comments.type.ofType.ofType)).toBe(true)
       expect(comments.type.ofType.ofType.name).toBe("Int")
     })
+
+    test("arrays in mutations - case #1", () => {
+      const mutation = schema.getMutationType()
+      expect(mutation).not.toBe(undefined)
+
+      const postSaveField = mutation!.getFields()["postSave"]
+      if (!isNonNullType(postSaveField.type)) fail("PostType is nullable")
+      expect(postSaveField.type.ofType.name).toBe("PostType")
+      expect(postSaveField.args.length).toBe(5)
+
+      // ------------------------------------------------
+
+      const tags = postSaveField.args.find((it) => it.name === "tags")
+      expect(tags).not.toBe(undefined)
+
+      if (!isNonNullType(tags!.type)) fail(`"tags" is nullable`)
+      expect(isListType(tags!.type.ofType)).toBe(true)
+      expect(isScalarType(tags!.type.ofType.ofType)).toBe(true)
+      expect(tags!.type.ofType.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const watches = postSaveField.args.find((it) => it.name === "watches")
+      expect(watches).not.toBe(undefined)
+
+      if (!isNonNullType(watches!.type)) fail(`"watches" is nullable`)
+      expect(isListType(watches!.type.ofType)).toBe(true)
+      expect(isScalarType(watches!.type.ofType.ofType)).toBe(true)
+      expect(watches!.type.ofType.ofType.name).toBe("Boolean")
+
+      // ------------------------------------------------
+
+      const categories = postSaveField.args.find(
+        (it) => it.name === "categories",
+      )
+      expect(categories).not.toBe(undefined)
+
+      if (!isNonNullType(categories!.type)) fail(`"categories" is nullable`)
+      expect(isListType(categories!.type.ofType)).toBe(true)
+      expect(isInputObjectType(categories!.type.ofType.ofType)).toBe(true)
+      expect(categories!.type.ofType.ofType.name).toBe("CategoryInput")
+
+      // ------------------------------------------------
+
+      const statuses = postSaveField.args.find((it) => it.name === "statuses")
+      expect(statuses).not.toBe(undefined)
+
+      if (!isNonNullType(statuses!.type)) fail(`"statuses" is nullable`)
+      expect(isListType(statuses!.type.ofType)).toBe(true)
+      expect(isEnumType(statuses!.type.ofType.ofType)).toBe(true)
+      expect(statuses!.type.ofType.ofType.name).toBe("PostInputStatusesEnum")
+    })
+
+    test("arrays in mutations - case #2", () => {
+      const mutation = schema.getMutationType()
+      expect(mutation).not.toBe(undefined)
+
+      const postsSaveField = mutation!.getFields()["postsSave"]
+      if (!isNonNullType(postsSaveField.type)) fail("PostType is nullable")
+      expect(isListType(postsSaveField.type.ofType)).toBe(true)
+      expect(isObjectType(postsSaveField.type.ofType.ofType)).toBe(true)
+      expect(postsSaveField.type.ofType.ofType.name).toBe("PostType")
+      expect(postsSaveField.args.length).toBe(1)
+
+      // ------------------------------------------------
+
+      const posts = postsSaveField.args.find((it) => it.name === "posts")
+      expect(posts).not.toBe(undefined)
+
+      if (!isNonNullType(posts!.type)) fail(`"posts" is nullable`)
+      expect(isListType(posts!.type.ofType)).toBe(true)
+      expect(isInputObjectType(posts!.type.ofType.ofType)).toBe(true)
+      expect(posts!.type.ofType.ofType.name).toBe("PostInput")
+    })
+
+    test("arrays in mutations - case #3", () => {
+      const mutation = schema.getMutationType()
+      expect(mutation).not.toBe(undefined)
+
+      const categoriesSaveField = mutation!.getFields()["categoriesSave"]
+      if (!isNonNullType(categoriesSaveField.type))
+        fail("CategoryType is nullable")
+      expect(isListType(categoriesSaveField.type.ofType)).toBe(true)
+      expect(isObjectType(categoriesSaveField.type.ofType.ofType)).toBe(true)
+      expect(categoriesSaveField.type.ofType.ofType.name).toBe(
+        "CategoriesSaveReturnModel",
+      )
+      expect(categoriesSaveField.args.length).toBe(1)
+
+      // ------------------------------------------------
+
+      const categories = categoriesSaveField.args.find(
+        (it) => it.name === "categories",
+      )
+      expect(categories).not.toBe(undefined)
+
+      if (!isNonNullType(categories!.type)) fail(`"categories" is nullable`)
+      expect(isListType(categories!.type.ofType)).toBe(true)
+      expect(isInputObjectType(categories!.type.ofType.ofType)).toBe(true)
+      expect(categories!.type.ofType.ofType.name).toBe(
+        "CategoriesSaveArgsCategoriesInput",
+      )
+
+      const categoryFields = categories!.type.ofType.ofType.getFields()
+
+      const names = categoryFields["names"]
+      if (!isNonNullType(names.type)) fail(`"names" is nullable`)
+      expect(isListType(names.type.ofType)).toBe(true)
+      expect(isScalarType(names.type.ofType.ofType)).toBe(true)
+      expect(names.type.ofType.ofType.name).toBe("String")
+
+      const posts = categoryFields["posts"]
+      if (!isNonNullType(posts.type)) fail(`"posts" is nullable`)
+      expect(isListType(posts.type.ofType)).toBe(true)
+      expect(isInputObjectType(posts.type.ofType.ofType)).toBe(true)
+      expect(posts.type.ofType.ofType.name).toBe("PostInput")
+
+      const votes = categoryFields["votes"]
+      if (!isNonNullType(votes.type)) fail(`"votes" is nullable`)
+      expect(isListType(votes.type.ofType)).toBe(true)
+      expect(isScalarType(votes.type.ofType.ofType)).toBe(true)
+      expect(votes.type.ofType.ofType.name).toBe("BigInt")
+
+      const comments = categoryFields["comments"]
+      if (!isNonNullType(comments.type)) fail(`"comments" is nullable`)
+      expect(isListType(comments.type.ofType)).toBe(true)
+      expect(isScalarType(comments.type.ofType.ofType)).toBe(true)
+      expect(comments.type.ofType.ofType.name).toBe("Int")
+    })
   })
 })

@@ -32,6 +32,13 @@ export const App = createApp<{
       categories: (CategoryInput & CountersType)[]
     }): (CategoryType & CountersType)[]
   }
+  subscriptions: {
+    onPostSave(args: PostInput): PostType
+    onPostsSave(args: { posts: PostInput[] }): PostType[]
+    onCategoriesSave(args: {
+      categories: (CategoryInput & CountersType)[]
+    }): (CategoryType & CountersType)[]
+  }
 }>()
 
 // ------------------------------------------------
