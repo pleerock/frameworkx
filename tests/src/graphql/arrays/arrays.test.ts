@@ -3,7 +3,14 @@ import {
   buildGraphQLSchema,
   DefaultNamingStrategy,
 } from "@microframework/graphql"
-import { isEnumType, isListType, isNonNullType, isObjectType } from "graphql"
+import {
+  isEnumType,
+  isInputObjectType,
+  isListType,
+  isNonNullType,
+  isObjectType,
+  isScalarType,
+} from "graphql"
 import { getRealTypes } from "../../util/test-common"
 
 describe("graphql > schema builder", () => {
@@ -40,6 +47,7 @@ describe("graphql > schema builder", () => {
         "CategoriesReturnModel",
         "CategoriesArgsCategoriesInput",
         "CategoriesSaveReturnModel",
+        "CategoriesSaveArgsCategoriesInput",
       ])
     })
 
@@ -221,16 +229,219 @@ describe("graphql > schema builder", () => {
       const names = categoryFields["names"]
       if (!isNonNullType(names.type)) fail(`"names" is nullable`)
       expect(isListType(names.type.ofType)).toBe(true)
+      expect(isScalarType(names.type.ofType.ofType)).toBe(true)
       expect(names.type.ofType.ofType.name).toBe("String")
 
       const votes = categoryFields["votes"]
       if (!isNonNullType(votes.type)) fail(`"votes" is nullable`)
       expect(isListType(votes.type.ofType)).toBe(true)
+      expect(isScalarType(votes.type.ofType.ofType)).toBe(true)
       expect(votes.type.ofType.ofType.name).toBe("BigInt")
 
       const comments = categoryFields["comments"]
       if (!isNonNullType(comments.type)) fail(`"comments" is nullable`)
       expect(isListType(comments.type.ofType)).toBe(true)
+      expect(isScalarType(comments.type.ofType.ofType)).toBe(true)
+      expect(comments.type.ofType.ofType.name).toBe("Int")
+    })
+
+    test("arrays in inputs", () => {
+      const postInput = schema.getType("PostInput")
+      expect(postInput).not.toBe(undefined)
+
+      if (!isInputObjectType(postInput)) fail("PostInput is not an object type")
+      expect(postInput.name).toBe("PostInput")
+
+      const fields = postInput.getFields()
+
+      // ------------------------------------------------
+
+      const tags = fields["tags"]
+      expect(tags).not.toBe(undefined)
+      if (!isNonNullType(tags.type)) fail(`"tags" is nullable`)
+      expect(isNonNullType(tags.type)).toBe(true)
+      expect(isListType(tags.type.ofType)).toBe(true)
+      expect(tags.type.ofType.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const watches = fields["watches"]
+      expect(watches).not.toBe(undefined)
+      if (!isNonNullType(watches.type)) fail(`"watches" is nullable`)
+      expect(isListType(watches.type.ofType)).toBe(true)
+      expect(isScalarType(watches.type.ofType.ofType)).toBe(true)
+      expect(watches.type.ofType.ofType.name).toBe("Boolean")
+
+      // ------------------------------------------------
+
+      const categories = fields["categories"]
+      expect(categories).not.toBe(undefined)
+      if (!isNonNullType(categories.type)) fail(`"categories" is nullable`)
+      expect(isNonNullType(categories.type)).toBe(true)
+      expect(isListType(categories.type.ofType)).toBe(true)
+
+      const categoryInput = categories.type.ofType.ofType
+      expect(categoryInput.name).toBe("CategoryInput")
+
+      if (!isInputObjectType(categoryInput))
+        fail(`"categories" is not an object`)
+      const categoryFields = categoryInput.getFields()
+
+      const categoryNames = categoryFields["names"]
+      expect(categoryNames).not.toBe(undefined)
+      if (!isNonNullType(categoryNames.type))
+        fail(`"categoryNames" is nullable`)
+      expect(isNonNullType(categoryNames.type)).toBe(true)
+      expect(isListType(categoryNames.type.ofType)).toBe(true)
+
+      const categoryPosts = categoryFields["posts"]
+      expect(categoryPosts).not.toBe(undefined)
+      if (!isNonNullType(categoryPosts.type))
+        fail(`"categoryPosts" is nullable`)
+      expect(isNonNullType(categoryPosts.type)).toBe(true)
+
+      expect(isListType(categoryPosts.type.ofType)).toBe(true)
+
+      const categoryPostType = categoryPosts.type.ofType.ofType
+      expect(categoryPostType.name).toBe("PostInput")
+      if (!isInputObjectType(categoryPostType)) fail(`"posts" is not an object`)
+
+      // ------------------------------------------------
+
+      const statuses = fields["statuses"]
+      expect(statuses).not.toBe(undefined)
+      if (!isNonNullType(statuses.type)) fail(`"statuses" is nullable`)
+      expect(isNonNullType(statuses.type)).toBe(true)
+      expect(isListType(statuses.type.ofType)).toBe(true)
+
+      const statusEnum = statuses.type.ofType.ofType
+      expect(statusEnum.name).toBe("PostInputStatusesEnum")
+      expect(isEnumType(statusEnum)).toBe(true)
+    })
+
+    test("arrays in queries - case #1", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const postField = query!.getFields()["post"]
+      if (!isNonNullType(postField.type)) fail("PostType is nullable")
+      expect(postField.type.ofType.name).toBe("PostType")
+      expect(postField.args.length).toBe(5)
+
+      // ------------------------------------------------
+
+      const tags = postField.args.find((it) => it.name === "tags")
+      expect(tags).not.toBe(undefined)
+
+      if (!isNonNullType(tags!.type)) fail(`"tags" is nullable`)
+      expect(isListType(tags!.type.ofType)).toBe(true)
+      expect(isScalarType(tags!.type.ofType.ofType)).toBe(true)
+      expect(tags!.type.ofType.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const watches = postField.args.find((it) => it.name === "watches")
+      expect(watches).not.toBe(undefined)
+
+      if (!isNonNullType(watches!.type)) fail(`"watches" is nullable`)
+      expect(isListType(watches!.type.ofType)).toBe(true)
+      expect(isScalarType(watches!.type.ofType.ofType)).toBe(true)
+      expect(watches!.type.ofType.ofType.name).toBe("Boolean")
+
+      // ------------------------------------------------
+
+      const categories = postField.args.find((it) => it.name === "categories")
+      expect(categories).not.toBe(undefined)
+
+      if (!isNonNullType(categories!.type)) fail(`"categories" is nullable`)
+      expect(isListType(categories!.type.ofType)).toBe(true)
+      expect(isInputObjectType(categories!.type.ofType.ofType)).toBe(true)
+      expect(categories!.type.ofType.ofType.name).toBe("CategoryInput")
+
+      // ------------------------------------------------
+
+      const statuses = postField.args.find((it) => it.name === "statuses")
+      expect(statuses).not.toBe(undefined)
+
+      if (!isNonNullType(statuses!.type)) fail(`"statuses" is nullable`)
+      expect(isListType(statuses!.type.ofType)).toBe(true)
+      expect(isEnumType(statuses!.type.ofType.ofType)).toBe(true)
+      expect(statuses!.type.ofType.ofType.name).toBe("PostInputStatusesEnum")
+    })
+
+    test("arrays in queries - case #2", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const postsField = query!.getFields()["posts"]
+      if (!isNonNullType(postsField.type)) fail("PostType is nullable")
+      expect(isListType(postsField.type.ofType)).toBe(true)
+      expect(isObjectType(postsField.type.ofType.ofType)).toBe(true)
+      expect(postsField.type.ofType.ofType.name).toBe("PostType")
+      expect(postsField.args.length).toBe(1)
+
+      // ------------------------------------------------
+
+      const posts = postsField.args.find((it) => it.name === "posts")
+      expect(posts).not.toBe(undefined)
+
+      if (!isNonNullType(posts!.type)) fail(`"posts" is nullable`)
+      expect(isListType(posts!.type.ofType)).toBe(true)
+      expect(isInputObjectType(posts!.type.ofType.ofType)).toBe(true)
+      expect(posts!.type.ofType.ofType.name).toBe("PostInput")
+    })
+
+    test("arrays in queries - case #3", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const categoriesField = query!.getFields()["categories"]
+      if (!isNonNullType(categoriesField.type)) fail("CategoryType is nullable")
+      expect(isListType(categoriesField.type.ofType)).toBe(true)
+      expect(isObjectType(categoriesField.type.ofType.ofType)).toBe(true)
+      expect(categoriesField.type.ofType.ofType.name).toBe(
+        "CategoriesReturnModel",
+      )
+      expect(categoriesField.args.length).toBe(1)
+
+      // ------------------------------------------------
+
+      const categories = categoriesField.args.find(
+        (it) => it.name === "categories",
+      )
+      expect(categories).not.toBe(undefined)
+
+      if (!isNonNullType(categories!.type)) fail(`"categories" is nullable`)
+      expect(isListType(categories!.type.ofType)).toBe(true)
+      expect(isInputObjectType(categories!.type.ofType.ofType)).toBe(true)
+      expect(categories!.type.ofType.ofType.name).toBe(
+        "CategoriesArgsCategoriesInput",
+      )
+
+      const categoryFields = categories!.type.ofType.ofType.getFields()
+
+      const names = categoryFields["names"]
+      if (!isNonNullType(names.type)) fail(`"names" is nullable`)
+      expect(isListType(names.type.ofType)).toBe(true)
+      expect(isScalarType(names.type.ofType.ofType)).toBe(true)
+      expect(names.type.ofType.ofType.name).toBe("String")
+
+      const posts = categoryFields["posts"]
+      if (!isNonNullType(posts.type)) fail(`"posts" is nullable`)
+      expect(isListType(posts.type.ofType)).toBe(true)
+      expect(isInputObjectType(posts.type.ofType.ofType)).toBe(true)
+      expect(posts.type.ofType.ofType.name).toBe("PostInput")
+
+      const votes = categoryFields["votes"]
+      if (!isNonNullType(votes.type)) fail(`"votes" is nullable`)
+      expect(isListType(votes.type.ofType)).toBe(true)
+      expect(isScalarType(votes.type.ofType.ofType)).toBe(true)
+      expect(votes.type.ofType.ofType.name).toBe("BigInt")
+
+      const comments = categoryFields["comments"]
+      if (!isNonNullType(comments.type)) fail(`"comments" is nullable`)
+      expect(isListType(comments.type.ofType)).toBe(true)
+      expect(isScalarType(comments.type.ofType.ofType)).toBe(true)
       expect(comments.type.ofType.ofType.name).toBe("Int")
     })
   })

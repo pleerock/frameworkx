@@ -24,21 +24,13 @@ export const App = createApp<{
     categories(args: {
       categories: (CategoryInput & CountersType)[]
     }): (CategoryType & CountersType)[]
-    // questions(args: {
-    //   questions: QuestionType[] | QuestionAnswerType[]
-    // }): QuestionType[] | QuestionAnswerType[]
-    // mixedQuestions(args: {
-    //   questions: (QuestionType | QuestionAnswerType)[]
-    // }): (QuestionType | QuestionAnswerType)[]
   }
   mutations: {
     postSave(args: PostInput): PostType
-    postsSave(args: { ids: number[] }): PostType[]
-    categoriesSave(): (CategoryType & CountersType)[]
-    // questionsSave(): QuestionType[] | QuestionAnswerType[]
-    // mixedQuestionsSave(args: {
-    //   ids: number[]
-    // }): (QuestionType | QuestionAnswerType)[]
+    postsSave(args: { posts: PostInput[] }): PostType[]
+    categoriesSave(args: {
+      categories: (CategoryInput & CountersType)[]
+    }): (CategoryType & CountersType)[]
   }
 }>()
 
