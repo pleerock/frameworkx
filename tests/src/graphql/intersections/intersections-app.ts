@@ -13,23 +13,22 @@ export const App = createApp<{
   }
   inputs: {
     PostInput: PostInput
-    CategoryInput: CategoryGeneralType & CategoryMetaType
+    CategoryInput: CategoryGeneralInput & CategoryMetaInput
     PostCategoryInput: {
       post: PostInput
-      category: CategoryGeneralType & CategoryMetaType
+      category: CategoryGeneralInput & CategoryMetaInput
     }
     QuestionInput: QuestionInput & { answer: string }
     AnswerInput: { id: number } & { name: string }
   }
   queries: {
     post(args: PostInput): PostType
-    posts(args: { post: PostInput[] }): { post: PostType[] }[]
+    posts(args: {
+      post: PostInput & { isWatched: boolean }
+    }): { post: PostType & { isWatched: boolean } }
     category(
-      args: CategoryGeneralType & CategoryMetaType,
+      args: CategoryGeneralInput & CategoryMetaInput,
     ): CategoryGeneralType & CategoryMetaType
-    categories(
-      args: (CategoryGeneralType & CategoryMetaType)[],
-    ): (CategoryGeneralType & CategoryMetaType)[]
     question(
       args: QuestionInput & { isWatched: boolean },
     ): QuestionType & { answer: string }
@@ -39,14 +38,12 @@ export const App = createApp<{
   }
   mutations: {
     postSave(args: PostInput): PostType
-    postsSave(args: { post: PostInput }): { post: PostType }[]
-    postsBulkSave(args: { post: PostInput[] }[]): { post: PostType[] }[]
+    postsSave(args: {
+      post: PostInput & { isWatched: boolean }
+    }): { post: PostType & { isWatched: boolean } }
     categorySave(
-      args: CategoryGeneralType & CategoryMetaType,
+      args: CategoryGeneralInput & CategoryMetaInput,
     ): CategoryGeneralType & CategoryMetaType
-    categoryBulkSave(
-      args: (CategoryGeneralType & CategoryMetaType)[],
-    ): (CategoryGeneralType & CategoryMetaType)[]
     questionSave(
       args: QuestionInput & { isWatched: boolean },
     ): QuestionType & { answer: string }
@@ -55,24 +52,31 @@ export const App = createApp<{
     ): { id: number | undefined } & { name: string | null }
   }
   subscriptions: {
-    onPostSave(): PostType
-    onPostsSave(): { post: PostType }[]
-    onCategorySave(): CategoryGeneralType & CategoryMetaType
-    onCategoryBulkSave(): (CategoryGeneralType & CategoryMetaType)[]
-    onQuestionSave(): QuestionType & { answer: string }
-    onAnswerSave(): { id: number } & { name: string }
+    onPostSave(args: PostInput): PostType
+    onPostsSave(args: {
+      post: PostInput & { isWatched: boolean }
+    }): { post: PostType & { isWatched: boolean } }
+    onCategorySave(
+      args: CategoryGeneralInput & CategoryMetaInput,
+    ): CategoryGeneralType & CategoryMetaType
+    onQuestionSave(
+      args: QuestionInput & { isWatched: boolean },
+    ): QuestionType & { answer: string }
+    onAnswerSave(
+      args: { id: number | undefined } & { name: string | null },
+    ): { id: number | undefined } & { name: string | null }
   }
 }>()
+
+// ------------------------------------------------
 
 type PostType = PostGeneralType & PostMetaType
 type QuestionType = QuestionGeneralType & QuestionMetaType
 
-type PostInput = PostGeneralType & PostMetaType
-type QuestionInput = QuestionGeneralType & QuestionMetaType
-
 type PostGeneralType = {
   id: number
   title: string | undefined
+  categories: CategoryGeneralType & CategoryMetaType
 }
 
 type PostMetaType = {
@@ -82,10 +86,11 @@ type PostMetaType = {
 type CategoryGeneralType = {
   id: number
   title: string
+  post: PostType
 }
 
 type CategoryMetaType = {
-  rating: number
+  rating: bigint
 }
 
 type QuestionGeneralType = {
@@ -94,5 +99,39 @@ type QuestionGeneralType = {
 }
 
 type QuestionMetaType = {
+  rating: number
+}
+
+// ------------------------------------------------
+
+type PostInput = PostGeneralInput & PostMetaInput
+type QuestionInput = QuestionGeneralInput & QuestionMetaInput
+
+type PostGeneralInput = {
+  id: number
+  title: string | undefined
+  categories: CategoryGeneralInput & CategoryMetaInput
+}
+
+type PostMetaInput = {
+  rating: number | null
+}
+
+type CategoryGeneralInput = {
+  id: number
+  title: string
+  post: PostInput
+}
+
+type CategoryMetaInput = {
+  rating: number
+}
+
+type QuestionGeneralInput = {
+  id: number
+  title: string
+}
+
+type QuestionMetaInput = {
   rating: number
 }

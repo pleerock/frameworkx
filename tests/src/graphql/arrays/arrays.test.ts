@@ -14,7 +14,7 @@ import {
 import { getRealTypes } from "../../util/test-common"
 
 describe("graphql > schema builder", () => {
-  describe("app types defined with arrays", () => {
+  describe("application defined with arrays", () => {
     const appMetadata = parse(__dirname + "/arrays-app.ts")
     const schema = buildGraphQLSchema({
       assert: false,

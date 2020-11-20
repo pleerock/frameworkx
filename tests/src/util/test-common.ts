@@ -28,6 +28,7 @@ export function sleep(ms: number): Promise<void> {
 export function getRealTypes(types: string[]): string[] {
   const excluded = [
     "Int",
+    "BigInt",
     "String",
     "Boolean",
     "Model",
