@@ -4,6 +4,7 @@ import {
   DefaultNamingStrategy,
 } from "@microframework/graphql"
 import {
+  GraphQLField,
   isListType,
   isNonNullType,
   isNullableType,
@@ -128,6 +129,9 @@ describe("graphql > schema builder", () => {
 
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
+      expect(categoryRating.description).toBe("Category rating")
+      expect(categoryRating.isDeprecated).toBe(true)
+      expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)
       expect(isScalarType(categoryRating.type.ofType)).toBe(true)
@@ -137,6 +141,7 @@ describe("graphql > schema builder", () => {
 
       const rating = fields["rating"]
       expect(rating).not.toBe(undefined)
+      expect(rating.description).toBe("Post rating")
       if (!isNullableType(rating.type)) fail(`"rating" is not nullable`)
       if (!isScalarType(rating.type)) fail(`"rating" is not nullable`)
       expect(rating.type.name).toBe("Int")
@@ -192,6 +197,7 @@ describe("graphql > schema builder", () => {
 
       const postRating = postFields["rating"]
       expect(postRating).not.toBe(undefined)
+      expect(postRating.description).toBe("Post rating")
       if (!isNullableType(postRating.type)) fail(`"postRating" is not nullable`)
       if (!isScalarType(postRating.type)) fail(`"postRating" is not nullable`)
       expect(postRating.type.name).toBe("Int")
@@ -200,9 +206,173 @@ describe("graphql > schema builder", () => {
 
       const rating = fields["rating"]
       expect(rating).not.toBe(undefined)
+      expect(rating.description).toBe("Category rating")
+      expect((rating as GraphQLField<any, any>).isDeprecated).toBe(true)
+      expect(rating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(rating.type)) fail(`"rating" is nullable`)
       expect(isScalarType(rating.type.ofType)).toBe(true)
       expect(rating.type.ofType.name).toBe("BigInt")
+    })
+
+    test("intersections in models - case #3", () => {
+      const postCategoryType = schema.getType("PostCategoryType")
+      expect(postCategoryType).not.toBe(undefined)
+
+      if (!isObjectType(postCategoryType))
+        fail("PostCategoryType is not an object type")
+      expect(postCategoryType.name).toBe("PostCategoryType")
+
+      const fields = postCategoryType.getFields()
+
+      // ------------------------------------------------
+
+      const post = fields["post"]
+      expect(post).not.toBe(undefined)
+      if (!isNonNullType(post.type)) fail(`"post" is nullable`)
+      expect(isObjectType(post.type.ofType)).toBe(true)
+      expect(post.type.ofType.name).toBe("PostType")
+
+      const postFields = post.type.ofType.getFields()
+
+      const postId = postFields["id"]
+      expect(postId).not.toBe(undefined)
+      if (!isNonNullType(postId.type)) fail(`"postId" is nullable`)
+      expect(isScalarType(postId.type.ofType)).toBe(true)
+      expect(postId.type.ofType.name).toBe("Int")
+
+      const postTitle = postFields["title"]
+      expect(postTitle).not.toBe(undefined)
+      if (!isNullableType(postTitle.type)) fail(`"postTitle" is not nullable`)
+      if (!isScalarType(postTitle.type)) fail(`"postTitle" is not nullable`)
+      expect(postTitle.type.name).toBe("String")
+
+      const postRating = postFields["rating"]
+      expect(postRating).not.toBe(undefined)
+      expect(postRating.description).toBe("Post rating")
+      if (!isNullableType(postRating.type)) fail(`"postRating" is not nullable`)
+      if (!isScalarType(postRating.type)) fail(`"postRating" is not nullable`)
+      expect(postRating.type.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const category = fields["category"]
+      expect(category).not.toBe(undefined)
+      if (!isNonNullType(category.type)) fail(`"category" is nullable`)
+      expect(isObjectType(category.type.ofType)).toBe(true)
+      expect(category.type.ofType.name).toBe("PostCategoryTypeCategoryModel")
+
+      const categoryFields = category.type.ofType.getFields()
+
+      const categoryId = categoryFields["id"]
+      expect(categoryId).not.toBe(undefined)
+      if (!isNonNullType(categoryId.type)) fail(`"categoryId" is nullable`)
+      expect(isScalarType(categoryId.type.ofType)).toBe(true)
+      expect(categoryId.type.ofType.name).toBe("Int")
+
+      const categoryTitle = categoryFields["title"]
+      expect(categoryTitle).not.toBe(undefined)
+      if (!isNonNullType(categoryTitle.type))
+        fail(`"categoryTitle" is nullable`)
+      expect(isScalarType(categoryTitle.type.ofType)).toBe(true)
+      expect(categoryTitle.type.ofType.name).toBe("String")
+
+      const categoryPosts = categoryFields["posts"]
+      expect(categoryPosts).not.toBe(undefined)
+      if (!isNonNullType(categoryPosts.type))
+        fail(`"categoryPosts" is nullable`)
+      expect(isListType(categoryPosts.type.ofType)).toBe(true)
+      expect(categoryPosts.type.ofType.ofType.name).toBe("PostType")
+
+      const categoryRating = categoryFields["rating"]
+      expect(categoryRating).not.toBe(undefined)
+      expect(categoryRating.description).toBe("Category rating")
+      expect(categoryRating.isDeprecated).toBe(true)
+      expect(categoryRating.deprecationReason).toBe("not used anymore.")
+      if (!isNonNullType(categoryRating.type))
+        fail(`"categoryRating" is nullable`)
+      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
+      expect(categoryRating.type.ofType.name).toBe("BigInt")
+    })
+
+    test("intersections in models - case #4", () => {
+      const questionType = schema.getType("QuestionType")
+      expect(questionType).not.toBe(undefined)
+
+      if (!isObjectType(questionType))
+        fail("QuestionType is not an object type")
+      expect(questionType.name).toBe("QuestionType")
+
+      const fields = questionType.getFields()
+
+      // ------------------------------------------------
+
+      const id = fields["id"]
+      expect(id).not.toBe(undefined)
+      if (!isNonNullType(id.type)) fail(`"id" is nullable`)
+      expect(isScalarType(id.type.ofType)).toBe(true)
+      expect(id.type.ofType.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const title = fields["title"]
+      expect(title).not.toBe(undefined)
+      if (!isNonNullType(title.type)) fail(`"title" is nullable`)
+      expect(isScalarType(title.type.ofType)).toBe(true)
+      expect(title.type.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const rating = fields["rating"]
+      expect(rating).not.toBe(undefined)
+      if (!isNonNullType(rating.type)) fail(`"rating" is nullable`)
+      expect(isScalarType(rating.type.ofType)).toBe(true)
+      expect(rating.type.ofType.name).toBe("BigInt")
+
+      // ------------------------------------------------
+
+      const isAnswered = fields["isAnswered"]
+      expect(isAnswered).not.toBe(undefined)
+      expect(isAnswered.description).toBe("Is question answered.")
+      if (!isNonNullType(isAnswered.type)) fail(`"isAnswered" is nullable`)
+      expect(isScalarType(isAnswered.type.ofType)).toBe(true)
+      expect(isAnswered.type.ofType.name).toBe("Boolean")
+    })
+
+    test("intersections in models - case #5", () => {
+      const answerType = schema.getType("AnswerType")
+      expect(answerType).not.toBe(undefined)
+
+      if (!isObjectType(answerType)) fail("AnswerType is not an object type")
+      expect(answerType.name).toBe("AnswerType")
+
+      const fields = answerType.getFields()
+
+      // ------------------------------------------------
+
+      const id = fields["id"]
+      expect(id).not.toBe(undefined)
+      if (!isNonNullType(id.type)) fail(`"id" is nullable`)
+      expect(isScalarType(id.type.ofType)).toBe(true)
+      expect(id.type.ofType.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const name = fields["name"]
+      expect(name).not.toBe(undefined)
+      if (!isNonNullType(name.type)) fail(`"name" is nullable`)
+      expect(isScalarType(name.type.ofType)).toBe(true)
+      expect(name.type.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const accepted = fields["accepted"]
+      expect(accepted).not.toBe(undefined)
+      expect(accepted.description).toBe("Indicates if answer is accepted.")
+      expect((accepted as GraphQLField<any, any>).isDeprecated).toBe(true)
+      expect(accepted.deprecationReason).toBe("not used anymore.")
+      if (!isNonNullType(accepted.type)) fail(`"accepted" is nullable`)
+      expect(isScalarType(accepted.type.ofType)).toBe(true)
+      expect(accepted.type.ofType.name).toBe("Boolean")
     })
   })
 })

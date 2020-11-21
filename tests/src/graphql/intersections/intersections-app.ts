@@ -8,8 +8,19 @@ export const App = createApp<{
       post: PostType
       category: CategoryGeneralType & CategoryMetaType
     }
-    QuestionType: QuestionType & { answer: string }
-    AnswerType: { id: number } & { name: string }
+    QuestionType: QuestionType & {
+      /**
+       * Is question answered.
+       */
+      isAnswered: boolean
+    }
+    AnswerType: { id: number } & { name: string } & {
+      /**
+       * Indicates if answer is accepted.
+       * @deprecated not used anymore.
+       */
+      accepted: boolean
+    }
   }
   inputs: {
     PostInput: PostInput
@@ -18,8 +29,19 @@ export const App = createApp<{
       post: PostInput
       category: CategoryGeneralInput & CategoryMetaInput
     }
-    QuestionInput: QuestionInput & { answer: string }
-    AnswerInput: { id: number } & { name: string }
+    QuestionInput: QuestionInput & {
+      /**
+       * Is question answered.
+       */
+      isAnswered: boolean
+    }
+    AnswerInput: { id: number } & { name: string } & {
+      /**
+       * Indicates if answer is accepted.
+       * @deprecated not used anymore.
+       */
+      accepted: boolean
+    }
   }
   queries: {
     post(args: PostInput): PostType
@@ -30,11 +52,20 @@ export const App = createApp<{
       args: CategoryGeneralInput & CategoryMetaInput,
     ): CategoryGeneralType & CategoryMetaType
     question(
-      args: QuestionInput & { isWatched: boolean },
+      args: QuestionInput & {
+        /**
+         * Is question answered.
+         */
+        isAnswered: boolean
+      },
     ): QuestionType & { answer: string }
     answer(
-      args: { id: number | undefined } & { name: string | null },
-    ): { id: number | undefined } & { name: string | null }
+      args: { id: number | undefined } & { name: string | null } & {
+        accepted: boolean | null
+      },
+    ): { id: number | undefined } & { name: string | null } & {
+      accepted: boolean | null
+    }
   }
   mutations: {
     postSave(args: PostInput): PostType
@@ -45,11 +76,20 @@ export const App = createApp<{
       args: CategoryGeneralInput & CategoryMetaInput,
     ): CategoryGeneralType & CategoryMetaType
     questionSave(
-      args: QuestionInput & { isWatched: boolean },
+      args: QuestionInput & {
+        /**
+         * Is question answered.
+         */
+        isAnswered: boolean
+      },
     ): QuestionType & { answer: string }
     answerSave(
-      args: { id: number | undefined } & { name: string | null },
-    ): { id: number | undefined } & { name: string | null }
+      args: { id: number | undefined } & { name: string | null } & {
+        accepted: boolean | null
+      },
+    ): { id: number | undefined } & { name: string | null } & {
+      accepted: boolean | null
+    }
   }
   subscriptions: {
     onPostSave(args: PostInput): PostType
@@ -63,8 +103,12 @@ export const App = createApp<{
       args: QuestionInput & { isWatched: boolean },
     ): QuestionType & { answer: string }
     onAnswerSave(
-      args: { id: number | undefined } & { name: string | null },
-    ): { id: number | undefined } & { name: string | null }
+      args: { id: number | undefined } & { name: string | null } & {
+        accepted: boolean | null
+      },
+    ): { id: number | undefined } & { name: string | null } & {
+      accepted: boolean | null
+    }
   }
 }>()
 
@@ -80,6 +124,9 @@ type PostGeneralType = {
 }
 
 type PostMetaType = {
+  /**
+   * Post rating
+   */
   rating: number | null
 }
 
@@ -90,6 +137,10 @@ type CategoryGeneralType = {
 }
 
 type CategoryMetaType = {
+  /**
+   * Category rating
+   * @deprecated not used anymore.
+   */
   rating: bigint
 }
 
@@ -99,7 +150,7 @@ type QuestionGeneralType = {
 }
 
 type QuestionMetaType = {
-  rating: number
+  rating: BigInt
 }
 
 // ------------------------------------------------
