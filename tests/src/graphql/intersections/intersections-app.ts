@@ -60,11 +60,19 @@ export const App = createApp<{
       },
     ): QuestionType & { answer: string }
     answer(
-      args: { id: number | undefined } & { name: string | null } & {
-        accepted: boolean | null
+      args: { id: number } & { name: string } & {
+        /**
+         * Indicates if answer is accepted.
+         * @deprecated not used anymore !!!.
+         */
+        accepted: boolean
       },
-    ): { id: number | undefined } & { name: string | null } & {
-      accepted: boolean | null
+    ): { id: number } & { name: string } & {
+      /**
+       * Indicates if answer is accepted.
+       * @deprecated not used anymore !!!.
+       */
+      accepted: boolean
     }
   }
   mutations: {
@@ -84,11 +92,19 @@ export const App = createApp<{
       },
     ): QuestionType & { answer: string }
     answerSave(
-      args: { id: number | undefined } & { name: string | null } & {
-        accepted: boolean | null
+      args: { id: number } & { name: string } & {
+        /**
+         * Indicates if answer is accepted.
+         * @deprecated not used anymore !!!.
+         */
+        accepted: boolean
       },
-    ): { id: number | undefined } & { name: string | null } & {
-      accepted: boolean | null
+    ): { id: number } & { name: string } & {
+      /**
+       * Indicates if answer is accepted.
+       * @deprecated not used anymore !!!.
+       */
+      accepted: boolean
     }
   }
   subscriptions: {
@@ -103,11 +119,19 @@ export const App = createApp<{
       args: QuestionInput & { isWatched: boolean },
     ): QuestionType & { answer: string }
     onAnswerSave(
-      args: { id: number | undefined } & { name: string | null } & {
-        accepted: boolean | null
+      args: { id: number } & { name: string } & {
+        /**
+         * Indicates if answer is accepted.
+         * @deprecated not used anymore !!!.
+         */
+        accepted: boolean
       },
-    ): { id: number | undefined } & { name: string | null } & {
-      accepted: boolean | null
+    ): { id: number } & { name: string } & {
+      /**
+       * Indicates if answer is accepted.
+       * @deprecated not used anymore !!!.
+       */
+      accepted: boolean
     }
   }
 }>()

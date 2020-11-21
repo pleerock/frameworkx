@@ -893,5 +893,88 @@ describe("graphql > schema builder", () => {
       expect(isScalarType(rating!.type.ofType)).toBe(true)
       expect(rating!.type.ofType.name).toBe("BigInt")
     })
+
+    test("intersections in queries - case #4", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const questionField = query!.getFields()["question"]
+      if (!isNonNullType(questionField.type))
+        fail("QuestionReturnModel is nullable")
+      expect(questionField.type.ofType.name).toBe("QuestionReturnModel")
+      expect(questionField.args.length).toBe(4)
+
+      // ------------------------------------------------
+
+      const id = questionField.args.find((it) => it.name === "id")
+      expect(id).not.toBe(undefined)
+      if (!isNonNullType(id!.type)) fail(`"id" is nullable`)
+      expect(isScalarType(id!.type.ofType)).toBe(true)
+      expect(id!.type.ofType.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const title = questionField.args.find((it) => it.name === "title")
+      expect(title).not.toBe(undefined)
+      if (!isNonNullType(title!.type)) fail(`"title" is nullable`)
+      expect(isScalarType(title!.type.ofType)).toBe(true)
+      expect(title!.type.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const rating = questionField.args.find((it) => it.name === "rating")
+      expect(rating).not.toBe(undefined)
+      if (!isNonNullType(rating!.type)) fail(`"rating" is nullable`)
+      expect(isScalarType(rating!.type.ofType)).toBe(true)
+      expect(rating!.type.ofType.name).toBe("BigInt")
+
+      // ------------------------------------------------
+
+      const isAnswered = questionField.args.find(
+        (it) => it.name === "isAnswered",
+      )
+      expect(isAnswered).not.toBe(undefined)
+      expect(isAnswered!.description).toBe("Is question answered.")
+      if (!isNonNullType(isAnswered!.type)) fail(`"isAnswered" is nullable`)
+      expect(isScalarType(isAnswered!.type.ofType)).toBe(true)
+      expect(isAnswered!.type.ofType.name).toBe("Boolean")
+    })
+
+    test("intersections in queries - case #5", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const answerField = query!.getFields()["answer"]
+      if (!isNonNullType(answerField.type))
+        fail("QuestionReturnModel is nullable")
+      expect(answerField.type.ofType.name).toBe("AnswerReturnModel")
+      expect(answerField.args.length).toBe(3)
+
+      // ------------------------------------------------
+
+      const id = answerField.args.find((it) => it.name === "id")
+      expect(id).not.toBe(undefined)
+      if (!isNonNullType(id!.type)) fail(`"id" is nullable`)
+      expect(isScalarType(id!.type.ofType)).toBe(true)
+      expect(id!.type.ofType.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const name = answerField.args.find((it) => it.name === "name")
+      expect(name).not.toBe(undefined)
+      if (!isNonNullType(name!.type)) fail(`"name" is nullable`)
+      expect(isScalarType(name!.type.ofType)).toBe(true)
+      expect(name!.type.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const accepted = answerField.args.find((it) => it.name === "accepted")
+      expect(accepted).not.toBe(undefined)
+      expect(accepted!.description).toBe("Indicates if answer is accepted.")
+      expect(accepted!.deprecationReason).toBe("not used anymore.")
+      if (!isNonNullType(accepted!.type)) fail(`"accepted" is nullable`)
+      expect(isScalarType(accepted!.type.ofType)).toBe(true)
+      expect(accepted!.type.ofType.name).toBe("Boolean")
+    })
   })
 })
