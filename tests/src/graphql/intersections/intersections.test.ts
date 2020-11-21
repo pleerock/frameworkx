@@ -439,7 +439,6 @@ describe("graphql > schema builder", () => {
       expect(categoryPosts.type.ofType.ofType.name).toBe("PostInput")
 
       const categoryRating = categoryFields["rating"]
-      console.log(categoryRating)
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.isDeprecated).toBe(true)
@@ -688,6 +687,211 @@ describe("graphql > schema builder", () => {
       if (!isNonNullType(accepted.type)) fail(`"accepted" is nullable`)
       expect(isScalarType(accepted.type.ofType)).toBe(true)
       expect(accepted.type.ofType.name).toBe("Boolean")
+    })
+
+    test("intersections in queries - case #1", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const postField = query!.getFields()["post"]
+      if (!isNonNullType(postField.type)) fail("PostType is nullable")
+      expect(postField.type.ofType.name).toBe("PostType")
+      expect(postField.args.length).toBe(4)
+
+      // ------------------------------------------------
+
+      const id = postField.args.find((it) => it.name === "id")
+      expect(id).not.toBe(undefined)
+
+      if (!isNonNullType(id!.type)) fail(`"id" is nullable`)
+      expect(isScalarType(id!.type.ofType)).toBe(true)
+      expect(id!.type.ofType.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const title = postField.args.find((it) => it.name === "title")
+      expect(title).not.toBe(undefined)
+
+      if (!isNullableType(title!.type)) fail(`"title" is not nullable`)
+      if (!isScalarType(title!.type)) fail(`"title" is not a scalar`)
+      expect(title!.type.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const categories = postField.args.find((it) => it.name === "categories")
+      expect(categories).not.toBe(undefined)
+      if (!isNonNullType(categories!.type)) fail(`"categories" is nullable`)
+      expect(isListType(categories!.type.ofType)).toBe(true)
+      expect(isInputObjectType(categories!.type.ofType.ofType)).toBe(true)
+      expect(categories!.type.ofType.ofType.name).toBe(
+        "PostInputCategoriesInput",
+      )
+
+      const categoryFields = categories!.type.ofType.ofType.getFields()
+
+      const categoryId = categoryFields["id"]
+      expect(categoryId).not.toBe(undefined)
+      if (!isNonNullType(categoryId.type)) fail(`"categoryId" is nullable`)
+      expect(isScalarType(categoryId.type.ofType)).toBe(true)
+      expect(categoryId.type.ofType.name).toBe("Int")
+
+      const categoryTitle = categoryFields["title"]
+      expect(categoryTitle).not.toBe(undefined)
+      if (!isNonNullType(categoryTitle.type))
+        fail(`"categoryTitle" is nullable`)
+      expect(isScalarType(categoryTitle.type.ofType)).toBe(true)
+      expect(categoryTitle.type.ofType.name).toBe("String")
+
+      const categoryPosts = categoryFields["posts"]
+      expect(categoryPosts).not.toBe(undefined)
+      if (!isNonNullType(categoryPosts.type))
+        fail(`"categoryPosts" is nullable`)
+      expect(isListType(categoryPosts.type.ofType)).toBe(true)
+      expect(isInputObjectType(categoryPosts.type.ofType.ofType)).toBe(true)
+      expect(categoryPosts.type.ofType.ofType.name).toBe("PostInput")
+
+      const categoryRating = categoryFields["rating"]
+      expect(categoryRating).not.toBe(undefined)
+      expect(categoryRating.description).toBe("Category rating")
+      expect(categoryRating.isDeprecated).toBe(true)
+      expect(categoryRating.deprecationReason).toBe("not used anymore.")
+      if (!isNonNullType(categoryRating.type))
+        fail(`"categoryRating" is nullable`)
+      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
+      expect(categoryRating.type.ofType.name).toBe("BigInt")
+
+      // ------------------------------------------------
+
+      const rating = postField.args.find((it) => it.name === "rating")
+      expect(rating).not.toBe(undefined)
+      expect(rating!.description).toBe("Post rating")
+      if (!isNullableType(rating!.type)) fail(`"rating" is not nullable`)
+      if (!isScalarType(rating!.type)) fail(`"rating" is not nullable`)
+      expect(rating!.type.name).toBe("Int")
+    })
+
+    test("intersections in queries - case #2", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const postsField = query!.getFields()["posts"]
+      if (!isNonNullType(postsField.type)) fail("PostsReturnModel is nullable")
+      expect(postsField.type.ofType.name).toBe("PostsReturnModel")
+      expect(postsField.args.length).toBe(1)
+
+      // ------------------------------------------------
+
+      const post = postsField.args.find((it) => it.name === "post")
+      expect(post).not.toBe(undefined)
+
+      if (!isNonNullType(post!.type)) fail(`"id" is nullable`)
+      expect(isInputObjectType(post!.type.ofType)).toBe(true)
+      expect(post!.type.ofType.name).toBe("PostsArgsPostInput")
+
+      const postFields = post!.type.ofType.getFields()
+
+      // ------------------------------------------------
+
+      const postId = postFields["id"]
+      expect(postId).not.toBe(undefined)
+      if (!isNonNullType(postId.type)) fail(`"postId" is nullable`)
+      expect(isScalarType(postId.type.ofType)).toBe(true)
+      expect(postId.type.ofType.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const postTitle = postFields["title"]
+      expect(postTitle).not.toBe(undefined)
+      if (!isNullableType(postTitle.type)) fail(`"postTitle" is not nullable`)
+      if (!isScalarType(postTitle.type)) fail(`"postTitle" is not nullable`)
+      expect(postTitle.type.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const categories = postFields["categories"]
+      expect(categories).not.toBe(undefined)
+      if (!isNonNullType(categories.type)) fail(`"category" is nullable`)
+      expect(isListType(categories.type.ofType)).toBe(true)
+      expect(isInputObjectType(categories.type.ofType.ofType)).toBe(true)
+      expect(categories.type.ofType.ofType.name).toBe(
+        "PostsArgsPostCategoriesInput",
+      )
+
+      // ------------------------------------------------
+
+      const postRating = postFields["rating"]
+      expect(postRating).not.toBe(undefined)
+      expect(postRating.description).toBe("Post rating")
+      if (!isNullableType(postRating.type)) fail(`"postRating" is not nullable`)
+      if (!isScalarType(postRating.type)) fail(`"postRating" is not nullable`)
+      expect(postRating.type.name).toBe("Int")
+    })
+
+    test("intersections in queries - case #3", () => {
+      const query = schema.getQueryType()
+      expect(query).not.toBe(undefined)
+
+      const categoryField = query!.getFields()["category"]
+      if (!isNonNullType(categoryField.type))
+        fail("CategoryReturnModel is nullable")
+      expect(categoryField.type.ofType.name).toBe("CategoryReturnModel")
+      expect(categoryField.args.length).toBe(4)
+
+      // ------------------------------------------------
+
+      const id = categoryField.args.find((it) => it.name === "id")
+      expect(id).not.toBe(undefined)
+      if (!isNonNullType(id!.type)) fail(`"id" is nullable`)
+      expect(isScalarType(id!.type.ofType)).toBe(true)
+      expect(id!.type.ofType.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const title = categoryField.args.find((it) => it.name === "title")
+      expect(title).not.toBe(undefined)
+      if (!isNonNullType(title!.type)) fail(`"title" is nullable`)
+      expect(isScalarType(title!.type.ofType)).toBe(true)
+      expect(title!.type.ofType.name).toBe("String")
+
+      // ------------------------------------------------
+
+      const posts = categoryField.args.find((it) => it.name === "posts")
+      expect(posts).not.toBe(undefined)
+      if (!isNonNullType(posts!.type)) fail(`"posts" is nullable`)
+      expect(isListType(posts!.type.ofType)).toBe(true)
+      expect(isInputObjectType(posts!.type.ofType.ofType)).toBe(true)
+      expect(posts!.type.ofType.ofType.name).toBe("PostInput")
+
+      const postFields = posts!.type.ofType.ofType.getFields()
+
+      const postId = postFields["id"]
+      expect(postId).not.toBe(undefined)
+      if (!isNonNullType(postId.type)) fail(`"postId" is nullable`)
+      expect(isScalarType(postId.type.ofType)).toBe(true)
+      expect(postId.type.ofType.name).toBe("Int")
+
+      const postTitle = postFields["title"]
+      expect(postTitle).not.toBe(undefined)
+      if (!isNullableType(postTitle.type)) fail(`"postTitle" is not nullable`)
+      if (!isScalarType(postTitle.type)) fail(`"postTitle" is not nullable`)
+      expect(postTitle.type.name).toBe("String")
+
+      const postRating = postFields["rating"]
+      expect(postRating).not.toBe(undefined)
+      expect(postRating.description).toBe("Post rating")
+      if (!isNullableType(postRating.type)) fail(`"postRating" is not nullable`)
+      if (!isScalarType(postRating.type)) fail(`"postRating" is not nullable`)
+      expect(postRating.type.name).toBe("Int")
+
+      // ------------------------------------------------
+
+      const rating = categoryField.args.find((it) => it.name === "rating")
+      expect(rating).not.toBe(undefined)
+      expect(rating!.description).toBe("Category rating")
+      expect(rating!.deprecationReason).toBe("not used anymore.")
+      if (!isNonNullType(rating!.type)) fail(`"rating" is nullable`)
+      expect(isScalarType(rating!.type.ofType)).toBe(true)
+      expect(rating!.type.ofType.name).toBe("BigInt")
     })
   })
 })

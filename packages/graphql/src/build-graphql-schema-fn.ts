@@ -172,14 +172,24 @@ export function buildGraphQLSchema(
         const fields: GraphQLInputFieldConfigMap = {}
         for (const property of metadata.properties) {
           if (!property.propertyName) continue
+
+          let deprecationReason = undefined
+          if (typeof property.deprecated === "string") {
+            deprecationReason = property.deprecated
+          } else if (property.deprecated === true) {
+            deprecationReason = " "
+          }
+
           fields[property.propertyName] = {
             type: resolveGraphQLType("input", property),
             description: property.description,
+            deprecationReason,
           }
         }
         return fields
       },
     })
+    // console.log(newType.getFields())
     inputTypes.push(newType)
     return newType
   }

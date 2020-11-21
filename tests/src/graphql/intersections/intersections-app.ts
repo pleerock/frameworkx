@@ -38,7 +38,7 @@ export const App = createApp<{
     AnswerInput: { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
-       * @deprecated not used anymore.
+       * @deprecated not used anymore !!!.
        */
       accepted: boolean
     }
