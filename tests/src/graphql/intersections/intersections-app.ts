@@ -116,7 +116,12 @@ export const App = createApp<{
       args: CategoryGeneralInput & CategoryMetaInput,
     ): CategoryGeneralType & CategoryMetaType
     onQuestionSave(
-      args: QuestionInput & { isWatched: boolean },
+      args: QuestionInput & {
+        /**
+         * Is question answered.
+         */
+        isAnswered: boolean
+      },
     ): QuestionType & { answer: string }
     onAnswerSave(
       args: { id: number } & { name: string } & {
