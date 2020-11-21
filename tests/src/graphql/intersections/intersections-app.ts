@@ -165,17 +165,24 @@ type PostGeneralInput = {
 }
 
 type PostMetaInput = {
+  /**
+   * Post rating
+   */
   rating: number | null
 }
 
 type CategoryGeneralInput = {
   id: number
   title: string
-  post: PostInput
+  posts: PostInput[]
 }
 
 type CategoryMetaInput = {
-  rating: number
+  /**
+   * Category rating
+   * @deprecated not used anymore.
+   */
+  rating: bigint
 }
 
 type QuestionGeneralInput = {
@@ -184,5 +191,5 @@ type QuestionGeneralInput = {
 }
 
 type QuestionMetaInput = {
-  rating: number
+  rating: BigInt
 }
