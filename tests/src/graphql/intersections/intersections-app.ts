@@ -76,7 +76,7 @@ type QuestionType = QuestionGeneralType & QuestionMetaType
 type PostGeneralType = {
   id: number
   title: string | undefined
-  categories: CategoryGeneralType & CategoryMetaType
+  categories: (CategoryGeneralType & CategoryMetaType)[]
 }
 
 type PostMetaType = {
@@ -86,7 +86,7 @@ type PostMetaType = {
 type CategoryGeneralType = {
   id: number
   title: string
-  post: PostType
+  posts: PostType[]
 }
 
 type CategoryMetaType = {
@@ -110,7 +110,7 @@ type QuestionInput = QuestionGeneralInput & QuestionMetaInput
 type PostGeneralInput = {
   id: number
   title: string | undefined
-  categories: CategoryGeneralInput & CategoryMetaInput
+  categories: (CategoryGeneralInput & CategoryMetaInput)[]
 }
 
 type PostMetaInput = {
