@@ -258,7 +258,7 @@ type Subscription {
 }
 ```
 
-Once you define your declarations, you might want to create a [server](server.md) and 
+Once you define your declarations, you might want to create a [server](application-server.md) and 
 [resolvers](resolvers.md) to resolve declarations. 
 
 ## RESTful API

@@ -14,7 +14,7 @@ There are many ways how you can define resolvers.
 * [Model resolver](#model-resolver)
 * [Data loader model resolver](#data-loader-model-resolver)
 * [Context resolver](#context-resolver)
-* [Register resolver](#register-resolver)
+* [Register resolvers](#register-resolvers)
 
 ## Resolver types
 
@@ -168,7 +168,7 @@ export const PostRemovedSubscriptionResolver = resolver(App, "postRemoved", {
 })
 ```
 
-Read more about how to use subscriptions [here](server.md#subscriptions). 
+Read more about how to use subscriptions [here](application-server.md#subscriptions). 
 
 ## Action resolve syntax
 
@@ -211,7 +211,7 @@ export const PostsGetActionResolver = resolver(App, {
 ```
 
 
-Read more about how to use actions [here](server.md#actions).
+Read more about how to use actions [here](application-server.md#actions).
  
 ## Model resolver
 
@@ -268,19 +268,19 @@ export const ContextResolver = contextResolver(App, {
 })
 ```
 
-## Register resolver
+## Register resolvers
 
-All resolvers must be registered in the [application server](server.md):
+All resolvers must be registered in the [application server](application-server.md):
 
 ```typescript
 export const AppServer = createApplicationServer(App, {
   // ...
-  resolvers: {
-    PostRootResolver: PostRootResolver,
-    UserRootResolver: UserRootResolver,
-    UserModelResolver: UserModelResolver,
-    ContextResolver: ContextResolver,
-  },
+  resolvers: [
+    PostRootResolver,
+    UserRootResolver,
+    UserModelResolver,
+    ContextResolver,
+  ],
   // ...
 })
 ```

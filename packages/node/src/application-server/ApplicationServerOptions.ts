@@ -19,8 +19,10 @@ import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
  */
 export type ApplicationServerOptions = {
   /**
-   * App file path.
-   * Must point to .d.ts file in the javascript runtime.
+   * File path to application declaration file.
+   * Provided path should not contain an extension.
+   * In the JavaScript runtime must point to .d.ts file
+   * or .json file with the generated metadata.
    */
   appPath: string
 
@@ -29,24 +31,22 @@ export type ApplicationServerOptions = {
    */
   webserver: {
     /**
-     * Custom express server instance.
-     * You can create and configure your own instance of express and framework will use it.
-     * If not passed, default express server will be used.
-     */
-    express?: any
-
-    /**
      * Port on which to run express server.
      */
     port: number
 
     /**
-     * Should be set to true to enable cors.
+     * Indicates if CORS should be enabled or not.
+     * You can pass CORS options to configure how CORS are going to work.
+     *
+     * @see https://github.com/expressjs/cors
      */
     cors?: boolean | CorsOptions
 
     /**
-     * List of static directories to register in the Express server.
+     * List of middlewares to register in the app per each route / action.
+     *
+     * @see https://expressjs.com/en/starter/static-files.html
      */
     staticDirs?: {
       [route: string]: string
@@ -58,10 +58,16 @@ export type ApplicationServerOptions = {
     middlewares?: any[]
 
     /**
-     * List of registered action middlewares.
-     * This way you can setup middlewares per specific action.
+     * List of middlewares to register per specific route / action.
      */
     actionMiddleware?: { [key: string]: any[] }
+
+    /**
+     * Custom express server instance.
+     * You can create and configure your own instance of express and framework will use it.
+     * If not passed, default express server will be used.
+     */
+    express?: any
   }
 
   /**
@@ -69,45 +75,50 @@ export type ApplicationServerOptions = {
    */
   graphql?: {
     /**
-     * Route on which to register a graphql requests.
+     * route on which to register a GraphQL request handler.
      * If not set, default is "/graphql".
      */
     route?: string
 
     /**
-     * Indicates if graphiQL should be enabled or not.
+     * Indicates if GraphiQL should be enabled or not.
+     *
+     * @see https://github.com/graphql/graphiql
      */
     graphiql?: boolean
 
     /**
      * Indicates if playground should be enabled or not.
+     *
+     * @see https://github.com/graphql/graphql-playground
      */
     playground?: boolean
 
     /**
      * Additional GraphQL options when GraphQL middleware is created.
+     *
+     * @see https://github.com/graphql/express-graphql#options
      */
     options?: Partial<OptionsData>
   }
 
   /**
-   * Can be set to use websocket server.
+   * Can be set to use a WebSocket server.
    */
   websocket?: {
     /**
-     * Websocket host.
+     * WebSocket host.
      * For example, "localhost".
      */
     host: string
 
     /**
      * Port on which to run websocket server.
-     * Required parameter to enable websockets server.
      */
     port: number
 
     /**
-     * Route on which to register a subscriptions websocket interface.
+     * Route on which to register subscriptions websocket interface.
      * If not set, default is "/subscriptions".
      */
     path?: string
@@ -118,12 +129,12 @@ export type ApplicationServerOptions = {
     options?: Partial<ServerOptions>
 
     /**
-     * PubSub to be used for default subscriptions.
+     * PubSub to be used for subscriptions.
      */
     pubSub?: PubSubEngine
 
     /**
-     * When a connected user doesn't respond in a given amount of time,
+     * When a connected user doesn't respond in a given time,
      * he will be disconnected from a websocket.
      * Server and client must exchange with "ping"/"pong" messages.
      *
@@ -169,12 +180,12 @@ export type ApplicationServerOptions = {
 
   /**
    * List of entities to use in connection.
-   * If this property is set, they will be overridden in ORM.
+   * If this property set, they will be overridden in ORM.
    */
   entities?: MixedList<Function | string | EntitySchema>
 
   /**
-   * List of registered resolvers.
+   * List of resolvers to register in the app server.
    */
   resolvers: MixedList<AppResolverType>
 
