@@ -168,7 +168,7 @@ export const PostRemovedSubscriptionResolver = resolver(App, "postRemoved", {
 })
 ```
 
-Read more about how to use subscriptions [here](application-server.md#subscriptions). 
+Read more about how to use subscriptions [here](subscriptions.md). 
 
 ## Action resolve syntax
 
@@ -211,7 +211,7 @@ export const PostsGetActionResolver = resolver(App, {
 ```
 
 
-Read more about how to use actions [here](application-server.md#actions).
+Read more about how to use actions [here](actions.md).
  
 ## Model resolver
 

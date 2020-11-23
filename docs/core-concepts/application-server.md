@@ -1,7 +1,13 @@
 # Application server
 
 * [`appPath` option](#apppath-option)
-* [Options](#options)
+* [Web Server](#web-server)
+* [WebSocket Server](#websocket-server)
+* [GraphQL setup](#graphql-setup)
+* [Resolvers](#resolvers)
+* [Swagger API](#swagger-api)
+* [Rate limitation](#rate-limitation)
+* [Application Server Options](#application-server-options)
 
 Once application declaration defined, and 
 you have created resolvers for your queries / mutations / subscriptions / actions
@@ -17,10 +23,9 @@ export const AppServer = createApplicationServer(App, {
   graphql: {
     graphiql: true,
   },
-  resolvers: {
-    ...modelResolvers,
-    ...rootResolvers,
-  },
+  resolvers: [
+    // ...
+  ],
 })
 ```
 
@@ -72,7 +77,141 @@ To make this option work you must enable `declaration: true` in tsconfig file.
 You can generate application metadata file using [CLI commands](cli.md).
 This option is most performant when you execute the framework in a serverless environment. 
 
-## Options
+## Web Server
+
+In order for a WebServer to run, you must provide a `port` option.
+
+```typescript
+export const AppServer = createApplicationServer(App, {
+  // ...
+  webserver: {
+    port: 4000,
+  },
+  // ...
+})
+```
+
+This will setup Express server on port `4000`.
+
+## WebSocket Server
+
+In order for a WebSocket server to run, you must provide `host` and `port` options.
+
+```typescript
+export const AppServer = createApplicationServer(App, {
+  // ...
+  websocket: {
+    host: "localhost",
+    port: 5000,
+  },
+  // ...
+})
+```
+
+This will setup WebSocket server on `localhost:5000`.
+
+## GraphQL setup
+
+GraphQL is automatically set up if you registered queries / mutations / subscriptions
+in the application declaration. By default, GraphQL is registered by a `/graphql` route, but you can change this: 
+
+```typescript
+export const AppServer = createApplicationServer(App, {
+  // ...
+  graphql: {
+    route: "/api/graphql",
+  },
+  // ...
+})
+```
+
+You can also enable [GraphiQL](https://github.com/graphql/graphiql) and [GraphQL Playground](https://github.com/graphql/graphql-playground)
+ by setting `graphiql: true` and `playground: true` options.
+
+## Resolvers
+
+Once you define resolvers for declared queries / mutations / subscriptions / actions,
+you must register them in the application server:
+
+```typescript
+export const AppServer = createApplicationServer(App, {
+  // ...
+  resolvers: [
+    PostRootResolver,
+    CategoryRootResolver,
+    UserModelResolver,
+  ],
+  // ...
+})
+```
+
+Read more about resolvers [here](resolvers.md).
+
+## Swagger API
+
+Microframework can automatically generate a Swagger API documentation for the 
+[actions](actions.md) defined in the application declaration.
+To enable documentation generation you must specify `swagger.route` option:
+
+```typescript
+export const AppServer = createApplicationServer(App, {
+  // ...
+  swagger: {
+    route: "/api-docs",
+  },
+  // ...
+})
+```
+
+Then you can open http://localhost:4000/api-docs in your browser to access api docs.
+
+## Rate limitation
+
+Microframework supports endpoint rate limitation out of the box.
+In order to enable install `rate-limiter-flexible` package and all related dependencies,
+and set a `rateLimitConstructor` option:
+
+```typescript
+import { RateLimiterRedis } from "rate-limiter-flexible"
+const Redis = require("ioredis")
+const redisClient = new Redis()
+
+export const AppServer = createApplicationServer(App, {
+  // ...
+  rateLimitConstructor: (options) => {
+    return new RateLimiterRedis({
+      storeClient: redisClient,
+      ...options,
+    })
+  },
+  // ...
+})
+```
+
+Then you can set rate limitation per any query / mutation / subscription / action you have, for example:
+
+```typescript
+export const AppServer = createApplicationServer(App, {
+  // ...
+  rateLimits: {
+      queries: {
+        post: {
+          points: 10, // Number of points
+          duration: 1, // Per second
+        },
+      },
+      mutations: {
+        postSave: {
+          points: 10, // Number of points
+          duration: 1, // Per second
+        },
+      },
+  }
+  // ...
+})
+```
+
+## Application Server Options
 
 * `appPath: string` - file path to application declaration file. 
 Provided path should not contain an extension.
