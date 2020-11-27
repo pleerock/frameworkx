@@ -1,9 +1,10 @@
-import { ApplicationUtils, MixedList } from "@microframework/core/_/application"
-import { AppResolverType } from "@microframework/core/_/resolver/resolver-helper-types"
 import {
-  DeclarationResolverMetadata,
   AnyResolver,
-} from "@microframework/core/_/resolver/resolver-metadata"
+  ApplicationUtils,
+  AppResolverType,
+  DeclarationResolverMetadata,
+  MixedList
+} from "@microframework/core"
 
 /**
  * Core resolver utility functions.

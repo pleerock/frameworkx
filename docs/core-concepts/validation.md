@@ -96,7 +96,7 @@ export const UserModelValidationRule = validationRule(
   App.input("UserRegisterInput"),
   {
     async validate(user, context) {
-      const userWithSuchEmail = await UserRepository.find({ email: email })
+      const userWithSuchEmail = await UserRepository.find({ email: user.email })
       if (userWithSuchEmail) {
         throw new ValidationError(
           "USER_REGISTER_BUSY_EMAIL",
@@ -107,6 +107,36 @@ export const UserModelValidationRule = validationRule(
 })
 ```
 
+Custom validation function can be applied to properties as well:
+
+```typescript
+import { ValidationError, validationRule } from "@microframework/core"
+
+export const UserModelValidationRule = validationRule(
+  App.input("UserRegisterInput"),
+  {
+    projection: {
+      firstName(firstName, user, context) {
+        return firstName.trim()
+      },
+      lastName(firstName, user, context) {
+        return firstName.trim()
+      },
+      async email(email, user, context) {
+        const userWithSuchEmail = await UserRepository.find({ email: email })
+        if (userWithSuchEmail) {
+          throw new ValidationError(
+            "USER_REGISTER_BUSY_EMAIL",
+            `Provided email is already busy, please use a different email address.`
+          )
+        }
+        return email
+      }
+   }
+})
+```
+
+This way you can even modify a model / input value - useful if you want to apply sanitation too.
 
 ## Constraints
 

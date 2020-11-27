@@ -1,6 +1,5 @@
 import { ContextList, FlatMapType } from "../application"
-import { StringValidationConstraints } from "./validation-constraints-string"
-import { NumberValidationConstraints } from "./validation-constraints-number"
+import { ValidationConstraints } from "./validation-constraints"
 
 /**
  * Validation rule for a model with a number of constraints.
@@ -70,11 +69,7 @@ export type ModelPropertyValidationRule<
 export type ValidationRuleProjection<Model, Context extends ContextList> = {
   [P in keyof Model]?:
     | ModelPropertyValidationRule<Model, P, Context>
-    | (FlatMapType<NonNullable<Model[P]>> extends string
-        ? StringValidationConstraints
-        : FlatMapType<NonNullable<Model[P]>> extends number
-        ? NumberValidationConstraints
-        : never)
+    | ValidationConstraints<FlatMapType<NonNullable<Model[P]>>>
 }
 
 /**
@@ -96,5 +91,5 @@ export type ValidationFn<T> = (options: {
   /**
    * Validation constraints for a given value.
    */
-  constraints: StringValidationConstraints | NumberValidationConstraints
+  constraints: ValidationConstraints<T>
 }) => void | Promise<void>

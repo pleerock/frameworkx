@@ -13,7 +13,7 @@ import { GraphQLFieldResolver } from "graphql/type/definition"
 import { ApplicationServerProperties } from "../application-server"
 import { LoggerHelper } from "@microframework/logger"
 import { RateLimitItemOptions } from "../rate-limit"
-import { ValidationHelper } from "./ValidationHelper"
+import { validateTypeMetadata } from "./validation-utils"
 import { Connection } from "typeorm"
 import { Errors } from "../error"
 
@@ -22,7 +22,6 @@ import { Errors } from "../error"
  */
 export class ResolverHelper {
   private loggerHelper: LoggerHelper
-  private validator: ValidationHelper
   private properties: ApplicationServerProperties
   private dataSource: Connection | undefined
 
@@ -34,10 +33,6 @@ export class ResolverHelper {
     this.loggerHelper = logger
     this.properties = properties
     this.dataSource = dataSource
-    this.validator = new ValidationHelper(
-      properties.validator,
-      properties.validationRules,
-    )
   }
 
   createRootSubscriptionResolver(
@@ -265,7 +260,7 @@ export class ResolverHelper {
 
         // validate args
         if (metadata.args.length)
-          await this.validator.validate(metadata.args[0], args, userContext)
+          await this.validate(metadata.args[0], args, userContext)
 
         // execute the resolver and get the value it returns
         let result: any
@@ -280,7 +275,7 @@ export class ResolverHelper {
         }
 
         // perform returning value model validation
-        await this.validator.validate(returnType, result, context)
+        await this.validate(returnType, result, context)
 
         // log once again after resolver execution is finished
         logger.log(`return(${JSON.stringify(result)})`) // this.logger.logGraphQLResponse({ ...logInfo, content: result })
@@ -336,11 +331,7 @@ export class ResolverHelper {
 
                 // validate args
                 if (metadata.args.length)
-                  await this.validator.validate(
-                    metadata.args[0],
-                    args,
-                    userContext,
-                  )
+                  await this.validate(metadata.args[0], args, userContext)
 
                 // execute the resolver and get the value it returns
                 let result: any
@@ -356,7 +347,7 @@ export class ResolverHelper {
                 // it means data-loader is used, we need to validate each model in the array
                 await Promise.all(
                   result.map((item: any) => {
-                    return this.validator.validate(metadata, item, context)
+                    return this.validate(metadata, item, context)
                   }),
                 )
 
@@ -443,11 +434,7 @@ export class ResolverHelper {
 
                 // validate args
                 if (metadata.args.length)
-                  await this.validator.validate(
-                    metadata.args[0],
-                    args,
-                    userContext,
-                  )
+                  await this.validate(metadata.args[0], args, userContext)
 
                 // execute the resolver and get the value it returns
                 let result: any
@@ -463,7 +450,7 @@ export class ResolverHelper {
                 // it means data-loader is used, we need to validate each model in the array
                 await Promise.all(
                   result.map((item: any) => {
-                    return this.validator.validate(metadata, item, context)
+                    return this.validate(metadata, item, context)
                   }),
                 )
 
@@ -826,4 +813,14 @@ export class ResolverHelper {
   //     typeof value === "bigint" ? value.toString() : value
   //   })
   // }
+
+  private validate(type: TypeMetadata, value: any, context: any) {
+    return validateTypeMetadata(
+      this.properties.validator,
+      this.properties.validationRules,
+      type,
+      value,
+      context,
+    )
+  }
 }
