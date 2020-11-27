@@ -7,7 +7,7 @@ import { Express } from "express"
 import { Server as HttpServer } from "http"
 import { Connection } from "typeorm"
 import { Server as WebsocketServer } from "ws"
-import { ApplicationServerProperties } from "./ApplicationServerProperties"
+import { ApplicationServerProperties } from "./application-server-properties-type"
 
 /**
  * Application server.

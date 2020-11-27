@@ -3,7 +3,6 @@ import {
   ApplicationTypeMetadata,
   assign,
 } from "@microframework/core"
-import { LoggerHelper } from "@microframework/logger"
 import { buildGraphQLSchema } from "@microframework/graphql"
 import cors from "cors"
 import express, { Request, Response } from "express"
@@ -13,10 +12,11 @@ import { SubscriptionServer } from "subscriptions-transport-ws"
 import { Connection, ConnectionOptions } from "typeorm"
 import { Server as WebsocketServer } from "ws"
 import { GeneratedEntitySchemaBuilder, ResolverHelper } from ".."
-import { ApplicationServer } from "./ApplicationServer"
-import { ApplicationServerOptions } from "./ApplicationServerOptions"
-import { ApplicationServerUtils } from "./ApplicationServerUtils"
+import { ApplicationServer } from "./application-server-type"
+import { ApplicationServerOptions } from "./application-server-options-type"
+import { ApplicationServerUtils } from "./application-server-utils"
 import { generateSwaggerDocumentation } from "../swagger-generator"
+import { createApplicationLogger } from "../util/logger-utils"
 
 /**
  * Creates a new server.
@@ -28,8 +28,7 @@ export function createApplicationServer<App extends AnyApplication>(
   // -- private properties --
   let subscriptionServer: SubscriptionServer | undefined = undefined
   const properties = ApplicationServerUtils.optionsToProperties(options)
-  const loggerHelper = new LoggerHelper(properties.logger)
-  const logger = loggerHelper.createApplicationLogger()
+  const logger = createApplicationLogger(properties.logger)
 
   // -- private functions --
   // create and setup express server
@@ -216,11 +215,7 @@ export function createApplicationServer<App extends AnyApplication>(
         expressApp.use(corsMiddleware)
       }
 
-      const resolverHelper = new ResolverHelper(
-        loggerHelper,
-        properties,
-        this.dataSource,
-      )
+      const resolverHelper = new ResolverHelper(properties, this.dataSource)
 
       // setup GraphQL
       if (

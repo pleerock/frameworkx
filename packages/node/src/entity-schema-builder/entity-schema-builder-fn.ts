@@ -4,7 +4,7 @@ import {
   TypeMetadataUtils,
 } from "@microframework/core"
 import { Connection, EntityMetadata, InsertEvent } from "typeorm"
-import { ApplicationServerProperties } from "../application-server/ApplicationServerProperties"
+import { ApplicationServerProperties } from "../application-server/application-server-properties-type"
 
 /**
  * Generates resolvers and root declarations for the app entities.

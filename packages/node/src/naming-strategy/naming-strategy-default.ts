@@ -1,6 +1,6 @@
 import { DefaultNamingStrategy as GraphQLSchemaDefaultNamingStrategy } from "@microframework/graphql"
-import { NamingStrategy } from "./NamingStrategy"
-import { NamingStrategyUtils } from "./NamingStrategyUtils"
+import { NamingStrategy } from "./naming-strategy-type"
+import { NamingStrategyUtils } from "./naming-strategy-utils"
 
 const { capitalize, smallize, camelize } = NamingStrategyUtils
 

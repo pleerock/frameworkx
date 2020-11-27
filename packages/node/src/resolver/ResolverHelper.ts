@@ -11,26 +11,23 @@ import DataLoader from "dataloader"
 import { withFilter } from "graphql-subscriptions"
 import { GraphQLFieldResolver } from "graphql/type/definition"
 import { ApplicationServerProperties } from "../application-server"
-import { LoggerHelper } from "@microframework/logger"
 import { RateLimitItemOptions } from "../rate-limit"
-import { validateTypeMetadata } from "./validation-utils"
+import { validateTypeMetadata } from "../util/validation-utils"
 import { Connection } from "typeorm"
-import { Errors } from "../error"
+import { Errors } from "../errors"
+import { createContextLogger } from "../util/logger-utils"
 
 /**
  * Helper over resolving operations.
  */
 export class ResolverHelper {
-  private loggerHelper: LoggerHelper
   private properties: ApplicationServerProperties
   private dataSource: Connection | undefined
 
   constructor(
-    logger: LoggerHelper,
     properties: ApplicationServerProperties,
     dataSource: Connection | undefined,
   ) {
-    this.loggerHelper = logger
     this.properties = properties
     this.dataSource = dataSource
   }
@@ -244,7 +241,7 @@ export class ResolverHelper {
         propertyName: metadata.propertyName,
         graphQLResolverArgs: { parent, args, context, info },
       }
-      const logger = this.loggerHelper.createContextLogger(type, logEvent)
+      const logger = createContextLogger(this.properties.logger, type, logEvent)
       const defaultContext: DefaultContext = {
         ...context,
         logger: logger,
@@ -302,7 +299,7 @@ export class ResolverHelper {
         propertyName: metadata.propertyName,
         graphQLResolverArgs: { parent, args, context, info },
       }
-      const logger = this.loggerHelper.createContextLogger(type, logEvent)
+      const logger = createContextLogger(this.properties.logger, type, logEvent)
       const defaultContext: DefaultContext = {
         ...context,
         logger,
@@ -406,7 +403,7 @@ export class ResolverHelper {
         propertyName: metadata.propertyName,
         graphQLResolverArgs: { parent, args, context, info },
       }
-      const logger = this.loggerHelper.createContextLogger(type, logEvent)
+      const logger = createContextLogger(this.properties.logger, type, logEvent)
       const defaultContext: DefaultContext = {
         request: context.request,
         response: context.response,
@@ -536,7 +533,11 @@ export class ResolverHelper {
       response,
       actionMetadata,
     }
-    const logger = this.loggerHelper.createContextLogger("action", logEvent)
+    const logger = createContextLogger(
+      this.properties.logger,
+      "action",
+      logEvent,
+    )
     const defaultContext: DefaultContext = { request, response, logger }
     logger.log("") // this.logger.resolveAction(actionEvent)
     try {

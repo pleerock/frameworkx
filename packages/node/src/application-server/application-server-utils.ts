@@ -7,9 +7,9 @@ import * as path from "path"
 import { MappedEntitySchemaProperty } from "typeorm"
 import { DefaultErrorHandler } from "../error-handler"
 import { DefaultNamingStrategy } from "../naming-strategy"
-import { ApplicationServerOptions } from "./ApplicationServerOptions"
-import { ApplicationServerProperties } from "./ApplicationServerProperties"
-import { ResolverUtils } from "../helper/resolver-utils"
+import { ApplicationServerOptions } from "./application-server-options-type"
+import { ApplicationServerProperties } from "./application-server-properties-type"
+import { ResolverUtils } from "../util/resolver-utils"
 
 /**
  * Application Server utility functions.

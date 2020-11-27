@@ -1,3 +1,3 @@
-export * from "./NamingStrategy"
-export * from "./DefaultNamingStrategy"
-export * from "./NamingStrategyUtils"
+export * from "./naming-strategy-type"
+export * from "./naming-strategy-default"
+export * from "./naming-strategy-utils"

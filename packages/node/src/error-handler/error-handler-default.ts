@@ -1,7 +1,5 @@
 import { LogEvent } from "@microframework/core"
-import { CodeError } from "./CodeError"
-import { ErrorHandler } from "./ErrorHandler"
-import { HttpError } from "./HttpError"
+import { CodeError, ErrorHandler, HttpError } from "./"
 
 /**
  * Default error handling logic.
