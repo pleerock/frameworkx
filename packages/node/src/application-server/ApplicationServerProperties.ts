@@ -2,7 +2,7 @@ import {
   AnyValidationRule,
   MixedList,
   Logger,
-  Validator,
+  ValidationFn,
   AnyResolver,
 } from "@microframework/core"
 import { CorsOptions } from "cors"
@@ -197,7 +197,7 @@ export type ApplicationServerProperties = {
    * Validation library to be used in the application.
    * If not specified, default validator will be used.
    */
-  readonly validator: Validator
+  readonly validator: ValidationFn<any>
 
   /**
    * Logger to be used in the application.

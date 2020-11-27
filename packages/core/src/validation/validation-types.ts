@@ -78,28 +78,23 @@ export type ValidationRuleProjection<Model, Context extends ContextList> = {
 }
 
 /**
- * Options for a Validator.
+ * Validator implementation should implement this type for a framework to execute validation.
+ * If validation of a given value is not successful this function must throw an error.
  */
-export type ValidatorOptions = {
+export type ValidationFn<T> = (options: {
   /**
    * Property name / identifier of the validated value.
    * Shown in error message.
    */
-  key: string
+  key?: string
 
   /**
    * Value to be validated.
    */
-  value: any
+  value: T
 
   /**
    * Validation constraints for a given value.
    */
   constraints: StringValidationConstraints | NumberValidationConstraints
-}
-
-/**
- * Validator implementation should implement this type for framework to execute a validation.
- * If validation of a given value is not successful this function must throw an error.
- */
-export type Validator = (options: ValidatorOptions) => void | Promise<void>
+}) => void | Promise<void>

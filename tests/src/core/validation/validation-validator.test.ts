@@ -1,12 +1,12 @@
 import {
   NumberValidationConstraints,
   StringValidationConstraints,
-  Validator,
+  ValidationFn,
 } from "@microframework/core"
 
 describe("core > validation > validator", () => {
   describe("Validator (sync)", () => {
-    const demoValidator: Validator = (options) => {
+    const demoValidator: ValidationFn<any> = (options) => {
       if (typeof options.value === "number") {
         const constraints = options.constraints as NumberValidationConstraints
         if (constraints.lessThan !== undefined) {
@@ -65,7 +65,7 @@ describe("core > validation > validator", () => {
     })
   })
   describe("Validator (async)", () => {
-    const demoValidator: Validator = async (options) => {
+    const demoValidator: ValidationFn<any> = async (options) => {
       if (typeof options.value === "number") {
         const constraints = options.constraints as NumberValidationConstraints
         if (constraints.lessThan !== undefined) {

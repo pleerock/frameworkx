@@ -290,7 +290,7 @@ Read more about this option [here](#apppath-option).
 
 * `validationRules?: ValidationRule[]` - list of [validation rules](validation.md).
 
-* `validator?: Validator` - validation library to be used in the application.
+* `validator?: ValidationFn<any>` - validation library to be used in the application.
     If not specified, default validator will be used.
 
 * `logger?: Logger` - logger to be used in the application.

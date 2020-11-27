@@ -2,18 +2,21 @@ import {
   AnyValidationRule,
   TypeMetadata,
   TypeMetadataUtils,
-  Validator,
+  ValidationFn,
 } from "@microframework/core"
 
 /**
  * Helper over validation operations.
  */
 export class ValidationHelper {
-  private validator: Validator
+  private validationFn: ValidationFn<any>
   private validationRules: AnyValidationRule[]
 
-  constructor(validator: Validator, validationRules: AnyValidationRule[]) {
-    this.validator = validator
+  constructor(
+    validator: ValidationFn<any>,
+    validationRules: AnyValidationRule[],
+  ) {
+    this.validationFn = validator
     this.validationRules = validationRules
   }
 
@@ -26,7 +29,7 @@ export class ValidationHelper {
     context: any,
   ): Promise<void> {
     // skip if validator wasn't defined in application bootstrap
-    if (!this.validator) return
+    if (!this.validationFn) return
     if (value === undefined || value === null) return
     if (TypeMetadataUtils.isPrimitive(metadata)) return
 
@@ -68,7 +71,7 @@ export class ValidationHelper {
                 }
                 value[property.propertyName!!] = result
               } else {
-                await this.validator({
+                await this.validationFn({
                   key: property.propertyName!!,
                   value: value[property.propertyName!!],
                   constraints: validationSchema,

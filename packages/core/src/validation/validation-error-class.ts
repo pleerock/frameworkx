@@ -1,4 +1,5 @@
 /**
+ * Error class for errors thrown by framework validation.
  */
 export class ValidationError extends Error {
   "@type": "ValidationError"

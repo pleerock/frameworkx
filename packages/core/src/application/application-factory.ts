@@ -2,7 +2,7 @@ import { action, mutation, query, request, subscription } from "../request"
 import { Model } from "@microframework/model"
 import { AnyValidationRule, validationRule } from "../validation"
 import { AnyApplicationOptions } from "./application-helper-types"
-import { contextResolver, resolver, AnyResolver } from "../resolver"
+import { AnyResolver, contextResolver, resolver } from "../resolver"
 import { Application } from "./application-type"
 
 /**

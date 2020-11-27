@@ -1,7 +1,7 @@
 {
   "name": "@microframework/validator",
   "version": "0.1.26",
-  "description": "Microframework validator",
+  "description": "Microframework validation library",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
   "main": "_/index.js",

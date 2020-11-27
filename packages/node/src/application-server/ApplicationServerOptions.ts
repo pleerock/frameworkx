@@ -3,7 +3,7 @@ import {
   AppResolverType,
   MixedList,
   Logger,
-  Validator,
+  ValidationFn,
 } from "@microframework/core"
 import { CorsOptions } from "cors"
 import { OptionsData } from "express-graphql"
@@ -198,7 +198,7 @@ export type ApplicationServerOptions = {
    * Validation library to be used in the application.
    * If not specified, default validator will be used.
    */
-  validator?: Validator
+  validator?: ValidationFn<any>
 
   /**
    * Logger to be used in the application.
