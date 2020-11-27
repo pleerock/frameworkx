@@ -18,7 +18,7 @@ export function parse(appFileName: string): ApplicationTypeMetadata {
   })
   const modelsAndInputs: string[] = []
 
-  // -- private functions --
+  // -- local functions --
 
   function parseAppDefinition(appDefinition: ts.TypeLiteralNode) {
     // first iteration

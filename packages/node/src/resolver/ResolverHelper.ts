@@ -15,13 +15,13 @@ import { RateLimitItemOptions } from "../rate-limit"
 import { validateTypeMetadata } from "../util/validation-utils"
 import { Connection } from "typeorm"
 import { Errors } from "../errors"
-import { createContextLogger } from "../util/logger-utils"
+import { LoggerUtils } from "../util/logger-utils"
 
 /**
  * Helper over resolving operations.
  */
 export class ResolverHelper {
-  private properties: ApplicationServerProperties
+  properties: ApplicationServerProperties
   private dataSource: Connection | undefined
 
   constructor(
@@ -241,7 +241,11 @@ export class ResolverHelper {
         propertyName: metadata.propertyName,
         graphQLResolverArgs: { parent, args, context, info },
       }
-      const logger = createContextLogger(this.properties.logger, type, logEvent)
+      const logger = LoggerUtils.createContextLogger(
+        this.properties.logger,
+        type,
+        logEvent,
+      )
       const defaultContext: DefaultContext = {
         ...context,
         logger: logger,
@@ -299,7 +303,11 @@ export class ResolverHelper {
         propertyName: metadata.propertyName,
         graphQLResolverArgs: { parent, args, context, info },
       }
-      const logger = createContextLogger(this.properties.logger, type, logEvent)
+      const logger = LoggerUtils.createContextLogger(
+        this.properties.logger,
+        type,
+        logEvent,
+      )
       const defaultContext: DefaultContext = {
         ...context,
         logger,
@@ -403,7 +411,11 @@ export class ResolverHelper {
         propertyName: metadata.propertyName,
         graphQLResolverArgs: { parent, args, context, info },
       }
-      const logger = createContextLogger(this.properties.logger, type, logEvent)
+      const logger = LoggerUtils.createContextLogger(
+        this.properties.logger,
+        type,
+        logEvent,
+      )
       const defaultContext: DefaultContext = {
         request: context.request,
         response: context.response,
@@ -533,7 +545,7 @@ export class ResolverHelper {
       response,
       actionMetadata,
     }
-    const logger = createContextLogger(
+    const logger = LoggerUtils.createContextLogger(
       this.properties.logger,
       "action",
       logEvent,

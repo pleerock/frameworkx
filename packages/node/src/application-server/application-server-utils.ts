@@ -1,15 +1,29 @@
-import { ApplicationUtils, TypeMetadata } from "@microframework/core"
+import {
+  ApplicationTypeMetadata,
+  ApplicationUtils,
+  assign,
+  MixedList,
+  TypeMetadata,
+} from "@microframework/core"
 import { debugLogger } from "@microframework/logger"
 import { parse } from "@microframework/parser"
 import { defaultValidator } from "@microframework/validator"
 import * as fs from "fs"
 import * as path from "path"
-import { MappedEntitySchemaProperty } from "typeorm"
+import {
+  Connection,
+  ConnectionOptions,
+  EntitySchema,
+  MappedEntitySchemaProperty,
+} from "typeorm"
 import { DefaultErrorHandler } from "../error-handler"
 import { DefaultNamingStrategy } from "../naming-strategy"
 import { ApplicationServerOptions } from "./application-server-options-type"
 import { ApplicationServerProperties } from "./application-server-properties-type"
 import { ResolverUtils } from "../util/resolver-utils"
+import { GraphQLError, GraphQLSchema } from "graphql"
+import { graphqlHTTP, OptionsData } from "express-graphql"
+import { Server as WebsocketServer } from "ws"
 
 /**
  * Application Server utility functions.
@@ -28,12 +42,16 @@ export const ApplicationServerUtils = {
     if (fs.existsSync(tsFilePath)) return parse(tsFilePath)
     if (fs.existsSync(dtsFilePath)) return parse(dtsFilePath)
 
-    throw new Error(`${tsFilePath} or ${dtsFilePath} were not found!`)
+    throw new Error(
+      `Application declaration is missing in "${filenameWithoutExt}.{.ts,.d.ts,.json}".` +
+        `Please make sure you specified a correct path to the application declaration file in the "appPath" option.` +
+        `Also make sure you didn't include file extension in the specified path of the "appPath" option.`,
+    )
   },
 
   /**
-   * Converts given type metadata models into MappedEntitySchemaProperty objects.
-   * These objects are used by TypeORM to set types to entity properties dynamically.
+   * Converts given type metadata models into TypeORM's MappedEntitySchemaProperty objects.
+   * Those objects are used by TypeORM to set types to entity properties dynamically.
    */
   modelsToApp(models: TypeMetadata[]): MappedEntitySchemaProperty[] {
     const mappedEntities: MappedEntitySchemaProperty[] = []
@@ -50,8 +68,8 @@ export const ApplicationServerUtils = {
   },
 
   /**
-   * Converts given ApplicationServerOptions object into ApplicationServerProperties object
-   * and sets default properties if something was not set in options.
+   * Converts given ApplicationServerOptions object into ApplicationServerProperties object.
+   * Sets default properties if something was not set in options.
    */
   optionsToProperties(
     options: ApplicationServerOptions,
@@ -111,5 +129,133 @@ export const ApplicationServerUtils = {
       rateLimits: options.rateLimits,
       rateLimitConstructor: options.rateLimitConstructor,
     }
+  },
+
+  /**
+   * Setups a database source (TypeORM's connection).
+   */
+  async loadDataSource(
+    metadata: ApplicationTypeMetadata,
+    dataSource:
+      | Connection
+      | ((options: Partial<ConnectionOptions>) => Promise<Connection>),
+    entities?: MixedList<Function | string | EntitySchema>,
+  ): Promise<Connection> {
+    // as usual, we can't rely on "instanceof", so let's just check if its a Connection object
+    // until we have "@type" property in the next TypeORM version
+    if (
+      (dataSource as Connection)["name"] &&
+      (dataSource as Connection)["options"]
+    ) {
+      if (entities) {
+        throw new Error(
+          `"entities" can only be used when "dataSource" is set to a factory function.`,
+        )
+      }
+      return dataSource as Connection
+    }
+    if (typeof dataSource === "function") {
+      const dataSourceOptions: Partial<ConnectionOptions> = {}
+      if (metadata && metadata.models.length > 0) {
+        assign(dataSourceOptions, {
+          mappedEntitySchemaProperties: ApplicationServerUtils.modelsToApp(
+            metadata.models,
+          ),
+        })
+      }
+      if (entities) {
+        assign(dataSourceOptions, {
+          entities,
+        })
+      }
+      return dataSource(dataSourceOptions)
+    }
+
+    throw new Error(`Invalid "dataSource" value.`)
+  },
+
+  /**
+   * Creates a GraphQL middleware for Express server.
+   */
+  createGraphQLMiddleware(
+    schema: GraphQLSchema,
+    graphiql: boolean,
+    options: Partial<OptionsData>,
+  ) {
+    // create a graphql HTTP server
+    return graphqlHTTP((request, response) => ({
+      schema: schema,
+      graphiql: graphiql,
+      context: {
+        request,
+        response,
+      },
+      customFormatErrorFn: (error: GraphQLError) => {
+        return {
+          ...error,
+          // trace: process.env.NODE_ENV !== "production" ? error.stack : null,
+          code: (error.originalError as Error & { code?: number })?.code,
+          stack: error.stack ? error.stack.split("\n") : [],
+          path: error.path,
+        }
+      },
+      ...options,
+    }))
+  },
+
+  /**
+   * Middleware for the Playground.
+   */
+  createPlaygroundMiddleware(
+    graphqlRoute: string,
+    subscriptionsEndpoint: string,
+  ) {
+    const expressPlayground = require("graphql-playground-middleware-express")
+      .default
+    return expressPlayground({
+      endpoint: graphqlRoute,
+      subscriptionsEndpoint: subscriptionsEndpoint,
+    })
+  },
+
+  /**
+   * Creates a websocket server.
+   */
+  createWebsocketServer(
+    websocketProperties: ApplicationServerProperties["websocket"],
+  ) {
+    const wsServer: typeof WebsocketServer =
+      websocketProperties.websocketServer || WebsocketServer
+    let websocketServer = new wsServer({
+      host: websocketProperties.host,
+      port: websocketProperties.port,
+      path: "/" + websocketProperties.path,
+      ...websocketProperties.options,
+    })
+
+    // setup a disconnection timeout to know when websocket user is disconnected
+    // https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
+    if (websocketProperties.disconnectTimeout) {
+      websocketServer!!.on("connection", (ws) => {
+        ;(ws as any)["isAlive"] = true
+        ws.on("pong", () => {
+          ;(ws as any)["isAlive"] = true
+        })
+      })
+
+      const interval = setInterval(() => {
+        websocketServer!.clients.forEach((ws) => {
+          if ((ws as any)["isAlive"] === false) return ws.terminate()
+          ;(ws as any)["isAlive"] = false
+          ws.ping(function () {})
+        })
+      }, websocketProperties.disconnectTimeout)
+
+      websocketServer!!.on("close", function close() {
+        clearInterval(interval)
+      })
+    }
+
+    return websocketServer
   },
 }

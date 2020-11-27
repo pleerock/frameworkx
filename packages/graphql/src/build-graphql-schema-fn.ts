@@ -26,13 +26,13 @@ import { GraphQLSchemaBuilderOptions } from "./build-graphql-schema-fn-options"
 export function buildGraphQLSchema(
   options: GraphQLSchemaBuilderOptions,
 ): GraphQLSchema {
-  // -- private properties --
+  // -- local properties --
   const objectTypes: GraphQLObjectType[] = []
   const inputTypes: GraphQLInputObjectType[] = []
   const enumTypes: GraphQLEnumType[] = []
   const unionTypes: GraphQLUnionType[] = []
 
-  // -- private functions --
+  // -- local functions --
 
   /**
    * Resolves a final GraphQL input / object / union / enum type for a given type metadata.
