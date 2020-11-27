@@ -6,9 +6,9 @@ import { initAction } from "./action/initAction"
 program.version(require("../package.json").version)
 
 program
-  .command("generate:metadata <destination>")
+  .command("generate:metadata <appFilePath>")
   .description("generates a metadata file from a given app .ts / .d.ts file")
-  .action((destination: string) => generateMetadataAction(destination))
+  .action((appFilePath: string) => generateMetadataAction(appFilePath))
 
 program
   .command("init <name>")
