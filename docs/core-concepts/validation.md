@@ -29,7 +29,7 @@ Input validation rule example:
 import { validationRule } from "@microframework/core"
 
 export const UserRegisterInputValidationRule = validationRule(
-  App.model("UserRegisterInput"),
+  App.input("UserRegisterInput"),
   {
     projection: {
       email: {
@@ -95,8 +95,8 @@ import { ValidationError, validationRule } from "@microframework/core"
 export const UserModelValidationRule = validationRule(
   App.input("UserRegisterInput"),
   {
-    async validate(user, context) {
-      const userWithSuchEmail = await UserRepository.find({ email: user.email })
+    async validate(userRegisterInput, context) {
+      const userWithSuchEmail = await UserRepository.find({ email: userRegisterInput.email })
       if (userWithSuchEmail) {
         throw new ValidationError(
           "USER_REGISTER_BUSY_EMAIL",
@@ -116,13 +116,13 @@ export const UserModelValidationRule = validationRule(
   App.input("UserRegisterInput"),
   {
     projection: {
-      firstName(firstName, user, context) {
+      firstName(firstName, userRegisterInput, context) {
         return firstName.trim()
       },
-      lastName(firstName, user, context) {
-        return firstName.trim()
+      lastName(lastName, userRegisterInput, context) {
+        return lastName.trim()
       },
-      async email(email, user, context) {
+      async email(email, userRegisterInput, context) {
         const userWithSuchEmail = await UserRepository.find({ email: email })
         if (userWithSuchEmail) {
           throw new ValidationError(

@@ -1,8 +1,12 @@
 ```ts
 export const App = createApp<{
   models: {
+    post: { id: number } | { id: string }
+    post: Post[] | Post2[]
+    post: (Post | Post2)[]
   }
   inputs: {
+    postInput: Post | Post2
   }
   queries: {
     post(args: PostInput[]): PostType & PostType2[]
