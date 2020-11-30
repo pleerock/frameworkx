@@ -103,6 +103,10 @@ export async function initAction(
       destination + "/packages/client/tsconfig.json",
     )
     await fs.rename(
+      destination + "/packages/client/.gitignore.template",
+      destination + "/packages/client/.gitignore",
+    )
+    await fs.rename(
       destination + "/packages/common/tsconfig.json.template",
       destination + "/packages/common/tsconfig.json",
     )
