@@ -26,4 +26,9 @@ export const App = createApp<{
   subscriptions: {
   }
 }>()
+
+// enum with one property must not be used
+enum Status {
+  active = "active",
+}
 ```

@@ -5,6 +5,7 @@ import {
   TypeMetadata,
 } from "@microframework/core"
 import * as ts from "typescript"
+import * as path from "path"
 import { Errors } from "./errors"
 import { ModelParser } from "./models-parser"
 import { ParserUtils } from "./utils"
@@ -269,7 +270,7 @@ export function parse(appFileName: string): ApplicationTypeMetadata {
   // -- logic itself --
 
   // find a provided application source file
-  const normalizedAppFileName = appFileName.replace(/\\/g, "/")
+  const normalizedAppFileName = path.resolve(appFileName.replace(/\\/g, "/"))
   const appSourceFile = program.getSourceFiles().find((file) => {
     return file.fileName === normalizedAppFileName
   })
