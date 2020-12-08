@@ -1,17 +1,17 @@
 # Installation
 
-* Using CLI
-    * Create a project
-    * Install dependencies
-    * Run the project
-* Manual installation
-    * Create a new project
-    * Setup TypeScript compiler
-    * Basic application structure
-    * Create a basic model and input
-    * Create basic queries and mutations
-    * Create basic resolvers
-    * Run the project
+* [Using CLI](#using-cli)
+    * [Create a project](#create-a-project)
+    * [Install dependencies](#install-dependencies)
+    * [Run the project](#run-the-project)
+* [Manual installation](#manual-installation)
+    * [Create a new project](#create-a-new-project)
+    * [Setup TypeScript compiler](#setup-typescript-compiler)
+    * [Basic application structure](#basic-application-structure)
+    * [Create a basic model and input](#create-a-basic-model-and-input)
+    * [Create basic queries and mutations](#create-basic-queries-and-mutations)
+    * [Create basic resolvers](#create-basic-resolvers)
+    * [Run project](#run-project)
 
 ## Using CLI
 
@@ -21,7 +21,7 @@ You can use microframework's CLI to generate a project scaffold.
 Use following command to generate a new `my-project` directory with a new project inside:
 
 ```shell script
-npx @microframework/core init my-project
+npx @microframework/cli init my-project
 ```
 
 There are 3 types of project skeletons you can generate:
@@ -88,7 +88,7 @@ And put following content inside:
   },
   "devDependencies": {
     "@types/node": "^14.11.1",
-    "typescript": "^4.1.1-rc"
+    "typescript": "4.1.2"
   },
   "scripts": {
     "start": "tsc && node ./_/index.js",
@@ -462,7 +462,7 @@ export const AppServer = createApplicationServer(App, {
 })
 ```
 
-### Run the project
+### Run project
 
 To run the project just run `npm start`.
 Once it gets start open http://localhost:4000/graphql in your browser
