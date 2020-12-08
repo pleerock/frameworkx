@@ -34,7 +34,7 @@ By default `init` command generates a monolith skeleton.
 You can use a `--type` option to generate a different skeleton, e.g.
 
 ```shell script
-npx @microframework/core init my-project --type monorepo
+npx @microframework/cli init my-project --type monorepo
 ```
 
 `monorepo` and `microservices` are advanced skeleton types, 
