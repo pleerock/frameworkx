@@ -7,12 +7,12 @@ export type NamingStrategy = {
   /**
    * GraphQL schema generation naming strategy.
    */
-  graphqlSchema: GraphQLSchemaBuilderNamingStrategy
+  generatedGraphQLTypes: GraphQLSchemaBuilderNamingStrategy
 
   /**
-   * Defines names of the generated model declarations.
+   * Defines names of the generated entity models.
    */
-  generatedModelDeclarations: {
+  generatedEntityModelNames: {
     one(modelName: string): string
     oneNotNull(modelName: string): string
     many(modelName: string): string
@@ -38,7 +38,7 @@ export type NamingStrategy = {
   /**
    * Defines descriptions of the generated model declarations.
    */
-  generatedModelDeclarationDescriptions: {
+  generatedEntityModelDescriptions: {
     one(modelName: string): string
     oneNotNull(modelName: string): string
     many(modelName: string): string
@@ -55,9 +55,9 @@ export type NamingStrategy = {
   }
 
   /**
-   * Defines names of the generated input declarations.
+   * Defines names of the "args" of the models.
    */
-  generatedModelInputs: {
+  generatedEntityModelArgs: {
     where(typeName: string): string
     save(typeName: string): string
     order(typeName: string): string

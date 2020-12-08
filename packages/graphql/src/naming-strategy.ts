@@ -1,5 +1,8 @@
 import { TypeMetadata } from "@microframework/core"
 
+/**
+ * Naming strategy for generated GraphQL types.
+ */
 export type GraphQLSchemaBuilderNamingStrategy = {
   /**
    * What name should be used for Inputs without name defined.

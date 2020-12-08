@@ -8,9 +8,8 @@ const { capitalize, smallize, camelize } = NamingStrategyUtils
  * Default framework naming strategy.
  */
 export const DefaultNamingStrategy: NamingStrategy = {
-  graphqlSchema: GraphQLSchemaDefaultNamingStrategy,
-
-  generatedModelDeclarations: {
+  generatedGraphQLTypes: GraphQLSchemaDefaultNamingStrategy,
+  generatedEntityModelNames: {
     one(modelName: string) {
       return smallize(`${modelName}One`)
     },
@@ -72,7 +71,7 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return modelName + "ObserveRemove"
     },
   },
-  generatedModelDeclarationDescriptions: {
+  generatedEntityModelDescriptions: {
     one(modelName: string) {
       return `Loads a single instance of the "${modelName}" model. Returns null if model not found.`
     },
@@ -113,7 +112,7 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return `Observes removals of the "${modelName}" model.`
     },
   },
-  generatedModelInputs: {
+  generatedEntityModelArgs: {
     where(typeName: string) {
       return capitalize(camelize(typeName + " Where"))
     },

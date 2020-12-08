@@ -33,7 +33,7 @@ export const ApplicationServerUtils = {
    * Loads application metadata from the declaration file.
    * Given file name shouldn't have an extension.
    */
-  loadAppMetadata(filenameWithoutExt: string) {
+  loadAppMetadata(filenameWithoutExt: string): ApplicationTypeMetadata {
     const jsonFilePath = path.normalize(filenameWithoutExt + ".json")
     const tsFilePath = path.normalize(filenameWithoutExt + ".ts")
     const dtsFilePath = path.normalize(filenameWithoutExt + ".d.ts")

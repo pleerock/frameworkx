@@ -63,7 +63,7 @@ export function createApplicationServer<App extends AnyApplication>(
           this.properties.dataSource,
           this.properties.entities,
         )
-        assign(this, { dataSource } as Partial<ApplicationServer<any>>)
+        assign(this, { dataSource })
       }
 
       // generate additional root definitions / resolvers for root models
@@ -106,7 +106,7 @@ export function createApplicationServer<App extends AnyApplication>(
         schema = buildGraphQLSchema({
           assert: true,
           appMetadata: metadata!,
-          namingStrategy: this.properties.namingStrategy.graphqlSchema,
+          namingStrategy: this.properties.namingStrategy.generatedGraphQLTypes,
           resolveFactory: resolverHelper.createRootDeclarationResolverFn.bind(
             resolverHelper,
           ) as any,
@@ -163,7 +163,8 @@ export function createApplicationServer<App extends AnyApplication>(
 
         if (!method || !route) {
           throw new Error(
-            `Invalid action defined "${action.name}". Action name must contain HTTP method (e.g. "get", "post", ...) and URL (e.g. "/users", ...).`,
+            `Invalid action defined "${action.name}". ` +
+              `Action name must contain HTTP method (e.g. "get", "post", ...) and route path (e.g. "/users", ...).`,
           )
         }
         if (!(expressApp as any)[method.toLowerCase()]) {
@@ -184,9 +185,7 @@ export function createApplicationServer<App extends AnyApplication>(
       // setup swagger
       if (properties.swagger) {
         const swaggerUi = require("swagger-ui-express")
-        // console.log(
-        //   JSON.stringify(generateSwaggerDocumentation(this.metadata!), null, 2),
-        // )
+        // console.log(JSON.stringify(generateSwaggerDocumentation(this.metadata!), null, 2))
         expressApp.use(
           properties.swagger.route,
           swaggerUi.serve,
