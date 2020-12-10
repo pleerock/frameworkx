@@ -1,6 +1,6 @@
 {
   "name": "@microframework/validator",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Microframework validation library",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -25,3 +25,5 @@
     "typescript": "4.1.2"
   }
 }
+
+// 5500 / 12

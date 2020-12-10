@@ -38,7 +38,7 @@ export function generateEntityResolvers(
     ResolverHelper.pushResolver(
       properties.resolvers,
       "query",
-      namingStrategy.generatedEntityModelNames.one(model.typeName),
+      namingStrategy.generatedEntityDeclarationNames.one(model.typeName),
       (args: any) => {
         args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
         return dataSource
@@ -50,7 +50,7 @@ export function generateEntityResolvers(
     ResolverHelper.pushResolver(
       properties.resolvers,
       "query",
-      namingStrategy.generatedEntityModelNames.oneNotNull(model.typeName),
+      namingStrategy.generatedEntityDeclarationNames.oneNotNull(model.typeName),
       (args: any) => {
         args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
         return dataSource
@@ -62,7 +62,7 @@ export function generateEntityResolvers(
     ResolverHelper.pushResolver(
       properties.resolvers,
       "query",
-      namingStrategy.generatedEntityModelNames.many(model.typeName),
+      namingStrategy.generatedEntityDeclarationNames.many(model.typeName),
       (args: any) => {
         args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
         return dataSource.getRepository(entityMetadata.name).find({
@@ -77,7 +77,7 @@ export function generateEntityResolvers(
     ResolverHelper.pushResolver(
       properties.resolvers,
       "query",
-      namingStrategy.generatedEntityModelNames.count(model.typeName),
+      namingStrategy.generatedEntityDeclarationNames.count(model.typeName),
       (args: any) => {
         args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
         return dataSource.getRepository(entityMetadata.name).count(args)
@@ -91,7 +91,7 @@ export function generateEntityResolvers(
     ResolverHelper.pushResolver(
       properties.resolvers,
       "mutation",
-      namingStrategy.generatedEntityModelNames.save(model.typeName),
+      namingStrategy.generatedEntityDeclarationNames.save(model.typeName),
       (input: any) => {
         return dataSource.getRepository(entityMetadata.name).save(input)
       },
@@ -100,7 +100,7 @@ export function generateEntityResolvers(
     ResolverHelper.pushResolver(
       properties.resolvers,
       "mutation",
-      namingStrategy.generatedEntityModelNames.remove(model.typeName),
+      namingStrategy.generatedEntityDeclarationNames.remove(model.typeName),
       (args: any) => {
         return dataSource.getRepository(entityMetadata.name).remove(args)
       },
@@ -111,25 +111,25 @@ export function generateEntityResolvers(
     // ------------------------------------------------------------
 
     if (pubSub) {
-      const manyTriggerName = namingStrategy.generatedEntityModelNames.observeManyTriggerName(
+      const manyTriggerName = namingStrategy.generatedEntityDeclarationNames.observeManyTriggerName(
         entityMetadata.name,
       )
-      const oneTriggerName = namingStrategy.generatedEntityModelNames.observeOneTriggerName(
+      const oneTriggerName = namingStrategy.generatedEntityDeclarationNames.observeOneTriggerName(
         entityMetadata.name,
       )
-      const countTriggerName = namingStrategy.generatedEntityModelNames.observeCountTriggerName(
+      const countTriggerName = namingStrategy.generatedEntityDeclarationNames.observeCountTriggerName(
         entityMetadata.name,
       )
-      const insertTriggerName = namingStrategy.generatedEntityModelNames.observeInsertTriggerName(
+      const insertTriggerName = namingStrategy.generatedEntityDeclarationNames.observeInsertTriggerName(
         entityMetadata.name,
       )
-      const saveTriggerName = namingStrategy.generatedEntityModelNames.observeSaveTriggerName(
+      const saveTriggerName = namingStrategy.generatedEntityDeclarationNames.observeSaveTriggerName(
         entityMetadata.name,
       )
-      const updateTriggerName = namingStrategy.generatedEntityModelNames.observeInsertTriggerName(
+      const updateTriggerName = namingStrategy.generatedEntityDeclarationNames.observeInsertTriggerName(
         entityMetadata.name,
       )
-      const removeTriggerName = namingStrategy.generatedEntityModelNames.observeRemoveTriggerName(
+      const removeTriggerName = namingStrategy.generatedEntityDeclarationNames.observeRemoveTriggerName(
         entityMetadata.name,
       )
 
@@ -153,7 +153,9 @@ export function generateEntityResolvers(
       ResolverHelper.pushResolver(
         properties.resolvers,
         "subscription",
-        namingStrategy.generatedEntityModelNames.observeInsert(model.typeName),
+        namingStrategy.generatedEntityDeclarationNames.observeInsert(
+          model.typeName,
+        ),
         {
           triggers: [insertTriggerName],
         },
@@ -162,7 +164,9 @@ export function generateEntityResolvers(
       ResolverHelper.pushResolver(
         properties.resolvers,
         "subscription",
-        namingStrategy.generatedEntityModelNames.observeUpdate(model.typeName),
+        namingStrategy.generatedEntityDeclarationNames.observeUpdate(
+          model.typeName,
+        ),
         {
           triggers: [updateTriggerName],
         },
@@ -171,7 +175,9 @@ export function generateEntityResolvers(
       ResolverHelper.pushResolver(
         properties.resolvers,
         "subscription",
-        namingStrategy.generatedEntityModelNames.observeSave(model.typeName),
+        namingStrategy.generatedEntityDeclarationNames.observeSave(
+          model.typeName,
+        ),
         {
           triggers: [saveTriggerName],
         },
@@ -179,7 +185,9 @@ export function generateEntityResolvers(
       ResolverHelper.pushResolver(
         properties.resolvers,
         "subscription",
-        namingStrategy.generatedEntityModelNames.observeRemove(model.typeName),
+        namingStrategy.generatedEntityDeclarationNames.observeRemove(
+          model.typeName,
+        ),
         {
           triggers: [removeTriggerName],
         },
@@ -188,7 +196,9 @@ export function generateEntityResolvers(
       ResolverHelper.pushResolver(
         properties.resolvers,
         "subscription",
-        namingStrategy.generatedEntityModelNames.observeOne(model.typeName),
+        namingStrategy.generatedEntityDeclarationNames.observeOne(
+          model.typeName,
+        ),
         {
           triggers: [oneTriggerName],
           onSubscribe: (args: any, context: any) => {
@@ -213,7 +223,9 @@ export function generateEntityResolvers(
       ResolverHelper.pushResolver(
         properties.resolvers,
         "subscription",
-        namingStrategy.generatedEntityModelNames.observeMany(model.typeName),
+        namingStrategy.generatedEntityDeclarationNames.observeMany(
+          model.typeName,
+        ),
         {
           triggers: [manyTriggerName],
           onSubscribe: (args: any, context: any) => {
@@ -238,7 +250,9 @@ export function generateEntityResolvers(
       ResolverHelper.pushResolver(
         properties.resolvers,
         "subscription",
-        namingStrategy.generatedEntityModelNames.observeCount(model.typeName),
+        namingStrategy.generatedEntityDeclarationNames.observeCount(
+          model.typeName,
+        ),
         {
           triggers: [countTriggerName],
           onSubscribe: (args: any, context: any) => {
@@ -296,19 +310,25 @@ export function generateEntityResolvers(
     }
 
     const whereArgs = TypeMetadataUtils.create("object", {
-      typeName: namingStrategy.generatedEntityModelArgs.where(model.typeName!!),
+      typeName: namingStrategy.generatedEntityDeclarationArgsInputs.where(
+        model.typeName!!,
+      ),
       propertyName: "where",
       nullable: true,
       properties: whereArgsProperties,
     })
 
     const saveArgs = TypeMetadataUtils.create("object", {
-      typeName: namingStrategy.generatedEntityModelArgs.save(model.typeName!!),
+      typeName: namingStrategy.generatedEntityDeclarationArgsInputs.save(
+        model.typeName!!,
+      ),
       properties: saveArgsProperties,
     })
 
     const orderByArgs = TypeMetadataUtils.create("object", {
-      typeName: namingStrategy.generatedEntityModelArgs.order(model.typeName!!),
+      typeName: namingStrategy.generatedEntityDeclarationArgsInputs.order(
+        model.typeName!!,
+      ),
       propertyName: "order",
       nullable: true,
       properties: orderArgsProperties,
@@ -326,10 +346,10 @@ export function generateEntityResolvers(
     DeclarationHelper.pushQuery(appMetadata.queries, {
       ...model,
       nullable: true,
-      propertyName: namingStrategy.generatedEntityModelNames.one(
+      propertyName: namingStrategy.generatedEntityDeclarationNames.one(
         model.typeName,
       ),
-      description: namingStrategy.generatedEntityModelDescriptions.one(
+      description: namingStrategy.generatedEntityDeclarationDescriptions.one(
         model.typeName,
       ),
       args: [queryArgs],
@@ -337,10 +357,10 @@ export function generateEntityResolvers(
     DeclarationHelper.pushQuery(appMetadata.queries, {
       ...model,
       nullable: false,
-      propertyName: namingStrategy.generatedEntityModelNames.oneNotNull(
+      propertyName: namingStrategy.generatedEntityDeclarationNames.oneNotNull(
         model.typeName,
       ),
-      description: namingStrategy.generatedEntityModelDescriptions.oneNotNull(
+      description: namingStrategy.generatedEntityDeclarationDescriptions.oneNotNull(
         model.typeName,
       ),
       args: [queryArgs],
@@ -348,20 +368,20 @@ export function generateEntityResolvers(
     DeclarationHelper.pushQuery(appMetadata.queries, {
       ...model,
       array: true,
-      propertyName: namingStrategy.generatedEntityModelNames.many(
+      propertyName: namingStrategy.generatedEntityDeclarationNames.many(
         model.typeName,
       ),
-      description: namingStrategy.generatedEntityModelDescriptions.many(
+      description: namingStrategy.generatedEntityDeclarationDescriptions.many(
         model.typeName,
       ),
       args: [queryArgs],
     })
     DeclarationHelper.pushQuery(appMetadata.queries, {
       ...TypeMetadataUtils.create("number"),
-      propertyName: namingStrategy.generatedEntityModelNames.count(
+      propertyName: namingStrategy.generatedEntityDeclarationNames.count(
         model.typeName,
       ),
-      description: namingStrategy.generatedEntityModelDescriptions.count(
+      description: namingStrategy.generatedEntityDeclarationDescriptions.count(
         model.typeName,
       ),
       args: [whereArgs],
@@ -373,20 +393,20 @@ export function generateEntityResolvers(
 
     DeclarationHelper.pushMutation(appMetadata.mutations, {
       ...model,
-      propertyName: namingStrategy.generatedEntityModelNames.save(
+      propertyName: namingStrategy.generatedEntityDeclarationNames.save(
         model.typeName,
       ),
-      description: namingStrategy.generatedEntityModelDescriptions.save(
+      description: namingStrategy.generatedEntityDeclarationDescriptions.save(
         model.typeName,
       ),
       args: [saveArgs],
     })
     DeclarationHelper.pushMutation(appMetadata.mutations, {
       ...TypeMetadataUtils.create("boolean"),
-      propertyName: namingStrategy.generatedEntityModelNames.remove(
+      propertyName: namingStrategy.generatedEntityDeclarationNames.remove(
         model.typeName,
       ),
-      description: namingStrategy.generatedEntityModelDescriptions.remove(
+      description: namingStrategy.generatedEntityDeclarationDescriptions.remove(
         model.typeName,
       ),
       args: [whereArgs],
@@ -399,50 +419,50 @@ export function generateEntityResolvers(
     if (pubSub) {
       DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
         ...model,
-        propertyName: namingStrategy.generatedEntityModelNames.observeInsert(
+        propertyName: namingStrategy.generatedEntityDeclarationNames.observeInsert(
           model.typeName,
         ),
-        description: namingStrategy.generatedEntityModelDescriptions.observeInsert(
-          model.typeName,
-        ),
-        // args: whereArgs,
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        propertyName: namingStrategy.generatedEntityModelNames.observeUpdate(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityModelDescriptions.observeUpdate(
+        description: namingStrategy.generatedEntityDeclarationDescriptions.observeInsert(
           model.typeName,
         ),
         // args: whereArgs,
       })
       DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
         ...model,
-        propertyName: namingStrategy.generatedEntityModelNames.observeSave(
+        propertyName: namingStrategy.generatedEntityDeclarationNames.observeUpdate(
           model.typeName,
         ),
-        description: namingStrategy.generatedEntityModelDescriptions.observeSave(
-          model.typeName,
-        ),
-        // args: whereArgs,
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        propertyName: namingStrategy.generatedEntityModelNames.observeRemove(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityModelDescriptions.observeRemove(
+        description: namingStrategy.generatedEntityDeclarationDescriptions.observeUpdate(
           model.typeName,
         ),
         // args: whereArgs,
       })
       DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
         ...model,
-        propertyName: namingStrategy.generatedEntityModelNames.observeOne(
+        propertyName: namingStrategy.generatedEntityDeclarationNames.observeSave(
           model.typeName,
         ),
-        description: namingStrategy.generatedEntityModelDescriptions.observeOne(
+        description: namingStrategy.generatedEntityDeclarationDescriptions.observeSave(
+          model.typeName,
+        ),
+        // args: whereArgs,
+      })
+      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
+        ...model,
+        propertyName: namingStrategy.generatedEntityDeclarationNames.observeRemove(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.observeRemove(
+          model.typeName,
+        ),
+        // args: whereArgs,
+      })
+      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
+        ...model,
+        propertyName: namingStrategy.generatedEntityDeclarationNames.observeOne(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.observeOne(
           model.typeName,
         ),
         args: [whereArgs],
@@ -450,20 +470,20 @@ export function generateEntityResolvers(
       DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
         ...model,
         array: true,
-        propertyName: namingStrategy.generatedEntityModelNames.observeMany(
+        propertyName: namingStrategy.generatedEntityDeclarationNames.observeMany(
           model.typeName,
         ),
-        description: namingStrategy.generatedEntityModelDescriptions.observeMany(
+        description: namingStrategy.generatedEntityDeclarationDescriptions.observeMany(
           model.typeName,
         ),
         args: [queryArgs],
       })
       DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
         ...TypeMetadataUtils.create("number"),
-        propertyName: namingStrategy.generatedEntityModelNames.observeCount(
+        propertyName: namingStrategy.generatedEntityDeclarationNames.observeCount(
           model.typeName,
         ),
-        description: namingStrategy.generatedEntityModelDescriptions.observeCount(
+        description: namingStrategy.generatedEntityDeclarationDescriptions.observeCount(
           model.typeName,
         ),
         args: [whereArgs],

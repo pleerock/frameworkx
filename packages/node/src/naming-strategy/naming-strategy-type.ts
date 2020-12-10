@@ -12,7 +12,7 @@ export type NamingStrategy = {
   /**
    * Defines names of the generated entity models.
    */
-  generatedEntityModelNames: {
+  generatedEntityDeclarationNames: {
     one(modelName: string): string
     oneNotNull(modelName: string): string
     many(modelName: string): string
@@ -38,7 +38,7 @@ export type NamingStrategy = {
   /**
    * Defines descriptions of the generated model declarations.
    */
-  generatedEntityModelDescriptions: {
+  generatedEntityDeclarationDescriptions: {
     one(modelName: string): string
     oneNotNull(modelName: string): string
     many(modelName: string): string
@@ -57,7 +57,7 @@ export type NamingStrategy = {
   /**
    * Defines names of the "args" of the models.
    */
-  generatedEntityModelArgs: {
+  generatedEntityDeclarationArgsInputs: {
     where(typeName: string): string
     save(typeName: string): string
     order(typeName: string): string

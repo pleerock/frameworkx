@@ -5,16 +5,6 @@ import { TypeMetadata } from "@microframework/core"
  */
 export type GraphQLSchemaBuilderNamingStrategy = {
   /**
-   * What name should be used for Inputs without name defined.
-   */
-  namelessInput(): string
-
-  /**
-   * What name should be used for Models without name defined.
-   */
-  namelessModel(): string
-
-  /**
    * Generates a model name for a nameless TypeMetadata.
    */
   modelTypeName(type: TypeMetadata): string

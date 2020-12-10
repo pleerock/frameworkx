@@ -9,7 +9,7 @@ const { capitalize, smallize, camelize } = NamingStrategyUtils
  */
 export const DefaultNamingStrategy: NamingStrategy = {
   generatedGraphQLTypes: GraphQLSchemaDefaultNamingStrategy,
-  generatedEntityModelNames: {
+  generatedEntityDeclarationNames: {
     one(modelName: string) {
       return smallize(`${modelName}One`)
     },
@@ -71,7 +71,7 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return modelName + "ObserveRemove"
     },
   },
-  generatedEntityModelDescriptions: {
+  generatedEntityDeclarationDescriptions: {
     one(modelName: string) {
       return `Loads a single instance of the "${modelName}" model. Returns null if model not found.`
     },
@@ -112,7 +112,7 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return `Observes removals of the "${modelName}" model.`
     },
   },
-  generatedEntityModelArgs: {
+  generatedEntityDeclarationArgsInputs: {
     where(typeName: string) {
       return capitalize(camelize(typeName + " Where"))
     },

@@ -1,6 +1,6 @@
 {
   "name": "@microframework/fetcher",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Microframework fetcher",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",

@@ -49,7 +49,7 @@ export const EntitySchemaArgsHelper = {
 
           allTypes.push(
             TypeMetadataUtils.create("object", {
-              typeName: appProperties.namingStrategy.generatedEntityModelArgs.whereRelation(
+              typeName: appProperties.namingStrategy.generatedEntityDeclarationArgsInputs.whereRelation(
                 type.typeName!!,
                 property.propertyName!!,
               ),
@@ -116,7 +116,7 @@ export const EntitySchemaArgsHelper = {
 
           allTypes.push(
             TypeMetadataUtils.create("object", {
-              typeName: appProperties.namingStrategy.generatedEntityModelArgs.saveRelation(
+              typeName: appProperties.namingStrategy.generatedEntityDeclarationArgsInputs.saveRelation(
                 type.typeName!!,
                 property.propertyName!!,
               ),

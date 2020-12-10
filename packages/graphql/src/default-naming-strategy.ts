@@ -1,4 +1,5 @@
 import { TypeMetadata } from "@microframework/core"
+import { GraphQLSchemaBuilderNamingStrategy } from "./naming-strategy"
 /**
  * Generates a random string of a given length.
  */
@@ -29,18 +30,7 @@ function capitalize(str: string) {
 /**
  * Default naming strategy.
  */
-export const DefaultNamingStrategy = {
-  namelessInput() {
-    return randomString(10) + "Input"
-  },
-
-  namelessModel() {
-    return randomString(10) + "Model"
-  },
-
-  /**
-   * Generates a model name for a nameless TypeMetadata.
-   */
+export const DefaultNamingStrategy: GraphQLSchemaBuilderNamingStrategy = {
   modelTypeName(type: TypeMetadata) {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
@@ -48,9 +38,6 @@ export const DefaultNamingStrategy = {
     return capitalize(camelize(type.propertyPath.replace(/\./g, " "))) + "Model"
   },
 
-  /**
-   * Generates an input name for a nameless TypeMetadata.
-   */
   inputTypeName(type: TypeMetadata) {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
@@ -58,9 +45,6 @@ export const DefaultNamingStrategy = {
     return capitalize(camelize(type.propertyPath.replace(/\./g, " "))) + "Input"
   },
 
-  /**
-   * Generates an enum name for a nameless TypeMetadata.
-   */
   enumTypeName(type: TypeMetadata) {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
@@ -68,9 +52,6 @@ export const DefaultNamingStrategy = {
     return capitalize(camelize(type.propertyPath.replace(/\./g, " "))) + "Enum"
   },
 
-  /**
-   * Generates union name for a nameless TypeMetadata.
-   */
   unionTypeName(type: TypeMetadata) {
     if (type.propertyPath === type.propertyName) {
       return type.propertyPath
