@@ -1,5 +1,5 @@
 import { createApplicationServer } from "@microframework/node"
-import { Fetcher } from "@microframework/fetcher"
+import { createFetcher, Fetcher } from "@microframework/fetcher"
 import gql from "graphql-tag"
 import { obtainPort } from "../../../util/test-common"
 import { App } from "../../rate-limits/app"
@@ -22,7 +22,7 @@ describe("node > app server options > graphql options", () => {
     // make sure option property was set
     expect(server.properties.graphql.route).toBe("/api")
 
-    const fetcher = new Fetcher({
+    const fetcher = createFetcher({
       graphqlEndpoint: `http://localhost:${port}/api`,
     })
     const query = gql`

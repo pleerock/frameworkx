@@ -1,7 +1,7 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort, sleep } from "../../util/test-common"
-import { Fetcher } from "@microframework/fetcher"
+import { createFetcher, Fetcher } from "@microframework/fetcher"
 import { AppServer } from "./server"
 
 // NOTE: if these tests are failing for you, make sure you have redis running
@@ -9,11 +9,11 @@ import { AppServer } from "./server"
 describe("node > rate limitation", () => {
   let port: number = 0
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: Fetcher | undefined = undefined
+  let fetcher: Fetcher<any> | undefined = undefined
 
   beforeEach(async () => {
     port = await obtainPort()
-    fetcher = new Fetcher({
+    fetcher = createFetcher({
       graphqlEndpoint: `http://localhost:${port}/graphql`,
     })
   })

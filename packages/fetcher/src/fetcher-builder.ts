@@ -9,7 +9,7 @@ import {
  * Creates a new universal FetcherQueryBuilder.
  */
 export function createFetcherQueryBuilder(
-  fetcher: Fetcher,
+  fetcher: Fetcher<any>,
   request: Request<any>,
   builderItem?: AnyRequestMapItem,
 ) {
@@ -61,7 +61,7 @@ export function createFetcherQueryBuilder(
  * Creates a proxy object that intercepts all fetcher method calls.
  */
 export function createFetcherMethodsProxy(
-  fetcher: Fetcher,
+  fetcher: Fetcher<any>,
   request: Request<any>,
   itemName: string,
 ) {

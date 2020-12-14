@@ -1,6 +1,6 @@
 {
   "name": "@microframework/cli",
-  "version": "0.1.29",
+  "version": "0.1.32",
   "description": "Microframework core",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",

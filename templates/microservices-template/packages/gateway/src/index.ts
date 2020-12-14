@@ -1,5 +1,4 @@
 require("dotenv").config()
-globalThis.fetch = require("node-fetch")
 import { GatewayServer } from "./app"
 
 GatewayServer.start()

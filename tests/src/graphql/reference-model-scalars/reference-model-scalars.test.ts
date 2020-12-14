@@ -315,12 +315,10 @@ describe("graphql > schema builder", () => {
     expect(postTypeDeprecated.description).toBe("This type is deprecated.")
 
     const id = postTypeDeprecated.getFields()["id"]
-    expect((id as GraphQLField<any, any>).isDeprecated).toBe(true)
     expect(id.deprecationReason).toBe(" ")
 
     const name = postTypeDeprecated.getFields()["name"]
     expect(name.description).toBe("This property is deprecated")
-    expect((name as GraphQLField<any, any>).isDeprecated).toBe(true)
     expect(name.deprecationReason).toBe("Does not need anymore")
   })
 })

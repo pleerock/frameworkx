@@ -1,18 +1,18 @@
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import { obtainPort } from "../../../util/test-common"
-import { Fetcher, FetcherError } from "@microframework/fetcher"
+import { createFetcher, Fetcher, FetcherError } from "@microframework/fetcher"
 import { AppServer } from "./server"
 import { FetchError } from "node-fetch"
 
 describe("node > error handling > basic errors", () => {
   let port: number = 0
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: Fetcher | undefined = undefined
+  let fetcher: Fetcher<any> | undefined = undefined
 
   beforeEach(async () => {
     port = await obtainPort()
-    fetcher = new Fetcher({
+    fetcher = createFetcher({
       graphqlEndpoint: `http://localhost:${port}/graphql`,
     })
     server = await AppServer(port).start()

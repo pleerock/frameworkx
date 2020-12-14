@@ -38,7 +38,7 @@ export const App = createApp<{
     AnswerInput: { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
-       * @deprecated not used anymore !!!.
+       * @deprecated not used anymore.
        */
       accepted: boolean
     }
@@ -63,14 +63,14 @@ export const App = createApp<{
       args: { id: number } & { name: string } & {
         /**
          * Indicates if answer is accepted.
-         * @deprecated not used anymore !!!.
+         * @deprecated not used anymore.
          */
         accepted: boolean
       },
     ): { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
-       * @deprecated not used anymore !!!.
+       * @deprecated not used anymore.
        */
       accepted: boolean
     }
@@ -95,14 +95,14 @@ export const App = createApp<{
       args: { id: number } & { name: string } & {
         /**
          * Indicates if answer is accepted.
-         * @deprecated not used anymore !!!.
+         * @deprecated not used anymore.
          */
         accepted: boolean
       },
     ): { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
-       * @deprecated not used anymore !!!.
+       * @deprecated not used anymore.
        */
       accepted: boolean
     }
@@ -127,14 +127,14 @@ export const App = createApp<{
       args: { id: number } & { name: string } & {
         /**
          * Indicates if answer is accepted.
-         * @deprecated not used anymore !!!.
+         * @deprecated not used anymore.
          */
         accepted: boolean
       },
     ): { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
-       * @deprecated not used anymore !!!.
+       * @deprecated not used anymore.
        */
       accepted: boolean
     }
@@ -168,6 +168,7 @@ type CategoryGeneralType = {
 type CategoryMetaType = {
   /**
    * Category rating
+   *
    * @deprecated not used anymore.
    */
   rating: bigint

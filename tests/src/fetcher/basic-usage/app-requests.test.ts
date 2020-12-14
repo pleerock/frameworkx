@@ -1,4 +1,4 @@
-import { Fetcher } from "@microframework/fetcher"
+import { createFetcher, Fetcher } from "@microframework/fetcher"
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
 import ws from "ws"
@@ -11,13 +11,13 @@ describe("core > request > app syntax", () => {
   let webserverPort: number = 0
   let websocketPort: number = 0
   let server: ApplicationServer<any> | undefined = undefined
-  let fetcher: Fetcher | undefined = undefined
+  let fetcher: Fetcher<any> | undefined = undefined
 
   beforeEach(async () => {
     webserverPort = await obtainPort()
     websocketPort = await obtainPort()
     server = await AppServer(webserverPort, websocketPort).start()
-    fetcher = new Fetcher({
+    fetcher = createFetcher({
       clientId: "jest-test-fetcher",
       actionEndpoint: `http://localhost:${webserverPort}`,
       graphqlEndpoint: `http://localhost:${webserverPort}/graphql`,

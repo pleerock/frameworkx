@@ -1,4 +1,4 @@
-import { Fetcher } from "@microframework/fetcher"
+import { createFetcher, Fetcher } from "@microframework/fetcher"
 import { ApplicationServer } from "@microframework/node"
 import ws from "ws"
 import { obtainPort, sleep } from "../../util/test-common"
@@ -16,7 +16,7 @@ describe("core > request > app fetcher syntax", () => {
     webserverPort = await obtainPort()
     websocketPort = await obtainPort()
     server = await AppServer(webserverPort, websocketPort).start()
-    fetcher = new Fetcher(App, {
+    fetcher = createFetcher(App, {
       clientId: "jest-test-fetcher",
       actionEndpoint: `http://localhost:${webserverPort}`,
       graphqlEndpoint: `http://localhost:${webserverPort}/graphql`,
@@ -45,17 +45,6 @@ describe("core > request > app fetcher syntax", () => {
         title: true,
       })
       .fetch()
-
-    // console.log(result.id2)
-
-    const postsRequest = App.request("Posts", {
-      firstPost: App.query("postRandomOne", {
-        select: {
-          id: true,
-          title: true,
-        },
-      }),
-    })
 
     expect(result).toEqual({
       data: {

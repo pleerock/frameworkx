@@ -133,7 +133,6 @@ describe("graphql > schema builder", () => {
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
-      expect(categoryRating.isDeprecated).toBe(true)
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)
@@ -210,7 +209,6 @@ describe("graphql > schema builder", () => {
       const rating = fields["rating"]
       expect(rating).not.toBe(undefined)
       expect(rating.description).toBe("Category rating")
-      expect((rating as GraphQLField<any, any>).isDeprecated).toBe(true)
       expect(rating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(rating.type)) fail(`"rating" is nullable`)
       expect(isScalarType(rating.type.ofType)).toBe(true)
@@ -290,7 +288,6 @@ describe("graphql > schema builder", () => {
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
-      expect(categoryRating.isDeprecated).toBe(true)
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)
@@ -372,7 +369,6 @@ describe("graphql > schema builder", () => {
       const accepted = fields["accepted"]
       expect(accepted).not.toBe(undefined)
       expect(accepted.description).toBe("Indicates if answer is accepted.")
-      expect((accepted as GraphQLField<any, any>).isDeprecated).toBe(true)
       expect(accepted.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(accepted.type)) fail(`"accepted" is nullable`)
       expect(isScalarType(accepted.type.ofType)).toBe(true)
@@ -441,7 +437,6 @@ describe("graphql > schema builder", () => {
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
-      expect(categoryRating.isDeprecated).toBe(true)
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)
@@ -519,7 +514,6 @@ describe("graphql > schema builder", () => {
       const rating = fields["rating"]
       expect(rating).not.toBe(undefined)
       expect(rating.description).toBe("Category rating")
-      expect((rating as GraphQLField<any, any>).isDeprecated).toBe(true)
       expect(rating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(rating.type)) fail(`"rating" is nullable`)
       expect(isScalarType(rating.type.ofType)).toBe(true)
@@ -599,7 +593,6 @@ describe("graphql > schema builder", () => {
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
-      expect(categoryRating.isDeprecated).toBe(true)
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)
@@ -682,7 +675,6 @@ describe("graphql > schema builder", () => {
       const accepted = fields["accepted"]
       expect(accepted).not.toBe(undefined)
       expect(accepted.description).toBe("Indicates if answer is accepted.")
-      expect((accepted as GraphQLField<any, any>).isDeprecated).toBe(true)
       expect(accepted.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(accepted.type)) fail(`"accepted" is nullable`)
       expect(isScalarType(accepted.type.ofType)).toBe(true)
@@ -753,7 +745,6 @@ describe("graphql > schema builder", () => {
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
-      expect(categoryRating.isDeprecated).toBe(true)
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)
@@ -1041,7 +1032,6 @@ describe("graphql > schema builder", () => {
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
-      expect(categoryRating.isDeprecated).toBe(true)
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)
@@ -1329,7 +1319,6 @@ describe("graphql > schema builder", () => {
       const categoryRating = categoryFields["rating"]
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
-      expect(categoryRating.isDeprecated).toBe(true)
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
       if (!isNonNullType(categoryRating.type))
         fail(`"categoryRating" is nullable`)

@@ -1,5 +1,5 @@
 import { createApplicationServer } from "@microframework/node"
-import { createConnection } from "typeorm"
+import { createConnection, getConnectionManager } from "typeorm"
 import { obtainPort } from "../../../util/test-common"
 import { App } from "../../rate-limits/app"
 import { PostEntity } from "./entities"
@@ -7,7 +7,7 @@ import { PostEntity } from "./entities"
 describe("node > app server options > basic options", () => {
   test("dataSource typeorm connection", async () => {
     const port = await obtainPort()
-    const dataSource = await createConnection({
+    const dataSource = getConnectionManager().create({
       type: "sqlite",
       database: ":memory:",
     })
@@ -17,7 +17,7 @@ describe("node > app server options > basic options", () => {
         port,
       },
       entities: [PostEntity],
-      dataSource,
+      dataSource: (options) => dataSource.setOptions(options).connect(),
       resolvers: [],
     })
 

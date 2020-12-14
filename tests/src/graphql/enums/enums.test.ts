@@ -363,13 +363,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -442,13 +440,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -519,13 +515,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -598,13 +592,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -681,13 +673,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -766,13 +756,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -816,13 +804,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -899,13 +885,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -984,13 +968,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -1032,13 +1014,11 @@ describe("graphql > schema builder", () => {
       expect(argsStatusEnum.getValues()[2].name).toBe("removed")
       expect(argsStatusEnum.getValues()[2].value).toBe("removed")
       expect(argsStatusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(argsStatusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(argsStatusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(argsStatusEnum.getValues()[3].name).toBe("watched")
       expect(argsStatusEnum.getValues()[3].value).toBe("watched")
       expect(argsStatusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(argsStatusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(argsStatusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -1114,13 +1094,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -1198,13 +1176,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -1283,13 +1259,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -1331,13 +1305,11 @@ describe("graphql > schema builder", () => {
       expect(argsStatusEnum.getValues()[2].name).toBe("removed")
       expect(argsStatusEnum.getValues()[2].value).toBe("removed")
       expect(argsStatusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(argsStatusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(argsStatusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(argsStatusEnum.getValues()[3].name).toBe("watched")
       expect(argsStatusEnum.getValues()[3].value).toBe("watched")
       expect(argsStatusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(argsStatusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(argsStatusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )
@@ -1413,13 +1385,11 @@ describe("graphql > schema builder", () => {
       expect(statusEnum.getValues()[2].name).toBe("removed")
       expect(statusEnum.getValues()[2].value).toBe("removed")
       expect(statusEnum.getValues()[2].description).toBe("Is removed.")
-      expect(statusEnum.getValues()[2].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[2].deprecationReason).toBe("")
 
       expect(statusEnum.getValues()[3].name).toBe("watched")
       expect(statusEnum.getValues()[3].value).toBe("watched")
       expect(statusEnum.getValues()[3].description).toBe("Is watched.")
-      expect(statusEnum.getValues()[3].isDeprecated).toBe(true)
       expect(statusEnum.getValues()[3].deprecationReason).toBe(
         "this status is not used anymore.",
       )

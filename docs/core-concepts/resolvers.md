@@ -210,7 +210,6 @@ export const PostsGetActionResolver = resolver(App, {
 })
 ```
 
-
 Read more about how to use actions [here](actions.md).
  
 ## Model resolver
@@ -258,8 +257,8 @@ import { contextResolver } from "@microframework/core"
 import { App } from "./app"
 
 export const ContextResolver = contextResolver(App, {
-  async currentUser({ request, response }) {
-    // todo: get user based on request.headers.authorization
+  async currentUser(defaultContext) {
+    // todo: get a user based on defaultContext.request.headers.authorization
     return {
       id: 1,
       name: "Timber"
@@ -267,6 +266,9 @@ export const ContextResolver = contextResolver(App, {
   }
 })
 ```
+
+When context property resolved, resolving function accepts a `defaultContext` which contains `request` and `response` objects.
+They are extremely helpful if you want to resolve data based on a user request. 
 
 ## Register resolvers
 

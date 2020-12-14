@@ -270,9 +270,9 @@ export function parse(appFileName: string): ApplicationTypeMetadata {
   // -- logic itself --
 
   // find a provided application source file
-  const normalizedAppFileName = path.resolve(appFileName.replace(/\\/g, "/"))
+  const normalizedAppFileName = path.resolve(appFileName) // .replace(/\\/g, "/"))
   const appSourceFile = program.getSourceFiles().find((file) => {
-    return file.fileName === normalizedAppFileName
+    return path.resolve(file.fileName) === normalizedAppFileName
   })
   if (!appSourceFile) throw Errors.appFileInvalid(appFileName)
 
