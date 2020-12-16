@@ -17,6 +17,11 @@ export type FetcherQueryBuilder<
   Queries extends GraphQLDeclarationList,
   Map extends RequestMap
 > = {
+  /**
+   * Add a new entry into GraphQL query.
+   * Using this operator you can combine queries to a different GraphQL root declarations
+   * in a single HTTP request.
+   */
   add<Name extends string>(name: Name): FetcherQueryMethods<Queries, Name, Map>
 }
 
@@ -27,6 +32,11 @@ export type FetcherMutationBuilder<
   Mutations extends GraphQLDeclarationList,
   Map extends RequestMap
 > = {
+  /**
+   * Add a new entry into GraphQL query.
+   * Using this operator you can combine mutations to a different GraphQL root declarations
+   * in a single HTTP request.
+   */
   add<Name extends string>(
     name: Name,
   ): FetcherMutationMethods<Mutations, Name, Map>
@@ -39,6 +49,11 @@ export type FetcherSubscriptionBuilder<
   Subscriptions extends GraphQLDeclarationList,
   Map extends RequestMap
 > = {
+  /**
+   * Add a new entry into GraphQL query.
+   * Using this operator you can combine subscriptions to a different GraphQL root declarations
+   * in a single HTTP request.
+   */
   add<Name extends string>(
     name: Name,
   ): FetcherSubscriptionMethods<Subscriptions, Name, Map>
@@ -51,8 +66,20 @@ export type FetcherQueryExecutor<
   Queries extends GraphQLDeclarationList,
   Map extends RequestMap
 > = FetcherQueryBuilder<Queries, Map> & {
+  /**
+   * Executes a query and returns a Response object.
+   */
   response(): Promise<Response>
+
+  /**
+   * Executes a query and returns the data out of response.
+   */
   fetch(): Promise<{ data: RequestMapReturnType<Map>; errors?: any[] }>
+
+  /**
+   * Executes a query and returns the data out of response.
+   * Unsafe version returns original root declaration type.
+   */
   fetchUnsafe(): Promise<{ data: RequestMapOriginType<Map>; errors?: any[] }>
 }
 
@@ -63,8 +90,20 @@ export type FetcherMutationExecutor<
   Mutations extends GraphQLDeclarationList,
   Map extends RequestMap
 > = FetcherMutationBuilder<Mutations, Map> & {
+  /**
+   * Executes a query and returns a Response object.
+   */
   response(): Promise<Response>
+
+  /**
+   * Executes a query and returns the data out of response.
+   */
   fetch(): Promise<{ data: RequestMapReturnType<Map>; errors?: any[] }>
+
+  /**
+   * Executes a query and returns the data out of response.
+   * Unsafe version returns original root declaration type.
+   */
   fetchUnsafe(): Promise<{ data: RequestMapOriginType<Map>; errors?: any[] }>
 }
 
@@ -75,7 +114,15 @@ export type FetcherSubscriptionExecutor<
   Subscriptions extends GraphQLDeclarationList,
   Map extends RequestMap
 > = FetcherSubscriptionBuilder<Subscriptions, Map> & {
+  /**
+   * Creates an Observable for a given Subscription.
+   */
   observe(): Observable<RequestMapReturnType<Map>>
+
+  /**
+   * Creates an Observable for a given Subscription.
+   * Returns original type instead of selection.
+   */
   observeUnsafe(): Observable<RequestMapOriginType<Map>>
 }
 
@@ -92,6 +139,9 @@ export type FetcherQueryMethods<
     ...args: Parameters<Queries[P]>
   ) => NonArray<NonNullable<ReturnTypeOptional<Queries[P]>>> extends object
     ? {
+        /**
+         * Choose what to select from a model returned by a GraphQL root declaration.
+         */
         select<Selection extends RequestSelection<Queries[P]>>(
           selection: Selection,
         ): FetcherQueryExecutor<
@@ -124,6 +174,9 @@ export type FetcherMutationMethods<
     ...args: Parameters<Mutations[P]>
   ) => NonArray<NonNullable<ReturnTypeOptional<Mutations[P]>>> extends object
     ? {
+        /**
+         * Choose what to select from a model returned by a GraphQL root declaration.
+         */
         select<Selection extends RequestSelection<Mutations[P]>>(
           selection: Selection,
         ): FetcherMutationExecutor<
@@ -158,6 +211,9 @@ export type FetcherSubscriptionMethods<
     NonNullable<ReturnTypeOptional<Subscriptions[P]>>
   > extends object
     ? {
+        /**
+         * Choose what to select from a model returned by a GraphQL root declaration.
+         */
         select<Selection extends RequestSelection<Subscriptions[P]>>(
           selection: Selection,
         ): FetcherSubscriptionExecutor<

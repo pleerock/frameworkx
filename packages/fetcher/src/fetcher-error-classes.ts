@@ -1,5 +1,5 @@
 /**
- * Special type of Error use show errors occurred during network request execution.
+ * Special type of Error containing errors occurred during network request execution.
  */
 export class FetcherError extends Error {
   "@type": "FetcherError"

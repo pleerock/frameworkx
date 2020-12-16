@@ -23,6 +23,18 @@ export type RequestActionOptions<
   (Action["body"] extends object ? { body: Action["body"] } : {})
 
 /**
+ * All request action options, no matter what action is.
+ * Helper type.
+ */
+export type AllRequestActionOptions = {
+  query: any
+  params: any
+  headers: any
+  cookies: any
+  body: any
+}
+
+/**
  * Request properties for a particular action.
  */
 export type RequestAction<

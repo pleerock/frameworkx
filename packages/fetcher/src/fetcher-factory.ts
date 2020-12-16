@@ -1,23 +1,25 @@
 import {
-  AnyAction,
   AnyApplication,
-  AnyRequestAction,
   Request,
-  RequestActionOptions,
   RequestMap,
   RequestMapReturnType,
 } from "@microframework/core"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import Observable from "zen-observable-ts"
 import { v4 as uuidv4 } from "uuid"
-import { Fetcher, FetcherOptions } from "./fetcher-types"
+import { Fetcher, FetcherOptions } from "./fetcher-core-types"
 import { FetcherError } from "./fetcher-error-classes"
-import { compile } from "path-to-regexp"
-import { createFetcherQueryBuilder } from "./fetcher-builder"
-import { extractQueryMetadata } from "./fetcher-utils"
+import { createFetcherQueryBuilder } from "./fetcher-query-builder-factory"
+import { FetcherUtils } from "./fetcher-utils"
+import { FetcherErrors } from "./fetcher-errors"
+
+// todo-s:
+//  * implement non-json actions
+//  * implement file uploads?
+//  * implement any http query?
 
 /**
- * Fetcher helps to execute network queries.
+ * Creates a Fetcher that can be used to execute a network requests.
  */
 export function createFetcher<App extends AnyApplication>(
   app: App,
@@ -25,19 +27,25 @@ export function createFetcher<App extends AnyApplication>(
 ): Fetcher<App>
 
 /**
- * Fetcher helps to execute network queries.
+ * Creates a Fetcher that can be used to execute a network requests.
  */
 export function createFetcher(options: FetcherOptions): Fetcher<any>
 
 /**
- * Fetcher helps to execute network queries.
+ * Creates a Fetcher that can be used to execute a network requests.
  */
 export function createFetcher(
   appOrOptions: AnyApplication | FetcherOptions,
   maybeOptions?: FetcherOptions,
 ): Fetcher<any> {
-  let websocketProtocols: string[] = ["graphql-ws"]
-  let ws: ReconnectingWebSocket | undefined = undefined
+  const app: AnyApplication | undefined =
+    arguments.length === 2 ? (appOrOptions as AnyApplication) : undefined
+  const options: FetcherOptions =
+    arguments.length === 1
+      ? (appOrOptions as FetcherOptions)
+      : (maybeOptions as FetcherOptions)
+  const clientId: string = options.clientId || uuidv4()
+
   let id: number = 0
   let wsInitialized: boolean = false
   let subscribedMessageCallbacks: {
@@ -49,137 +57,108 @@ export function createFetcher(
     callback: () => any
   }[] = []
 
-  const app: AnyApplication | undefined =
-    arguments.length === 2 ? (appOrOptions as AnyApplication) : undefined
-  const options: FetcherOptions =
-    arguments.length === 1
-      ? (appOrOptions as FetcherOptions)
-      : (maybeOptions as FetcherOptions)
-  const clientId: string = options.clientId || uuidv4()
-
-  async function buildHeaders() {
-    const headers: any = {
-      "Content-type": "application/json",
-    }
-    if (options.headersFactory) {
-      const userHeaders = options.headersFactory()
-      if (userHeaders["then"] !== undefined) {
-        Object.assign(headers, await userHeaders)
-      } else {
-        Object.assign(headers, userHeaders)
-      }
-    }
-    return headers
-  }
-
   return {
     "@type": "Fetcher",
     app,
-    ws,
+    options,
+    ws: undefined,
+
+    query(name: string) {
+      if (!app) throw FetcherErrors.noAppToUseOperator("query")
+
+      return createFetcherQueryBuilder(this, {
+        "@type": "Request",
+        name: name,
+        type: "query",
+        map: {},
+      } as Request<any>)
+    },
+
+    mutation(name: string) {
+      if (!app) throw FetcherErrors.noAppToUseOperator("mutation")
+
+      return createFetcherQueryBuilder(this, {
+        "@type": "Request",
+        name: name,
+        type: "mutation",
+        map: {},
+      } as Request<any>)
+    },
+
+    subscription(name: string) {
+      if (!app) throw FetcherErrors.noAppToUseOperator("subscription")
+
+      return createFetcherQueryBuilder(this, {
+        "@type": "Request",
+        name: name,
+        type: "subscription",
+        map: {},
+      } as Request<any>)
+    },
+
+    action(name: any, ...args: any) {
+      if (!app) throw FetcherErrors.noAppToUseOperator("action")
+
+      return this.fetch(app.request((app.action as any)(name, args)))
+    },
 
     async connect() {
-      if (options.websocketEndpoint) {
-        ws = new ReconnectingWebSocket(
+      if (!options.websocketEndpoint) {
+        throw FetcherErrors.noWebsocketEndpointDefined()
+      }
+      if (this.ws) {
+        throw FetcherErrors.wsAlreadyConnected()
+      }
+
+      // create a new websocket instance
+      if (options.websocketFactory) {
+        this.ws = options.websocketFactory(options) as ReconnectingWebSocket
+        if (!this.ws) {
+          throw FetcherErrors.websocketFactoryInvalid()
+        }
+      } else {
+        this.ws = new ReconnectingWebSocket(
           options.websocketEndpoint,
-          websocketProtocols,
+          ["graphql-ws"],
           options.websocketOptions,
         )
+      }
 
-        ws.onopen = () => {
-          ws!.send(
-            JSON.stringify({
-              type: "connection_init",
-              payload: {
-                id: clientId,
-              },
-            }),
-          )
-          wsInitialized = true
-          pendingMessageCallbacks.forEach((item) => {
-            item.callback()
-          })
-          pendingMessageCallbacks = []
-          // ws.close()
+      // setup websocket callbacks
+      this.ws.onopen = () => {
+        // send a message about connection being initialized
+        this.ws!.send(
+          JSON.stringify({
+            type: "connection_init",
+            payload: {
+              id: clientId,
+            },
+          }),
+        )
+
+        // call app pending for a connection callbacks
+        wsInitialized = true
+        for (let item of pendingMessageCallbacks) {
+          item.callback()
         }
-        ws.onclose = () => {
-          // console.log("closed")
-        }
-        ws.onmessage = (event) => {
-          // console.log("onMessage", event)
-          for (let onMessageCallback of subscribedMessageCallbacks) {
-            onMessageCallback.callback(event)
-          }
+        pendingMessageCallbacks = []
+      }
+      this.ws.onclose = () => {}
+      this.ws.onmessage = (event) => {
+        for (let onMessageCallback of subscribedMessageCallbacks) {
+          onMessageCallback.callback(event)
         }
       }
       return this
     },
 
     async disconnect() {
-      if (ws) {
-        ws.close()
+      if (this.ws) {
+        this.ws.close()
+        this.ws = undefined
+        wsInitialized = false
       }
       return this
-    },
-
-    query(name: string) {
-      if (!app) {
-        throw new Error(
-          `In order to execute an action application instance must be set in the fetcher constructor.`,
-        )
-      }
-      const request: Request<any> = {
-        "@type": "Request",
-        name: name,
-        type: "query",
-        map: {},
-      }
-      return createFetcherQueryBuilder(this, request)
-    },
-
-    mutation(name: string) {
-      if (!app) {
-        throw new Error(
-          `In order to execute an action application instance must be set in the fetcher constructor.`,
-        )
-      }
-      const request: Request<any> = {
-        "@type": "Request",
-        name: name,
-        type: "mutation",
-        map: {},
-      }
-      return createFetcherQueryBuilder(this, request)
-    },
-
-    subscription(name: string) {
-      if (!app) {
-        throw new Error(
-          `In order to execute an action application instance must be set in the fetcher constructor.`,
-        )
-      }
-      const request: Request<any> = {
-        "@type": "Request",
-        name: name,
-        type: "subscription",
-        map: {},
-      }
-      return createFetcherQueryBuilder(this, request)
-    },
-
-    action<ActionKey extends keyof AnyApplication["_options"]["actions"]>(
-      name: ActionKey,
-      options: RequestActionOptions<
-        AnyApplication["_options"]["actions"][ActionKey]
-      >,
-    ) {
-      // todo: implement it same way as Application.action()
-      if (!app) {
-        throw new Error(
-          `In order to execute an action application instance must be set in the fetcher constructor.`,
-        )
-      }
-
-      return this.fetch(app.request((app.action as any)(name, options))) // todo: remove any
     },
 
     async fetchUnsafe(
@@ -193,79 +172,18 @@ export function createFetcher(
       request: Request<any> | string | any,
       variables?: { [key: string]: any },
     ): Promise<any> {
-      if (
-        typeof request === "object" &&
-        request.map &&
-        request.map["@type"] === "RequestAction"
-      ) {
-        if (!options.actionEndpoint) {
-          throw new Error(
-            "`actionEndpoint` must be set in Fetcher options in order to execute requests.",
-          )
-        }
-        const requestAction: AnyRequestAction = request.map
-        const headers = await buildHeaders()
-        let body: any = undefined
-        const actionOptions: AnyAction = requestAction.options
-        if (actionOptions.body) {
-          body = JSON.stringify(actionOptions.body)
-        }
-
-        let path: string = requestAction.path
-        if (actionOptions.params) {
-          const toPath = compile(path, {
-            encode: encodeURIComponent,
-          })
-          path = toPath(actionOptions.params)
-        }
-
-        let query = ""
-        if (actionOptions.query) {
-          query =
-            "?" +
-            Object.keys(actionOptions.query)
-              .map(
-                (k) =>
-                  encodeURIComponent(k) +
-                  "=" +
-                  encodeURIComponent(actionOptions.query[k]),
-              )
-              .join("&")
-        }
-
-        // console.log("executing:", options.actionEndpoint + path + query)
-        const response = await fetch(options.actionEndpoint + path + query, {
-          method: requestAction.method,
-          // todo: send cookies
-          headers: headers,
-          body,
-        })
+      const response = await this.response(request, variables)
+      if (FetcherUtils.isRequestAnAction(request)) {
         // todo: what about non-json responses?
         return response.json()
       } else {
-        if (!options.graphqlEndpoint)
-          throw new Error(
-            "`graphqlEndpoint` must be set in Fetcher options in order to execute GraphQL queries.",
-          )
-
-        const { queryName, queryString } = extractQueryMetadata(request)
-        const headers = await buildHeaders()
-        const response = await fetch(
-          options.graphqlEndpoint + "?" + queryName,
-          {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify({
-              query: queryString,
-              variables,
-            }),
-          },
-        )
+        // parse json result
         const result = await response.json()
         if (result["errors"]) {
-          throw new FetcherError(queryName, result["errors"])
+          const queryMeta = FetcherUtils.extractQueryMetadata(request)
+          throw new FetcherError(queryMeta.name, result["errors"])
         }
-        return result // .data
+        return result
       }
     },
 
@@ -273,16 +191,48 @@ export function createFetcher(
       request: Request<any> | string | any, // | DocumentNode,
       variables?: { [key: string]: any },
     ): Promise<Response> {
-      const { queryName, queryString } = extractQueryMetadata(request)
-      const headers = await buildHeaders()
-      return await fetch(options.graphqlEndpoint + "?" + queryName, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify({
-          query: queryString,
-          variables,
-        }),
-      })
+      if (FetcherUtils.isRequestAnAction(request)) {
+        if (!options.actionEndpoint) {
+          throw FetcherErrors.noActionEndpointDefined()
+        }
+        if (variables) {
+          throw FetcherErrors.variablesNotSupportedInAction()
+        }
+
+        // prepare data for a new fetch request
+        const headers = await FetcherUtils.buildHeaders(options, request.map)
+        const body = FetcherUtils.buildBody(request.map)
+        const path = FetcherUtils.buildParamsPath(request.map)
+        const query = FetcherUtils.buildQueryString(request.map)
+        const url = options.actionEndpoint + path + query
+        const method = request.map.method
+        return fetch(url, {
+          method,
+          headers,
+          body,
+        })
+      } else {
+        if (!options.graphqlEndpoint) {
+          throw FetcherErrors.noGraphQLEndpointDefined()
+        }
+
+        // prepare data for a new fetch request
+        const queryMeta = FetcherUtils.extractQueryMetadata(request)
+        const url = options.graphqlEndpoint + "?" + queryMeta.name
+        const headers = await FetcherUtils.buildHeaders(options, undefined)
+
+        // execute fetch request
+        const response = await fetch(url, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            query: queryMeta.body,
+            variables,
+          }),
+        })
+
+        return response.json()
+      }
     },
 
     observeUnsafe<T extends RequestMap>(
@@ -296,22 +246,22 @@ export function createFetcher(
       query: Request<any> | string | any, // | DocumentNode,
       variables?: { [key: string]: any },
     ): Observable<any> {
-      const { queryName, queryString } = extractQueryMetadata(query)
+      const queryMeta = FetcherUtils.extractQueryMetadata(query)
       const updatedId = ++id
       const sentData = JSON.stringify({
         id: id,
-        name: queryName,
+        name: queryMeta.name,
         type: "start",
         payload: {
           variables,
-          query: queryString,
+          query: queryMeta.body,
         },
       })
 
-      let messageSendCallback = () => {
-        if (!ws) throw new Error(`Websocket connection is not established`)
+      const messageSendCallback = () => {
+        if (!this.ws) throw FetcherErrors.wsNotConnected()
         // console.log("sentData", sentData)
-        ws.send(sentData)
+        this.ws.send(sentData)
       }
       if (wsInitialized) {
         messageSendCallback()
@@ -331,13 +281,6 @@ export function createFetcher(
               observer.error(data.payload)
               return
             }
-            // if (data.payload.data) {
-            // this check is temporary and based only on query name
-            // need to re-implement with real query ids
-
-            // console.log(name, data.payload.data)
-            // const dataName = Object.keys(data.payload.data)[0]
-            // if (data.payload.data[dataName]) {
             if (data.payload.data) {
               observer.next(data.payload.data)
             }
@@ -351,18 +294,19 @@ export function createFetcher(
           callback: onMessageCallback,
         }
         subscribedMessageCallbacks.push(subscribedMessageCallback)
-        // console.log(subscribedMessageCallbacks)
 
         return () => {
           const index = subscribedMessageCallbacks.indexOf(
             subscribedMessageCallback,
           )
           if (index !== -1) {
-            // console.trace("splice?")
             subscribedMessageCallbacks.splice(index, 1)
           }
-          if (!ws) throw new Error(`Websocket connection is not established`)
-          ws.send(
+          if (!this.ws) {
+            throw FetcherErrors.wsNotConnected()
+          }
+
+          this.ws.send(
             JSON.stringify({
               id: updatedId,
               type: "stop",

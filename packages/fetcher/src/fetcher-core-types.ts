@@ -2,10 +2,10 @@ import ReconnectingWebSocket, {
   Options as WebsocketOptions,
 } from "reconnecting-websocket"
 import {
+  ActionFnParams,
   AnyApplication,
   AnyRequestAction,
   Request,
-  RequestActionOptions,
   RequestMap,
   RequestMapOriginType,
   RequestMapReturnType,
@@ -18,7 +18,7 @@ import {
 } from "./index"
 
 /**
- * Executes queries against application server.
+ * Executes a network requests.
  * Can be used in the browser, mobile (react native or ionic) or another server.
  * Also can be used to execute cross-server requests in microservices architecture.
  */
@@ -33,6 +33,11 @@ export type Fetcher<App extends AnyApplication> = {
    * Undefined if fetcher without application instance specified was created.
    */
   app?: App
+
+  /**
+   * Options defined in the fetcher.
+   */
+  options: FetcherOptions
 
   /**
    * Reference to a WebSocket connection.
@@ -70,14 +75,15 @@ export type Fetcher<App extends AnyApplication> = {
   ): FetcherSubscriptionBuilder<App["_options"]["subscriptions"], {}>
 
   /**
-   * Executes an action.
+   * Creates a "request action".
    */
-  action<ActionKey extends keyof App["_options"]["actions"]>(
+  action<
+    ActionKey extends keyof App["_options"]["actions"],
+    Action extends App["_options"]["actions"][ActionKey]
+  >(
     name: ActionKey,
-    options: RequestActionOptions<App["_options"]["actions"][ActionKey]>,
-  ): Promise<
-    RequestActionOptions<App["_options"]["actions"][ActionKey]["return"]>
-  >
+    ...args: ActionFnParams<Action>
+  ): Promise<Action["return"]>
 
   /**
    * Loads data from a server.
@@ -207,6 +213,13 @@ export type FetcherOptions = {
    * Extra websocket options.
    */
   websocketOptions?: WebsocketOptions
+
+  /**
+   * A custom factory to create a WebSocket instance.
+   * Can be used if using ReconnectingWebSocket isn't acceptable,
+   * or specific configuration is required.
+   */
+  websocketFactory?: (options: FetcherOptions) => ReconnectingWebSocket | any
 
   /**
    * Function that builds and returns request headers.

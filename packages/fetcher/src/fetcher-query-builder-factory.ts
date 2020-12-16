@@ -4,6 +4,7 @@ import {
   Request,
   RequestMapItem,
 } from "@microframework/core"
+import { FetcherErrors } from "./fetcher-errors"
 
 /**
  * Creates a new universal FetcherQueryBuilder.
@@ -17,42 +18,37 @@ export function createFetcherQueryBuilder(
     add(name: string) {
       return createFetcherMethodsProxy(fetcher, request, name)
     },
+
     select(selection: any) {
-      if (!builderItem) {
-        throw new Error(`Add a request item before selection.`)
-      }
+      if (!builderItem) throw FetcherErrors.requestItemNotAddedInQb()
       ;(builderItem.options as any).select = selection
       return createFetcherQueryBuilder(fetcher, request)
     },
+
     response() {
       const itemsCount = Object.keys(request.map)
-      if (!itemsCount)
-        throw new Error(`You must build a complete query, before fetching it.`)
-
+      if (!itemsCount) throw FetcherErrors.requestItemNotAddedInQb()
       return fetcher.response(request)
     },
+
     fetch() {
       const itemsCount = Object.keys(request.map)
-      if (!itemsCount)
-        throw new Error(`You must build a complete query, before fetching it.`)
-
+      if (!itemsCount) throw FetcherErrors.requestItemNotAddedInQb()
       return fetcher.fetch(request)
     },
-    fetchUnsafe() {
-      const itemsCount = Object.keys(request.map)
-      if (!itemsCount)
-        throw new Error(`You must build a complete query, before fetching it.`)
 
-      return fetcher.fetchUnsafe(request)
+    fetchUnsafe() {
+      return this.fetch()
     },
+
     observe() {
       const itemsCount = Object.keys(request.map)
-      if (!itemsCount) {
-        throw new Error(
-          `You must build a complete query, before observing to it.`,
-        )
-      }
+      if (!itemsCount) throw FetcherErrors.requestItemNotAddedInQb()
       return fetcher.observe(request)
+    },
+
+    observeUnsafe() {
+      return this.observe()
     },
   }
 }

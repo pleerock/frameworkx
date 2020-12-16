@@ -1,4 +1,4 @@
-// if fetch doesn't exist in the environment, we just patch it
+// if fetch doesn't exist in the environment, we patch it
 if (!globalThis.fetch) {
   globalThis.fetch = require("node-fetch")
 }
@@ -6,4 +6,4 @@ if (!globalThis.fetch) {
 export * from "./fetcher-factory"
 export * from "./fetcher-error-classes"
 export * from "./fetcher-query-builder-types"
-export * from "./fetcher-types"
+export * from "./fetcher-core-types"

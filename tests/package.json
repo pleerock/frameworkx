@@ -31,6 +31,7 @@
     "mkdirp": "^1.0.4",
     "prettier": "^2.0.5",
     "rate-limiter-flexible": "^2.1.7",
+    "reconnecting-websocket": "^4.4.0",
     "sqlite3": "^5.0.0",
     "ts-jest": "^26.1.1",
     "typeorm": "^0.3.0-rc.21",
