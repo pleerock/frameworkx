@@ -1,15 +1,16 @@
 import { ApplicationTypeMetadata, TypeMetadata } from "@microframework/core"
 import { GraphQLFieldResolver } from "graphql/type/definition"
 import { GraphQLSchemaBuilderNamingStrategy } from "./naming-strategy"
+import * as GraphQL from "graphql"
 
 /**
  * GraphQLSchemaBuilder options.
  */
 export type GraphQLSchemaBuilderOptions = {
   /**
-   * Assert schema after build.
+   * GraphQL package to use for schema build.
    */
-  assert: boolean
+  graphql: typeof GraphQL
 
   /**
    * The whole application metadata that needs to be built.

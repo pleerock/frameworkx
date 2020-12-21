@@ -54,9 +54,8 @@ function typeMetadataToDefinitionProperty(
       )
     }
 
-    metadata = {
-      ...referencedMetadata,
-      array: metadata.array, // todo check
+    return {
+      $ref: "#/definitions/" + metadata.typeName, // todo: or modelName ?
     }
   }
 

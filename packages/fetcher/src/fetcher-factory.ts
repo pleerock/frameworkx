@@ -145,6 +145,7 @@ export function createFetcher(
       }
       this.ws.onclose = () => {}
       this.ws.onmessage = (event) => {
+        console.log(event)
         for (let onMessageCallback of subscribedMessageCallbacks) {
           onMessageCallback.callback(event)
         }
@@ -248,8 +249,9 @@ export function createFetcher(
     ): Observable<any> {
       const queryMeta = FetcherUtils.extractQueryMetadata(query)
       const updatedId = ++id
+      // note: don't use original "id" variable below, since it's value can change within other observes
       const sentData = JSON.stringify({
-        id: id,
+        id: updatedId,
         name: queryMeta.name,
         type: "start",
         payload: {
@@ -302,9 +304,7 @@ export function createFetcher(
           if (index !== -1) {
             subscribedMessageCallbacks.splice(index, 1)
           }
-          if (!this.ws) {
-            throw FetcherErrors.wsNotConnected()
-          }
+          if (!this.ws) throw FetcherErrors.wsNotConnected()
 
           this.ws.send(
             JSON.stringify({

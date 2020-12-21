@@ -1,31 +1,45 @@
 import { TypeMetadata } from "@microframework/core"
-import {
-  assertValidSchema,
-  GraphQLBoolean,
+import type {
   GraphQLEnumType,
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfigMap,
-  GraphQLFloat,
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
-  GraphQLInt,
-  GraphQLList,
-  GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLSchema,
-  GraphQLString,
   GraphQLUnionType,
 } from "graphql"
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
-import { GraphQLBigInt } from "./scalars-graphql"
 import { GraphQLSchemaBuilderOptions } from "./build-graphql-schema-fn-options"
+import type { GraphQLSchemaConfig } from "graphql/type/schema"
 
 /**
  * Builds a GraphQL schema for a provided application metadata.
  */
 export function buildGraphQLSchema(
   options: GraphQLSchemaBuilderOptions,
-): GraphQLSchema {
+): GraphQLSchemaConfig {
+  const graphql = options.graphql
+  /**
+   * GraphQL type for a BitInt scalar type.
+   */
+  const GraphQLBigInt = new graphql.GraphQLScalarType({
+    name: "BigInt",
+    description:
+      "BigInt is a built-in object that provides a way to represent whole numbers larger than 253 - 1.",
+    serialize: (value) => BigInt(value),
+    parseValue: (value) => BigInt(value),
+    parseLiteral(ast) {
+      if (
+        ast.kind === graphql.Kind.INT ||
+        ast.kind === graphql.Kind.FLOAT ||
+        ast.kind === graphql.Kind.STRING
+      ) {
+        return BigInt(ast.value)
+      }
+      return null
+    },
+  })
+
   // -- local properties --
   const objectTypes: GraphQLObjectType[] = []
   const inputTypes: GraphQLInputObjectType[] = []
@@ -54,13 +68,13 @@ export function buildGraphQLSchema(
         ...type,
         nullable: true,
       })
-      return GraphQLNonNull(subConverted)
+      return graphql.GraphQLNonNull(subConverted)
     } else if (type.array) {
       const subConverted = resolveGraphQLType(mode, {
         ...type,
         array: false,
       })
-      return GraphQLList(subConverted)
+      return graphql.GraphQLList(subConverted)
     }
 
     if (mode === "object") {
@@ -114,17 +128,17 @@ export function buildGraphQLSchema(
     }
 
     if (type.kind === "boolean") {
-      return GraphQLBoolean
+      return graphql.GraphQLBoolean
     } else if (type.kind === "string") {
-      return GraphQLString
+      return graphql.GraphQLString
     } else if (type.kind === "number") {
-      return GraphQLInt
+      return graphql.GraphQLInt
     } else if (type.kind === "bigint") {
       return GraphQLBigInt
     } else if (type.typeName === "BigInt") {
       return GraphQLBigInt
     } else if (type.typeName === "Float") {
-      return GraphQLFloat
+      return graphql.GraphQLFloat
     } else if (type.typeName === "Date") {
       return GraphQLDate
     } else if (type.typeName === "Time") {
@@ -165,7 +179,7 @@ export function buildGraphQLSchema(
     // console.log("typeName", typeName, metadata)
 
     // create a new type and return it back
-    const newType = new GraphQLInputObjectType({
+    const newType = new graphql.GraphQLInputObjectType({
       name: typeName, // metadata.typeName || options.namingStrategy.namelessInput(),
       description: metadata.description,
       fields: () => {
@@ -232,7 +246,7 @@ export function buildGraphQLSchema(
     //   throw new Error("Metadata doesn't have a name, cannot create enum")
 
     // create a new type and return it back
-    const newEnum = new GraphQLEnumType({
+    const newEnum = new graphql.GraphQLEnumType({
       name: typeName,
       description: metadata.description,
       values: values,
@@ -259,7 +273,7 @@ export function buildGraphQLSchema(
     // }
 
     // create a new type and return it back
-    const newUnion = new GraphQLUnionType({
+    const newUnion = new graphql.GraphQLUnionType({
       name: typeName,
       description: metadata.description,
       types: () => {
@@ -305,7 +319,7 @@ export function buildGraphQLSchema(
     // }
 
     // create a new type and return it back
-    const newType = new GraphQLObjectType({
+    const newType = new graphql.GraphQLObjectType({
       name: typeName,
       description: metadata.description,
       fields: () => {
@@ -351,10 +365,12 @@ export function buildGraphQLSchema(
     const description = options.namingStrategy.defaultTypeDescription(type)
     const fields: GraphQLFieldConfigMap<any, any> = {}
     for (let metadata of metadatas) {
-      if (metadata.kind !== "function")
+      if (metadata.kind !== "function") {
+        console.log(metadata)
         throw new Error(
           `Root declaration can only be a method definition, e.g. users(): User[].`,
         )
+      }
       if (!metadata.propertyName)
         throw new Error(`Missing property name in root declaration.`)
       if (!metadata.returnType)
@@ -381,7 +397,7 @@ export function buildGraphQLSchema(
       }
     }
 
-    return new GraphQLObjectType({ name, description, fields })
+    return new graphql.GraphQLObjectType({ name, description, fields })
   }
 
   /**
@@ -390,13 +406,13 @@ export function buildGraphQLSchema(
    * This method is used to spread input arguments for root declaration arguments.
    */
   function destructGraphQLType(inputType: any): any {
-    if (inputType instanceof GraphQLNonNull) {
+    if (inputType instanceof graphql.GraphQLNonNull) {
       return destructGraphQLType(inputType.ofType)
-    } else if (inputType instanceof GraphQLList) {
+    } else if (inputType instanceof graphql.GraphQLList) {
       return destructGraphQLType(inputType.ofType)
-    } else if (inputType instanceof GraphQLInputObjectType) {
+    } else if (inputType instanceof graphql.GraphQLInputObjectType) {
       return inputType.getFields()
-    } else if (inputType instanceof GraphQLObjectType) {
+    } else if (inputType instanceof graphql.GraphQLObjectType) {
       return inputType.getFields()
     }
 
@@ -463,7 +479,7 @@ export function buildGraphQLSchema(
   // console.log(JSON.stringify(options.appMetadata, undefined, 2))
   // console.log(options.appMetadata.queries)
 
-  const schema = new GraphQLSchema({
+  return {
     types: [...objectTypes, ...inputTypes, ...enumTypes, ...unionTypes],
     query: createRootGraphQLObjectType("query", options.appMetadata.queries),
     mutation: createRootGraphQLObjectType(
@@ -474,12 +490,5 @@ export function buildGraphQLSchema(
       "subscription",
       options.appMetadata.subscriptions,
     ),
-  })
-
-  // make sure schema is valid
-  if (options.assert) {
-    assertValidSchema(schema)
   }
-
-  return schema
 }

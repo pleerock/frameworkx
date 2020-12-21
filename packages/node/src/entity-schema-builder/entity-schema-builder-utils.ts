@@ -6,6 +6,7 @@ import {
 } from "@microframework/core"
 import { EntityMetadata } from "typeorm"
 import { ApplicationServerProperties } from "../application-server"
+import { ParserUtils } from "@microframework/parser"
 
 export const EntitySchemaArgsHelper = {
   /**
@@ -17,6 +18,7 @@ export const EntitySchemaArgsHelper = {
     entityMetadata: EntityMetadata,
     type: TypeMetadata,
     deepness: number,
+    parentName: string,
   ): TypeMetadata[] {
     const allTypes: TypeMetadata[] = []
     for (const key in type.properties) {
@@ -50,17 +52,22 @@ export const EntitySchemaArgsHelper = {
           allTypes.push(
             TypeMetadataUtils.create("object", {
               typeName: appProperties.namingStrategy.generatedEntityDeclarationArgsInputs.whereRelation(
-                type.typeName!!,
-                property.propertyName!!,
+                type.typeName!,
+                property.propertyName!,
               ),
               nullable: true,
               propertyName: property.propertyName,
+              propertyPath: ParserUtils.joinStrings(
+                parentName,
+                property.propertyName!,
+              ),
               properties: this.createWhereArgs(
                 appMetadata,
                 appProperties,
                 relationWithSuchProperty.inverseEntityMetadata,
                 reference,
                 deepness + 1,
+                ParserUtils.joinStrings(parentName, property.propertyName!),
               ),
             }),
           )
@@ -68,6 +75,75 @@ export const EntitySchemaArgsHelper = {
       }
     }
     // }
+    return allTypes
+  },
+
+  /**
+   * Recursively creates OrderByArgs for entity.
+   */
+  createOrderByArgs(
+    appMetadata: ApplicationTypeMetadata,
+    appProperties: ApplicationServerProperties,
+    entityMetadata: EntityMetadata,
+    type: TypeMetadata,
+    deepness: number,
+    parentName: string,
+  ): TypeMetadata[] {
+    const allTypes: TypeMetadata[] = []
+    for (const key in type.properties) {
+      // todo: use enum instead of string
+      const property = type.properties[key]
+      if (TypeMetadataUtils.isPrimitive(property) /* or enum? */) {
+        const columnWithSuchProperty = entityMetadata.findColumnsWithPropertyPath(
+          property.propertyName!,
+        )
+        if (columnWithSuchProperty) {
+          allTypes.push(
+            TypeMetadataUtils.create("string", {
+              nullable: true,
+              propertyName: property.propertyName,
+            }),
+          )
+        }
+      } else {
+        const relationWithSuchProperty = entityMetadata.findRelationWithPropertyPath(
+          property.propertyName!,
+        )
+        if (
+          relationWithSuchProperty &&
+          deepness < appProperties.maxGeneratedConditionsDeepness
+        ) {
+          const reference = appMetadata.models.find(
+            (type) => type.typeName === property.typeName,
+          )
+          if (!reference)
+            throw new Error(`cannot find a type ${property.typeName}`)
+
+          allTypes.push(
+            TypeMetadataUtils.create("object", {
+              typeName: appProperties.namingStrategy.generatedEntityDeclarationArgsInputs.whereRelation(
+                type.typeName!,
+                property.propertyName!,
+              ),
+              nullable: true,
+              propertyName: property.propertyName,
+              propertyPath: ParserUtils.joinStrings(
+                parentName,
+                property.propertyName!,
+              ),
+              properties: this.createOrderByArgs(
+                appMetadata,
+                appProperties,
+                relationWithSuchProperty.inverseEntityMetadata,
+                reference,
+                deepness + 1,
+                ParserUtils.joinStrings(parentName, property.propertyName!),
+              ),
+            }),
+          )
+        }
+      }
+    }
     return allTypes
   },
 
@@ -80,6 +156,7 @@ export const EntitySchemaArgsHelper = {
     entityMetadata: EntityMetadata,
     type: TypeMetadata,
     deepness: number,
+    parentName: string,
   ): TypeMetadata[] {
     const allTypes: TypeMetadata[] = []
     for (const key in type.properties) {
@@ -117,8 +194,8 @@ export const EntitySchemaArgsHelper = {
           allTypes.push(
             TypeMetadataUtils.create("object", {
               typeName: appProperties.namingStrategy.generatedEntityDeclarationArgsInputs.saveRelation(
-                type.typeName!!,
-                property.propertyName!!,
+                type.typeName!,
+                property.propertyName!,
               ),
               nullable: true,
               array: isArray,
@@ -129,6 +206,7 @@ export const EntitySchemaArgsHelper = {
                 relationWithSuchProperty.inverseEntityMetadata,
                 reference,
                 deepness + 1,
+                ParserUtils.joinStrings(parentName, property.propertyName!),
               ),
             }),
           )
@@ -198,7 +276,7 @@ export const DeclarationHelper = {
    */
   pushMutation(mutations: TypeMetadata[], type: TypeMetadata) {
     const sameNameMutation = mutations.find(
-      (query) => query.propertyName === type.propertyName,
+      (mutation) => mutation.propertyName === type.propertyName,
     )
     if (!sameNameMutation) {
       mutations.push(type)
@@ -210,7 +288,7 @@ export const DeclarationHelper = {
    */
   pushSubscription(subscriptions: TypeMetadata[], type: TypeMetadata) {
     const sameNameSubscription = subscriptions.find(
-      (query) => query.propertyName === type.propertyName,
+      (subscription) => subscription.propertyName === type.propertyName,
     )
     if (!sameNameSubscription) {
       subscriptions.push(type)

@@ -1,8 +1,9 @@
 import { AnyApplication, assign } from "@microframework/core"
 import { buildGraphQLSchema } from "@microframework/graphql"
+import * as GraphQL from "graphql"
 import cors from "cors"
 import express, { Request, Response } from "express"
-import { execute, GraphQLSchema, subscribe } from "graphql"
+import { assertValidSchema, execute, GraphQLSchema, subscribe } from "graphql"
 import { SubscriptionServer } from "subscriptions-transport-ws"
 import { generateEntityResolvers, ResolverHelper } from ".."
 import { ApplicationServer } from "./application-server-type"
@@ -103,17 +104,23 @@ export function createApplicationServer<App extends AnyApplication>(
         Object.keys(metadata.mutations).length > 0 ||
         Object.keys(metadata.subscriptions).length > 0
       ) {
-        schema = buildGraphQLSchema({
-          assert: true,
-          appMetadata: metadata!,
-          namingStrategy: this.properties.namingStrategy.generatedGraphQLTypes,
-          resolveFactory: resolverHelper.createRootDeclarationResolverFn.bind(
-            resolverHelper,
-          ) as any,
-          subscribeFactory: resolverHelper.createRootSubscriptionResolver.bind(
-            resolverHelper,
-          ) as any,
-        })
+        schema = new GraphQLSchema(
+          buildGraphQLSchema({
+            graphql: GraphQL,
+            appMetadata: metadata!,
+            namingStrategy: this.properties.namingStrategy
+              .generatedGraphQLTypes,
+            resolveFactory: resolverHelper.createRootDeclarationResolverFn.bind(
+              resolverHelper,
+            ) as any,
+            subscribeFactory: resolverHelper.createRootSubscriptionResolver.bind(
+              resolverHelper,
+            ) as any,
+          }),
+        )
+
+        // make sure schema is valid
+        assertValidSchema(schema)
 
         // setup a GraphQL route
         expressApp.use(

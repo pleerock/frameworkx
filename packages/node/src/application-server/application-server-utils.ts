@@ -21,7 +21,7 @@ import { DefaultNamingStrategy } from "../naming-strategy"
 import { ApplicationServerOptions } from "./application-server-options-type"
 import { ApplicationServerProperties } from "./application-server-properties-type"
 import { ResolverUtils } from "../util/resolver-utils"
-import { GraphQLError, GraphQLSchema } from "graphql"
+import type { GraphQLError, GraphQLSchema } from "graphql"
 import { graphqlHTTP, OptionsData } from "express-graphql"
 import { Server as WebsocketServer } from "ws"
 

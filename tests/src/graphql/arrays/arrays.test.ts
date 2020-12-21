@@ -3,7 +3,9 @@ import {
   buildGraphQLSchema,
   DefaultNamingStrategy,
 } from "@microframework/graphql"
+import * as GraphQL from "graphql"
 import {
+  GraphQLSchema,
   isEnumType,
   isInputObjectType,
   isListType,
@@ -16,13 +18,15 @@ import { getRealTypes } from "../../util/test-common"
 describe("graphql > schema builder", () => {
   describe("application defined with arrays", () => {
     const appMetadata = parse(__dirname + "/arrays-app.ts")
-    const schema = buildGraphQLSchema({
-      assert: false,
-      appMetadata: appMetadata,
-      namingStrategy: DefaultNamingStrategy,
-      resolveFactory: () => undefined,
-      subscribeFactory: () => undefined,
-    })
+    const schema = new GraphQLSchema(
+      buildGraphQLSchema({
+        graphql: GraphQL,
+        appMetadata: appMetadata,
+        namingStrategy: DefaultNamingStrategy,
+        resolveFactory: () => undefined,
+        subscribeFactory: () => undefined,
+      }),
+    )
     if (!schema) fail("Schema built failed")
 
     test("should properly create all GraphQL types", () => {

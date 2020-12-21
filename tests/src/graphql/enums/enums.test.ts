@@ -4,22 +4,26 @@ import {
   DefaultNamingStrategy,
 } from "@microframework/graphql"
 import {
+  GraphQLSchema,
   isEnumType,
   isInputObjectType,
   isNonNullType,
   isObjectType,
 } from "graphql"
 import { getRealTypes } from "../../util/test-common"
+import * as GraphQL from "graphql"
 
 describe("graphql > schema builder", () => {
   const appMetadata = parse(__dirname + "/enums-app.ts")
-  const schema = buildGraphQLSchema({
-    assert: false,
-    appMetadata: appMetadata,
-    namingStrategy: DefaultNamingStrategy,
-    resolveFactory: () => undefined,
-    subscribeFactory: () => undefined,
-  })
+  const schema = new GraphQLSchema(
+    buildGraphQLSchema({
+      graphql: GraphQL,
+      appMetadata: appMetadata,
+      namingStrategy: DefaultNamingStrategy,
+      resolveFactory: () => undefined,
+      subscribeFactory: () => undefined,
+    }),
+  )
   if (!schema) fail("Schema built failed")
 
   const postType = schema.getType("PostType")

@@ -10,10 +10,10 @@ import {
   EntitySchemaArgsHelper,
   ResolverHelper,
 } from "./entity-schema-builder-utils"
+import { ParserUtils } from "@microframework/parser"
 
 /**
  * Generates root declarations type metadatas and resolvers for them.
- * Generated entries are used for
  */
 export function generateEntityResolvers(
   appMetadata: ApplicationTypeMetadata,
@@ -92,7 +92,8 @@ export function generateEntityResolvers(
       properties.resolvers,
       "mutation",
       namingStrategy.generatedEntityDeclarationNames.save(model.typeName),
-      (input: any) => {
+      (args: any) => {
+        const input = JSON.parse(JSON.stringify(args.input))
         return dataSource.getRepository(entityMetadata.name).save(input)
       },
     )
@@ -101,8 +102,10 @@ export function generateEntityResolvers(
       properties.resolvers,
       "mutation",
       namingStrategy.generatedEntityDeclarationNames.remove(model.typeName),
-      (args: any) => {
-        return dataSource.getRepository(entityMetadata.name).remove(args)
+      async (args: any) => {
+        const where = JSON.parse(JSON.stringify(args.where))
+        await dataSource.getRepository(entityMetadata.name).remove(where)
+        return true
       },
     )
 
@@ -203,12 +206,14 @@ export function generateEntityResolvers(
           triggers: [oneTriggerName],
           onSubscribe: (args: any, context: any) => {
             // console.log("subscribed", args)
+            const where = JSON.parse(JSON.stringify(args.where)) // temporary fix for args being typeof object but not instanceof Object
+            const order = JSON.parse(JSON.stringify(args.order)) // temporary fix for args being typeof object but not instanceof Object
+
             context.observeOneEntitySubscription = dataSource.manager
               .getRepository(entityMetadata.name)
-              .observeOne(args)
+              .observeOne({ where, order })
               .subscribe((entity) => {
                 // console.log("trigger", oneTriggerName)
-                args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
                 pubSub!.publish(oneTriggerName, entity)
               })
           },
@@ -230,10 +235,14 @@ export function generateEntityResolvers(
           triggers: [manyTriggerName],
           onSubscribe: (args: any, context: any) => {
             // console.log("subscribed", args)
-            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            const where = JSON.parse(JSON.stringify(args.where)) // temporary fix for args being typeof object but not instanceof Object
+            const order = JSON.parse(JSON.stringify(args.order)) // temporary fix for args being typeof object but not instanceof Object
             context.observeOneEntitySubscription = dataSource.manager
               .getRepository(entityMetadata.name)
-              .observe(args)
+              .observe({
+                where,
+                order,
+              })
               .subscribe((entities) => {
                 // console.log("trigger", manyTriggerName, entities)
                 pubSub!.publish(manyTriggerName, entities)
@@ -257,10 +266,11 @@ export function generateEntityResolvers(
           triggers: [countTriggerName],
           onSubscribe: (args: any, context: any) => {
             // console.log("subscribed", args)
-            args = JSON.parse(JSON.stringify(args)) // temporary fix for args being typeof object but not instanceof Object
+            const where = JSON.parse(JSON.stringify(args.where)) // temporary fix for args being typeof object but not instanceof Object
+
             context.observeOneEntitySubscription = dataSource.manager
               .getRepository(entityMetadata.name)
-              .observeCount(args)
+              .observeCount(where)
               .subscribe((entity) => {
                 // console.log("trigger", countTriggerName)
                 pubSub!.publish(countTriggerName, entity)
@@ -286,6 +296,15 @@ export function generateEntityResolvers(
       entityMetadata,
       model,
       0,
+      ParserUtils.joinStrings(model.typeName, "Where", "Args"),
+    )
+    const orderArgsProperties = EntitySchemaArgsHelper.createOrderByArgs(
+      appMetadata,
+      properties,
+      entityMetadata,
+      model,
+      0,
+      ParserUtils.joinStrings(model.typeName, "OrderBy", "Args"),
     )
     const saveArgsProperties = EntitySchemaArgsHelper.createSaveArgs(
       appMetadata,
@@ -293,36 +312,22 @@ export function generateEntityResolvers(
       entityMetadata,
       model,
       0,
+      ParserUtils.joinStrings(model.typeName, "Save", "Args"),
     )
-
-    const orderArgsProperties: TypeMetadata[] = []
-    for (const key in model.properties) {
-      const property = model.properties[key]
-      if (TypeMetadataUtils.isPrimitive(property)) {
-        // todo: yeah make it more complex like with where
-        orderArgsProperties.push(
-          TypeMetadataUtils.create("string", {
-            propertyName: property.propertyName,
-            nullable: true,
-          }),
-        ) // we need to do enum and specify DESC and ASC
-      }
-    }
 
     const whereArgs = TypeMetadataUtils.create("object", {
       typeName: namingStrategy.generatedEntityDeclarationArgsInputs.where(
         model.typeName!!,
       ),
       propertyName: "where",
+      propertyPath: ParserUtils.joinStrings(
+        model.typeName,
+        "GeneratedWhere",
+        "Args",
+        "where",
+      ),
       nullable: true,
       properties: whereArgsProperties,
-    })
-
-    const saveArgs = TypeMetadataUtils.create("object", {
-      typeName: namingStrategy.generatedEntityDeclarationArgsInputs.save(
-        model.typeName!!,
-      ),
-      properties: saveArgsProperties,
     })
 
     const orderByArgs = TypeMetadataUtils.create("object", {
@@ -330,6 +335,12 @@ export function generateEntityResolvers(
         model.typeName!!,
       ),
       propertyName: "order",
+      propertyPath: ParserUtils.joinStrings(
+        model.typeName,
+        "GeneratedOrder",
+        "Args",
+        "order",
+      ),
       nullable: true,
       properties: orderArgsProperties,
     })
@@ -337,157 +348,398 @@ export function generateEntityResolvers(
     const queryArgs = TypeMetadataUtils.create("object", {
       nullable: true,
       properties: [whereArgs, orderByArgs],
+      propertyPath: ParserUtils.joinStrings(
+        model.typeName,
+        "GeneratedFind",
+        "Args",
+      ),
+    })
+
+    const saveInputArgs = TypeMetadataUtils.create("object", {
+      typeName: namingStrategy.generatedEntityDeclarationArgsInputs.save(
+        model.typeName!!,
+      ),
+      properties: saveArgsProperties,
+      propertyName: "input",
+      propertyPath: ParserUtils.joinStrings(
+        model.typeName,
+        "GeneratedSave",
+        "Args",
+        "input",
+      ),
+    })
+
+    const saveArgs = TypeMetadataUtils.create("object", {
+      nullable: true,
+      properties: [saveInputArgs],
+      propertyPath: ParserUtils.joinStrings(
+        model.typeName,
+        "GeneratedSave",
+        "Args",
+      ),
     })
 
     // ------------------------------------------------------------
     // register root queries
     // ------------------------------------------------------------
 
-    DeclarationHelper.pushQuery(appMetadata.queries, {
-      ...model,
-      nullable: true,
-      propertyName: namingStrategy.generatedEntityDeclarationNames.one(
-        model.typeName,
-      ),
-      description: namingStrategy.generatedEntityDeclarationDescriptions.one(
-        model.typeName,
-      ),
-      args: [queryArgs],
-    })
-    DeclarationHelper.pushQuery(appMetadata.queries, {
-      ...model,
-      nullable: false,
-      propertyName: namingStrategy.generatedEntityDeclarationNames.oneNotNull(
-        model.typeName,
-      ),
-      description: namingStrategy.generatedEntityDeclarationDescriptions.oneNotNull(
-        model.typeName,
-      ),
-      args: [queryArgs],
-    })
-    DeclarationHelper.pushQuery(appMetadata.queries, {
-      ...model,
-      array: true,
-      propertyName: namingStrategy.generatedEntityDeclarationNames.many(
-        model.typeName,
-      ),
-      description: namingStrategy.generatedEntityDeclarationDescriptions.many(
-        model.typeName,
-      ),
-      args: [queryArgs],
-    })
-    DeclarationHelper.pushQuery(appMetadata.queries, {
-      ...TypeMetadataUtils.create("number"),
-      propertyName: namingStrategy.generatedEntityDeclarationNames.count(
-        model.typeName,
-      ),
-      description: namingStrategy.generatedEntityDeclarationDescriptions.count(
-        model.typeName,
-      ),
-      args: [whereArgs],
-    })
+    // console.log("queryArgs", model.typeName!!, queryArgs)
+    DeclarationHelper.pushQuery(
+      appMetadata.queries,
+      TypeMetadataUtils.create("function", {
+        propertyName: namingStrategy.generatedEntityDeclarationNames.one(
+          model.typeName,
+        ),
+        propertyPath: namingStrategy.generatedEntityDeclarationNames.one(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.one(
+          model.typeName,
+        ),
+        returnType: TypeMetadataUtils.create("reference", {
+          typeName: model.typeName,
+          propertyPath: ParserUtils.joinStrings(
+            namingStrategy.generatedEntityDeclarationNames.one(model.typeName),
+            "Return",
+          ),
+          nullable: true,
+        }),
+        args: [queryArgs],
+      }),
+    )
+    DeclarationHelper.pushQuery(
+      appMetadata.queries,
+      TypeMetadataUtils.create("function", {
+        propertyName: namingStrategy.generatedEntityDeclarationNames.oneNotNull(
+          model.typeName,
+        ),
+        propertyPath: namingStrategy.generatedEntityDeclarationNames.oneNotNull(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.oneNotNull(
+          model.typeName,
+        ),
+        returnType: TypeMetadataUtils.create("reference", {
+          typeName: model.typeName,
+          propertyPath: ParserUtils.joinStrings(
+            namingStrategy.generatedEntityDeclarationNames.oneNotNull(
+              model.typeName,
+            ),
+            "Return",
+          ),
+          nullable: false,
+        }),
+        args: [queryArgs],
+      }),
+    )
+    DeclarationHelper.pushQuery(
+      appMetadata.queries,
+      TypeMetadataUtils.create("function", {
+        propertyName: namingStrategy.generatedEntityDeclarationNames.many(
+          model.typeName,
+        ),
+        propertyPath: namingStrategy.generatedEntityDeclarationNames.many(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.many(
+          model.typeName,
+        ),
+        returnType: TypeMetadataUtils.create("reference", {
+          typeName: model.typeName,
+          propertyPath: ParserUtils.joinStrings(
+            namingStrategy.generatedEntityDeclarationNames.many(model.typeName),
+            "Return",
+          ),
+          array: true,
+        }),
+        args: [queryArgs],
+      }),
+    )
+    DeclarationHelper.pushQuery(
+      appMetadata.queries,
+      TypeMetadataUtils.create("function", {
+        propertyName: namingStrategy.generatedEntityDeclarationNames.count(
+          model.typeName,
+        ),
+        propertyPath: namingStrategy.generatedEntityDeclarationNames.count(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.count(
+          model.typeName,
+        ),
+        returnType: TypeMetadataUtils.create("number", {
+          propertyPath: ParserUtils.joinStrings(
+            namingStrategy.generatedEntityDeclarationNames.count(
+              model.typeName,
+            ),
+            "Return",
+          ),
+        }),
+        args: [
+          TypeMetadataUtils.create("object", {
+            nullable: true,
+            properties: [whereArgs],
+            propertyPath: ParserUtils.joinStrings(
+              model.typeName,
+              "GeneratedCount",
+              "Args",
+            ),
+          }),
+        ],
+      }),
+    )
 
     // ------------------------------------------------------------
     // register root mutations
     // ------------------------------------------------------------
 
-    DeclarationHelper.pushMutation(appMetadata.mutations, {
-      ...model,
-      propertyName: namingStrategy.generatedEntityDeclarationNames.save(
-        model.typeName,
-      ),
-      description: namingStrategy.generatedEntityDeclarationDescriptions.save(
-        model.typeName,
-      ),
-      args: [saveArgs],
-    })
-    DeclarationHelper.pushMutation(appMetadata.mutations, {
-      ...TypeMetadataUtils.create("boolean"),
-      propertyName: namingStrategy.generatedEntityDeclarationNames.remove(
-        model.typeName,
-      ),
-      description: namingStrategy.generatedEntityDeclarationDescriptions.remove(
-        model.typeName,
-      ),
-      args: [whereArgs],
-    })
+    DeclarationHelper.pushMutation(
+      appMetadata.mutations,
+      TypeMetadataUtils.create("function", {
+        propertyName: namingStrategy.generatedEntityDeclarationNames.save(
+          model.typeName,
+        ),
+        propertyPath: namingStrategy.generatedEntityDeclarationNames.save(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.save(
+          model.typeName,
+        ),
+        returnType: TypeMetadataUtils.create("reference", {
+          typeName: model.typeName,
+          propertyPath: ParserUtils.joinStrings(
+            namingStrategy.generatedEntityDeclarationNames.save(model.typeName),
+            "Return",
+          ),
+        }),
+        args: [saveArgs],
+      }),
+    )
+
+    DeclarationHelper.pushMutation(
+      appMetadata.mutations,
+      TypeMetadataUtils.create("function", {
+        propertyName: namingStrategy.generatedEntityDeclarationNames.remove(
+          model.typeName,
+        ),
+        propertyPath: namingStrategy.generatedEntityDeclarationNames.remove(
+          model.typeName,
+        ),
+        description: namingStrategy.generatedEntityDeclarationDescriptions.remove(
+          model.typeName,
+        ),
+        returnType: TypeMetadataUtils.create("boolean", {
+          propertyPath: ParserUtils.joinStrings(
+            namingStrategy.generatedEntityDeclarationNames.remove(
+              model.typeName,
+            ),
+            "Return",
+          ),
+        }),
+        args: [
+          TypeMetadataUtils.create("object", {
+            properties: [{ ...whereArgs, nullable: false }],
+            propertyPath: ParserUtils.joinStrings(
+              model.typeName,
+              "GeneratedRemove",
+              "Args",
+            ),
+          }),
+        ],
+      }),
+    )
 
     // ------------------------------------------------------------
     // register root subscriptions
     // ------------------------------------------------------------
 
     if (pubSub) {
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        propertyName: namingStrategy.generatedEntityDeclarationNames.observeInsert(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityDeclarationDescriptions.observeInsert(
-          model.typeName,
-        ),
-        // args: whereArgs,
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        propertyName: namingStrategy.generatedEntityDeclarationNames.observeUpdate(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityDeclarationDescriptions.observeUpdate(
-          model.typeName,
-        ),
-        // args: whereArgs,
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        propertyName: namingStrategy.generatedEntityDeclarationNames.observeSave(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityDeclarationDescriptions.observeSave(
-          model.typeName,
-        ),
-        // args: whereArgs,
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        propertyName: namingStrategy.generatedEntityDeclarationNames.observeRemove(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityDeclarationDescriptions.observeRemove(
-          model.typeName,
-        ),
-        // args: whereArgs,
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        propertyName: namingStrategy.generatedEntityDeclarationNames.observeOne(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityDeclarationDescriptions.observeOne(
-          model.typeName,
-        ),
-        args: [whereArgs],
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...model,
-        array: true,
-        propertyName: namingStrategy.generatedEntityDeclarationNames.observeMany(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityDeclarationDescriptions.observeMany(
-          model.typeName,
-        ),
-        args: [queryArgs],
-      })
-      DeclarationHelper.pushSubscription(appMetadata.subscriptions, {
-        ...TypeMetadataUtils.create("number"),
-        propertyName: namingStrategy.generatedEntityDeclarationNames.observeCount(
-          model.typeName,
-        ),
-        description: namingStrategy.generatedEntityDeclarationDescriptions.observeCount(
-          model.typeName,
-        ),
-        args: [whereArgs],
-      })
+      DeclarationHelper.pushSubscription(
+        appMetadata.subscriptions,
+        TypeMetadataUtils.create("function", {
+          propertyName: namingStrategy.generatedEntityDeclarationNames.observeInsert(
+            model.typeName,
+          ),
+          propertyPath: namingStrategy.generatedEntityDeclarationNames.observeInsert(
+            model.typeName,
+          ),
+          description: namingStrategy.generatedEntityDeclarationDescriptions.observeInsert(
+            model.typeName,
+          ),
+          returnType: TypeMetadataUtils.create("reference", {
+            typeName: model.typeName,
+            propertyPath: ParserUtils.joinStrings(
+              namingStrategy.generatedEntityDeclarationNames.observeInsert(
+                model.typeName,
+              ),
+              "Return",
+            ),
+          }),
+          args: [
+            /*whereArgs*/
+          ],
+        }),
+      )
+      DeclarationHelper.pushSubscription(
+        appMetadata.subscriptions,
+        TypeMetadataUtils.create("function", {
+          propertyName: namingStrategy.generatedEntityDeclarationNames.observeUpdate(
+            model.typeName,
+          ),
+          propertyPath: namingStrategy.generatedEntityDeclarationNames.observeUpdate(
+            model.typeName,
+          ),
+          description: namingStrategy.generatedEntityDeclarationDescriptions.observeUpdate(
+            model.typeName,
+          ),
+          returnType: TypeMetadataUtils.create("reference", {
+            typeName: model.typeName,
+            propertyPath: ParserUtils.joinStrings(
+              namingStrategy.generatedEntityDeclarationNames.observeUpdate(
+                model.typeName,
+              ),
+              "Return",
+            ),
+          }),
+          args: [
+            /*whereArgs*/
+          ],
+        }),
+      )
+      DeclarationHelper.pushSubscription(
+        appMetadata.subscriptions,
+        TypeMetadataUtils.create("function", {
+          propertyName: namingStrategy.generatedEntityDeclarationNames.observeSave(
+            model.typeName,
+          ),
+          propertyPath: namingStrategy.generatedEntityDeclarationNames.observeSave(
+            model.typeName,
+          ),
+          description: namingStrategy.generatedEntityDeclarationDescriptions.observeSave(
+            model.typeName,
+          ),
+          returnType: TypeMetadataUtils.create("reference", {
+            typeName: model.typeName,
+            propertyPath: ParserUtils.joinStrings(
+              namingStrategy.generatedEntityDeclarationNames.observeSave(
+                model.typeName,
+              ),
+              "Return",
+            ),
+          }),
+          args: [
+            /*whereArgs*/
+          ],
+        }),
+      )
+      DeclarationHelper.pushSubscription(
+        appMetadata.subscriptions,
+        TypeMetadataUtils.create("function", {
+          propertyName: namingStrategy.generatedEntityDeclarationNames.observeRemove(
+            model.typeName,
+          ),
+          propertyPath: namingStrategy.generatedEntityDeclarationNames.observeRemove(
+            model.typeName,
+          ),
+          description: namingStrategy.generatedEntityDeclarationDescriptions.observeRemove(
+            model.typeName,
+          ),
+          returnType: TypeMetadataUtils.create("reference", {
+            typeName: model.typeName,
+            propertyPath: ParserUtils.joinStrings(
+              namingStrategy.generatedEntityDeclarationNames.observeRemove(
+                model.typeName,
+              ),
+              "Return",
+            ),
+          }),
+          args: [
+            /*whereArgs*/
+          ],
+        }),
+      )
+      DeclarationHelper.pushSubscription(
+        appMetadata.subscriptions,
+        TypeMetadataUtils.create("function", {
+          propertyName: namingStrategy.generatedEntityDeclarationNames.observeOne(
+            model.typeName,
+          ),
+          propertyPath: namingStrategy.generatedEntityDeclarationNames.observeOne(
+            model.typeName,
+          ),
+          description: namingStrategy.generatedEntityDeclarationDescriptions.observeOne(
+            model.typeName,
+          ),
+          returnType: TypeMetadataUtils.create("reference", {
+            typeName: model.typeName,
+            propertyPath: ParserUtils.joinStrings(
+              namingStrategy.generatedEntityDeclarationNames.observeOne(
+                model.typeName,
+              ),
+              "Return",
+            ),
+          }),
+          args: [queryArgs],
+        }),
+      )
+      DeclarationHelper.pushSubscription(
+        appMetadata.subscriptions,
+        TypeMetadataUtils.create("function", {
+          propertyName: namingStrategy.generatedEntityDeclarationNames.observeMany(
+            model.typeName,
+          ),
+          propertyPath: namingStrategy.generatedEntityDeclarationNames.observeMany(
+            model.typeName,
+          ),
+          description: namingStrategy.generatedEntityDeclarationDescriptions.observeMany(
+            model.typeName,
+          ),
+          returnType: TypeMetadataUtils.create("reference", {
+            typeName: model.typeName,
+            array: true,
+            propertyPath: ParserUtils.joinStrings(
+              namingStrategy.generatedEntityDeclarationNames.observeMany(
+                model.typeName,
+              ),
+              "Return",
+            ),
+          }),
+          args: [queryArgs],
+        }),
+      )
+      DeclarationHelper.pushSubscription(
+        appMetadata.subscriptions,
+        TypeMetadataUtils.create("function", {
+          propertyName: namingStrategy.generatedEntityDeclarationNames.observeCount(
+            model.typeName,
+          ),
+          propertyPath: namingStrategy.generatedEntityDeclarationNames.observeCount(
+            model.typeName,
+          ),
+          description: namingStrategy.generatedEntityDeclarationDescriptions.observeCount(
+            model.typeName,
+          ),
+          returnType: TypeMetadataUtils.create("number", {
+            typeName: model.typeName,
+            propertyPath: ParserUtils.joinStrings(
+              namingStrategy.generatedEntityDeclarationNames.observeCount(
+                model.typeName,
+              ),
+              "Return",
+            ),
+          }),
+          args: [
+            TypeMetadataUtils.create("object", {
+              properties: [{ ...whereArgs, nullable: false }],
+              propertyPath: ParserUtils.joinStrings(
+                model.typeName,
+                "GeneratedCount",
+                "Args",
+              ),
+            }),
+          ],
+        }),
+      )
     }
   }
 }

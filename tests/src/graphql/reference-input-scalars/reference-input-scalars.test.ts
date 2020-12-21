@@ -4,22 +4,26 @@ import {
   DefaultNamingStrategy,
 } from "@microframework/graphql"
 import {
+  GraphQLSchema,
   isInputObjectType,
   isNonNullType,
   isNullableType,
   isScalarType,
 } from "graphql"
+import * as GraphQL from "graphql"
 
 describe("graphql > schema builder", () => {
   test("input (referenced type) with scalar properties", () => {
     const appMetadata = parse(__dirname + "/reference-input-scalars-app.ts")
-    const schema = buildGraphQLSchema({
-      assert: false,
-      appMetadata: appMetadata,
-      namingStrategy: DefaultNamingStrategy,
-      resolveFactory: () => undefined,
-      subscribeFactory: () => undefined,
-    })
+    const schema = new GraphQLSchema(
+      buildGraphQLSchema({
+        graphql: GraphQL,
+        appMetadata: appMetadata,
+        namingStrategy: DefaultNamingStrategy,
+        resolveFactory: () => undefined,
+        subscribeFactory: () => undefined,
+      }),
+    )
     if (!schema) fail("Schema built failed")
     const postInput = schema.getType("PostInput")
     expect(postInput).not.toBe(undefined)

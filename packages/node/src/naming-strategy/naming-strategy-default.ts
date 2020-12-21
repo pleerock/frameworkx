@@ -38,16 +38,16 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return smallize(modelName + "ObserveCount")
     },
     observeInsert(modelName: string) {
-      return smallize(modelName + "ObserveInsert")
+      return "on" + capitalize(modelName) + "Insert"
     },
     observeUpdate(modelName: string) {
-      return smallize(modelName + "ObserveUpdate")
+      return "on" + capitalize(modelName) + "Update"
     },
     observeSave(modelName: string) {
-      return smallize(modelName + "ObserveSave")
+      return "on" + capitalize(modelName) + "Save"
     },
     observeRemove(modelName: string) {
-      return smallize(modelName + "ObserveRemove")
+      return "on" + capitalize(modelName) + "Remove"
     },
     observeOneTriggerName(modelName: string) {
       return modelName + "ObserveOne"
@@ -59,16 +59,16 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return modelName + "ObserveCount"
     },
     observeInsertTriggerName(modelName: string) {
-      return modelName + "ObserveInsert"
+      return "On" + capitalize(modelName) + "Insert"
     },
     observeUpdateTriggerName(modelName: string) {
-      return modelName + "ObserveUpdate"
+      return "On" + capitalize(modelName) + "Update"
     },
     observeSaveTriggerName(modelName: string) {
-      return modelName + "ObserveSave"
+      return "On" + capitalize(modelName) + "Save"
     },
     observeRemoveTriggerName(modelName: string) {
-      return modelName + "ObserveRemove"
+      return "On" + capitalize(modelName) + "Remove"
     },
   },
   generatedEntityDeclarationDescriptions: {
@@ -117,7 +117,7 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return capitalize(camelize(typeName + " Where"))
     },
     save(typeName: string) {
-      return capitalize(camelize(typeName + " Save"))
+      return capitalize(camelize(typeName + " SaveInput"))
     },
     order(typeName: string) {
       return capitalize(camelize(typeName + " OrderBy"))
@@ -126,7 +126,9 @@ export const DefaultNamingStrategy: NamingStrategy = {
       return capitalize(camelize(typeName + " " + relationName + " InWhere"))
     },
     saveRelation(typeName: string, relationName: string) {
-      return capitalize(camelize(typeName + " " + relationName + " InSave"))
+      return capitalize(
+        camelize(typeName + " " + relationName + " InSaveInput"),
+      )
     },
   },
 }
