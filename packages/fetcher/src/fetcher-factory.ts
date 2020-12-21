@@ -98,8 +98,7 @@ export function createFetcher(
 
     action(name: any, ...args: any) {
       if (!app) throw FetcherErrors.noAppToUseOperator("action")
-
-      return this.fetch(app.request((app.action as any)(name, args)))
+      return this.fetch(app.request((app.action as any)(name, ...args)))
     },
 
     async connect() {
@@ -145,7 +144,7 @@ export function createFetcher(
       }
       this.ws.onclose = () => {}
       this.ws.onmessage = (event) => {
-        console.log(event)
+        // console.log(event)
         for (let onMessageCallback of subscribedMessageCallbacks) {
           onMessageCallback.callback(event)
         }
@@ -176,7 +175,9 @@ export function createFetcher(
       const response = await this.response(request, variables)
       if (FetcherUtils.isRequestAnAction(request)) {
         // todo: what about non-json responses?
-        return response.json()
+        const result = await response.json()
+        // console.log("result", result)
+        return result
       } else {
         // parse json result
         const result = await response.json()
@@ -232,7 +233,7 @@ export function createFetcher(
           }),
         })
 
-        return response.json()
+        return response
       }
     },
 
@@ -278,16 +279,18 @@ export function createFetcher(
         const onMessageCallback = (event: any) => {
           // console.log("got a message", event)
           const data = JSON.parse(event.data)
-          if (data.payload) {
-            if (data.type === "error") {
-              observer.error(data.payload)
-              return
-            }
-            if (data.payload.data) {
-              observer.next(data.payload.data)
-            }
-            if (data.payload.errors) {
-              observer.error(data.payload)
+          if (data.id && data.id === updatedId) {
+            if (data.payload) {
+              if (data.type === "error") {
+                observer.error(data.payload)
+                return
+              }
+              if (data.payload.data) {
+                observer.next(data.payload.data)
+              }
+              if (data.payload.errors) {
+                observer.error(data.payload)
+              }
             }
           }
         }

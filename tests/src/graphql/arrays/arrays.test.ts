@@ -42,7 +42,7 @@ describe("graphql > schema builder", () => {
         "QuestionTypeCategoriesModel",
         "QuestionAnswerType",
         "QuestionAnswerTypeAnswersModel",
-        "BigInt",
+        // "BigInt", // ?
         "PostCategoryType",
         "PostCategoryTypeCategoriesModel",
         "PostInput",

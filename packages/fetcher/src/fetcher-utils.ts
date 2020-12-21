@@ -85,11 +85,12 @@ export const FetcherUtils = {
    */
   buildParamsPath(action: AnyRequestAction): string {
     let path: string = action.path
-    if ((action.options as AllRequestActionOptions).params) {
+    const options = action.options as AllRequestActionOptions // []
+    if (options && options.params) {
       const toPath = compile(path, {
         encode: encodeURIComponent,
       })
-      path = toPath((action.options as AllRequestActionOptions).params)
+      path = toPath(options.params)
     }
 
     return path
