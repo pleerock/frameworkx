@@ -1,4 +1,4 @@
-import { createApp } from "@microframework/core"
+import { createApp, DateTime, Float, Time } from "@microframework/core"
 import { RedisPubSub } from "graphql-redis-subscriptions"
 import {
   CategoryType,
@@ -42,6 +42,110 @@ export const App = createApp<{
         id: number
       }
       return: PostType | null
+    }
+    "GET /posts-params/:number/:string/:boolean/:bigint/:bigintObj/:date/:dateTime/:time/:float/:object": {
+      params: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+      return: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+    }
+    "GET /posts-headers": {
+      headers: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+      return: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+    }
+    "GET /posts-query": {
+      query: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+      return: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+    }
+    "POST /post-body": {
+      body: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+      return: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
     }
   }
   context: {

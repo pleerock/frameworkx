@@ -28,7 +28,7 @@ export const FetcherUtils = {
     options: FetcherOptions,
     action?: AnyRequestAction,
   ): Promise<{ [key: string]: string }> {
-    const headers: { [key: string]: string } = {
+    const headers: { [key: string]: any } = {
       "Content-type": "application/json",
     }
     if (
@@ -47,6 +47,13 @@ export const FetcherUtils = {
         Object.assign(headers, await userHeaders)
       } else {
         Object.assign(headers, userHeaders)
+      }
+    }
+    for (let key in headers) {
+      if (headers[key] instanceof Date) {
+        headers[key] = headers[key].toISOString()
+      } else if (typeof headers[key] === "object") {
+        headers[key] = JSON.stringify(headers[key])
       }
     }
     return headers
@@ -71,9 +78,15 @@ export const FetcherUtils = {
     if (queryMap) {
       let query = "?"
       query += Object.keys(queryMap)
-        .map(
-          (k) => encodeURIComponent(k) + "=" + encodeURIComponent(queryMap[k]),
-        )
+        .map((k) => {
+          let value = queryMap[k]
+          if (value instanceof Date) {
+            value = value.toISOString()
+          } else if (typeof value === "object") {
+            value = JSON.stringify(value)
+          }
+          return encodeURIComponent(k) + "=" + encodeURIComponent(value)
+        })
         .join("&")
       return query
     }
@@ -87,10 +100,23 @@ export const FetcherUtils = {
     let path: string = action.path
     const options = action.options as AllRequestActionOptions // []
     if (options && options.params) {
+      const paramMap: { [key: string]: any } = {}
+      for (let key in options.params) {
+        let value = options.params[key]
+        if (value instanceof Date) {
+          value = value.toISOString()
+        } else if (typeof value === "object") {
+          value = JSON.stringify(value)
+        } else if (typeof value === "boolean" || typeof value === "bigint") {
+          value = value.toString()
+        }
+        paramMap[key] = value
+      }
+
       const toPath = compile(path, {
         encode: encodeURIComponent,
       })
-      path = toPath(options.params)
+      path = toPath(paramMap)
     }
 
     return path

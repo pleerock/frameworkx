@@ -50,4 +50,18 @@ export const PostResolver = resolver(App, {
   ["GET /posts-one-by-qs"]: ({ query }) => {
     return PostList.find((post) => post.id === query.id) || null
   },
+  ["GET /posts-params/:number/:string/:boolean/:bigint/:bigintObj/:date/:dateTime/:time/:float/:object"]: ({
+    params,
+  }) => {
+    return params
+  },
+  ["GET /posts-headers"]: ({ headers }) => {
+    return headers
+  },
+  ["GET /posts-query"]: ({ query }) => {
+    return query
+  },
+  ["POST /post-body"]: ({ body }) => {
+    return body
+  },
 })

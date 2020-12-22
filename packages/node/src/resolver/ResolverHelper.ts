@@ -579,8 +579,16 @@ export class ResolverHelper {
       const context = await this.buildContext(defaultContext)
       const result = actionResolverFn(
         {
-          params: this.buildActionParams(request.params, actionMetadata.params),
-          query: this.buildActionParams(request.query, actionMetadata.query),
+          params: this.buildActionParams(
+            request.params,
+            actionMetadata.params,
+            false,
+          ),
+          query: this.buildActionParams(
+            request.query,
+            actionMetadata.query,
+            false,
+          ),
           headers: this.buildHeaderParams(
             request.headers,
             actionMetadata.headers,
@@ -588,6 +596,7 @@ export class ResolverHelper {
           cookies: this.buildActionParams(
             request.cookies,
             actionMetadata.cookies,
+            false,
           ),
           body: request.body,
         },
@@ -598,10 +607,11 @@ export class ResolverHelper {
         return result
           .then((result) => {
             logger.log(`return(${JSON.stringify(result)})`) // this.logger.logActionResponse({ ...actionEvent, content: result })
-            return result
-          })
-          .then((result) => {
-            if (actionMetadata.return !== undefined) response.json(result)
+            if (actionMetadata.return !== undefined) {
+              response.json(
+                this.buildActionParams(result, actionMetadata.return, true),
+              )
+            }
           })
           .catch((error) => {
             logger.error(error) // this.logger.resolveActionError({ ...actionEvent, error })
@@ -611,7 +621,9 @@ export class ResolverHelper {
         // this.logger.logActionResponse({ ...actionEvent, content: result })
         if (actionMetadata.return !== undefined) {
           logger.log(`return(${JSON.stringify(result)})`)
-          response.json(result)
+          response.json(
+            this.buildActionParams(result, actionMetadata.return, true),
+          )
         }
       } // think about text responses, status, etc.
     } catch (error) {
@@ -798,24 +810,16 @@ export class ResolverHelper {
   private buildActionParams(
     requestParams: any,
     paramsMetadata: TypeMetadata | undefined,
+    transformScalars: boolean,
   ) {
     if (paramsMetadata) {
       for (let metadata of paramsMetadata.properties) {
         if (!metadata.propertyName) continue
-        if (typeof requestParams[metadata.propertyName] !== "string") continue
-        if (metadata.kind === "number") {
-          requestParams[metadata.propertyName] = parseInt(
-            requestParams[metadata.propertyName],
-          )
-        } else if (metadata.kind === "bigint") {
-          requestParams[metadata.propertyName] = BigInt(
-            requestParams[metadata.propertyName],
-          )
-        } else if (metadata.kind === "boolean") {
-          requestParams[metadata.propertyName] =
-            requestParams[metadata.propertyName] === "true" ||
-            requestParams[metadata.propertyName] === "1"
-        }
+        requestParams[metadata.propertyName] = this.transformValue(
+          metadata,
+          requestParams[metadata.propertyName],
+          transformScalars,
+        )
       }
     }
     return requestParams
@@ -830,19 +834,79 @@ export class ResolverHelper {
       for (let metadata of paramsMetadata.properties) {
         if (!metadata.propertyName) continue
         const headerIndexName = metadata.propertyName.toLowerCase()
-        if (typeof headers[headerIndexName] !== "string") continue
-        if (metadata.kind === "number") {
-          newHeaders[metadata.propertyName] = parseInt(headers[headerIndexName])
-        } else if (metadata.kind === "bigint") {
-          newHeaders[metadata.propertyName] = BigInt(headers[headerIndexName])
-        } else if (metadata.kind === "boolean") {
-          newHeaders[metadata.propertyName] =
-            headers[headerIndexName] === "true" ||
-            headers[headerIndexName] === "1"
-        }
+        newHeaders[metadata.propertyName] = this.transformValue(
+          metadata,
+          headers[headerIndexName],
+          false,
+        )
       }
     }
-    return headers
+    return newHeaders
+  }
+
+  private transformValue(
+    metadata: TypeMetadata,
+    value: any,
+    transformScalars: boolean,
+  ): any {
+    if (metadata.kind === "number") {
+      return parseInt(value)
+    } else if (metadata.kind === "string") {
+      return value
+    } else if (metadata.kind === "bigint") {
+      return BigInt(value)
+    } else if (metadata.kind === "boolean") {
+      return value === "true" || value === "1" || value
+    } else if (metadata.kind === "object") {
+      if (metadata.typeName === "Date") {
+        const date = new Date(value)
+        if (transformScalars) {
+          return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+        } else {
+          return new Date(
+            Date.UTC(
+              date.getFullYear(),
+              date.getMonth(),
+              date.getDate(),
+              0,
+              0,
+              0,
+            ),
+          )
+        }
+      } else if (metadata.typeName === "DateTime") {
+        return new Date(value)
+      } else if (metadata.typeName === "Time") {
+        const date = new Date(value)
+        if (transformScalars) {
+          return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}Z`
+        } else {
+          return date
+        }
+      } else if (metadata.typeName === "Float") {
+        return parseFloat(value)
+      } else {
+        let obj = value
+        if (!transformScalars) obj = JSON.parse(value)
+
+        if (Array.isArray(obj)) {
+          return obj.map((subObj) =>
+            this.transformValue(metadata, subObj, transformScalars),
+          )
+        }
+        for (let subMetadata of metadata.properties) {
+          if (!subMetadata.propertyName) continue
+          obj[subMetadata.propertyName] = this.transformValue(
+            subMetadata,
+            obj[subMetadata.propertyName],
+            transformScalars,
+          )
+        }
+        return obj
+      }
+    }
+
+    return
   }
 
   // stringify(value: any) {

@@ -584,6 +584,13 @@ export class ModelParser {
         typeName === "Date" ||
         typeName === "DateTime"
       ) {
+        if (typeName === "BigInt") {
+          return TypeMetadataUtils.create("bigint", {
+            description,
+            deprecated,
+            propertyPath: parentName,
+          })
+        }
         return TypeMetadataUtils.create("object", {
           typeName,
           description,
