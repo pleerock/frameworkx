@@ -568,10 +568,18 @@ export class ModelParser {
         deprecated = ParserUtils.getDeprecation(symbol)
       }
 
+      // check if typeName is a BigInt, we create a "bigint" primitive
+      if (typeName === "BigInt") {
+        return TypeMetadataUtils.create("bigint", {
+          description,
+          deprecated,
+          propertyPath: parentName,
+        })
+      }
+
       // check if it's a reference to a default scalars we have
       if (
         typeName === "Float" ||
-        typeName === "BigInt" ||
         typeName === "Time" ||
         typeName === "Date" ||
         typeName === "DateTime"

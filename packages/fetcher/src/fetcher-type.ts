@@ -1,6 +1,4 @@
-import ReconnectingWebSocket, {
-  Options as WebsocketOptions,
-} from "reconnecting-websocket"
+import ReconnectingWebSocket from "reconnecting-websocket"
 import {
   ActionFnParams,
   AnyApplication,
@@ -13,6 +11,7 @@ import {
 import Observable from "zen-observable-ts"
 import {
   FetcherMutationBuilder,
+  FetcherOptions,
   FetcherQueryBuilder,
   FetcherSubscriptionBuilder,
 } from "./index"
@@ -44,6 +43,12 @@ export type Fetcher<App extends AnyApplication> = {
    * Undefined until connection is established.
    */
   ws?: ReconnectingWebSocket
+
+  /**
+   * Indicates if connection with websocket has been established,
+   * and connection is already opened.
+   */
+  wsConnectionOpened: boolean
 
   /**
    * Connects to a websocket.
@@ -132,7 +137,7 @@ export type Fetcher<App extends AnyApplication> = {
   fetch<T = any>(
     request: string | any,
     variables?: { [key: string]: any },
-  ): Promise<T>
+  ): Promise<{ data: any; errors?: any[] }>
 
   /**
    * Fetches data from a server based on a given Request.
@@ -182,49 +187,4 @@ export type Fetcher<App extends AnyApplication> = {
     query: Request<any> | string | any, // | DocumentNode,
     variables?: { [key: string]: any },
   ): Observable<any>
-}
-
-/**
- * Options for Fetcher object.
- */
-export type FetcherOptions = {
-  /**
-   * Endpoint for action queries.
-   */
-  actionEndpoint?: string
-
-  /**
-   * Endpoint for GraphQL queries.
-   */
-  graphqlEndpoint?: string
-
-  /**
-   * Endpoint for GraphQL websocket queries.
-   */
-  websocketEndpoint?: string
-
-  /**
-   * Unique client id. Used to represent unique client id for websocket connections.
-   * If not specified, randomly generated uuid will be used.
-   */
-  clientId?: string
-
-  /**
-   * Extra websocket options.
-   */
-  websocketOptions?: WebsocketOptions
-
-  /**
-   * A custom factory to create a WebSocket instance.
-   * Can be used if using ReconnectingWebSocket isn't acceptable,
-   * or specific configuration is required.
-   */
-  websocketFactory?: (options: FetcherOptions) => ReconnectingWebSocket | any
-
-  /**
-   * Function that builds and returns request headers.
-   */
-  headersFactory?: () =>
-    | { [key: string]: string }
-    | Promise<{ [key: string]: string }>
 }

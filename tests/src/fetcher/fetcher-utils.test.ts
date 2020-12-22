@@ -1,0 +1,10 @@
+describe("fetcher > utils", () => {
+  test("isRequestAnAction", async () => {})
+  test("buildHeaders", async () => {})
+  test("buildBody", async () => {})
+  test("buildQueryString", async () => {})
+  test("buildParamsPath", async () => {})
+  test("extractQueryMetadata", async () => {})
+  test("requestToQuery", async () => {})
+  test("serializeInput", async () => {})
+})

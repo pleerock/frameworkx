@@ -6,6 +6,10 @@ import {
 } from "@microframework/core"
 import { FetcherErrors } from "./fetcher-errors"
 
+// ------------------------------------------------------
+// EXPORTED
+// ------------------------------------------------------
+
 /**
  * Creates a new universal FetcherQueryBuilder.
  */
@@ -53,10 +57,14 @@ export function createFetcherQueryBuilder(
   }
 }
 
+// ------------------------------------------------------
+// LOCAL SCOPE
+// ------------------------------------------------------
+
 /**
  * Creates a proxy object that intercepts all fetcher method calls.
  */
-export function createFetcherMethodsProxy(
+function createFetcherMethodsProxy(
   fetcher: Fetcher<any>,
   request: Request<any>,
   itemName: string,

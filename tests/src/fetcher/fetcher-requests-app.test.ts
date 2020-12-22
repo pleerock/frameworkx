@@ -1,10 +1,3 @@
-import {
-  action,
-  mutation,
-  query,
-  request,
-  subscription,
-} from "@microframework/core"
 import { createFetcher, Fetcher } from "@microframework/fetcher"
 import { ApplicationServer } from "@microframework/node"
 import gql from "graphql-tag"
@@ -13,8 +6,9 @@ import { obtainPort, sleep } from "../util/test-common"
 import { App } from "./fetcher-test-app/app"
 import { AppServer } from "./fetcher-test-app/server"
 import { PostList } from "./fetcher-test-app/repositories"
+import { PostType } from "./fetcher-test-app/models";
 
-describe("fetcher > standalone requests", () => {
+describe("fetcher > requests > app syntax", () => {
   let webserverPort: number = 0
   let websocketPort: number = 0
   let server: ApplicationServer<any> | undefined = undefined
@@ -65,8 +59,8 @@ describe("fetcher > standalone requests", () => {
   })
 
   test("fetch by request > case #1 (single item)", async () => {
-    const postsRequest = request("Posts", {
-      firstPost: query(App, "postRandomOne", {
+    const postsRequest = App.request("Posts", {
+      firstPost: App.query("postRandomOne", {
         select: {
           id: true,
           title: true,
@@ -82,12 +76,19 @@ describe("fetcher > standalone requests", () => {
           title: "post #1",
         },
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.firstPost
+    // @ts-expect-error
+    result.data.secondPost
+    // @ts-expect-error
+    result.data.firstPost.likes
   })
 
   test("fetch by request > case #2 (loading array)", async () => {
-    const postsRequest = request("Posts", {
-      posts: query(App, "posts", {
+    const postsRequest = App.request("Posts", {
+      posts: App.query("posts", {
         input: {
           skip: 0,
           take: 5,
@@ -122,8 +123,8 @@ describe("fetcher > standalone requests", () => {
   })
 
   test("fetch by request > case #3 (nested selection)", async () => {
-    const postsRequest = request("Posts", {
-      posts: query(App, "posts", {
+    const postsRequest = App.request("Posts", {
+      posts: App.query("posts", {
         input: {
           skip: 0,
           take: 5,
@@ -163,8 +164,8 @@ describe("fetcher > standalone requests", () => {
     })
   })
   test("fetch by request > case #4 (input)", async () => {
-    const postsRequest = request("Posts", {
-      posts: query(App, "posts", {
+    const postsRequest = App.request("Posts", {
+      posts: App.query("posts", {
         input: {
           skip: 0,
           take: 5,
@@ -205,8 +206,8 @@ describe("fetcher > standalone requests", () => {
     })
   })
   test("fetch by request > case #5 (complex input)", async () => {
-    const postsRequest = request("Posts", {
-      posts: query(App, "postsSearch", {
+    const postsRequest = App.request("Posts", {
+      posts: App.query("postsSearch", {
         input: {
           keyword: "Hello",
           filter: {
@@ -246,8 +247,8 @@ describe("fetcher > standalone requests", () => {
     })
   })
   test("fetch by request > case #6 (multiple loaded data)", async () => {
-    const postsRequest = request("Posts", {
-      firstPost: query(App, "post", {
+    const postsRequest = App.request("Posts", {
+      firstPost: App.query("post", {
         input: {
           id: 1,
         },
@@ -256,7 +257,7 @@ describe("fetcher > standalone requests", () => {
           title: true,
         },
       }),
-      secondPost: query(App, "post", {
+      secondPost: App.query("post", {
         input: {
           id: 2,
         },
@@ -265,7 +266,7 @@ describe("fetcher > standalone requests", () => {
           title: true,
         },
       }),
-      nonExistPost: query(App, "post", {
+      nonExistPost: App.query("post", {
         input: {
           id: 1000,
         },
@@ -274,7 +275,7 @@ describe("fetcher > standalone requests", () => {
           title: true,
         },
       }),
-      posts: query(App, "posts", {
+      posts: App.query("posts", {
         input: {
           skip: 0,
           take: 5,
@@ -318,8 +319,8 @@ describe("fetcher > standalone requests", () => {
     })
   })
   test("fetch by request > case #7 (mutation)", async () => {
-    const postsRequest = request("Posts", {
-      newPost: mutation(App, "postCreate", {
+    const postsRequest = App.request("Posts", {
+      newPost: App.mutation("postCreate", {
         input: {
           title: "New Post!",
         },
@@ -328,7 +329,7 @@ describe("fetcher > standalone requests", () => {
           title: true,
         },
       }),
-      removedPost: mutation(App, "postRemove", {
+      removedPost: App.mutation("postRemove", {
         input: {
           id: 2,
         },
@@ -347,8 +348,8 @@ describe("fetcher > standalone requests", () => {
     })
   })
   test("fetch by request > case #8 (subscription)", async () => {
-    const postsRequest = request("Posts", {
-      onPostCreate: subscription(App, "postCreated", {
+    const postsRequest = App.request("Posts", {
+      onPostCreate: App.subscription("postCreated", {
         // input: {
         //   ids: [1, 2, 3],
         // },
@@ -370,8 +371,8 @@ describe("fetcher > standalone requests", () => {
     })
 
     // send a query that will trigger event for the subscription
-    const postSaveRequest = request("Posts", {
-      newPost: mutation(App, "postCreate", {
+    const postSaveRequest = App.request("Posts", {
+      newPost: App.mutation("postCreate", {
         input: {
           title: "iamtheonlyonepost",
         },
@@ -407,15 +408,15 @@ describe("fetcher > standalone requests", () => {
   }, 10000)
 
   test("fetch by request > case #9 (actions, GET)", async () => {
-    const postsRequest = request(action(App, "GET /posts"))
+    const postsRequest = App.request(App.action("GET /posts"))
 
     const result = await fetcher!.fetch(postsRequest)
     expect(result).toEqual(PostList)
   })
 
   test("fetch by request > case #10 (actions, GET with parameter)", async () => {
-    const postsRequest = request(
-      action(App, "GET /posts/:id", {
+    const postsRequest = App.request(
+      App.action("GET /posts/:id", {
         params: {
           id: 1,
         },
@@ -427,8 +428,8 @@ describe("fetcher > standalone requests", () => {
   })
 
   test("fetch by request > case #11 (actions, GET with query param)", async () => {
-    const postsRequest = request(
-      action(App, "GET /posts-one-by-qs", {
+    const postsRequest = App.request(
+      App.action("GET /posts-one-by-qs", {
         query: {
           id: 2,
         },

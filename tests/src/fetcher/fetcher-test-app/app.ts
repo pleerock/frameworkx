@@ -1,10 +1,10 @@
 import { createApp } from "@microframework/core"
 import { RedisPubSub } from "graphql-redis-subscriptions"
 import {
-  PostFilterInput,
-  PostType,
   CategoryType,
+  PostFilterInput,
   PostSearchInput,
+  PostType,
 } from "./models"
 
 export const App = createApp<{

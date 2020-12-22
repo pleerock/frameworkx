@@ -3,7 +3,7 @@ jest.mock("reconnecting-websocket")
 import { AppServer } from "./fetcher-test-app/server"
 import { App } from "./fetcher-test-app/app"
 import { createFetcher } from "@microframework/fetcher"
-import { obtainPort, sleep } from "../util/test-common"
+import { obtainPort } from "../util/test-common"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import ws from "ws"
 
@@ -96,4 +96,7 @@ describe("fetcher > websockets", () => {
   test("subscribers must receive a messages even if subscription was registered before connection established", async () => {})
   test("'start' message must be sent to the server on client subscription", async () => {})
   test("'stop' message must be sent to the server on unsubscription", async () => {})
+  test("'connection_init' message must be sent on websocket connection open", async () => {})
+  test("provided clientId should be sent in 'connection_init' payload", async () => {})
+  test("auto-generated clientId should be sent in 'connection_init' payload", async () => {})
 })

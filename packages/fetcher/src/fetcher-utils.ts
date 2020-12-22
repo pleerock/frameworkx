@@ -4,7 +4,7 @@ import {
   Request,
 } from "@microframework/core"
 import { compile } from "path-to-regexp"
-import { FetcherOptions } from "./fetcher-core-types"
+import { FetcherOptions } from "./fetcher-options-type"
 import { FetcherErrors } from "./fetcher-errors"
 
 /**

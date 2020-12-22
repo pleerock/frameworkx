@@ -3,6 +3,7 @@ import { createApplicationServer } from "@microframework/node"
 import { RedisPubSub } from "graphql-redis-subscriptions"
 import { App } from "./app"
 import { PostResolver } from "./resolvers"
+
 const Redis = require("ioredis")
 
 export const AppServer = (webserverPort: number, websocketPort: number) => {

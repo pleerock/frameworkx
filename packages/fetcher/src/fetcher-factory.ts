@@ -7,11 +7,12 @@ import {
 import ReconnectingWebSocket from "reconnecting-websocket"
 import Observable from "zen-observable-ts"
 import { v4 as uuidv4 } from "uuid"
-import { Fetcher, FetcherOptions } from "./fetcher-core-types"
+import { FetcherOptions } from "./fetcher-options-type"
 import { FetcherError } from "./fetcher-error-classes"
-import { createFetcherQueryBuilder } from "./fetcher-query-builder-factory"
 import { FetcherUtils } from "./fetcher-utils"
 import { FetcherErrors } from "./fetcher-errors"
+import { Fetcher } from "./fetcher-type"
+import { createFetcherQueryBuilder } from "./fetcher-query-builder-factory"
 
 // todo-s:
 //  * implement non-json actions
@@ -47,7 +48,6 @@ export function createFetcher(
   const clientId: string = options.clientId || uuidv4()
 
   let id: number = 0
-  let wsInitialized: boolean = false
   let subscribedMessageCallbacks: {
     id: string
     callback: (event: any) => any
@@ -62,6 +62,7 @@ export function createFetcher(
     app,
     options,
     ws: undefined,
+    wsConnectionOpened: false,
 
     query(name: string) {
       if (!app) throw FetcherErrors.noAppToUseOperator("query")
@@ -136,7 +137,7 @@ export function createFetcher(
         )
 
         // call app pending for a connection callbacks
-        wsInitialized = true
+        this.wsConnectionOpened = true
         for (let item of pendingMessageCallbacks) {
           item.callback()
         }
@@ -156,7 +157,7 @@ export function createFetcher(
       if (this.ws) {
         this.ws.close()
         this.ws = undefined
-        wsInitialized = false
+        this.wsConnectionOpened = false
       }
       return this
     },
@@ -266,7 +267,7 @@ export function createFetcher(
         // console.log("sentData", sentData)
         this.ws.send(sentData)
       }
-      if (wsInitialized) {
+      if (this.wsConnectionOpened) {
         messageSendCallback()
       } else {
         pendingMessageCallbacks.push({
