@@ -25,18 +25,24 @@ export type Fetcher<App extends AnyApplication> = {
   /**
    * Unique type identifier.
    */
-  "@type": "Fetcher"
+  readonly "@type": "Fetcher"
 
   /**
    * Application used in the fetcher.
    * Undefined if fetcher without application instance specified was created.
    */
-  app?: App
+  readonly app?: App
 
   /**
    * Options defined in the fetcher.
    */
-  options: FetcherOptions
+  readonly options: FetcherOptions
+
+  /**
+   * Unique client id. Used to represent unique client id for websocket connections.
+   * If not specified, randomly generated uuid will be used.
+   */
+  readonly clientId: string
 
   /**
    * Reference to a WebSocket connection.

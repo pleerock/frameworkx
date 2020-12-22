@@ -61,6 +61,7 @@ export function createFetcher(
     "@type": "Fetcher",
     app,
     options,
+    clientId,
     ws: undefined,
     wsConnectionOpened: false,
 
@@ -131,7 +132,7 @@ export function createFetcher(
           JSON.stringify({
             type: "connection_init",
             payload: {
-              id: clientId,
+              id: this.clientId,
             },
           }),
         )
