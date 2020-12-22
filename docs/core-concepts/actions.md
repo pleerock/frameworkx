@@ -20,7 +20,7 @@ export const App = createApp<{
       return: Post[]
     }
     "GET /posts/:id": {
-      params: {
+      query: {
         id: number
       }
       return: Post

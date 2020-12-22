@@ -7,7 +7,7 @@ import { AppServer } from "./fetcher-test-app/server"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import ws from "ws"
 
-describe("fetcher > basic types", () => {
+describe("fetcher > factory", () => {
   test("fetcher should have a proper instance", async () => {
     const fetcher = createFetcher({})
     expect(fetcher["@type"]).toBe("Fetcher")
@@ -34,7 +34,7 @@ describe("fetcher > basic types", () => {
       clientId: "test-fetcher",
       actionEndpoint: "http://localhost/api",
       graphqlEndpoint: "http://localhost/graphql",
-      websocketEndpoint: "http://localhost/subscriptions",
+      websocketEndpoint: "ws://localhost/subscriptions",
       headersFactory() {
         return { Authorization: "None" }
       },

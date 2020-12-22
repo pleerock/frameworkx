@@ -24,7 +24,13 @@ export function createApplicationServer<App extends AnyApplication>(
   let schema: GraphQLSchema | undefined = undefined
   const properties = ApplicationServerUtils.optionsToProperties(options)
   const logger = LoggerUtils.createApplicationLogger(properties.logger)
-  const expressApp = properties.webserver.express || express()
+  let expressApp = properties.webserver.express
+
+  // if express app was not specified, create a new one
+  if (!expressApp) {
+    expressApp = express()
+    expressApp.use(express.json())
+  }
 
   return {
     "@type": "ApplicationServer",

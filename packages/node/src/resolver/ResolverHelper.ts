@@ -581,8 +581,8 @@ export class ResolverHelper {
         {
           params: this.buildActionParams(request.params, actionMetadata.params),
           query: this.buildActionParams(request.query, actionMetadata.query),
-          headers: this.buildActionParams(
-            request.header,
+          headers: this.buildHeaderParams(
+            request.headers,
             actionMetadata.headers,
           ),
           cookies: this.buildActionParams(
@@ -819,6 +819,30 @@ export class ResolverHelper {
       }
     }
     return requestParams
+  }
+
+  private buildHeaderParams(
+    headers: { [key: string]: string },
+    paramsMetadata: TypeMetadata | undefined,
+  ): { [key: string]: any } {
+    const newHeaders: { [key: string]: any } = {}
+    if (paramsMetadata) {
+      for (let metadata of paramsMetadata.properties) {
+        if (!metadata.propertyName) continue
+        const headerIndexName = metadata.propertyName.toLowerCase()
+        if (typeof headers[headerIndexName] !== "string") continue
+        if (metadata.kind === "number") {
+          newHeaders[metadata.propertyName] = parseInt(headers[headerIndexName])
+        } else if (metadata.kind === "bigint") {
+          newHeaders[metadata.propertyName] = BigInt(headers[headerIndexName])
+        } else if (metadata.kind === "boolean") {
+          newHeaders[metadata.propertyName] =
+            headers[headerIndexName] === "true" ||
+            headers[headerIndexName] === "1"
+        }
+      }
+    }
+    return headers
   }
 
   // stringify(value: any) {
