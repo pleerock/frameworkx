@@ -14,7 +14,7 @@ export const FetcherUtils = {
   /**
    * Checks if given value is a RequestAction.
    */
-  isRequestAnAction(request: any): request is Request<any> {
+  isRequestAction(request: any): request is Request<any> {
     return (
       typeof request === "object" &&
       request.map &&

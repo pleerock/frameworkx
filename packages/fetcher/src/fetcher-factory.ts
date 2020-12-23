@@ -175,7 +175,7 @@ export function createFetcher(
       variables?: { [key: string]: any },
     ): Promise<any> {
       const response = await this.response(request, variables)
-      if (FetcherUtils.isRequestAnAction(request)) {
+      if (FetcherUtils.isRequestAction(request)) {
         // todo: what about non-json responses?
         const result = await response.json()
         // console.log("result", result)
@@ -195,7 +195,7 @@ export function createFetcher(
       request: Request<any> | string | any, // | DocumentNode,
       variables?: { [key: string]: any },
     ): Promise<Response> {
-      if (FetcherUtils.isRequestAnAction(request)) {
+      if (FetcherUtils.isRequestAction(request)) {
         if (!options.actionEndpoint) {
           throw FetcherErrors.noActionEndpointDefined()
         }
