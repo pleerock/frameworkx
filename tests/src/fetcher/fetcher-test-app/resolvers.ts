@@ -55,6 +55,9 @@ export const PostResolver = resolver(App, {
   }) => {
     return params
   },
+  ["GET /posts-default-headers"]: ({ headers }) => {
+    return headers
+  },
   ["GET /posts-headers"]: ({ headers }) => {
     return headers
   },

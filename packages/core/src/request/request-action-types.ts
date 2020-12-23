@@ -18,7 +18,9 @@ export type RequestActionOptions<
   Action extends AnyAction
 > = (Action["query"] extends object ? { query: Action["query"] } : {}) &
   (Action["params"] extends object ? { params: Action["params"] } : {}) &
-  (Action["headers"] extends object ? { headers: Action["headers"] } : {}) &
+  (Action["headers"] extends object
+    ? { headers: Partial<Action["headers"]> }
+    : {}) &
   (Action["cookies"] extends object ? { cookies: Action["cookies"] } : {}) &
   (Action["body"] extends object ? { body: Action["body"] } : {})
 

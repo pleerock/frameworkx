@@ -69,6 +69,34 @@ export const App = createApp<{
         object: { id: number; name: string }
       }
     }
+    "GET /posts-default-headers": {
+      headers?: {
+        number: number
+        string: string
+        boolean: boolean
+        bigint: bigint
+        bigintObj: BigInt
+        date: Date
+        dateTime: DateTime
+        time: Time
+        float: Float
+        object: { id: number; name: string }
+      }
+      return:
+        | {
+            number: number
+            string: string
+            boolean: boolean
+            bigint: bigint
+            bigintObj: BigInt
+            date: Date
+            dateTime: DateTime
+            time: Time
+            float: Float
+            object: { id: number; name: string }
+          }
+        | undefined
+    }
     "GET /posts-headers": {
       headers: {
         number: number

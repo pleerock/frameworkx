@@ -145,7 +145,49 @@ describe("fetcher > actions", () => {
     expect(result.object).toEqual(body.object)
   })
 
-  test("default headers should be sent in a request", async () => {})
+  test("default headers should be sent in a request", async () => {
+    const headers = {
+      number: 1,
+      string: "ASD12345",
+      boolean: true,
+      bigint: BigInt(900719925474099),
+      bigintObj: BigInt(9007199254740991),
+      date: new Date(),
+      dateTime: new Date(),
+      time: new Date(),
+      float: 2.5,
+      object: {
+        id: 1,
+        name: "Admin",
+      },
+    }
+    fetcher = createFetcher({
+      clientId: "jest-test-fetcher",
+      actionEndpoint: `http://localhost:${webserverPort}`,
+      headersFactory: async () => {
+        return headers
+      },
+    })
+
+    const postRequest = App.request(App.action("GET /posts-default-headers"))
+    const result = await fetcher!.fetch(postRequest)
+
+    expect(result!.number).toEqual(headers.number)
+    expect(result!.string).toEqual(headers.string)
+    expect(result!.boolean).toEqual(headers.boolean)
+    expect(result!.bigint).toEqual(headers.bigint.toString())
+    expect(result!.bigintObj).toEqual(headers.bigintObj.toString())
+    expect(result!.date).toEqual(
+      `${headers.date.getFullYear()}-${headers.date.getMonth()}-${headers.date.getDate()}`,
+    )
+    expect(result!.dateTime).toEqual(headers.dateTime.toISOString())
+    expect(result!.time).toEqual(
+      `${headers.time.getHours()}:${headers.time.getMinutes()}:${headers.time.getSeconds()}.${headers.time.getMilliseconds()}Z`,
+    )
+    expect(result!.float).toEqual(headers.float)
+    expect(result!.object).toEqual(headers.object)
+  })
+
   test("headers should be sent in a request", async () => {
     const headers = {
       number: 1,
@@ -184,5 +226,4 @@ describe("fetcher > actions", () => {
     expect(result.float).toEqual(headers.float)
     expect(result.object).toEqual(headers.object)
   })
-  test("all headers should be sent in a request", async () => {})
 })

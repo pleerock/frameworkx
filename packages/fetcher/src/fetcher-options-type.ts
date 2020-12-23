@@ -58,6 +58,6 @@ export type FetcherOptions = {
    * Function that builds and returns request headers.
    */
   headersFactory?: () =>
-    | { [key: string]: string }
-    | Promise<{ [key: string]: string }>
+    | { [key: string]: any }
+    | Promise<{ [key: string]: any }>
 }
