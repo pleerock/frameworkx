@@ -92,9 +92,50 @@ describe("fetcher > websockets", () => {
     await subscription2.unsubscribe()
     await subscription3.unsubscribe()
     await fetcher.disconnect()
+    await server.stop()
   })
+
   test("subscribers must receive a messages even if subscription was registered before connection established", async () => {})
-  test("'start' message must be sent to the server on client subscription", async () => {})
+  test("'start' message must be sent to the server on client subscription", async () => {
+    const webserverPort = await obtainPort()
+    const websocketPort = await obtainPort()
+    const server = await AppServer(webserverPort, websocketPort).start()
+    const fetcher = createFetcher(App, {
+      clientId: "jest-test-fetcher",
+      actionEndpoint: `http://localhost:${webserverPort}`,
+      graphqlEndpoint: `http://localhost:${webserverPort}/graphql`,
+      websocketEndpoint: `ws://localhost:${websocketPort}/subscriptions`,
+      websocketOptions: {
+        WebSocket: ws,
+        connectionTimeout: 1000,
+        maxRetries: 10,
+      },
+    })
+    await fetcher.connect()
+    const sendFn = jest.spyOn(fetcher.ws!, "send")
+
+    const subscription = fetcher
+      .subscription("OnPostCreate")
+      .add("post")
+      .postCreated()
+      .select({
+        id: true,
+      })
+      .observe()
+      .subscribe(() => {})
+
+    // fake-deliver the message
+    fetcher.ws!.onmessage!({
+      data: JSON.stringify({ id: 1, payload: { data: { post: { id: 555 } } } }),
+    } as MessageEvent)
+
+    expect(fetcher.ws!.send).toBeCalled()
+    expect(sendFn).toBeCalledWith({ type: "start" })
+
+    await subscription.unsubscribe()
+    await fetcher.disconnect()
+    await server.stop()
+  })
   test("'stop' message must be sent to the server on unsubscription", async () => {})
   test("'connection_init' message must be sent on websocket connection open", async () => {})
   test("provided clientId should be sent in 'connection_init' payload", async () => {})
