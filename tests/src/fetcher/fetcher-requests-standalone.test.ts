@@ -82,7 +82,12 @@ describe("fetcher > requests > standalone", () => {
           title: "post #1",
         },
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.firstPost
+    // @ts-expect-error
+    result.data.firstPost.likes
   })
 
   test("fetch by request > case #2 (loading array)", async () => {
@@ -118,7 +123,16 @@ describe("fetcher > requests > standalone", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
 
   test("fetch by request > case #3 (nested selection)", async () => {
@@ -160,8 +174,22 @@ describe("fetcher > requests > standalone", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #4 (input)", async () => {
     const postsRequest = request("Posts", {
       posts: query(App, "posts", {
@@ -202,8 +230,22 @@ describe("fetcher > requests > standalone", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #5 (complex input)", async () => {
     const postsRequest = request("Posts", {
       posts: query(App, "postsSearch", {
@@ -243,8 +285,22 @@ describe("fetcher > requests > standalone", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #6 (multiple loaded data)", async () => {
     const postsRequest = request("Posts", {
       firstPost: query(App, "post", {
@@ -315,8 +371,20 @@ describe("fetcher > requests > standalone", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.firstPost.likes
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
+
   test("fetch by request > case #7 (mutation)", async () => {
     const postsRequest = request("Posts", {
       newPost: mutation(App, "postCreate", {
@@ -344,8 +412,16 @@ describe("fetcher > requests > standalone", () => {
         },
         removedPost: true,
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.newPost
+    // @ts-expect-error
+    result.data.newPost.likes
+    // @ts-expect-error
+    result.data.removedPost.id
   })
+
   test("fetch by request > case #8 (subscription)", async () => {
     const postsRequest = request("Posts", {
       onPostCreate: subscription(App, "postCreated", {
@@ -389,7 +465,12 @@ describe("fetcher > requests > standalone", () => {
           title: "iamtheonlyonepost",
         },
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.newPost
+    // @ts-expect-error
+    result.data.newPost.likes
 
     // let's wait a bit until subscriber receives a message
     await sleep(2000)

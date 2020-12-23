@@ -53,7 +53,12 @@ describe("fetcher > requests > query builder", () => {
           title: "post #1",
         },
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.firstPost
+    // @ts-expect-error
+    result.data.firstPost.likes
   })
 
   test("fetch by request > case #2 (loading array)", async () => {
@@ -88,7 +93,16 @@ describe("fetcher > requests > query builder", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
 
   test("fetch by request > case #3 (nested selection)", async () => {
@@ -129,8 +143,22 @@ describe("fetcher > requests > query builder", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #4 (input)", async () => {
     const result = await fetcher!
       .query("PostsQuery")
@@ -170,8 +198,22 @@ describe("fetcher > requests > query builder", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #5 (complex input)", async () => {
     const result = await fetcher!
       .query("PostsSearchQuery")
@@ -210,8 +252,22 @@ describe("fetcher > requests > query builder", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #6 (multiple loaded data)", async () => {
     const result = await fetcher!
       .query("ComplexQuery")
@@ -278,8 +334,20 @@ describe("fetcher > requests > query builder", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.firstPost.likes
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
+
   test("fetch by request > case #7 (mutation)", async () => {
     const result = await fetcher!
       .mutation("PostsChange")
@@ -305,8 +373,16 @@ describe("fetcher > requests > query builder", () => {
         },
         removedPost: true,
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.newPost
+    // @ts-expect-error
+    result.data.newPost.likes
+    // @ts-expect-error
+    result.data.removedPost.id
   })
+
   test("fetch by request > case #8 (subscription)", async () => {
     // connect to websocket and wait a bit until connection is established
     await fetcher!.connect()
@@ -347,7 +423,12 @@ describe("fetcher > requests > query builder", () => {
           title: "iamtheonlyonepost",
         },
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.newPost
+    // @ts-expect-error
+    result.data.newPost.likes
 
     // let's wait a bit until subscriber receives a message
     await sleep(2000)

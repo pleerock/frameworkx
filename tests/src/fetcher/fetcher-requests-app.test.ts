@@ -6,7 +6,6 @@ import { obtainPort, sleep } from "../util/test-common"
 import { App } from "./fetcher-test-app/app"
 import { AppServer } from "./fetcher-test-app/server"
 import { PostList } from "./fetcher-test-app/repositories"
-import { PostType } from "./fetcher-test-app/models";
 
 describe("fetcher > requests > app syntax", () => {
   let webserverPort: number = 0
@@ -119,7 +118,14 @@ describe("fetcher > requests > app syntax", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
 
   test("fetch by request > case #3 (nested selection)", async () => {
@@ -161,8 +167,20 @@ describe("fetcher > requests > app syntax", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].title
   })
+
   test("fetch by request > case #4 (input)", async () => {
     const postsRequest = App.request("Posts", {
       posts: App.query("posts", {
@@ -203,8 +221,20 @@ describe("fetcher > requests > app syntax", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].title
   })
+
   test("fetch by request > case #5 (complex input)", async () => {
     const postsRequest = App.request("Posts", {
       posts: App.query("postsSearch", {
@@ -244,8 +274,20 @@ describe("fetcher > requests > app syntax", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].title
   })
+
   test("fetch by request > case #6 (multiple loaded data)", async () => {
     const postsRequest = App.request("Posts", {
       firstPost: App.query("post", {
@@ -316,8 +358,16 @@ describe("fetcher > requests > app syntax", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
+
   test("fetch by request > case #7 (mutation)", async () => {
     const postsRequest = App.request("Posts", {
       newPost: App.mutation("postCreate", {
@@ -345,8 +395,18 @@ describe("fetcher > requests > app syntax", () => {
         },
         removedPost: true,
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.newPost
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.newPost.likes
+    // @ts-expect-error
+    result.data.removedPost.id
   })
+
   test("fetch by request > case #8 (subscription)", async () => {
     const postsRequest = App.request("Posts", {
       onPostCreate: App.subscription("postCreated", {
@@ -390,7 +450,14 @@ describe("fetcher > requests > app syntax", () => {
           title: "iamtheonlyonepost",
         },
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.newPost
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.newPost.likes
 
     // let's wait a bit until subscriber receives a message
     await sleep(2000)

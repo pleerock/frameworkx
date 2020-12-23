@@ -1,13 +1,9 @@
 import { createFetcher, Fetcher } from "@microframework/fetcher"
 import { ApplicationServer } from "@microframework/node"
-import gql from "graphql-tag"
 import ws from "ws"
 import { obtainPort, sleep } from "../util/test-common"
 import { App } from "./fetcher-test-app/app"
 import { AppServer } from "./fetcher-test-app/server"
-import { PostList } from "./fetcher-test-app/repositories"
-import { PostType } from "./fetcher-test-app/models"
-import { FetcherUtils } from "@microframework/fetcher/_/fetcher-utils"
 
 describe("fetcher > requests > request fn", () => {
   let webserverPort: number = 0
@@ -98,7 +94,16 @@ describe("fetcher > requests > request fn", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
 
   test("fetch by request > case #3 (nested selection)", async () => {
@@ -141,8 +146,22 @@ describe("fetcher > requests > request fn", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #4 (input)", async () => {
     const postsRequest = App.requestFn("Posts", {
       posts: App.query("posts", {
@@ -184,7 +203,20 @@ describe("fetcher > requests > request fn", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
   test("fetch by request > case #5 (complex input)", async () => {
     const postsRequest = App.requestFn("Posts", {
@@ -226,8 +258,22 @@ describe("fetcher > requests > request fn", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
+    // @ts-expect-error
+    result.data.posts[0].categories.id
+    // @ts-expect-error
+    result.data.posts[0].categories[0].name
   })
+
   test("fetch by request > case #6 (multiple loaded data)", async () => {
     const postsRequest = App.requestFn("Posts", {
       firstPost: App.query("post", {
@@ -293,8 +339,20 @@ describe("fetcher > requests > request fn", () => {
           },
         ],
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.posts
+    // @ts-expect-error
+    result.data.firstPost.likes
+    // @ts-expect-error
+    result.data.post
+    // @ts-expect-error
+    result.data.posts.id
+    // @ts-expect-error
+    result.data.posts[0].likes
   })
+
   test("fetch by request > case #7 (mutation)", async () => {
     const postsRequest = App.requestFn("Posts", {
       newPost: App.mutation("postCreate", {
@@ -322,9 +380,20 @@ describe("fetcher > requests > request fn", () => {
           title: "New Post!",
         },
         removedPost: true,
+        allRemoved: true,
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.post
+    // @ts-expect-error
+    result.data.newPost.likes
+    // @ts-expect-error
+    result.data.removedPost.id
+    // @ts-expect-error
+    result.data.allRemoved.id
   })
+
   test("fetch by request > case #8 (subscription)", async () => {
     const postsRequest = App.requestFn("Posts", {
       onPostCreate: App.subscription("postCreated", {
@@ -338,7 +407,14 @@ describe("fetcher > requests > request fn", () => {
     await sleep(2000)
 
     // subscribe to changes
-    let dataFromSubscription: any
+    let dataFromSubscription:
+      | {
+          onPostCreate: {
+            id: number
+            title: string
+          }
+        }
+      | undefined = undefined
     const observable = fetcher!.observe(postsRequest()).subscribe((data) => {
       dataFromSubscription = data
     })
@@ -350,6 +426,7 @@ describe("fetcher > requests > request fn", () => {
         title: true,
       }),
     })
+
     const result = await fetcher!.fetch(
       postSaveRequest({
         newPost: {
@@ -357,6 +434,7 @@ describe("fetcher > requests > request fn", () => {
         },
       }),
     )
+
     expect(result).toEqual({
       data: {
         newPost: {
@@ -364,7 +442,12 @@ describe("fetcher > requests > request fn", () => {
           title: "iamtheonlyonepost",
         },
       },
-    })
+    } as typeof result)
+
+    // @ts-expect-error
+    result.post
+    // @ts-expect-error
+    result.data.newPost.likes
 
     // let's wait a bit until subscriber receives a message
     await sleep(2000)
@@ -376,6 +459,12 @@ describe("fetcher > requests > request fn", () => {
         title: "iamtheonlyonepost",
       },
     })
+
+    // @ts-expect-error
+    dataFromSubscription.post
+    // @ts-expect-error
+    dataFromSubscription?.onPostCreate.likes
+
     observable.unsubscribe()
     await fetcher!.disconnect()
     await sleep(2000)
