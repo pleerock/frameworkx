@@ -21,11 +21,11 @@ export type RequestMapItemOptions<
   : Declaration extends (input: infer Input) => infer Return
   ? Return extends object
     ? {
-        input: Input
+        input?: Input
         select: Selection
       }
     : {
-        input: Input
+        input?: Input
       }
   : never
 

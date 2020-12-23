@@ -50,6 +50,8 @@ export type ActionArgs<Action extends AnyAction> = Pick<
 
 /**
  * Helper type to get input args of a given declaration.
+ *
+ * todo: rename to ArgsOf
  */
 export type InputOf<
   App extends AnyApplication,

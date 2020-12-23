@@ -8,6 +8,7 @@ import {
   RequestMapItem,
   RequestSelection,
   ActionFnParams,
+  RequestFn,
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
 import {
@@ -70,6 +71,17 @@ export type Application<Options extends AnyApplicationOptions> = {
   /**
    * Creates a "request query".
    */
+  query<QueryKey extends keyof Options["queries"]>(
+    name: QueryKey,
+  ): RequestMapItem<
+    ForcedType<Options["queries"], GraphQLDeclarationList>,
+    QueryKey,
+    never
+  >
+
+  /**
+   * Creates a "request query".
+   */
   query<
     QueryKey extends keyof Options["queries"],
     Declaration extends Options["queries"][QueryKey],
@@ -86,6 +98,35 @@ export type Application<Options extends AnyApplicationOptions> = {
     ForcedType<Options["queries"], GraphQLDeclarationList>,
     QueryKey,
     Selection
+  >
+
+  /**
+   * Creates a "request query".
+   */
+  query<
+    QueryKey extends keyof Options["queries"],
+    Declaration extends Options["queries"][QueryKey],
+    Selection extends RequestSelection<
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>
+    >
+  >(
+    name: QueryKey,
+    selection: Selection,
+  ): RequestMapItem<
+    ForcedType<Options["queries"], GraphQLDeclarationList>,
+    QueryKey,
+    Selection
+  >
+
+  /**
+   * Creates a "request mutation".
+   */
+  mutation<MutationKey extends keyof Options["mutations"]>(
+    name: MutationKey,
+  ): RequestMapItem<
+    ForcedType<Options["mutations"], GraphQLDeclarationList>,
+    MutationKey,
+    never
   >
 
   /**
@@ -110,6 +151,34 @@ export type Application<Options extends AnyApplicationOptions> = {
   >
 
   /**
+   * Creates a "request mutation".
+   */
+  mutation<
+    MutationKey extends keyof Options["mutations"],
+    Declaration extends Options["mutations"][MutationKey],
+    Selection extends RequestSelection<
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>
+    >
+  >(
+    name: MutationKey,
+    selection: Selection,
+  ): RequestMapItem<
+    ForcedType<Options["mutations"], GraphQLDeclarationList>,
+    MutationKey,
+    Selection
+  >
+
+  /**
+   * Creates a "request subscription".
+   */
+  subscription<SubscriptionKey extends keyof Options["subscriptions"]>(
+    name: SubscriptionKey,
+  ): RequestMapItem<
+    ForcedType<Options["subscriptions"], GraphQLDeclarationList>,
+    SubscriptionKey,
+    never
+  >
+  /**
    * Creates a "request subscription".
    */
   subscription<
@@ -124,6 +193,24 @@ export type Application<Options extends AnyApplicationOptions> = {
       ForcedType<Declaration, GraphQLDeclarationItem<any>>,
       Selection
     >,
+  ): RequestMapItem<
+    ForcedType<Options["subscriptions"], GraphQLDeclarationList>,
+    SubscriptionKey,
+    Selection
+  >
+
+  /**
+   * Creates a "request subscription".
+   */
+  subscription<
+    SubscriptionKey extends keyof Options["subscriptions"],
+    Declaration extends Options["subscriptions"][SubscriptionKey],
+    Selection extends RequestSelection<
+      ForcedType<Declaration, GraphQLDeclarationItem<any>>
+    >
+  >(
+    name: SubscriptionKey,
+    selection: Selection,
   ): RequestMapItem<
     ForcedType<Options["subscriptions"], GraphQLDeclarationList>,
     SubscriptionKey,
@@ -155,6 +242,14 @@ export type Application<Options extends AnyApplicationOptions> = {
    * Creates a request.
    */
   request<T extends RequestMap | AnyRequestAction>(): Request<T>
+
+  /**
+   * A graphql request factory function.
+   */
+  requestFn<Map extends RequestMap>(
+    name: string,
+    map: Map,
+  ): RequestFn<Application<Options>, Request<Map>>
 
   /**
    * Creates a new validation rule for a given App's model.

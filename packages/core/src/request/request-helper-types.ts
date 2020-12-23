@@ -1,7 +1,40 @@
-import { ReturnTypeOptional } from "../application"
+import { AnyApplication, ReturnTypeOptional } from "../application"
 import { AnyRequestAction } from "./request-action-types"
 import { AnyRequestMapItem, Request, RequestMap } from "./request-map-types"
 import { ModelSelection } from "../selection"
+import { InputOf } from "../resolver"
+
+/**
+ * Helper type to pick non-never properties of the selection.
+ */
+export type RequestFnKnownPick<
+  App extends AnyApplication,
+  R extends Request<any>
+> = Pick<
+  R["map"],
+  {
+    [P in keyof R["map"]]: InputOf<App, R["map"][P]["name"]> extends object
+      ? P
+      : never
+  }[keyof R["map"]]
+>
+
+export type RequestFnArgs<
+  App extends AnyApplication,
+  R extends Request<any>
+> = {
+  [P in keyof RequestFnKnownPick<App, R>]: InputOf<App, R["map"][P]["name"]>
+}
+
+/**
+ * Used to determine a ReturnType of a particular request's selection.
+ */
+export type RequestFn<
+  App extends AnyApplication,
+  R extends Request<any>
+> = keyof RequestFnArgs<App, R> extends never
+  ? () => R
+  : (args: RequestFnArgs<App, R>) => R
 
 /**
  * Used to determine a ReturnType of a particular request's selection.

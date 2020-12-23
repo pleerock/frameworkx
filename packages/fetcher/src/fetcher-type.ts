@@ -143,7 +143,7 @@ export type Fetcher<App extends AnyApplication> = {
   fetch<T = any>(
     request: string | any,
     variables?: { [key: string]: any },
-  ): Promise<{ data: any; errors?: any[] }>
+  ): Promise<{ data: T; errors?: any[] }>
 
   /**
    * Fetches data from a server based on a given Request.

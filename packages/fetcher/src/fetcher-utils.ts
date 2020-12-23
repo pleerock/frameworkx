@@ -249,6 +249,7 @@ export const FetcherUtils = {
    * Serializes a given selection object into GraphQL's query selection format.
    */
   serializeSelect(select: any, nestingLevel: number) {
+    if (Object.keys(select).length === 0) return ""
     let query = "{\r\n"
     for (let key in select) {
       if (select[key] === true) {

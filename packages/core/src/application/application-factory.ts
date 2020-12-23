@@ -1,4 +1,11 @@
-import { action, mutation, query, request, subscription } from "../request"
+import {
+  action,
+  mutation,
+  query,
+  request,
+  requestFn,
+  subscription,
+} from "../request"
 import { Model } from "@microframework/model"
 import { AnyValidationRule, validationRule } from "../validation"
 import { AnyApplicationOptions } from "./application-helper-types"
@@ -8,9 +15,9 @@ import { Application } from "./application-type"
 /**
  * Creates a new Application based on a given options.
  */
-export function createApp<Options extends AnyApplicationOptions>(): Application<
-  Options
-> {
+export function createApp<
+  Options extends AnyApplicationOptions
+>(): Application<Options> {
   return {
     "@type": "Application",
 
@@ -26,20 +33,24 @@ export function createApp<Options extends AnyApplicationOptions>(): Application<
       return (action as any)(this, ...args)
     },
 
-    query(...args) {
+    query(...args: any[]) {
       return (query as any)(this, ...args)
     },
 
-    mutation(...args) {
+    mutation(...args: any[]) {
       return (mutation as any)(this, ...args)
     },
 
-    subscription(...args) {
+    subscription(...args: any[]) {
       return (subscription as any)(this, ...args)
     },
 
     request(...args: any[]) {
       return (request as any)(...args)
+    },
+
+    requestFn(...args: any[]) {
+      return (requestFn as any)(...args)
     },
 
     validationRule(...args: any[]): AnyValidationRule {
