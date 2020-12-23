@@ -204,17 +204,61 @@ describe("fetcher > utils", () => {
         "  }\r\n" +
         "}\r\n",
     )
+
+    const request2 = App.request("Posts", {
+      firstPost: App.query("postRandomOne", {
+        select: {
+          id: true,
+          title: true,
+        },
+      }),
+      removedPost: App.mutation("postRemove", {
+        input: {
+          id: 2,
+        },
+      }),
+    })
+
+    expect(() => FetcherUtils.requestToQuery(request2)).toThrowError(
+      "A single request can't mix queries, mutations and subscriptions.",
+    )
   })
 
   test("serializeInput", async () => {
+    const date = new Date(Date.UTC(2020, 1, 1, 1, 1, 1, 1))
     const input = {
-      id: 1,
-      title: "Post",
-      text: "My first post.",
+      number: 1,
+      string: "ASD12345",
+      boolean: true,
+      bigint: BigInt(900719925474099),
+      bigintObj: BigInt(9007199254740991),
+      date: date,
+      dateTime: date,
+      time: date,
+      float: 2.5,
+      object: {
+        id: 1,
+        name: "Admin",
+      },
     }
     const serialized = FetcherUtils.serializeInput(input, 0)
     expect(serialized).toEqual(
-      "  id: 1\r\n" + '  title: "Post"\r\n' + '  text: "My first post."\r\n',
+      "  number: 1\r\n" +
+        '  string: "ASD12345"\r\n' +
+        "  boolean: true\r\n" +
+        '  bigint: "900719925474099"\r\n' +
+        '  bigintObj: "9007199254740991"\r\n' +
+        "  date: {\r\n" +
+        "  }\r\n" +
+        "  dateTime: {\r\n" +
+        "  }\r\n" +
+        "  time: {\r\n" +
+        "  }\r\n" +
+        "  float: 2.5\r\n" +
+        "  object: {\r\n" +
+        "    id: 1\r\n" +
+        '    name: "Admin"\r\n' +
+        "  }\r\n",
     )
   })
 
