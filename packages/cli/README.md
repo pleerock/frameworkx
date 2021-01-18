@@ -1,1 +1,3 @@
-# Framework Core
+# CLI
+
+Microframework's CLI tools.

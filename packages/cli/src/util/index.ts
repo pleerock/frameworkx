@@ -1,51 +1,58 @@
 import { lstatSync, promises as fs } from "fs"
-import mkdirp from "mkdirp"
 import { glob } from "glob"
+import path from "path"
 
 /**
  * Lists all files from a given directory but excludes given files.
  */
-export function scanFiles(source: string, ignore: string[]) {
+export function scanFiles(source: string, ignore: string[]): Promise<string[]> {
   return new Promise<string[]>((ok, fail) => {
-    glob(
-      source + "/**/*",
-      {
-        dot: true,
-        ignore,
-      },
-      function (err, matches) {
-        if (err) return fail(err)
-        ok(matches)
-      },
-    )
+    try {
+      glob(
+        source + "/**/*",
+        {
+          dot: true,
+          nodir: true,
+          ignore,
+        },
+        function (err, matches) {
+          if (err) return fail(err)
+          ok(matches)
+        },
+      )
+    } catch (err) {
+      fail(err)
+    }
   })
 }
 
 /**
  * Copies all files from source directory into the given destination directory.
+ * Returns all copied file paths.
  */
 export async function copyFiles({
-  source,
+  basedir,
   files,
   destination,
 }: {
-  source: string
+  basedir: string
   files: string[]
   destination: string
-}) {
-  await mkdirp(destination)
+}): Promise<string[]> {
+  await fs.mkdir(destination, { recursive: true })
 
   return new Promise<string[]>(async (ok, fail) => {
     try {
       const copiedFiles: string[] = []
       for (let file of files) {
-        const dest = destination + file.replace(source, "")
-        if (lstatSync(file).isDirectory()) {
-          await mkdirp(dest)
-        } else {
-          await fs.copyFile(file, dest)
-          copiedFiles.push(dest)
+        if (lstatSync(file).isDirectory()) continue
+        const dest = destination + file.replace(basedir, "")
+        const fileDir = path.dirname(dest)
+        if (fileDir) {
+          await fs.mkdir(fileDir, { recursive: true })
         }
+        await fs.copyFile(file, dest)
+        copiedFiles.push(dest)
       }
       ok(copiedFiles)
     } catch (e) {

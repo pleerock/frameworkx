@@ -2,6 +2,9 @@ import { promises as fs } from "fs"
 import * as path from "path"
 import { copyFiles, replaceInFile, scanFiles } from "../util"
 
+/**
+ * Initializes a boilerplate project.
+ */
 export async function initAction(
   name: string,
   directory: string,
@@ -28,7 +31,7 @@ export async function initAction(
 
   if (scale === "monolith") {
     await copyFiles({
-      source,
+      basedir: source,
       files,
       destination: destination,
     })
@@ -50,7 +53,7 @@ export async function initAction(
     })
   } else if (scale === "monorepo") {
     const copiedFiles = await copyFiles({
-      source,
+      basedir: source,
       files,
       destination,
     })
@@ -116,7 +119,7 @@ export async function initAction(
     )
   } else if (scale === "microservices") {
     const copiedFiles = await copyFiles({
-      source,
+      basedir: source,
       files,
       destination,
     })
