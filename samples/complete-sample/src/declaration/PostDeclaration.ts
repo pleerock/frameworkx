@@ -1,12 +1,12 @@
 import { PostFilterInput, PostInput } from "../input"
-import { Post, PostModel } from "../model"
+import { Post } from "../model"
 
 /**
  * Declarations for Post.
  */
 export type PostDeclaration = {
   models: {
-    Post: PostModel
+    Post: Post
   }
 
   inputs: {

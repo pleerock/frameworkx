@@ -123,6 +123,7 @@ export function parse(appFileName: string): ApplicationTypeMetadata {
         "@type": "ActionTypeMetadata",
         name: action.propertyName,
         description: action.description,
+        deprecated: !!action.deprecated,
         return: returning ? { ...returning, propertyName: "" } : undefined,
         query,
         params,

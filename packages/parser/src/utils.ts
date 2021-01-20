@@ -39,7 +39,6 @@ export const ParserUtils = {
       str = str.substr(argsIndex + ".Args.".length)
       return str.split(".").length >= deepness.args
     }
-
     return str.split(".").length >= deepness.regular
   },
 

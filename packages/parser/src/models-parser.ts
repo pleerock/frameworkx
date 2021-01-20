@@ -55,7 +55,7 @@ export class ModelParser {
     debugPath: string,
     noReferences: boolean,
   ): TypeMetadata {
-    // console.log("debug path:", origin)
+    // console.log("debug path:", debugPath, { nodeKind: node.kind, useReferences: !noReferences })
     if (node.kind === ts.SyntaxKind.NumberKeyword) {
       return TypeMetadataUtils.create("number", {
         propertyPath: parentName,
@@ -389,8 +389,13 @@ export class ModelParser {
       }
 
       // finally create a union type for type references
-      const properties = typesWithoutNullAndUndefined.map((type) => {
-        return this.parse(type, parentName, `${debugPath}.union`, false)
+      const properties = typesWithoutNullAndUndefined.map((type, index) => {
+        return this.parse(
+          type,
+          ParserUtils.joinStrings(parentName, `${index}`),
+          `${debugPath}[${index}].union`,
+          false,
+        )
       })
 
       // in the case if all properties are "enums", user declared a union consist of enums, e.g.
@@ -543,14 +548,12 @@ export class ModelParser {
       // otherwise we'll never get an object structure of a User object
       // that's why we have a check for parentName here
       const existType = this.types.find((type) => type === typeName)
-      if (
-        noReferences === false &&
-        ParserUtils.checkPathDeepness(parentName, {
-          regular: this.replaceReferencesOnParentDeepnessLevel,
-          args: 1,
-        }) &&
-        existType
-      ) {
+      const deepnessCheck = ParserUtils.checkPathDeepness(parentName, {
+        regular: this.replaceReferencesOnParentDeepnessLevel,
+        args: 1,
+      })
+      // console.log("parentName", { parentName, existType, deepnessCheck })
+      if (noReferences === false && deepnessCheck && existType) {
         return TypeMetadataUtils.create("reference", {
           typeName,
           propertyPath: ParserUtils.joinStrings(parentName), // , typeName),

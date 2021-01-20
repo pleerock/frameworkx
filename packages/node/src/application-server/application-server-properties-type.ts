@@ -13,6 +13,7 @@ import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"
 import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
+import { SwaggerUiOptions } from "swagger-ui-express"
 
 /**
  * Properties held by ApplicationServer.
@@ -157,7 +158,7 @@ export type ApplicationServerProperties = {
      *
      * @see https://github.com/scottie1984/swagger-ui-express#custom-swagger-options
      */
-    readonly options?: any
+    readonly options?: SwaggerUiOptions
   }
 
   /**

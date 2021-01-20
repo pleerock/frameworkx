@@ -1,20 +1,18 @@
 import { ApplicationTypeMetadata, TypeMetadata } from "@microframework/core"
-import {
-  BodyParameter,
-  Operation,
-  ParameterType,
-  Path,
-  PathParameter,
-  QueryParameter,
-  Schema,
-  Spec,
-} from "swagger-schema-official"
+import { OpenAPIV3 } from "openapi-types"
+import SchemaObject = OpenAPIV3.SchemaObject
+import OperationObject = OpenAPIV3.OperationObject
+import PathsObject = OpenAPIV3.PathsObject
+import ReferenceObject = OpenAPIV3.ReferenceObject
+import Document = OpenAPIV3.Document
+import NonArraySchemaObject = OpenAPIV3.NonArraySchemaObject
+import NonArraySchemaObjectType = OpenAPIV3.NonArraySchemaObjectType
 
 function typeMetadataToDefinitionProperty(
   appMetadata: ApplicationTypeMetadata,
   metadata: TypeMetadata,
   root: boolean,
-): Schema {
+): SchemaObject | ReferenceObject | NonArraySchemaObject {
   if (metadata.array) {
     return {
       type: "array",
@@ -31,8 +29,7 @@ function typeMetadataToDefinitionProperty(
 
   if (metadata.kind === "union") {
     return {
-      // todo: replace to oneOf once available
-      allOf: metadata.properties.map((property) => {
+      oneOf: metadata.properties.map((property) => {
         return typeMetadataToDefinitionProperty(appMetadata, property, false)
       }),
     }
@@ -40,7 +37,7 @@ function typeMetadataToDefinitionProperty(
 
   if (metadata.kind === "object" && metadata.typeName && !root) {
     return {
-      $ref: "#/definitions/" + metadata.typeName, // todo: or modelName ?
+      $ref: "#/components/schemas/" + metadata.typeName, // todo: or modelName ?
     }
   }
 
@@ -55,7 +52,7 @@ function typeMetadataToDefinitionProperty(
     }
 
     return {
-      $ref: "#/definitions/" + metadata.typeName, // todo: or modelName ?
+      $ref: "#/components/schemas/" + metadata.typeName, // todo: or modelName ?
     }
   }
 
@@ -74,7 +71,7 @@ function typeMetadataToDefinitionProperty(
             ),
           }
         },
-        {} as Schema["properties"],
+        {} as SchemaObject["properties"],
       ),
       required: metadata.properties
         .filter(
@@ -87,7 +84,14 @@ function typeMetadataToDefinitionProperty(
     }
   }
 
-  let type: ParameterType | undefined = undefined
+  if (metadata.kind === "enum") {
+    return {
+      type: "string",
+      enum: metadata.properties.map((property) => property.propertyName),
+    }
+  }
+
+  let type: NonArraySchemaObjectType | undefined = undefined
   switch (metadata.kind) {
     case "number":
       type = "integer"
@@ -101,9 +105,9 @@ function typeMetadataToDefinitionProperty(
     case "boolean":
       type = "boolean"
       break
-    case "enum":
-      type = "object"
-      break
+    // case "enum":
+    //   type = "string"
+    //   break
     // case "model":
     //   type = "object"
     //   break
@@ -128,8 +132,8 @@ function typeMetadataToDefinitionProperty(
  */
 export function generateSwaggerDocumentation(
   appMetadata: ApplicationTypeMetadata,
-): Spec {
-  const definitions: Spec["definitions"] = [
+): Document {
+  const definitions: { [key: string]: SchemaObject } = [
     ...appMetadata.models,
     ...appMetadata.inputs,
   ].reduce((definitions, model) => {
@@ -143,9 +147,9 @@ export function generateSwaggerDocumentation(
         true,
       ),
     }
-  }, {} as Spec["definitions"])
+  }, {})
 
-  const paths: Spec["paths"] = appMetadata.actions.reduce((paths, action) => {
+  const paths: PathsObject[] = appMetadata.actions.reduce((paths, action) => {
     if (!action.name) return paths
 
     // todo: duplicate, extract into utils
@@ -157,20 +161,26 @@ export function generateSwaggerDocumentation(
       )
     }
 
-    const operation: Operation = {
+    const operation: OperationObject = {
       summary: action.description,
       parameters: [],
+      deprecated: action.deprecated,
       responses: {
         "200": {
           description: "", // action.return,
-          schema: action.return
-            ? typeMetadataToDefinitionProperty(
-                appMetadata,
-                action.return,
-                false,
-              )
-            : undefined,
-          // headers: todo
+          content: {
+            "application/json": {
+              // todo: content type for other return types
+              schema: action.return
+                ? typeMetadataToDefinitionProperty(
+                    appMetadata,
+                    action.return,
+                    false,
+                  )
+                : undefined,
+              // headers: todo
+            },
+          },
         },
       },
     }
@@ -178,55 +188,56 @@ export function generateSwaggerDocumentation(
       for (let parameter of action.params.properties) {
         operation.parameters!.push({
           in: "path",
-          name: parameter.propertyName, // todo: check this name
+          name: parameter.propertyName!, // todo: check this name
           required:
             parameter.nullable === false && parameter.canBeUndefined === false,
-          type: parameter.kind,
+          // type: parameter.kind,
           description: parameter.description,
-        } as PathParameter)
+        })
       }
     }
     if (action.body) {
       for (let parameter of action.body.properties) {
         operation.parameters!.push({
           in: "body",
-          name: parameter.propertyName, // todo: check this name
+          name: parameter.propertyName!, // todo: check this name
           required:
             parameter.nullable === false && parameter.canBeUndefined === false,
-          type: parameter.kind,
+          // type: parameter.kind,
           description: parameter.description,
-        } as BodyParameter)
+        })
       }
     }
     if (action.query) {
       for (let parameter of action.query.properties) {
         operation.parameters!.push({
           in: "query",
-          name: parameter.propertyName, // todo: check this name
+          name: parameter.propertyName!, // todo: check this name
           required:
             parameter.nullable === false && parameter.canBeUndefined === false,
-          type: parameter.kind,
+          // type: parameter.kind,
           description: parameter.description,
-        } as QueryParameter)
+        })
       }
     }
     // todo: cookies, headers, etc.
 
-    if (!paths[route]) paths[route] = {}
-    ;(paths[route] as any)[method] = operation
+    if (!(paths as any)[route]) (paths as any)[route] = {}
+    ;((paths as any)[route] as any)[method] = operation
 
     return paths
-  }, {} as Spec["paths"])
+  }, [])
 
   return {
-    swagger: "2.0",
+    openapi: "3.0.0",
     info: {
+      version: "1",
       title: appMetadata.name,
       description: appMetadata.description,
     },
-    definitions,
-    paths,
-    consumes: ["application/json"], // todo: implement other types
-    produces: ["application/json"], // todo: implement other types
-  } as Spec
+    components: {
+      schemas: { ...definitions },
+    },
+    paths: { ...paths },
+  } as Document
 }

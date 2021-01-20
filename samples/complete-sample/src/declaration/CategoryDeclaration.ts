@@ -55,7 +55,7 @@ export type CategoryDeclaration = {
     }
 
     /**
-     * Removes a category.
+     * Removes a category by id.
      */
     "DELETE /api/category/:id": {
       params: {
@@ -64,6 +64,16 @@ export type CategoryDeclaration = {
          */
         id: number
       }
+      return: {
+        success: boolean
+      }
+    }
+
+    /**
+     * Deprecated, use delete by id instead.
+     * @deprecated
+     */
+    "DELETE /api/categories": {
       return: {
         success: boolean
       }

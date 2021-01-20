@@ -197,8 +197,9 @@ export function createApplicationServer<App extends AnyApplication>(
 
       // setup swagger
       if (properties.swagger) {
+        // console.log(metadata);
         const swaggerUi = require("swagger-ui-express")
-        // console.log(JSON.stringify(generateSwaggerDocumentation(this.metadata!), null, 2))
+        // console.log(JSON.stringify(metadata.models.filter(m => m.kind === "union"), null, 2))
         expressApp.use(
           properties.swagger.route,
           swaggerUi.serve,
@@ -207,6 +208,7 @@ export function createApplicationServer<App extends AnyApplication>(
               generateSwaggerDocumentation(metadata),
               properties.swagger.document || {},
             ),
+            properties.swagger.options,
           ),
         )
       }

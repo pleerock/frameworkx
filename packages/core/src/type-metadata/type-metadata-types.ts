@@ -112,6 +112,11 @@ export type ActionTypeMetadata = {
   description?: string
 
   /**
+   * Action deprecation status.
+   */
+  deprecated?: boolean
+
+  /**
    * What data this action returns.
    */
   return?: TypeMetadata
