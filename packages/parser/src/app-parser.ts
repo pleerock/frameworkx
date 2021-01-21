@@ -21,12 +21,6 @@ export function parse(appFileName: string): ApplicationTypeMetadata {
   // -- local functions --
 
   function parseAppDefinition(appDefinition: ts.TypeLiteralNode) {
-    // first iteration
-    const inputNames = declarationPropertyNames("inputs", appDefinition)
-    const modelNames = declarationPropertyNames("models", appDefinition)
-    modelsAndInputs.push(...inputNames)
-    modelsAndInputs.push(...modelNames)
-
     return {
       actions: parseActions(appDefinition),
       models: parseModelsInputs("models", appDefinition),
@@ -353,7 +347,49 @@ export function parse(appFileName: string): ApplicationTypeMetadata {
     mutations: [],
     subscriptions: [],
   }
+  // first we collect all root input and model names
+  if (ts.isIntersectionTypeNode(appDefOptions)) {
+    appDefOptions.types.forEach((type) => {
+      if (ts.isTypeLiteralNode(type)) {
+        modelsAndInputs.push(...declarationPropertyNames("inputs", type))
+        modelsAndInputs.push(...declarationPropertyNames("models", type))
+      } else if (ts.isTypeReferenceNode(type)) {
+        const referencedType = program.getTypeChecker().getTypeAtLocation(type)
+        const symbol = referencedType.aliasSymbol || referencedType.symbol
+        if (symbol && symbol.declarations[0]) {
+          const declaration = symbol.declarations[0]
+          if (ts.isTypeLiteralNode(declaration)) {
+            modelsAndInputs.push(
+              ...declarationPropertyNames("inputs", declaration),
+            )
+            modelsAndInputs.push(
+              ...declarationPropertyNames("models", declaration),
+            )
+            return
+          } else if (
+            ts.isTypeAliasDeclaration(declaration) &&
+            ts.isTypeLiteralNode(declaration.type)
+          ) {
+            modelsAndInputs.push(
+              ...declarationPropertyNames("inputs", declaration.type),
+            )
+            modelsAndInputs.push(
+              ...declarationPropertyNames("models", declaration.type),
+            )
+            return
+          }
+        }
+      }
+    })
+  } else {
+    if (!ts.isTypeLiteralNode(appDefOptions))
+      throw Errors.appTypeInvalidArguments()
 
+    modelsAndInputs.push(...declarationPropertyNames("inputs", appDefOptions))
+    modelsAndInputs.push(...declarationPropertyNames("models", appDefOptions))
+  }
+
+  // next, parse all actions, models, inputs, queries, mutations, subscriptions
   if (ts.isIntersectionTypeNode(appDefOptions)) {
     appDefOptions.types.forEach((type) => {
       if (ts.isTypeLiteralNode(type)) {

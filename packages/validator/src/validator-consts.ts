@@ -57,4 +57,4 @@ export const ValidationErrorCodes = {
   lessThanOrEqual: "VALIDATION_LESS_THAN_OR_EQUAL",
   greaterThan: "VALIDATION_GREATER_THAN",
   greaterThanOrEqual: "VALIDATION_GREATER_THAN_OR_EQUAL",
-}
+} as const

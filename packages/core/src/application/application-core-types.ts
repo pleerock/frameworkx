@@ -1,83 +1,11 @@
-import {
-  AnyApplication,
-  AnyApplicationOptions,
-} from "./application-helper-types"
-
-/**
- * Collection of root queries, mutations and subscriptions.
- */
-export type GraphQLDeclarationList = {
-  [name: string]: GraphQLDeclarationItem<any>
-}
-
-/**
- * Collection of actions (HTTP routes).
- */
-export type ActionList = {
-  [name: string]: AnyAction
-}
+import { AnyApplicationOptions } from "./application-helper-types"
 
 /**
  * List of models defined in the application.
  */
 export type ModelList = {
-  [name: string]: ModelWithArgs<ModelType, ArgsOfModel<ModelType>> | ModelType
+  [name: string]: ModelMixed
 }
-
-/**
- * List of inputs defined in the application.
- */
-export type InputTypeList = {
-  [name: string]: InputType
-}
-
-/**
- * List of context variables.
- */
-export type ContextList = {
-  [name: string]: any
-}
-
-/**
- * Type of the value returned by a single declaration.
- */
-export type GraphQLDeclarationItemReturnType =
-  | string
-  | number
-  | boolean
-  | object
-  | undefined
-  | null
-
-/**
- * A single root query, mutation or subscription declaration.
- *
- * Examples:
- *    post(args: { id: number }): Post
- *    posts(): Post[]
- *    postsCount(): number
- */
-export type GraphQLDeclarationItem<ArgsType extends { [key: string]: any }> =
-  | ((args: ArgsType) => GraphQLDeclarationItemReturnType) // example: post(args: { id: number }): Post
-  | (() => GraphQLDeclarationItemReturnType) // example: posts(): Post[]
-
-/**
- * Action is a single HTTP route that serves network requests.
- */
-export type Action<ReturnType, Params, Query, Headers, Cookies, Body> = {
-  return?: ReturnType
-  params?: Params
-  query?: Query
-  headers?: Headers
-  cookies?: Cookies
-  body?: Body
-  middlewares?: () => any[]
-}
-
-/**
- * Action with any generic types.
- */
-export type AnyAction = Action<any, any, any, any, any, any>
 
 /**
  * Model type.
@@ -100,7 +28,6 @@ export type ModelWithArgs<
   Type extends ModelType,
   Args extends ArgsOfModel<Type>
 > = {
-  "@type": "ModelWithArgs"
   type: Type
   args: Args
 }
@@ -109,22 +36,96 @@ export type ModelWithArgs<
  * Extracts a "real" model type out of mixed model type.
  * ModelWithArgs | ModelType is called a mixed model type.
  */
-export type ModelOrigin<
-  MixedModel extends
-    | ModelWithArgs<ModelType, ArgsOfModel<ModelType>>
-    | ModelType
-> = MixedModel extends ModelWithArgs<ModelType, ArgsOfModel<ModelType>>
-  ? MixedModel["type"]
-  : MixedModel
+export type ModelOrigin<T extends ModelMixed> = T extends ModelWithArgs<
+  ModelType,
+  ArgsOfModel<ModelType>
+>
+  ? T["type"]
+  : T
 
 /**
- * Input is a type of model that will be used as input for application declarations.
+ * ModelWithArgs | ModelType is called a mixed model type.
+ * Model can be defined as a regular type or a ModelWithArgs
+ * which represents a type plus arguments accepted by a type properties.
  */
-export type InputType = any
+export type ModelMixed =
+  | ModelWithArgs<ModelType, ArgsOfModel<ModelType>>
+  | ModelType
 
 /**
- * Represents any "key" resolver can resolve (particular query, mutation, action, subscription, model).
- * For example from declaration "{ queries: { posts(): Post[] }, mutations: { savePost(): Post } }"
+ * List of inputs defined in the application.
+ */
+export type InputTypeList = {
+  [name: string]: any
+}
+
+/**
+ * List of context variables.
+ */
+export type ContextList = {
+  [name: string]: any
+}
+
+/**
+ * Collection of root queries, mutations and subscriptions.
+ */
+export type GraphQLDeclarationList = {
+  [name: string]: GraphQLDeclarationItem<any>
+}
+
+/**
+ * A single root query, mutation or subscription declaration.
+ *
+ * Examples:
+ *    post(args: { id: number }): Post
+ *    posts(): Post[]
+ *    postsCount(): number
+ */
+export type GraphQLDeclarationItem<ArgsType extends { [key: string]: any }> =
+  | ((args: ArgsType) => GraphQLDeclarationItemReturnType) // example: post(args: { id: number }): Post
+  | (() => GraphQLDeclarationItemReturnType) // example: posts(): Post[]
+
+/**
+ * Type of the value returned by a single GraphQL declaration.
+ */
+export type GraphQLDeclarationItemReturnType =
+  | string
+  | number
+  | boolean
+  | object
+  | undefined
+  | null
+
+/**
+ * Collection of actions (HTTP routes).
+ */
+export type ActionList = {
+  [name: string]: AnyAction
+}
+
+/**
+ * Action is a single HTTP route that serves network requests.
+ */
+export type Action<ReturnType, Params, Query, Headers, Cookies, Body> = {
+  return: ReturnType
+  params: Params
+  query: Query
+  headers: Headers
+  cookies: Cookies
+  body: Body
+  // middlewares?: () => any[]
+}
+
+/**
+ * Action with any generic types.
+ * Helper type.
+ */
+export type AnyAction = Partial<Action<any, any, any, any, any, any>>
+
+/**
+ * Extracts declaration "keys" from any declaration types in the application declaration.
+ * For example from a following declaration:
+ * "{ queries: { posts(): Post[] }, mutations: { savePost(): Post } }"
  * it will take "posts"|"savePost".
  */
 export type DeclarationKeys<Options extends AnyApplicationOptions> =
@@ -135,7 +136,7 @@ export type DeclarationKeys<Options extends AnyApplicationOptions> =
   | keyof Options["subscriptions"]
 
 /**
- * Possible declaration types.
+ * Possible declaration types in the application declaration.
  */
 export type DeclarationTypes =
   | "inputs"
