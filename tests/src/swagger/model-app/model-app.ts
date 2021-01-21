@@ -1,11 +1,24 @@
 import { createApp } from "@microframework/core"
 
 export const App = createApp<{
+  models: {
+    Category: Category
+    Post: Post
+  }
+  inputs: {
+    CategoryInput: CategoryInput
+  }
   actions: {
     /**
      * Loads a single category by its id.
      */
     "GET /api/category/:id": {
+      headers: {
+        "X-Request-ID": string
+      }
+      cookies: {
+        accessToken: string
+      }
       params: {
         /**
          * Category id.
@@ -35,6 +48,32 @@ export const App = createApp<{
       }
       return: {
         success: boolean
+      }
+    }
+
+    /**
+     * Deprecated, use delete by id instead.
+     * @deprecated
+     */
+    "DELETE /api/categories": {
+      return: {
+        success: boolean
+      }
+    }
+
+    /**
+     * Saves a post.
+     */
+    "POST /api/post": {
+      body: {
+        id: string
+        title: string
+      }
+      return: {
+        id: string
+        title: string
+        status: PostStatus
+        categories: Category[]
       }
     }
   }
@@ -92,6 +131,11 @@ interface Post {
    * @deprecated Will be removed.
    */
   categoryCount: number
+
+  /**
+   * Post categories.
+   */
+  categories: Category[]
 
   /**
    * Indicates if post is moderated or not.

@@ -42,18 +42,11 @@ function typeMetadataToDefinitionProperty(
   }
 
   if (metadata.kind === "reference") {
-    let referencedMetadata = appMetadata.models.find(
-      (model) => model.typeName === metadata.typeName,
-    )
+    const referencedMetadata = findTypeMetadata(appMetadata, metadata.typeName)
     if (!referencedMetadata) {
-      referencedMetadata = appMetadata.inputs.find(
-        (model) => model.typeName === metadata.typeName,
+      throw new Error(
+        `Referenced metadata ${metadata.typeName} was not found registered in the models.`,
       )
-      if (!referencedMetadata) {
-        throw new Error(
-          `Referenced metadata ${metadata.typeName} was not found registered in the models.`,
-        )
-      }
     }
 
     return {
@@ -203,20 +196,28 @@ export function generateSwaggerDocumentation(
     }
 
     if (action.body) {
+      const typeMetadata =
+        action.body.kind === "reference"
+          ? findTypeMetadata(appMetadata, action.body.typeName!)
+          : action.body
+      if (!typeMetadata) {
+        throw new Error(
+          `Referenced metadata ${action.body.typeName} was not found neither in the models not in inputs.`,
+        )
+      }
+
       operation.requestBody = {
-        description: action.body.description,
+        description: typeMetadata.description,
         required:
-          action.body.nullable === false &&
-          action.body.canBeUndefined === false,
+          typeMetadata.nullable === false &&
+          typeMetadata.canBeUndefined === false,
         content: {
           "application/json": {
-            schema: action.body
-              ? typeMetadataToDefinitionProperty(
-                  appMetadata,
-                  action.body,
-                  false,
-                )
-              : undefined,
+            schema: typeMetadataToDefinitionProperty(
+              appMetadata,
+              typeMetadata,
+              false,
+            ),
           },
         },
       }
@@ -278,4 +279,15 @@ export function generateSwaggerDocumentation(
     },
     paths: { ...paths },
   } as Document
+}
+
+function findTypeMetadata(
+  appMetadata: ApplicationTypeMetadata,
+  name: string | undefined,
+): TypeMetadata | undefined {
+  let found = appMetadata.models.find((model) => model.typeName === name)
+  if (!found) {
+    found = appMetadata.inputs.find((model) => model.typeName === name)
+  }
+  return found
 }
