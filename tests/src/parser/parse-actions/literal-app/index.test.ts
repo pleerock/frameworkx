@@ -8,6 +8,7 @@ describe("parser > parse actions", () => {
       actions: [
         {
           "@type": "ActionTypeMetadata",
+          deprecated: false,
           body: undefined,
           cookies: undefined,
           description: "Loads a single category by its id.",
@@ -27,7 +28,7 @@ describe("parser > parse actions", () => {
                 "@type": "TypeMetadata",
                 args: [],
                 array: false,
-                canBeUndefined: false,
+                canBeUndefined5: false,
                 deprecated: false,
                 description: "Category id.",
                 kind: "number",
@@ -180,6 +181,7 @@ describe("parser > parse actions", () => {
         },
         {
           "@type": "ActionTypeMetadata",
+          deprecated: false,
           body: {
             "@type": "TypeMetadata",
             args: [],

@@ -19,7 +19,8 @@ describe("cli > util", () => {
   })
   test("copyFiles", async () => {
     // remove all files before copying
-    await fs.rmdir(basedir + "/_/temp/copied", { recursive: true })
+    const randomDir = "temp" + Math.floor(Math.random() * 10000)
+    await fs.rmdir(`${basedir}/_/${randomDir}/copied`, { recursive: true })
 
     // copy all files
     const copiedFiles = await copyFiles({
@@ -30,31 +31,31 @@ describe("cli > util", () => {
         basedir + "/src/cli/actions/init/cli-init-monorepo.test.ts",
         basedir + "/src/cli/util/cli-util.test.ts",
       ],
-      destination: basedir + "/_/temp/copied",
+      destination: `${basedir}/_/${randomDir}/copied`,
     })
     expect(copiedFiles).toEqual([
-      basedir +
-        "/_/temp/copied/src/cli/actions/init/cli-init-microservices.test.ts",
-      basedir + "/_/temp/copied/src/cli/actions/init/cli-init-monolith.test.ts",
-      basedir + "/_/temp/copied/src/cli/actions/init/cli-init-monorepo.test.ts",
-      basedir + "/_/temp/copied/src/cli/util/cli-util.test.ts",
+      `${basedir}/_/${randomDir}/copied/src/cli/actions/init/cli-init-microservices.test.ts`,
+      `${basedir}/_/${randomDir}/copied/src/cli/actions/init/cli-init-monolith.test.ts`,
+      `${basedir}/_/${randomDir}/copied/src/cli/actions/init/cli-init-monorepo.test.ts`,
+      `${basedir}/_/${randomDir}/copied/src/cli/util/cli-util.test.ts`,
     ])
 
     // use scan files to make sure files actually in there
-    const files = await scanFiles("_/temp/copied", [])
+    const files = await scanFiles(`_/${randomDir}/copied`, [])
     expect(files).toEqual([
-      "_/temp/copied/src/cli/actions/init/cli-init-microservices.test.ts",
-      "_/temp/copied/src/cli/actions/init/cli-init-monolith.test.ts",
-      "_/temp/copied/src/cli/actions/init/cli-init-monorepo.test.ts",
-      "_/temp/copied/src/cli/util/cli-util.test.ts",
+      `_/${randomDir}/copied/src/cli/actions/init/cli-init-microservices.test.ts`,
+      `_/${randomDir}/copied/src/cli/actions/init/cli-init-monolith.test.ts`,
+      `_/${randomDir}/copied/src/cli/actions/init/cli-init-monorepo.test.ts`,
+      `_/${randomDir}/copied/src/cli/util/cli-util.test.ts`,
     ])
   })
   test("replaceInFile", async () => {
     // copy this file
+    const randomDir = "temp" + Math.floor(Math.random() * 10000)
     const [copiedFile] = await copyFiles({
       basedir: basedir,
       files: [basedir + "/src/cli/util/cli-util.test.ts"],
-      destination: basedir + "/_/temp/copied",
+      destination: `${basedir}/_/${randomDir}/copied`,
     })
 
     console.log(copiedFile)

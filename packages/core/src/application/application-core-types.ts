@@ -33,7 +33,7 @@ export type ModelWithArgs<
 }
 
 /**
- * Extracts a "real" model type out of mixed model type.
+ * Extracts the "real" model type out of mixed model type.
  * ModelWithArgs | ModelType is called a mixed model type.
  */
 export type ModelOrigin<T extends ModelMixed> = T extends ModelWithArgs<
