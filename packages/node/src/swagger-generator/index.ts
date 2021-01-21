@@ -42,13 +42,18 @@ function typeMetadataToDefinitionProperty(
   }
 
   if (metadata.kind === "reference") {
-    const referencedMetadata = appMetadata.models.find(
+    let referencedMetadata = appMetadata.models.find(
       (model) => model.typeName === metadata.typeName,
     )
     if (!referencedMetadata) {
-      throw new Error(
-        `Referenced metadata ${metadata.typeName} was not found registered in the models.`,
+      referencedMetadata = appMetadata.inputs.find(
+        (model) => model.typeName === metadata.typeName,
       )
+      if (!referencedMetadata) {
+        throw new Error(
+          `Referenced metadata ${metadata.typeName} was not found registered in the models.`,
+        )
+      }
     }
 
     return {
@@ -167,7 +172,7 @@ export function generateSwaggerDocumentation(
       deprecated: action.deprecated,
       responses: {
         "200": {
-          description: "", // action.return,
+          description: action.return ? action.return.description : "",
           content: {
             "application/json": {
               // todo: content type for other return types
@@ -178,12 +183,12 @@ export function generateSwaggerDocumentation(
                     false,
                   )
                 : undefined,
-              // headers: todo
             },
           },
         },
       },
     }
+
     if (action.params) {
       for (let parameter of action.params.properties) {
         operation.parameters!.push({
@@ -196,16 +201,24 @@ export function generateSwaggerDocumentation(
         })
       }
     }
+
     if (action.body) {
-      for (let parameter of action.body.properties) {
-        operation.parameters!.push({
-          in: "body",
-          name: parameter.propertyName!, // todo: check this name
-          required:
-            parameter.nullable === false && parameter.canBeUndefined === false,
-          // type: parameter.kind,
-          description: parameter.description,
-        })
+      operation.requestBody = {
+        description: action.body.description,
+        required:
+          action.body.nullable === false &&
+          action.body.canBeUndefined === false,
+        content: {
+          "application/json": {
+            schema: action.body
+              ? typeMetadataToDefinitionProperty(
+                  appMetadata,
+                  action.body,
+                  false,
+                )
+              : undefined,
+          },
+        },
       }
     }
     if (action.query) {
@@ -220,7 +233,32 @@ export function generateSwaggerDocumentation(
         })
       }
     }
-    // todo: cookies, headers, etc.
+
+    if (action.headers) {
+      for (let parameter of action.headers.properties) {
+        operation.parameters!.push({
+          in: "header",
+          name: parameter.propertyName!,
+          required:
+            parameter.nullable === false && parameter.canBeUndefined === false,
+          // type: parameter.kind,
+          description: parameter.description,
+        })
+      }
+    }
+
+    if (action.cookies) {
+      for (let parameter of action.cookies.properties) {
+        operation.parameters!.push({
+          in: "cookie",
+          name: parameter.propertyName!,
+          required:
+            parameter.nullable === false && parameter.canBeUndefined === false,
+          // type: parameter.kind,
+          description: parameter.description,
+        })
+      }
+    }
 
     if (!(paths as any)[route]) (paths as any)[route] = {}
     ;((paths as any)[route] as any)[method] = operation

@@ -37,6 +37,12 @@ export type CategoryDeclaration = {
      * Loads a single category by its id.
      */
     "GET /api/category/:id": {
+      headers: {
+        "X-Request-ID": string
+      }
+      cookies: {
+        accessToken: string
+      }
       params: {
         /**
          * Category id.
