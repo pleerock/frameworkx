@@ -28,7 +28,7 @@ describe("parser > parse actions", () => {
                 "@type": "TypeMetadata",
                 args: [],
                 array: false,
-                canBeUndefined5: false,
+                canBeUndefined: false,
                 deprecated: false,
                 description: "Category id.",
                 kind: "number",

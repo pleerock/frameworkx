@@ -1,4 +1,5 @@
 import {
+  ActionTypeMetadata,
   ApplicationTypeMetadata,
   TypeMetadata,
   TypeMetadataKind,
@@ -10,7 +11,64 @@ import { DeepPartial } from "../application"
  */
 export const TypeMetadataUtils = {
   /**
-   * Helper function to create a type metadata.
+   * Helper function to create a new ApplicationTypeMetadata.
+   */
+  createApplicationTypeMetadata(
+    name: string,
+    description: string,
+  ): ApplicationTypeMetadata {
+    return {
+      "@type": "ApplicationTypeMetadata",
+      name,
+      description,
+      actions: [],
+      models: [],
+      inputs: [],
+      queries: [],
+      mutations: [],
+      subscriptions: [],
+    }
+  },
+
+  /**
+   * Converts a given TypeMetadata into ActionTypeMetadata.
+   */
+  createActionTypeMetadata(action: TypeMetadata): ActionTypeMetadata {
+    const returning = action.properties.find(
+      (property) => property.propertyName === "return",
+    )
+    const query = action.properties.find(
+      (property) => property.propertyName === "query",
+    )
+    const params = action.properties.find(
+      (property) => property.propertyName === "params",
+    )
+    const headers = action.properties.find(
+      (property) => property.propertyName === "headers",
+    )
+    const cookies = action.properties.find(
+      (property) => property.propertyName === "cookies",
+    )
+    const body = action.properties.find(
+      (property) => property.propertyName === "body",
+    )
+
+    return {
+      "@type": "ActionTypeMetadata",
+      name: action.propertyName!,
+      description: action.description,
+      deprecated: !!action.deprecated,
+      return: returning ? { ...returning, propertyName: "" } : undefined,
+      query,
+      params,
+      headers,
+      cookies,
+      body,
+    }
+  },
+
+  /**
+   * Helper function to create a new TypeMetadata.
    */
   create(
     kind: TypeMetadataKind,

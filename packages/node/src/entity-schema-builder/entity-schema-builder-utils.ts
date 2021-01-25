@@ -6,7 +6,12 @@ import {
 } from "@microframework/core"
 import { EntityMetadata } from "typeorm"
 import { ApplicationServerProperties } from "../application-server"
-import { ParserUtils } from "@microframework/parser"
+import { joinStrings } from "@microframework/parser"
+// import { ParserUtils } from "@microframework/parser"
+
+const ParserUtils = {
+  joinStrings: joinStrings,
+}
 
 export const EntitySchemaArgsHelper = {
   /**

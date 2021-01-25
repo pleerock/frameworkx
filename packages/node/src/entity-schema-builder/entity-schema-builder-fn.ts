@@ -10,7 +10,11 @@ import {
   EntitySchemaArgsHelper,
   ResolverHelper,
 } from "./entity-schema-builder-utils"
-import { ParserUtils } from "@microframework/parser"
+import { joinStrings } from "@microframework/parser"
+
+const ParserUtils = {
+  joinStrings: joinStrings,
+}
 
 /**
  * Generates root declarations type metadatas and resolvers for them.

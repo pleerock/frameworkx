@@ -1,23 +1,62 @@
 import { TypeMetadata, TypeMetadataUtils } from "@microframework/core"
 import * as ts from "typescript"
 import { Errors } from "./errors"
-import { ParserUtils } from "./utils"
+import * as ParserUtils from "./utils"
+import { ParserContext } from "./types"
 
-export class ModelParser {
-  private program: ts.Program
-  private typeChecker: ts.TypeChecker
-  private types: string[]
+/**
+ * Parses any declaration.
+ * Used to parse models, inputs, queries, mutations, subscriptions, actions.
+ */
+export function parseAppDeclaration(
+  context: ParserContext,
+  type:
+    | "models"
+    | "inputs"
+    | "queries"
+    | "mutations"
+    | "subscriptions"
+    | "actions",
+  appNode: ts.TypeLiteralNode,
+): TypeMetadata[] {
+  let node: any = ParserUtils.findTypeLiteralProperty(appNode, type)
+  if (!node) return []
+
+  const replaceReferencesOnParentDeepnessLevel =
+    type === "models" || type === "inputs" ? 2 : 1
+
+  if (type === "actions") {
+    // make sure signature is supported
+    if (!node.type || !ts.isTypeLiteralNode(node.type))
+      throw Errors.appItemInvalidSignature(type, node.type)
+
+    // no members - not a problem, nothing to do here
+    if (!node.type.members.length) return []
+
+    node = node.type
+  }
+
+  const parser = new ModelParser(
+    context,
+    replaceReferencesOnParentDeepnessLevel,
+  )
+  return parser.parse(node, "", "app." + type, false).properties
+}
+
+// ------------------------------------------------------------
+// Local functions
+// ------------------------------------------------------------
+
+class ModelParser {
+  private context: ParserContext
   private replaceReferencesOnParentDeepnessLevel: number
 
   constructor(
-    program: ts.Program,
-    types: string[],
+    context: ParserContext,
     replaceReferencesOnParentDeepnessLevel: number,
   ) {
-    this.program = program
-    this.types = types
+    this.context = context
     this.replaceReferencesOnParentDeepnessLevel = replaceReferencesOnParentDeepnessLevel
-    this.typeChecker = program.getTypeChecker()
   }
 
   private appendType(
@@ -28,7 +67,7 @@ export class ModelParser {
     if (noReferences) return type
 
     // return type
-    const existType = this.types.find(
+    const existType = this.context.typeNames.find(
       (existType) => existType === type.typeName,
     )
     if (
@@ -44,7 +83,7 @@ export class ModelParser {
         propertyPath: ParserUtils.joinStrings(parentName), //, existType),
       })
     } else {
-      // this.types.push(type)
+      // this.context.typeNames.push(type)
       return type
     }
   }
@@ -144,7 +183,7 @@ export class ModelParser {
 
       // if this class name is listed in the model list, all we need is to set a typeName
       let typeName: string | undefined = undefined
-      if (this.types.includes(node.name.text)) {
+      if (this.context.typeNames.includes(node.name.text)) {
         typeName = node.name.text
       }
 
@@ -182,7 +221,7 @@ export class ModelParser {
 
       // if this interface name is listed in the model list, all we need is to set a typeName
       let typeName: string | undefined = undefined
-      if (this.types.includes(node.name.text)) {
+      if (this.context.typeNames.includes(node.name.text)) {
         typeName = node.name.text
       }
 
@@ -429,7 +468,7 @@ export class ModelParser {
       //  because user most likely will use union reference in the code, but generated name can't be used)
       const missingPropertiesInTypes = properties.filter((metadata) => {
         if (!metadata.typeName) return true
-        if (!this.types.includes(metadata.typeName)) return true
+        if (!this.context.typeNames.includes(metadata.typeName)) return true
 
         return false
       })
@@ -464,7 +503,7 @@ export class ModelParser {
       // in type aliases type is declared as: type User = { ... }
       // we have everything parsed from { ... }, but we don't really have a type name
       // that's why we append it here, but only if name was declared in the models / inputs
-      if (!type.typeName && this.types.includes(node.name.text)) {
+      if (!type.typeName && this.context.typeNames.includes(node.name.text)) {
         type.typeName = node.name.text
       }
 
@@ -491,7 +530,9 @@ export class ModelParser {
 
       return type
     } else if (ts.isTypeReferenceNode(node)) {
-      const referencedType = this.typeChecker.getTypeAtLocation(node)
+      const referencedType = this.context.program
+        .getTypeChecker()
+        .getTypeAtLocation(node)
 
       if (!ts.isIdentifier(node.typeName) || !node.typeName.text)
         throw Errors.typeReferenceInvalidName(parentName)
@@ -517,7 +558,7 @@ export class ModelParser {
 
         // if this is a nested call (in case we'll have a parent name) -
         // we don't go deeper to prevent recursion for named symbols
-        // const existType = this.types.find((type) => type === modelName)
+        // const existType = this.context.typeNames.find((type) => type === modelName)
         // if (existType) {
         //   return TypeMetadataUtils.create("model", {
         //     modelName,
@@ -532,7 +573,7 @@ export class ModelParser {
           debugPath,
         )
         model.description = ParserUtils.getDescription(
-          this.typeChecker,
+          this.context.program.getTypeChecker(),
           modelSymbol,
         )
         model.deprecated = ParserUtils.getDeprecation(modelSymbol)
@@ -547,7 +588,7 @@ export class ModelParser {
       // example: { models: { User: User } } -> in this example we cannot make User as a reference
       // otherwise we'll never get an object structure of a User object
       // that's why we have a check for parentName here
-      const existType = this.types.find((type) => type === typeName)
+      const existType = this.context.typeNames.find((type) => type === typeName)
       const deepnessCheck = ParserUtils.checkPathDeepness(parentName, {
         regular: this.replaceReferencesOnParentDeepnessLevel,
         args: 1,
@@ -567,7 +608,10 @@ export class ModelParser {
       let deprecated: string | boolean = false
       if (symbol) {
         resolvedType = symbol.declarations[0]
-        description = ParserUtils.getDescription(this.typeChecker, symbol)
+        description = ParserUtils.getDescription(
+          this.context.program.getTypeChecker(),
+          symbol,
+        )
         deprecated = ParserUtils.getDeprecation(symbol)
       }
 
@@ -610,7 +654,7 @@ export class ModelParser {
       // class User { ... }
       // here, we have everything parsed from { ... }, but we don't really have a type name
       // that's why we append it here
-      if (this.types.includes(typeName)) {
+      if (this.context.typeNames.includes(typeName)) {
         type.typeName = typeName
       }
 
@@ -634,9 +678,9 @@ export class ModelParser {
 
       // find model
       let modelType: ts.Node | undefined = undefined
-      const modelSymbol = this.typeChecker.getTypeAtLocation(
-        node.typeArguments[0],
-      )
+      const modelSymbol = this.context.program
+        .getTypeChecker()
+        .getTypeAtLocation(node.typeArguments[0])
       if (modelSymbol.symbol) {
         modelType = modelSymbol.symbol.declarations[0]
       }
@@ -645,7 +689,9 @@ export class ModelParser {
       // find args
       let argsType: ts.Node | undefined = undefined
       if (node.typeArguments[1]) {
-        const symbol = this.typeChecker.getTypeAtLocation(node.typeArguments[1])
+        const symbol = this.context.program
+          .getTypeChecker()
+          .getTypeAtLocation(node.typeArguments[1])
         if (symbol.aliasSymbol) {
           argsType = symbol.aliasSymbol.declarations[0]
         }
@@ -653,7 +699,7 @@ export class ModelParser {
 
       const model = this.parseModel("", "", modelType, argsType, debugPath)
       model.description = ParserUtils.getDescription(
-        this.typeChecker,
+        this.context.program.getTypeChecker(),
         modelSymbol.symbol,
       )
       model.deprecated = ParserUtils.getDeprecation(modelSymbol.symbol)
@@ -740,7 +786,10 @@ export class ModelParser {
       // get property name, description, deprecation
       const rawMemberName = member.name.getText()
       const propertyName = ParserUtils.normalizeTextSymbol(rawMemberName)
-      const description = ParserUtils.getDescription(this.typeChecker, member)
+      const description = ParserUtils.getDescription(
+        this.context.program.getTypeChecker(),
+        member,
+      )
       const deprecated = ParserUtils.getDeprecation(member)
       let result: TypeMetadata | undefined = undefined
 
