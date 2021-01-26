@@ -162,8 +162,54 @@ describe("swagger > generate documentation", () => {
 
     // ------------------------------------------------
 
-    const path3 = swaggerOutput.paths["/api/post"]
+    const path3 = swaggerOutput.paths["/api/post-category"]
     expect(path3!.post).toEqual({
+      summary: "Saves a category or a post.",
+      parameters: [],
+      deprecated: false,
+      responses: {
+        "200": {
+          description: "",
+          content: {
+            "application/json": {
+              schema: {
+                oneOf: [
+                  {
+                    $ref: "#/components/schemas/Category",
+                  },
+                  {
+                    $ref: "#/components/schemas/Post",
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      requestBody: {
+        description: "",
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              oneOf: [
+                {
+                  $ref: "#/components/schemas/CategoryInput",
+                },
+                {
+                  $ref: "#/components/schemas/PostInput",
+                },
+              ],
+            },
+          },
+        },
+      },
+    })
+
+    // ------------------------------------------------
+
+    const path4 = swaggerOutput.paths["/api/post"]
+    expect(path4!.post).toEqual({
       summary: "Saves a post.",
       parameters: [],
       deprecated: false,

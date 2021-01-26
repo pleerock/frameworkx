@@ -1,4 +1,5 @@
 import { createApp } from "@microframework/core"
+import { PostInput } from "../../node/types/basic-types/models"
 
 export const App = createApp<{
   models: {
@@ -7,6 +8,7 @@ export const App = createApp<{
   }
   inputs: {
     CategoryInput: CategoryInput
+    PostInput: PostInput
   }
   actions: {
     /**
@@ -26,6 +28,14 @@ export const App = createApp<{
         id: number
       }
       return: Category
+    }
+
+    /**
+     * Saves a category or a post.
+     */
+    "POST /api/post-category": {
+      body: CategoryInput | PostInput
+      return: Category | Post
     }
 
     /**
