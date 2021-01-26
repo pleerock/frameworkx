@@ -67,4 +67,7 @@ export const App = createApp<{
       name: number
     }
   }
+  queries: {
+    test(): boolean
+  }
 }>()

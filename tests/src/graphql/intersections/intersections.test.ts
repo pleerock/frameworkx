@@ -3,8 +3,10 @@ import {
   buildGraphQLSchema,
   DefaultNamingStrategy,
 } from "@microframework/graphql"
+import * as GraphQL from "graphql"
 import {
-  GraphQLField,
+  assertValidSchema,
+  GraphQLScalarType,
   GraphQLSchema,
   isInputObjectType,
   isListType,
@@ -13,7 +15,6 @@ import {
   isObjectType,
   isScalarType,
 } from "graphql"
-import * as GraphQL from "graphql"
 import { getRealTypes } from "../../util/test-common"
 
 describe("graphql > schema builder", () => {
@@ -29,6 +30,7 @@ describe("graphql > schema builder", () => {
       }),
     )
     if (!schema) fail("Schema built failed")
+    assertValidSchema(schema)
 
     test("should properly create all GraphQL types", () => {
       const types = getRealTypes(
@@ -138,10 +140,10 @@ describe("graphql > schema builder", () => {
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(categoryRating.type))
-        fail(`"categoryRating" is nullable`)
-      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
-      expect(categoryRating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(categoryRating.type))
+        fail(`"categoryRating" is not nullable`)
+      expect(isScalarType(categoryRating.type)).toBe(true)
+      expect(categoryRating.type.name).toBe("BigInt")
 
       // ------------------------------------------------
 
@@ -214,9 +216,9 @@ describe("graphql > schema builder", () => {
       expect(rating).not.toBe(undefined)
       expect(rating.description).toBe("Category rating")
       expect(rating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(rating.type)) fail(`"rating" is nullable`)
-      expect(isScalarType(rating.type.ofType)).toBe(true)
-      expect(rating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(rating.type)) fail(`"rating" is not nullable`)
+      expect(isScalarType(rating.type)).toBe(true)
+      expect((rating.type as GraphQLScalarType).name).toBe("BigInt")
     })
 
     test("intersections in models - case #3", () => {
@@ -293,10 +295,10 @@ describe("graphql > schema builder", () => {
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(categoryRating.type))
-        fail(`"categoryRating" is nullable`)
-      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
-      expect(categoryRating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(categoryRating.type))
+        fail(`"categoryRating" is not nullable`)
+      expect(isScalarType(categoryRating.type)).toBe(true)
+      expect(categoryRating.type.name).toBe("BigInt")
     })
 
     test("intersections in models - case #4", () => {
@@ -374,9 +376,9 @@ describe("graphql > schema builder", () => {
       expect(accepted).not.toBe(undefined)
       expect(accepted.description).toBe("Indicates if answer is accepted.")
       expect(accepted.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(accepted.type)) fail(`"accepted" is nullable`)
-      expect(isScalarType(accepted.type.ofType)).toBe(true)
-      expect(accepted.type.ofType.name).toBe("Boolean")
+      if (!isNullableType(accepted.type)) fail(`"accepted" is not nullable`)
+      expect(isScalarType(accepted.type)).toBe(true)
+      expect((accepted.type as GraphQLScalarType).name).toBe("Boolean")
     })
 
     test("intersections in inputs - case #1", () => {
@@ -442,10 +444,10 @@ describe("graphql > schema builder", () => {
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(categoryRating.type))
-        fail(`"categoryRating" is nullable`)
-      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
-      expect(categoryRating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(categoryRating.type))
+        fail(`"categoryRating" is not nullable`)
+      expect(isScalarType(categoryRating.type)).toBe(true)
+      expect(categoryRating.type.name).toBe("BigInt")
 
       // ------------------------------------------------
 
@@ -519,9 +521,9 @@ describe("graphql > schema builder", () => {
       expect(rating).not.toBe(undefined)
       expect(rating.description).toBe("Category rating")
       expect(rating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(rating.type)) fail(`"rating" is nullable`)
-      expect(isScalarType(rating.type.ofType)).toBe(true)
-      expect(rating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(rating.type)) fail(`"rating" is nullable`)
+      expect(isScalarType(rating.type)).toBe(true)
+      expect((rating.type as GraphQLScalarType).name).toBe("BigInt")
     })
 
     test("intersections in inputs - case #3", () => {
@@ -598,10 +600,10 @@ describe("graphql > schema builder", () => {
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(categoryRating.type))
-        fail(`"categoryRating" is nullable`)
-      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
-      expect(categoryRating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(categoryRating.type))
+        fail(`"categoryRating" is not nullable`)
+      expect(isScalarType(categoryRating.type)).toBe(true)
+      expect(categoryRating.type.name).toBe("BigInt")
     })
 
     test("intersections in inputs - case #4", () => {
@@ -680,9 +682,9 @@ describe("graphql > schema builder", () => {
       expect(accepted).not.toBe(undefined)
       expect(accepted.description).toBe("Indicates if answer is accepted.")
       expect(accepted.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(accepted.type)) fail(`"accepted" is nullable`)
-      expect(isScalarType(accepted.type.ofType)).toBe(true)
-      expect(accepted.type.ofType.name).toBe("Boolean")
+      if (!isNullableType(accepted.type)) fail(`"accepted" is not nullable`)
+      expect(isScalarType(accepted.type)).toBe(true)
+      expect((accepted.type as GraphQLScalarType).name).toBe("Boolean")
     })
 
     test("intersections in queries - case #1", () => {
@@ -750,10 +752,10 @@ describe("graphql > schema builder", () => {
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(categoryRating.type))
-        fail(`"categoryRating" is nullable`)
-      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
-      expect(categoryRating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(categoryRating.type))
+        fail(`"categoryRating" is not nullable`)
+      expect(isScalarType(categoryRating.type)).toBe(true)
+      expect(categoryRating.type.name).toBe("BigInt")
 
       // ------------------------------------------------
 
@@ -884,9 +886,9 @@ describe("graphql > schema builder", () => {
       expect(rating).not.toBe(undefined)
       expect(rating!.description).toBe("Category rating")
       expect(rating!.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(rating!.type)) fail(`"rating" is nullable`)
-      expect(isScalarType(rating!.type.ofType)).toBe(true)
-      expect(rating!.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(rating!.type)) fail(`"rating" is not nullable`)
+      expect(isScalarType(rating!.type)).toBe(true)
+      expect((rating!.type as GraphQLScalarType).name).toBe("BigInt")
     })
 
     test("intersections in queries - case #4", () => {
@@ -967,9 +969,9 @@ describe("graphql > schema builder", () => {
       expect(accepted).not.toBe(undefined)
       expect(accepted!.description).toBe("Indicates if answer is accepted.")
       expect(accepted!.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(accepted!.type)) fail(`"accepted" is nullable`)
-      expect(isScalarType(accepted!.type.ofType)).toBe(true)
-      expect(accepted!.type.ofType.name).toBe("Boolean")
+      if (!isNullableType(accepted!.type)) fail(`"accepted" is not nullable`)
+      expect(isScalarType(accepted!.type)).toBe(true)
+      expect((accepted!.type as GraphQLScalarType).name).toBe("Boolean")
     })
 
     test("intersections in mutations - case #1", () => {
@@ -1037,10 +1039,10 @@ describe("graphql > schema builder", () => {
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(categoryRating.type))
-        fail(`"categoryRating" is nullable`)
-      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
-      expect(categoryRating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(categoryRating.type))
+        fail(`"categoryRating" is not nullable`)
+      expect(isScalarType(categoryRating.type)).toBe(true)
+      expect(categoryRating.type.name).toBe("BigInt")
 
       // ------------------------------------------------
 
@@ -1171,9 +1173,7 @@ describe("graphql > schema builder", () => {
       expect(rating).not.toBe(undefined)
       expect(rating!.description).toBe("Category rating")
       expect(rating!.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(rating!.type)) fail(`"rating" is nullable`)
-      expect(isScalarType(rating!.type.ofType)).toBe(true)
-      expect(rating!.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(rating!.type)) fail(`"rating" is not nullable`)
     })
 
     test("intersections in mutations - case #4", () => {
@@ -1254,9 +1254,7 @@ describe("graphql > schema builder", () => {
       expect(accepted).not.toBe(undefined)
       expect(accepted!.description).toBe("Indicates if answer is accepted.")
       expect(accepted!.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(accepted!.type)) fail(`"accepted" is nullable`)
-      expect(isScalarType(accepted!.type.ofType)).toBe(true)
-      expect(accepted!.type.ofType.name).toBe("Boolean")
+      if (!isNullableType(accepted!.type)) fail(`"accepted" is not nullable`)
     })
 
     test("intersections in subscriptions - case #1", () => {
@@ -1324,10 +1322,10 @@ describe("graphql > schema builder", () => {
       expect(categoryRating).not.toBe(undefined)
       expect(categoryRating.description).toBe("Category rating")
       expect(categoryRating.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(categoryRating.type))
-        fail(`"categoryRating" is nullable`)
-      expect(isScalarType(categoryRating.type.ofType)).toBe(true)
-      expect(categoryRating.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(categoryRating.type))
+        fail(`"categoryRating" is not nullable`)
+      expect(isScalarType(categoryRating.type)).toBe(true)
+      expect(categoryRating.type.name).toBe("BigInt")
 
       // ------------------------------------------------
 
@@ -1458,9 +1456,7 @@ describe("graphql > schema builder", () => {
       expect(rating).not.toBe(undefined)
       expect(rating!.description).toBe("Category rating")
       expect(rating!.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(rating!.type)) fail(`"rating" is nullable`)
-      expect(isScalarType(rating!.type.ofType)).toBe(true)
-      expect(rating!.type.ofType.name).toBe("BigInt")
+      if (!isNullableType(rating!.type)) fail(`"rating" is not nullable`)
     })
 
     test("intersections in subscriptions - case #4", () => {
@@ -1541,9 +1537,7 @@ describe("graphql > schema builder", () => {
       expect(accepted).not.toBe(undefined)
       expect(accepted!.description).toBe("Indicates if answer is accepted.")
       expect(accepted!.deprecationReason).toBe("not used anymore.")
-      if (!isNonNullType(accepted!.type)) fail(`"accepted" is nullable`)
-      expect(isScalarType(accepted!.type.ofType)).toBe(true)
-      expect(accepted!.type.ofType.name).toBe("Boolean")
+      if (!isNullableType(accepted!.type)) fail(`"accepted" is not nullable`)
     })
   })
 })

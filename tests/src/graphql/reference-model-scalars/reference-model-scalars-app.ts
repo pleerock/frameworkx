@@ -5,6 +5,9 @@ export const App = createApp<{
     PostType: PostType
     PostTypeDeprecated: PostTypeDeprecated
   }
+  queries: {
+    test(): boolean
+  }
 }>()
 
 /**

@@ -277,19 +277,24 @@ export function buildGraphQLSchema(
       name: typeName,
       description: metadata.description,
       types: () => {
-        return metadata.properties.map((property) => {
+        return metadata.properties.reduce((types, property) => {
           const type = objectTypes.find(
             (type) => type.name === property.typeName,
           )
-          if (!type) {
-            console.log(metadata)
-            throw new Error(
-              `Cannot find type "${property.typeName}" from union type. Did you forget to register type in the app?`,
-            )
+          if (type) {
+            return [...types, type]
+          }
+          const unionType = unionTypes.find(
+            (type) => type.name === property.typeName,
+          )
+          if (unionType) {
+            return [...types, ...unionType.getTypes()]
           }
 
-          return type
-        })
+          throw new Error(
+            `Cannot find type "${property.typeName}" from union type. Did you forget to register type in the app?`,
+          )
+        }, [] as GraphQLObjectType[])
       },
       // resolveType: (obj) => {
       //     console.log(obj)

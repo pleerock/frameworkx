@@ -4,6 +4,9 @@ export const App = createApp<{
   inputs: {
     PostInput: PostInput
   }
+  queries: {
+    test(): boolean
+  }
 }>()
 
 /**

@@ -4,6 +4,7 @@ import {
   DefaultNamingStrategy,
 } from "@microframework/graphql"
 import {
+  assertValidSchema,
   GraphQLSchema,
   isEnumType,
   isInputObjectType,
@@ -25,6 +26,7 @@ describe("graphql > schema builder", () => {
     }),
   )
   if (!schema) fail("Schema built failed")
+  assertValidSchema(schema)
 
   const postType = schema.getType("PostType")
   const postTypeStatusEnum = schema.getType("PostTypeStatusEnum")

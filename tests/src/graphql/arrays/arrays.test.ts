@@ -5,6 +5,7 @@ import {
 } from "@microframework/graphql"
 import * as GraphQL from "graphql"
 import {
+  assertValidSchema,
   GraphQLSchema,
   isEnumType,
   isInputObjectType,
@@ -28,6 +29,7 @@ describe("graphql > schema builder", () => {
       }),
     )
     if (!schema) fail("Schema built failed")
+    assertValidSchema(schema)
 
     test("should properly create all GraphQL types", () => {
       const types = getRealTypes(

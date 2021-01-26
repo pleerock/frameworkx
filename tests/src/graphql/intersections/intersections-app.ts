@@ -19,7 +19,7 @@ export const App = createApp<{
        * Indicates if answer is accepted.
        * @deprecated not used anymore.
        */
-      accepted: boolean
+      accepted?: boolean
     }
   }
   inputs: {
@@ -40,7 +40,7 @@ export const App = createApp<{
        * Indicates if answer is accepted.
        * @deprecated not used anymore.
        */
-      accepted: boolean
+      accepted?: boolean
     }
   }
   queries: {
@@ -65,14 +65,14 @@ export const App = createApp<{
          * Indicates if answer is accepted.
          * @deprecated not used anymore.
          */
-        accepted: boolean
+        accepted?: boolean
       },
     ): { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
        * @deprecated not used anymore.
        */
-      accepted: boolean
+      accepted?: boolean
     }
   }
   mutations: {
@@ -97,14 +97,14 @@ export const App = createApp<{
          * Indicates if answer is accepted.
          * @deprecated not used anymore.
          */
-        accepted: boolean
+        accepted?: boolean
       },
     ): { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
        * @deprecated not used anymore.
        */
-      accepted: boolean
+      accepted?: boolean
     }
   }
   subscriptions: {
@@ -129,14 +129,14 @@ export const App = createApp<{
          * Indicates if answer is accepted.
          * @deprecated not used anymore.
          */
-        accepted: boolean
+        accepted?: boolean
       },
     ): { id: number } & { name: string } & {
       /**
        * Indicates if answer is accepted.
        * @deprecated not used anymore.
        */
-      accepted: boolean
+      accepted?: boolean
     }
   }
 }>()
@@ -171,7 +171,7 @@ type CategoryMetaType = {
    *
    * @deprecated not used anymore.
    */
-  rating: bigint
+  rating?: bigint
 }
 
 type QuestionGeneralType = {
@@ -212,7 +212,7 @@ type CategoryMetaInput = {
    * Category rating
    * @deprecated not used anymore.
    */
-  rating: bigint
+  rating?: bigint
 }
 
 type QuestionGeneralInput = {

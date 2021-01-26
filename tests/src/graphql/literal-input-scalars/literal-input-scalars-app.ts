@@ -43,4 +43,7 @@ export const App = createApp<{
       timeNullable: Time | null
     }
   }
+  queries: {
+    test(): boolean
+  }
 }>()

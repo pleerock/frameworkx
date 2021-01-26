@@ -4,6 +4,7 @@ import {
   DefaultNamingStrategy,
 } from "@microframework/graphql"
 import {
+  assertValidSchema,
   GraphQLSchema,
   isInputObjectType,
   isNonNullType,
@@ -25,6 +26,8 @@ describe("graphql > schema builder", () => {
       }),
     )
     if (!schema) fail("Schema built failed")
+    assertValidSchema(schema)
+
     const postInput = schema.getType("PostInput")
     expect(postInput).not.toBe(undefined)
 

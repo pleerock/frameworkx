@@ -7,7 +7,10 @@ export const App = createApp<{
     PostMetaType: PostMetaType
     PostType: PostType
     Category: Category
-    // PostExtendedType: PostType | PostMetaType
+    PostExtendedType: PostType | PostMetaType
+  }
+  queries: {
+    test(): boolean
   }
 }>()
 

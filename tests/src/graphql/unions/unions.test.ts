@@ -3,8 +3,8 @@ import {
   buildGraphQLSchema,
   DefaultNamingStrategy,
 } from "@microframework/graphql"
-import { GraphQLSchema, isUnionType } from "graphql"
 import * as GraphQL from "graphql"
+import { assertValidSchema, GraphQLSchema, isUnionType } from "graphql"
 
 describe("graphql > schema builder", () => {
   test("model with union type", () => {
@@ -18,6 +18,8 @@ describe("graphql > schema builder", () => {
         subscribeFactory: () => undefined,
       }),
     )
+    assertValidSchema(schema)
+
     if (!schema) fail("Schema built failed")
     const postType = schema.getType("PostType")
     expect(postType).not.toBe(undefined)
@@ -28,6 +30,15 @@ describe("graphql > schema builder", () => {
     expect(postType.getTypes()[0].name).toBe("BlogPostType")
     expect(postType.getTypes()[1].name).toBe("NewsPostType")
 
-    // TODO: test all cases
+    const postExtendedType = schema.getType("PostExtendedType")
+    expect(postExtendedType).not.toBe(undefined)
+
+    if (!isUnionType(postExtendedType))
+      fail("PostExtendedType is not a union type")
+    expect(postExtendedType.name).toBe("PostExtendedType")
+    expect(postExtendedType.getTypes().length).toBe(3)
+    expect(postExtendedType.getTypes()[0].name).toBe("BlogPostType")
+    expect(postExtendedType.getTypes()[1].name).toBe("NewsPostType")
+    expect(postExtendedType.getTypes()[2].name).toBe("PostMetaType")
   })
 })
