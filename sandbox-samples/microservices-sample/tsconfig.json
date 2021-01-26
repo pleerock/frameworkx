@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/gateway" },
+    { "path": "./packages/category" },
+    { "path": "./packages/post" },
+    { "path": "./packages/user" }
+  ]
+}

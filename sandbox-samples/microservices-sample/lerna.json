@@ -1,0 +1,9 @@
+{
+  "packages": [
+    "./packages/gateway",
+    "./packages/category",
+    "./packages/post",
+    "./packages/user"
+  ],
+  "version": "0.0.0"
+}
