@@ -50,6 +50,8 @@ export function parseAppDeclaration(
 // Local functions
 // ------------------------------------------------------------
 
+type ParentType = "literal" | "intersection" | "enum"
+
 function parse({
   context,
   replaceReferencesOnParentDeepnessLevel,
@@ -83,9 +85,7 @@ function parse({
       propertyPath: parentName,
     })
   } else if (ts.isPropertySignature(node)) {
-    if (!node.type) {
-      throw Errors.propertySignatureInvalid(parentName, debugPath)
-    }
+    if (!node.type) throw Errors.propertySignatureInvalid(parentName, debugPath)
     return parse({
       context: context,
       replaceReferencesOnParentDeepnessLevel: replaceReferencesOnParentDeepnessLevel,
@@ -122,7 +122,7 @@ function parse({
         replaceReferencesOnParentDeepnessLevel: replaceReferencesOnParentDeepnessLevel,
         members: node.members,
         parentName: parentName,
-        parentType: parentType,
+        parentType: "literal",
         debugPath: `${debugPath}.literal`,
       }),
       propertyPath: parentName,
@@ -152,28 +152,20 @@ function parse({
       })
 
       // we only support objects in intersection types
-      if (parsed.kind !== "object") {
-        throw new Error(
-          `Unsupported intersection type was provided at ${debugPath}`,
-        )
-      }
+      if (parsed.kind !== "object")
+        throw Errors.intersectionInvalid(parentName, debugPath)
+
       properties.push(...parsed.properties)
     }
-
-    // todo: add error handling if different intersection types are resulted in properties
 
     return TypeMetadataUtils.create("object", {
       properties,
       propertyPath: parentName,
     })
-  } else if (ts.isClassDeclaration(node)) {
-    if (!node.name) {
-      throw Errors.classNameless(parentName, debugPath)
-    }
-
+  } else if (ts.isClassLike(node)) {
     // if this class name is listed in the model list, all we need is to set a typeName
     let typeName: string | undefined = undefined
-    if (context.typeNames.includes(node.name.text)) {
+    if (node.name && context.typeNames.includes(node.name.text)) {
       typeName = node.name.text
     }
 
@@ -202,10 +194,6 @@ function parse({
       }),
     })
   } else if (ts.isInterfaceDeclaration(node)) {
-    if (!node.name) {
-      throw Errors.interfaceNameless(parentName, debugPath)
-    }
-
     // if this interface name is listed in the model list, all we need is to set a typeName
     let typeName: string | undefined = undefined
     if (context.typeNames.includes(node.name.text)) {
@@ -237,9 +225,7 @@ function parse({
       }),
     })
   } else if (ts.isEnumMember(node)) {
-    if (!node.initializer) {
-      throw Errors.enumMemberInvalid(parentName, debugPath)
-    }
+    if (!node.initializer) throw Errors.enumMemberInvalid(parentName, debugPath)
 
     const initializerName = node.initializer.getText().trim()
     const propertyName = ParserUtils.normalizeTextSymbol(initializerName)
@@ -558,13 +544,36 @@ function parse({
     // }
 
     return type
-  } else if (ts.isTypeReferenceNode(node)) {
+    // } else if (ts.isTypeQueryNode(node)) {
+    //   if (!ts.isIdentifier(node.exprName) || !node.exprName.text)
+    //     throw Errors.typeReferenceInvalidName(parentName)
+    //
+    //   const referencedType = context.program
+    //     .getTypeChecker()
+    //     .getTypeAtLocation(node)
+    //
+    //   const symbol = referencedType.aliasSymbol || referencedType.symbol
+    //   let resolvedType = undefined
+    //   let description: string = ""
+    //   let deprecated: string | boolean = false
+    //   if (symbol) {
+    //     resolvedType = symbol.declarations[0]
+    //     description = ParserUtils.getDescription(
+    //       context.program.getTypeChecker(),
+    //       symbol,
+    //     )
+    //     deprecated = ParserUtils.getDeprecation(symbol)
+    //   }
+  } else if (ts.isTypeReferenceNode(node) || ts.isTypeQueryNode(node)) {
+    const nodeName = ts.isTypeReferenceNode(node)
+      ? node.typeName
+      : node.exprName
+    if (!ts.isIdentifier(nodeName) || !nodeName.text)
+      throw Errors.typeReferenceInvalidName(parentName)
+
     const referencedType = context.program
       .getTypeChecker()
       .getTypeAtLocation(node)
-
-    if (!ts.isIdentifier(node.typeName) || !node.typeName.text)
-      throw Errors.typeReferenceInvalidName(parentName)
 
     // this is a special handling section for Model definitions
     if (
@@ -573,7 +582,7 @@ function parse({
       referencedType.aliasTypeArguments
     ) {
       // extract model's type and args information
-      const modelName = node.typeName.text
+      const modelName = nodeName.text
       const modelSymbol =
         referencedType.aliasTypeArguments[0].aliasSymbol ||
         referencedType.aliasTypeArguments[0].symbol
@@ -626,7 +635,7 @@ function parse({
     }
 
     // extract information out of type reference
-    const typeName = node.typeName.text
+    const typeName = nodeName.text
 
     // if there is no parent name here, it means this is a root models and inputs
     // and we must create a type out of it, we cannot have a root objects as references
@@ -690,7 +699,7 @@ function parse({
       node: resolvedType,
       parentName: parentName,
       parentType: parentType,
-      debugPath: `${debugPath}.typeReferenceNode(${node.typeName.getText()})`,
+      debugPath: `${debugPath}.typeReferenceNode(${nodeName.getText()})`,
     })
 
     // in type aliases type is declared as:

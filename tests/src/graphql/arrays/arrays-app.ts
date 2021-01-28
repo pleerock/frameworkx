@@ -57,9 +57,11 @@ class CategoryType {
   posts!: PostType[]
 }
 
-interface CountersType {
-  votes: bigint[]
-  comments: number[]
+type CountersType = typeof CountersCls
+
+const CountersCls = class {
+  votes: bigint[] = []
+  comments: number[] = []
 }
 
 type QuestionAnswerType = {

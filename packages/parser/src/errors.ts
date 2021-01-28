@@ -15,6 +15,15 @@ export const Errors = {
   },
 
   /**
+   * Thrown when something other than object is used in intersection.
+   */
+  intersectionInvalid(path: string, debugPath: string) {
+    return new Error(
+      `Unsupported intersection type was provided at ${path} (debug path: ${debugPath})`,
+    )
+  },
+
+  /**
    * Error thrown on miscellaneous enum member signature errors.
    */
   enumMemberInvalid(path: string, debugPath: string) {
@@ -35,24 +44,6 @@ export const Errors = {
       `Invalid enum value ${propertyName} at ${path}. ` +
         `Enum value must be initialized and value must be equal to a property name. ` +
         `Try to set it to ${propertyName} = "${propertyName}".`,
-    )
-  },
-
-  /**
-   * Error thrown when class is nameless.
-   */
-  classNameless(path: string, debugPath: string) {
-    return new Error(
-      `Class declaration must have a name at ${path} (${debugPath}).`,
-    )
-  },
-
-  /**
-   * Error thrown when interface is nameless.
-   */
-  interfaceNameless(path: string, debugPath: string) {
-    return new Error(
-      `Interface declaration must have a name at ${path} (${debugPath}).`,
     )
   },
 
