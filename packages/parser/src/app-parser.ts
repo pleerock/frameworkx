@@ -47,7 +47,7 @@ export function parse(
   // find & parse createApp node
   const { appName, appDescription, appOptionsNode } = parseCreateApp(context)
 
-  // first we collect all root input and model names
+  // parse app options parts
   const appDeclarationParts = parseAppOptionParts(typeChecker, appOptionsNode)
 
   // iterate over application declaration parts and collect root model and input names
