@@ -10,6 +10,7 @@ describe("parser > parse actions", () => {
           "@type": "ActionTypeMetadata",
           description: "Loads a single category by its id.",
           name: "GET /api/category/:id",
+          deprecated: false,
           params: {
             "@type": "TypeMetadata",
             args: [],
@@ -206,6 +207,7 @@ describe("parser > parse actions", () => {
           description:
             "Loads a single category and a single post by their ids.",
           name: "GET /api/category-post/:id",
+          deprecated: false,
           params: {
             "@type": "TypeMetadata",
             args: [],
@@ -629,6 +631,7 @@ describe("parser > parse actions", () => {
             propertyName: "body",
             propertyPath: "POST /api/category.body",
           },
+          deprecated: false,
           description: "Saves a category.",
           name: "POST /api/category",
           return: {
@@ -799,6 +802,7 @@ describe("parser > parse actions", () => {
           "@type": "ActionTypeMetadata",
           description: "Removes a category.",
           name: "DELETE /api/category/:id",
+          deprecated: false,
           params: {
             "@type": "TypeMetadata",
             args: [],

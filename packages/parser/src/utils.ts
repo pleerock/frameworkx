@@ -13,16 +13,6 @@ export function isNodeExported(node: ts.Node): boolean {
   )
 }
 
-export function normalizeTextSymbol(symbol: string): string {
-  if (symbol.substr(0, 1) === `"`) {
-    symbol = symbol.substr(1)
-  }
-  if (symbol.substr(-1) === `"`) {
-    symbol = symbol.substr(0, symbol.length - 1)
-  }
-  return symbol
-}
-
 export function joinStrings(...args: string[]): string {
   return args.filter((str) => str !== "").join(".")
 }
