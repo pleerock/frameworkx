@@ -2,6 +2,7 @@ import { AnyApplication, assign } from "@microframework/core"
 import { buildGraphQLSchema } from "@microframework/graphql"
 import * as GraphQL from "graphql"
 import cors from "cors"
+import cookieParser from "cookie-parser"
 import express, { Request, Response } from "express"
 import { assertValidSchema, execute, GraphQLSchema, subscribe } from "graphql"
 import { SubscriptionServer } from "subscriptions-transport-ws"
@@ -90,6 +91,17 @@ export function createApplicationServer<App extends AnyApplication>(
             ? cors(properties.webserver.cors)
             : cors()
         expressApp.use(corsMiddleware)
+      }
+
+      // setup cookie-parser middleware
+      if (properties.webserver.cookieParser) {
+        const cookieParserMiddleware =
+          typeof properties.webserver.cookieParser === "object"
+            ? cookieParser(properties.webserver.cookieParser.secret, {
+                decode: properties.webserver.cookieParser.decode,
+              })
+            : cookieParser()
+        expressApp.use(cookieParserMiddleware)
       }
 
       // register static directories

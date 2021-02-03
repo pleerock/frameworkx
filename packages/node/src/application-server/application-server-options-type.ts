@@ -13,6 +13,7 @@ import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"
 import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
+import { CookieParseOptions } from "cookie-parser"
 
 /**
  * Application server startup options.
@@ -42,6 +43,19 @@ export type ApplicationServerOptions = {
      * @see https://github.com/expressjs/cors
      */
     cors?: boolean | CorsOptions
+
+    /**
+     * Indicates if cookie-parser should be enabled or not.
+     * You can pass cookie-parser options to configure how middleware must work.
+     *
+     * @see https://github.com/expressjs/cookie-parser
+     */
+    cookieParser?:
+      | boolean
+      | {
+          secret?: string | string[]
+          decode?(val: string): string
+        }
 
     /**
      * List of middlewares to register in the app per each route / action.

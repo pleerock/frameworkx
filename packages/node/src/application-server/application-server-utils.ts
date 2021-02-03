@@ -83,6 +83,7 @@ export const ApplicationServerUtils = {
         express: options.webserver.express,
         port: options.webserver.port,
         cors: options.webserver.cors || false,
+        cookieParser: options.webserver.cookieParser || false,
         staticDirs: options.webserver.staticDirs || {},
         middlewares: options.webserver.middlewares
           ? ApplicationUtils.mixedListToArray(options.webserver.middlewares)

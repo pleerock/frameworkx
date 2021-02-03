@@ -14,6 +14,7 @@ import { ErrorHandler } from "../error-handler"
 import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
 import { SwaggerUiOptions } from "swagger-ui-express"
+import { CookieParseOptions } from "cookie-parser"
 
 /**
  * Properties held by ApplicationServer.
@@ -45,6 +46,19 @@ export type ApplicationServerProperties = {
      * Should be set to true to enable cors.
      */
     readonly cors: boolean | CorsOptions
+
+    /**
+     * Indicates if cookie-parser should be enabled or not.
+     * You can pass cookie-parser options to configure how middleware must work.
+     *
+     * @see https://github.com/expressjs/cookie-parser
+     */
+    readonly cookieParser:
+      | boolean
+      | {
+          secret?: string | string[]
+          decode?(val: string): string
+        }
 
     /**
      * List of static directories to register in the Express server.
