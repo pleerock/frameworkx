@@ -38,6 +38,9 @@ export const PostResolver = resolver(App, {
   postRemoveAll() {
     return true
   },
+  content({ type }) {
+    return type
+  },
   postCreated: {
     triggers: ["POST_CREATED"],
   },

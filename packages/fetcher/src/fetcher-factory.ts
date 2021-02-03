@@ -166,15 +166,17 @@ export function createFetcher(
     async fetchUnsafe(
       request: Request<any> | string | any,
       variables?: { [key: string]: any },
+      fetchOptions?: RequestInit,
     ): Promise<any> {
-      return this.fetch(request, variables)
+      return this.fetch(request, variables, fetchOptions)
     },
 
     async fetch(
       request: Request<any> | string | any,
       variables?: { [key: string]: any },
+      fetchOptions?: RequestInit,
     ): Promise<any> {
-      const response = await this.response(request, variables)
+      const response = await this.response(request, variables, fetchOptions)
       if (FetcherUtils.isRequestAction(request)) {
         // todo: what about non-json responses?
         const result = await response.json()
@@ -194,6 +196,7 @@ export function createFetcher(
     async response(
       request: Request<any> | string | any, // | DocumentNode,
       variables?: { [key: string]: any },
+      fetchOptions?: RequestInit,
     ): Promise<Response> {
       if (FetcherUtils.isRequestAction(request)) {
         if (!options.actionEndpoint) {
@@ -214,6 +217,7 @@ export function createFetcher(
           method,
           headers,
           body,
+          ...(fetchOptions || {}),
         })
       } else {
         if (!options.graphqlEndpoint) {
@@ -226,16 +230,15 @@ export function createFetcher(
         const headers = await FetcherUtils.buildHeaders(options, undefined)
 
         // execute fetch request
-        const response = await fetch(url, {
+        return fetch(url, {
           method: "POST",
           headers,
           body: JSON.stringify({
             query: queryMeta.body,
             variables,
           }),
+          ...(fetchOptions || {}),
         })
-
-        return response
       }
     },
 

@@ -7,6 +7,26 @@ import { AnyRequestAction } from "./request-action-types"
 import { RequestSelection } from "./request-selection-types"
 
 /**
+ * Scalar is a special input value that is used while building a GraphQL query.
+ * Scalar values aren't parsed to strings in GraphQL queries.
+ */
+export type ScalarInInput<T> = {
+  "@type": "ScalarInInput"
+  value: T
+}
+
+/**
+ * Request can contain an input of a calling query / mutation / subscription.
+ * This input can have a "scalar" values. This type suppose to support inputs and
+ * inputs with scalars inside.
+ */
+export type InputWithScalars<Input> = NonNullable<Input> extends Array<infer U>
+  ? InputWithScalars<U>[]
+  : NonNullable<Input> extends Object
+  ? { [P in keyof Input]: InputWithScalars<Input[P]> | ScalarInInput<Input[P]> }
+  : Input
+
+/**
  * A particular query / mutation / subscription request properties.
  */
 export type RequestMapItemOptions<
@@ -21,11 +41,11 @@ export type RequestMapItemOptions<
   : Declaration extends (input: infer Input) => infer Return
   ? Return extends object
     ? {
-        input?: Input
+        input?: InputWithScalars<Input>
         select: Selection
       }
     : {
-        input?: Input
+        input?: InputWithScalars<Input>
       }
   : never
 

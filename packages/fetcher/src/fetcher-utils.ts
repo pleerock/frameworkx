@@ -2,6 +2,7 @@ import {
   AllRequestActionOptions,
   AnyRequestAction,
   Request,
+  ScalarInInput,
 } from "@microframework/core"
 import { compile } from "path-to-regexp"
 import { FetcherOptions } from "./fetcher-options-type"
@@ -217,10 +218,14 @@ export const FetcherUtils = {
             if (item === null || item === undefined) {
               subQuery += "null"
             } else if (typeof item === "object") {
-              subQuery += `{\r\n${this.serializeInput(
-                item,
-                nestingLevel + 1,
-              )}${"  ".repeat(nestingLevel + 1)}}`
+              if (item["@type"] && item["@type"] === "ScalarInInput") {
+                subQuery += (item as ScalarInInput<any>)["value"]
+              } else {
+                subQuery += `{\r\n${this.serializeInput(
+                  item,
+                  nestingLevel + 1,
+                )}${"  ".repeat(nestingLevel + 1)}}`
+              }
             } else {
               subQuery += JSON.stringify(item)
             }
@@ -230,12 +235,18 @@ export const FetcherUtils = {
       } else if (input[key] === null || input[key] === undefined) {
         query += `${"  ".repeat(nestingLevel + 1)}${key}: null\r\n`
       } else if (typeof input[key] === "object") {
-        query += `${"  ".repeat(
-          nestingLevel + 1,
-        )}${key}: {\r\n${this.serializeInput(
-          input[key],
-          nestingLevel + 1,
-        )}${"  ".repeat(nestingLevel + 1)}}\r\n`
+        if (input[key]["@type"] && input[key]["@type"] === "ScalarInInput") {
+          query += `${"  ".repeat(nestingLevel + 1)}${key}: ${
+            (input[key] as ScalarInInput<any>)["value"]
+          }\r\n`
+        } else {
+          query += `${"  ".repeat(
+            nestingLevel + 1,
+          )}${key}: {\r\n${this.serializeInput(
+            input[key],
+            nestingLevel + 1,
+          )}${"  ".repeat(nestingLevel + 1)}}\r\n`
+        }
       } else {
         query += `${"  ".repeat(nestingLevel + 1)}${key}: ${JSON.stringify(
           input[key],

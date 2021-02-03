@@ -10,6 +10,7 @@ import {
   RequestMapItem,
   RequestMapItemOptions,
   RequestSelection,
+  ScalarInInput,
 } from "./index"
 
 /**
@@ -262,4 +263,14 @@ export function requestFn<App extends AnyApplication, Map extends RequestMap>(
 
     return request(name, newMap)
   }) as any
+}
+
+/**
+ * This function can be used to provide scalar values into GraphQL query.
+ */
+export function scalar<T>(value: T): ScalarInInput<T> {
+  return {
+    "@type": "ScalarInInput",
+    value,
+  }
 }

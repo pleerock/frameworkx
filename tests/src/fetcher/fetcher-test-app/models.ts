@@ -29,3 +29,5 @@ export type PostSearchInput = {
   keyword?: string | null
   filter: PostFilterInput
 }
+
+export type ContentType = "post" | "category"

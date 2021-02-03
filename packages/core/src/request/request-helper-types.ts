@@ -1,6 +1,12 @@
 import { AnyApplication, ReturnTypeOptional } from "../application"
 import { AnyRequestAction } from "./request-action-types"
-import { AnyRequestMapItem, Request, RequestMap } from "./request-map-types"
+import {
+  AnyRequestMapItem,
+  InputWithScalars,
+  Request,
+  RequestMap,
+  ScalarInInput,
+} from "./request-map-types"
 import { ModelSelection } from "../selection"
 import { InputOf } from "../resolver"
 
@@ -23,7 +29,9 @@ export type RequestFnArgs<
   App extends AnyApplication,
   R extends Request<any>
 > = {
-  [P in keyof RequestFnKnownPick<App, R>]: InputOf<App, R["map"][P]["name"]>
+  [P in keyof RequestFnKnownPick<App, R>]: InputWithScalars<
+    InputOf<App, R["map"][P]["name"]>
+  >
 }
 
 /**

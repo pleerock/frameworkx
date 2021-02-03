@@ -1,21 +1,6 @@
 import ReconnectingWebSocket, {
   Options as WebsocketOptions,
 } from "reconnecting-websocket"
-import {
-  ActionFnParams,
-  AnyApplication,
-  AnyRequestAction,
-  Request,
-  RequestMap,
-  RequestMapOriginType,
-  RequestMapReturnType,
-} from "@microframework/core"
-import Observable from "zen-observable-ts"
-import {
-  FetcherMutationBuilder,
-  FetcherQueryBuilder,
-  FetcherSubscriptionBuilder,
-} from "./index"
 
 /**
  * Options for Fetcher object.

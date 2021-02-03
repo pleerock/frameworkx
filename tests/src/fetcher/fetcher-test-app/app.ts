@@ -2,6 +2,7 @@ import { createApp, DateTime, Float, Time } from "@microframework/core"
 import { RedisPubSub } from "graphql-redis-subscriptions"
 import {
   CategoryType,
+  ContentType,
   PostFilterInput,
   PostSearchInput,
   PostType,
@@ -17,6 +18,7 @@ export const App = createApp<{
     post(args: { id: number }): PostType | null
     posts(args: PostFilterInput): PostType[]
     postsSearch(args: PostSearchInput): PostType[]
+    content(args: { type: ContentType }): ContentType
   }
   mutations: {
     postCreate(args: { title: string }): PostType

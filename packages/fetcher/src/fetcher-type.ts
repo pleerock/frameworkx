@@ -111,6 +111,7 @@ export type Fetcher<App extends AnyApplication> = {
   fetchUnsafe<T extends RequestMap>(
     request: Request<T>,
     variables?: { [key: string]: any },
+    fetchOptions?: RequestInit,
   ): Promise<{ data: RequestMapOriginType<T>; errors?: any[] }>
 
   /**
@@ -120,6 +121,7 @@ export type Fetcher<App extends AnyApplication> = {
   fetchUnsafe(
     request: Request<any> | string | any,
     variables?: { [key: string]: any },
+    fetchOptions?: RequestInit,
   ): Promise<any>
 
   /**
@@ -135,6 +137,7 @@ export type Fetcher<App extends AnyApplication> = {
   fetch<T extends RequestMap>(
     request: Request<T>,
     variables?: { [key: string]: any },
+    fetchOptions?: RequestInit,
   ): Promise<{ data: RequestMapReturnType<T>; errors?: any[] }>
 
   /**
@@ -143,6 +146,7 @@ export type Fetcher<App extends AnyApplication> = {
   fetch<T = any>(
     request: string | any,
     variables?: { [key: string]: any },
+    fetchOptions?: RequestInit,
   ): Promise<{ data: T; errors?: any[] }>
 
   /**
@@ -151,6 +155,7 @@ export type Fetcher<App extends AnyApplication> = {
   fetch(
     request: Request<any> | string | any,
     variables?: { [key: string]: any },
+    fetchOptions?: RequestInit,
   ): Promise<any>
 
   /**
@@ -159,6 +164,7 @@ export type Fetcher<App extends AnyApplication> = {
   response(
     request: Request<any> | string | any, // | DocumentNode,
     variables?: { [key: string]: any },
+    fetchOptions?: RequestInit,
   ): Promise<Response>
 
   /**
