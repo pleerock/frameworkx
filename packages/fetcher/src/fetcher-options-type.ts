@@ -45,4 +45,11 @@ export type FetcherOptions = {
   headersFactory?: () =>
     | { [key: string]: any }
     | Promise<{ [key: string]: any }>
+
+  /**
+   * Options to the global `fetch` function that are passed to the every fetch request.
+   */
+  requestInitFactory?: () =>
+    | { [key: string]: any }
+    | Promise<{ [key: string]: any }>
 }

@@ -23,6 +23,13 @@ export const FetcherUtils = {
     )
   },
   /**
+   * Builds RequestInit options for `fetch` requests.
+   */
+  async buildRequestInitOptions(options: FetcherOptions) {
+    if (!options.requestInitFactory) return {}
+    return options.requestInitFactory()
+  },
+  /**
    * Builds a headers for a fetcher request.
    */
   async buildHeaders(

@@ -217,6 +217,7 @@ export function createFetcher(
           method,
           headers,
           body,
+          ...(await FetcherUtils.buildRequestInitOptions(options)),
           ...(fetchOptions || {}),
         })
       } else {
@@ -237,6 +238,7 @@ export function createFetcher(
             query: queryMeta.body,
             variables,
           }),
+          ...(await FetcherUtils.buildRequestInitOptions(options)),
           ...(fetchOptions || {}),
         })
       }
