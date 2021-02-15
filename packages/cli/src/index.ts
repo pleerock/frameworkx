@@ -18,11 +18,7 @@ program
     "destination directory where project needs to be created",
     "",
   )
-  .option(
-    "-t, --type <items>",
-    "project type",
-    "monolith,monorepo,microservices",
-  )
+  .option("-t, --type <items>", "project type", "monolith")
   .action(
     (
       name: string,

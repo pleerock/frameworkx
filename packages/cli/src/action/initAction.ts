@@ -1,4 +1,4 @@
-import { promises as fs } from "fs"
+import { promises as fs, existsSync } from "fs"
 import * as path from "path"
 import { copyFiles, replaceInFile, scanFiles } from "../util"
 
@@ -10,21 +10,41 @@ export async function initAction(
   directory: string,
   scale: "monolith" | "monorepo" | "microservices",
 ) {
+  // make sure project scale properly setup
+  if (
+    scale !== "monolith" &&
+    scale !== "monorepo" &&
+    scale !== "microservices"
+  ) {
+    throw new Error(
+      `Project type can only be one of the following values: "monolith", "monorepo", "microservices".`,
+    )
+  }
+
+  // make sure _templates are inside CLI package
+  if (!existsSync(__dirname + "/../../_templates")) {
+    throw new Error(
+      `Templates are missing in the project, cannot complete operation.`,
+    )
+  }
+
   // preparation
-  const templatesPath = __dirname + "/../../../../templates" // todo: this is different in npm version of cli package
+  // templatePath can be different in published version and local development version
+  const templatesPath = __dirname + "/../../_templates"
   const source = path.normalize(`${templatesPath}/${scale}-template`)
   const destination = directory
     ? process.cwd() + "/" + directory + "/" + name
     : process.cwd() + "/" + name
   const frameworkVersion = require("../../package.json").version
 
-  const files = await scanFiles(source, [
-    "**/_/**",
-    "**/node_modules/**",
-    "**/tsconfig.tsbuildinfo",
-    "**/package-lock.json",
-    "**/tsconfig.json",
-  ])
+  const files = await scanFiles(source, [])
+  // [
+  //   "**/_/**",
+  //   "**/node_modules/**",
+  //   "**/tsconfig.tsbuildinfo",
+  //   "**/package-lock.json",
+  //   "**/tsconfig.json",
+  // ]
 
   // copy all template files
   console.log(`creating a new project at "${destination}"...`)
@@ -188,5 +208,5 @@ export async function initAction(
     )
   }
 
-  console.log(`new project created`)
+  console.log(`New project successfully created`)
 }

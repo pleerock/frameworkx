@@ -31,5 +31,5 @@ export function generateMetadataAction(appFilePath: string) {
   // write a metadata into the file
   fs.writeFileSync(newFilePath, JSON.stringify(metadata))
 
-  console.log(`A new "${newFilePath}" file with metadata was generated.`)
+  console.log(`"${newFilePath}" file with metadata was generated.`)
 }
