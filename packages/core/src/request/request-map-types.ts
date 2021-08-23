@@ -21,7 +21,7 @@ export type ScalarInInput<T> = {
  * inputs with scalars inside.
  */
 export type InputWithScalars<Input> = NonNullable<Input> extends Array<infer U>
-  ? InputWithScalars<U>[]
+  ? InputWithScalars<U>[] | ScalarInInput<U[]>
   : NonNullable<Input> extends Object
   ? { [P in keyof Input]: InputWithScalars<Input[P]> | ScalarInInput<Input[P]> }
   : Input

@@ -226,7 +226,12 @@ export const FetcherUtils = {
               subQuery += "null"
             } else if (typeof item === "object") {
               if (item["@type"] && item["@type"] === "ScalarInInput") {
-                subQuery += (item as ScalarInInput<any>)["value"]
+                const scalarValue = (item as ScalarInInput<any>)["value"]
+                if (Array.isArray(scalarValue)) {
+                  subQuery += "[" + scalarValue.join(", ") + "]"
+                } else {
+                  subQuery += scalarValue
+                }
               } else {
                 subQuery += `{\r\n${this.serializeInput(
                   item,
@@ -243,9 +248,16 @@ export const FetcherUtils = {
         query += `${"  ".repeat(nestingLevel + 1)}${key}: null\r\n`
       } else if (typeof input[key] === "object") {
         if (input[key]["@type"] && input[key]["@type"] === "ScalarInInput") {
-          query += `${"  ".repeat(nestingLevel + 1)}${key}: ${
-            (input[key] as ScalarInInput<any>)["value"]
-          }\r\n`
+          const scalarValue = (input[key] as ScalarInInput<any>)["value"]
+          if (Array.isArray(scalarValue)) {
+            query += `${"  ".repeat(
+              nestingLevel + 1,
+            )}${key}: [${scalarValue.join(", ")}]\r\n`
+          } else {
+            query += `${"  ".repeat(
+              nestingLevel + 1,
+            )}${key}: ${scalarValue}\r\n`
+          }
         } else {
           query += `${"  ".repeat(
             nestingLevel + 1,
