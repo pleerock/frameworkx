@@ -19,6 +19,10 @@ export const App = createApp<{
       args: PostFilterInput | null | undefined,
     ): PostType[] | null | undefined
   }
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 type PostType = {

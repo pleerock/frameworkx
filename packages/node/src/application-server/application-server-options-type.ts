@@ -1,8 +1,8 @@
 import {
   AnyValidationRule,
   AppResolverType,
-  MixedList,
   Logger,
+  MixedList,
   ValidationFn,
 } from "@microframework/core"
 import { CorsOptions } from "cors"
@@ -13,7 +13,6 @@ import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"
 import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
-import { CookieParseOptions } from "cookie-parser"
 
 /**
  * Application server startup options.

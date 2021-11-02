@@ -20,6 +20,11 @@ export const App = createApp<{
     }
     CarInput: { body: CarBodyInput } & { wheels: WheelInput[] }
   }
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 // ------------------------------------------------

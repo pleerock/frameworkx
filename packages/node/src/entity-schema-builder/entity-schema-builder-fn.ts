@@ -1,6 +1,5 @@
 import {
   ApplicationTypeMetadata,
-  TypeMetadata,
   TypeMetadataUtils,
 } from "@microframework/core"
 import { Connection, InsertEvent } from "typeorm"

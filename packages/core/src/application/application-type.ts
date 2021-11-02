@@ -1,14 +1,13 @@
 import {
+  ActionFnParams,
+  AnyRequestAction,
   Request,
   RequestAction,
-  RequestActionOptions,
-  RequestMapItemOptions,
-  RequestMap,
-  AnyRequestAction,
-  RequestMapItem,
-  RequestSelection,
-  ActionFnParams,
   RequestFn,
+  RequestMap,
+  RequestMapItem,
+  RequestMapItemOptions,
+  RequestSelection,
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
 import {
@@ -30,12 +29,12 @@ import {
   LiteralOrClass,
 } from "./application-helper-types"
 import {
+  AnyResolver,
   ContextResolver,
   ContextResolverMetadata,
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
-  AnyResolver,
   ResolveStrategy,
 } from "../resolver"
 

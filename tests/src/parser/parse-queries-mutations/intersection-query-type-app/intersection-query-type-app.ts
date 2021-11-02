@@ -6,6 +6,12 @@ export const App = createApp<{
     post2(): PostType & PostData
     post3(): PostType & { title: string }
   }
+  models: {}
+  inputs: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 type PostType = {

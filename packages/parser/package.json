@@ -1,6 +1,6 @@
 {
   "name": "@microframework/parser",
-  "version": "0.1.75",
+  "version": "0.1.78",
   "description": "Microframework parser",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",

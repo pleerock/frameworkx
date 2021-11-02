@@ -5,6 +5,12 @@ export const App = createApp<{
     PersonIntersectionType: PersonIntersectionType
     PersonEducationType: PersonEducationType & { type: string }
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

@@ -7,6 +7,12 @@ export const App = createApp<{
     PostInterface: PostInterfaceModel
     PostLiteralModel: PostLiteralModel
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

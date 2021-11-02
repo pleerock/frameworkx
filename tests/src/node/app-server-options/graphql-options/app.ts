@@ -11,4 +11,8 @@ export const App = createApp<{
   mutations: {
     postSave(args: { id: number }): boolean
   }
+  inputs: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()

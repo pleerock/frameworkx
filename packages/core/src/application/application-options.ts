@@ -5,6 +5,7 @@ import {
   InputTypeList,
   ModelList,
 } from "./application-core-types"
+import { AnyApplicationOptions, ForcedType } from "./application-helper-types"
 
 /**
  * Application options passed to the main application entry point.
@@ -21,35 +22,81 @@ export type ApplicationOptions<
   /**
    * List of actions (HTTP/REST routes) defined in the app.
    */
-  actions?: Actions
+  actions: Actions
 
   /**
    * List of GraphQL queries defined in the app.
    */
-  queries?: Queries
+  queries: Queries
 
   /**
    * List of GraphQL mutations defined in the app.
    */
-  mutations?: Mutations
+  mutations: Mutations
 
   /**
    * List of GraphQL subscriptions defined in the app.
    */
-  subscriptions?: Subscriptions
+  subscriptions: Subscriptions
 
   /**
    * List of models in the application.
    */
-  models?: Models
+  models: Models
 
   /**
    * List of inputs in the application.
    */
-  inputs?: Inputs
+  inputs: Inputs
 
   /**
    * List of context variables used in the resolvers.
    */
-  context?: Context
+  context: Context
+}
+
+/**
+ * Application options given by user with optional properties being force casted to empty properties.
+ */
+export type ForcedApplicationOptions<
+  PartialOptions extends Partial<AnyApplicationOptions>
+> = {
+  /**
+   * List of actions (HTTP/REST routes) defined in the app.
+   */
+  actions: ForcedType<PartialOptions["actions"], ActionList, {}>
+
+  /**
+   * List of GraphQL queries defined in the app.
+   */
+  queries: ForcedType<PartialOptions["queries"], GraphQLDeclarationList, {}>
+
+  /**
+   * List of GraphQL mutations defined in the app.
+   */
+  mutations: ForcedType<PartialOptions["mutations"], GraphQLDeclarationList, {}>
+
+  /**
+   * List of GraphQL subscriptions defined in the app.
+   */
+  subscriptions: ForcedType<
+    PartialOptions["subscriptions"],
+    GraphQLDeclarationList,
+    {}
+  >
+
+  /**
+   * List of models in the application.
+   */
+  models: ForcedType<PartialOptions["models"], ModelList, {}>
+
+  /**
+   * List of inputs in the application.
+   */
+  inputs: ForcedType<PartialOptions["inputs"], InputTypeList, {}>
+
+  /**
+   * List of context variables used in the resolvers.
+   */
+  context: ForcedType<PartialOptions["context"], ContextList, {}>
 }

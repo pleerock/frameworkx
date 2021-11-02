@@ -4,6 +4,12 @@ export const App = createApp<{
   models: {
     PhotoInterface: PhotoInterface
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

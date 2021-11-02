@@ -4,6 +4,12 @@ export const App = createApp<{
   models: {
     AlbumType: AlbumType
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

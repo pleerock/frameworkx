@@ -7,18 +7,18 @@ import { CategoryRepository } from "../repository"
  * Resolver for category declarations.
  */
 export const CategoryDeclarationResolver = App.resolver({
-  async category(args: { id: number }) {
+  async category(args) {
     return await CategoryRepository.findOne(args.id)
   },
 
-  async categorySave(args: CategoryInput): Promise<Category> {
+  async categorySave(args): Promise<Category> {
     return await CategoryRepository.save({
       id: args.id || undefined,
       name: args.name,
     })
   },
 
-  async categoryRemove(args: { id: number }): Promise<boolean> {
+  async categoryRemove(args): Promise<boolean> {
     const category = await CategoryRepository.findOneOrFail(args.id)
     await CategoryRepository.remove(category)
     return true

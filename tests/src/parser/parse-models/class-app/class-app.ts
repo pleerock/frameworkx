@@ -4,6 +4,12 @@ export const App = createApp<{
   models: {
     UserClass: UserClass
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 class UserClass {

@@ -87,6 +87,10 @@ export const App = createApp<{
       }
     }
   }
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  context: {}
 }>()
 
 class Category {

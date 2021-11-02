@@ -35,6 +35,12 @@ describe("core > validation > functions", () => {
         models: {
           User: User
         }
+        inputs: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
       const userModelValidationRule = validationRule(app, "User", {
         projection: {
@@ -62,6 +68,12 @@ describe("core > validation > functions", () => {
         models: {
           User: User
         }
+        inputs: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
       validationRule(app, "User", {})
       // @ts-expect-error

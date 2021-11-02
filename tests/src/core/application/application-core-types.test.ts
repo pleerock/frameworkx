@@ -106,6 +106,9 @@ describe("core > application > helper types", () => {
       subscriptions: {
         onUserRegister(): string
       }
+      context: {}
+      inputs: {}
+      models: {}
     }>()
     type options = typeof app["_options"]
     type declarationKeys = DeclarationKeys<options>

@@ -7,6 +7,11 @@ export const App = createApp<{
   inputs: {
     PersonIntersectionInputType: PersonIntersectionInputType
   }
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

@@ -16,4 +16,8 @@ export const App = createApp<{
       createdAt: DateTime
     }): PostType
   }
+  inputs: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()

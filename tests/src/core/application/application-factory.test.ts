@@ -28,6 +28,12 @@ describe("core > application > factory", () => {
             age: number
           }
         }
+        inputs: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
       // this is undefined because type is "virtual", used for compilation purposes
       expect(app.model("User").type).toBe(undefined)
@@ -57,6 +63,12 @@ describe("core > application > factory", () => {
             age: number
           }
         }
+        models: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
       // this is undefined because type is "virtual", used for compilation purposes
       expect(app.input("UserInput").type).toBe(undefined)
@@ -87,6 +99,12 @@ describe("core > application > factory", () => {
             }[]
           }
         }
+        models: {}
+        inputs: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        context: {}
       }>()
 
       // make sure standalone request function "action" was called properly
@@ -111,6 +129,11 @@ describe("core > application > factory", () => {
         queries: {
           users(input: { take: number }): User[]
         }
+        inputs: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
 
       // make sure standalone request function "query" was called properly
@@ -159,6 +182,11 @@ describe("core > application > factory", () => {
         mutations: {
           createUser(input: { name: string }): User
         }
+        inputs: {}
+        queries: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
 
       // make sure standalone request function "mutation" was called properly
@@ -207,6 +235,11 @@ describe("core > application > factory", () => {
         subscriptions: {
           onUserCreate(): User
         }
+        inputs: {}
+        queries: {}
+        mutations: {}
+        actions: {}
+        context: {}
       }>()
 
       // make sure standalone request function "subscription" was called properly
@@ -250,6 +283,11 @@ describe("core > application > factory", () => {
         queries: {
           users(): User[]
         }
+        inputs: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
 
       // todo: provide a proper typing for RequestMap
@@ -282,6 +320,11 @@ describe("core > application > factory", () => {
         queries: {
           users(): User[]
         }
+        inputs: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
 
       // make sure standalone request function "validationRule" was called properly
@@ -320,6 +363,11 @@ describe("core > application > factory", () => {
         queries: {
           users(): User[]
         }
+        inputs: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
 
       const userModelResolver = {
@@ -356,6 +404,10 @@ describe("core > application > factory", () => {
         context: {
           currentUser: User
         }
+        inputs: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
       }>()
 
       const resolver = {

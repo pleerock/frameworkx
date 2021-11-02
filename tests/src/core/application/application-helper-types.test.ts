@@ -140,6 +140,8 @@ describe("core > application > helper types", () => {
   })
   test("AnyApplicationOptions", async () => {
     const options: AnyApplicationOptions = {
+      models: {},
+      inputs: {},
       actions: {},
       queries: {},
       mutations: {},

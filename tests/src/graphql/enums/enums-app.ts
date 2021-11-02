@@ -59,6 +59,8 @@ export const App = createApp<{
       type: "common" | "bounced"
     }
   }
+  actions: {}
+  context: {}
 }>()
 
 /**

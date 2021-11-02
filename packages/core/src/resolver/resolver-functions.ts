@@ -9,12 +9,12 @@ import {
   LiteralOrClass,
 } from "../application"
 import {
+  AnyResolver,
   ContextResolver,
   ContextResolverMetadata,
   DeclarationResolver,
   ModelDLResolver,
   ModelResolver,
-  AnyResolver,
   ResolveStrategy,
 } from "./index"
 

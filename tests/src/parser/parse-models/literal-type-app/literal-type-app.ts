@@ -5,6 +5,12 @@ export const App = createApp<{
     AlbumType: AlbumType
     AlbumStatusType: AlbumStatusType
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

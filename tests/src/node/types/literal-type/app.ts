@@ -14,4 +14,8 @@ export const App = createApp<{
       status: "DRAFT" | "ON_MODERATION" | "PUBLISHED"
     }): PostType
   }
+  inputs: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()

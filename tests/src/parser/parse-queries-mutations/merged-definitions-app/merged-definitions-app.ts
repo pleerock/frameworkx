@@ -6,6 +6,11 @@ export const App = createApp<{
     CategoryType: CategoryType
   }
   queries: PostQueries & CategoryQueries
+  inputs: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

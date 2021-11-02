@@ -8,6 +8,11 @@ export const App = createApp<{
     postSave(input: { id: number }): PostType
     postSave(input: { id: number }): PostType
   }
+  inputs: {}
+  queries: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 type PostType = {

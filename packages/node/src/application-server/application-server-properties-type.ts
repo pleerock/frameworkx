@@ -1,9 +1,9 @@
 import {
-  AnyValidationRule,
-  MixedList,
-  Logger,
-  ValidationFn,
   AnyResolver,
+  AnyValidationRule,
+  Logger,
+  MixedList,
+  ValidationFn,
 } from "@microframework/core"
 import { CorsOptions } from "cors"
 import { OptionsData } from "express-graphql"
@@ -14,7 +14,6 @@ import { ErrorHandler } from "../error-handler"
 import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
 import { SwaggerUiOptions } from "swagger-ui-express"
-import { CookieParseOptions } from "cookie-parser"
 
 /**
  * Properties held by ApplicationServer.

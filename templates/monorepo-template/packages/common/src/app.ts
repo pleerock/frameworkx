@@ -67,4 +67,7 @@ export const App = createApp<{
      */
     postCreated(): Post
   }
+
+  actions: {}
+  context: {}
 }>()

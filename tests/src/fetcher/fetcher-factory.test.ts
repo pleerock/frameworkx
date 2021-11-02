@@ -27,11 +27,11 @@ describe("fetcher > factory", () => {
       expect(createFetcher({}).app).toBeUndefined()
     })
     test("creating with app should provide a given app instance", async () => {
-      const app = createApp<{}>()
+      const app = createApp()
       expect(createFetcher(app, {}).app).toBe(app)
     })
     test("given fetcher options must be properly set", async () => {
-      const app = createApp<{}>()
+      const app = createApp()
       const options: FetcherOptions = {
         clientId: "test-fetcher",
         actionEndpoint: "http://localhost/api",

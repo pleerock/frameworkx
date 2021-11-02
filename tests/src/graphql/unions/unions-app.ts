@@ -12,6 +12,11 @@ export const App = createApp<{
   queries: {
     test(): boolean
   }
+  inputs: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 // ------------------------------------------------

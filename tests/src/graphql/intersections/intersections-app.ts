@@ -139,6 +139,8 @@ export const App = createApp<{
       accepted?: boolean
     }
   }
+  actions: {}
+  context: {}
 }>()
 
 // ------------------------------------------------

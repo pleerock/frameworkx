@@ -7,6 +7,11 @@ export const App = createApp<{
   queries: {
     test(): boolean
   }
+  models: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

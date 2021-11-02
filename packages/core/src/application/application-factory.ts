@@ -11,12 +11,16 @@ import { AnyValidationRule, validationRule } from "../validation"
 import { AnyApplicationOptions } from "./application-helper-types"
 import { AnyResolver, contextResolver, resolver } from "../resolver"
 import { Application } from "./application-type"
+import {
+  ApplicationOptions,
+  ForcedApplicationOptions,
+} from "./application-options"
 
 /**
  * Creates a new Application based on a given options.
  */
 export function createApp<
-  Options extends AnyApplicationOptions
+  Options extends ApplicationOptions<any, any, any, any, any, any, any>
 >(): Application<Options> {
   return {
     "@type": "Application",

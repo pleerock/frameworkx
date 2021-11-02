@@ -22,6 +22,9 @@ export const App = createApp<{
     postRemove(args: { id: number }): boolean
     categoriesSave(args: CategoryInput[]): { id: number }[]
   }
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

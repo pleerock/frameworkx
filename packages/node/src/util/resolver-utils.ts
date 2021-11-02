@@ -3,7 +3,7 @@ import {
   ApplicationUtils,
   AppResolverType,
   DeclarationResolverMetadata,
-  MixedList
+  MixedList,
 } from "@microframework/core"
 
 /**

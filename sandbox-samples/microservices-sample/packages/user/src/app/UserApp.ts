@@ -27,4 +27,8 @@ export const UserApp = createApp<{
      */
     userRegister(input: UserRegisterInput): User
   }
+
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()

@@ -39,6 +39,8 @@ export const App = createApp<{
       categories: (CategoryInput & CountersType)[]
     }): (CategoryType & CountersType)[]
   }
+  actions: {}
+  context: {}
 }>()
 
 // ------------------------------------------------

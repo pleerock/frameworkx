@@ -70,4 +70,8 @@ export const GatewayApp = createApp<{
      */
     userRegister(input: UserRegisterInput): User
   }
+
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()

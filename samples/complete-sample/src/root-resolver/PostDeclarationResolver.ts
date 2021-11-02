@@ -7,17 +7,17 @@ import { PostRepository } from "../repository"
  * Resolver for post declarations.
  */
 export const PostDeclarationResolver = App.resolver({
-  async posts(args: PostFilterInput, { logger }): Promise<Post[]> {
+  async posts(args, { logger }): Promise<Post[]> {
     return PostRepository.findAllPosts(args.offset, args.limit)
   },
 
-  async postRemove(args: { id: number }): Promise<boolean> {
+  async postRemove(args): Promise<boolean> {
     const post = await PostRepository.findOneOrFail(args.id)
     await PostRepository.remove(post)
     return true
   },
 
-  async postSave(args: PostInput): Promise<Post> {
+  async postSave(args): Promise<Post> {
     const post = await PostRepository.save({
       id: args.id || undefined,
       title: args.title,

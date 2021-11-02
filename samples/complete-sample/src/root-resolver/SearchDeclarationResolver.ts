@@ -11,7 +11,7 @@ import {
  * Resolver for search declarations.
  */
 export const SearchDeclarationResolver = App.resolver({
-  async search({ keyword }: { keyword: string }): Promise<SearchType[]> {
+  async search({ keyword }): Promise<SearchType[]> {
     const categories = await CategoryRepository.find({
       name: Like(`%${keyword}%`),
     })

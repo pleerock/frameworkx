@@ -6,6 +6,12 @@ export const App = createApp<{
     PostType: PostModel
     PersonComplexType: PersonComplexType
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

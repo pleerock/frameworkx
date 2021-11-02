@@ -1,5 +1,6 @@
 import { TypeMetadata } from "@microframework/core"
 import { GraphQLSchemaBuilderNamingStrategy } from "./naming-strategy"
+
 /**
  * Generates a random string of a given length.
  */

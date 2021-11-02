@@ -25,6 +25,12 @@ describe("core > request > action", () => {
             age: number
           }
         }
+        inputs: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
       // this is undefined because type is "virtual", used for compilation purposes
       expect(app.model("User").type).toBe(undefined)
@@ -54,6 +60,12 @@ describe("core > request > action", () => {
             age: number
           }
         }
+        models: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        actions: {}
+        context: {}
       }>()
       // this is undefined because type is "virtual", used for compilation purposes
       expect(app.input("UserInput").type).toBe(undefined)
@@ -129,6 +141,12 @@ describe("core > request > action", () => {
             }
           }
         }
+        models: {}
+        inputs: {}
+        queries: {}
+        mutations: {}
+        subscriptions: {}
+        context: {}
       }>()
 
       // make sure action returns us a proper RequestAction object

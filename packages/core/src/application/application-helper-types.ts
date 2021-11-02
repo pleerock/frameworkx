@@ -35,7 +35,9 @@ export type LiteralOrClass<T> = T | { new (...args: any[]): T }
  * If given T type is exactly a Desired one, returns just this T type.
  * Otherwise returns "any". Used to for force typing.
  */
-export type ForcedType<T, Desired> = T extends Desired ? T : any
+export type ForcedType<T, Desired, CastTo = any> = T extends Desired
+  ? T
+  : CastTo
 
 /**
  * FlatMap for a type - if given type is an array - returns array's generic type,
@@ -62,17 +64,17 @@ export type DeepPartial<T> = {
 /**
  * Handy way of using Application type when its options don't matter.
  */
-export type AnyApplication = Application<any>
+export type AnyApplication = Application<AnyApplicationOptions>
 
 /**
  * Handy way of using ApplicationOptions type when its generics don't matter.
  */
 export type AnyApplicationOptions = ApplicationOptions<
-  ActionList,
-  GraphQLDeclarationList,
-  GraphQLDeclarationList,
-  GraphQLDeclarationList,
-  ModelList,
-  InputTypeList,
-  ContextList
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any
 >

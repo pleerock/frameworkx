@@ -220,6 +220,9 @@ describe("core > resolver > helper types", () => {
         saveUser(input: UserInput): User
         removeUser(input: { id: number | null }): boolean
       }
+      subscriptions: {}
+      actions: {}
+      context: {}
     }>
 
     const assert1: InputOf<UserApp, "users"> = undefined

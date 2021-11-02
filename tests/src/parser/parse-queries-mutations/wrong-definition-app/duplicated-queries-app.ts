@@ -8,6 +8,11 @@ export const App = createApp<{
     post(input: { id: number }): PostType
     post(input: { id: number }): PostType
   }
+  inputs: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 type PostType = {

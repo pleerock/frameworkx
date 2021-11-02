@@ -82,4 +82,10 @@ export const App = createApp<{
       }
     }
   }
+  models: {}
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  context: {}
 }>()

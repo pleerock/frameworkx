@@ -12,4 +12,8 @@ export const App = createApp<{
   mutations: {
     postCreate(args: { title: string; status: StatusType }): PostType
   }
+  inputs: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()

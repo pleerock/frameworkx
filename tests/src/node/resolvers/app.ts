@@ -25,4 +25,7 @@ export const App = createApp<{
   context: {
     sessionPost: PostType
   }
+  inputs: {}
+  mutations: {}
+  subscriptions: {}
 }>()

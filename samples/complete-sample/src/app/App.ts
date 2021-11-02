@@ -11,5 +11,10 @@ import {
  * Declares all types we have in the app.
  */
 export const App = createApp<
-  CategoryDeclaration & UserDeclaration & PostDeclaration & SearchDeclaration
+  CategoryDeclaration &
+    UserDeclaration &
+    PostDeclaration &
+    SearchDeclaration & {
+      context: {}
+    }
 >()

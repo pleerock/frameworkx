@@ -36,4 +36,8 @@ export const CategoryApp = createApp<{
      */
     categoryRemove(input: { id: number }): boolean
   }
+
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()

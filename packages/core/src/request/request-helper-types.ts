@@ -5,7 +5,6 @@ import {
   InputWithScalars,
   Request,
   RequestMap,
-  ScalarInInput,
 } from "./request-map-types"
 import { ModelSelection } from "../selection"
 import { InputOf } from "../resolver"

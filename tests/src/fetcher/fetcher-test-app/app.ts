@@ -13,6 +13,7 @@ export const App = createApp<{
     PostType: PostType
     CategoryType: CategoryType
   }
+  inputs: {}
   queries: {
     postRandomOne(): PostType
     post(args: { id: number }): PostType | null

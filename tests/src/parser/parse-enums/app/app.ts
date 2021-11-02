@@ -5,6 +5,12 @@ export const App = createApp<{
     PostType: PostType
     PostStatusType: PostStatusType
   }
+  inputs: {}
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

@@ -7,6 +7,11 @@ export const App = createApp<{
   inputs: {
     PostInputClass: PostInputClass
   }
+  queries: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
 
 /**

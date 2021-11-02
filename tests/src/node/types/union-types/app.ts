@@ -10,4 +10,9 @@ export const App = createApp<{
   queries: {
     post(args: { id: number }): PostType
   }
+  inputs: {}
+  mutations: {}
+  subscriptions: {}
+  actions: {}
+  context: {}
 }>()
