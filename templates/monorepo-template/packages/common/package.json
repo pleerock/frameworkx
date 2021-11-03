@@ -6,7 +6,7 @@
     "@microframework/core": "*"
   },
   "devDependencies": {
-    "typescript": "4.2.2",
+    "typescript": "4.5.1-rc",
     "prettier": "^2.1.2"
   },
   "scripts": {

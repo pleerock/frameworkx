@@ -21,7 +21,7 @@
     "source-map-support": "^0.5.19",
     "ts-node": "^9.0.0",
     "nodemon": "^2.0.4",
-    "typescript": "4.2.2",
+    "typescript": "4.5.1-rc",
     "prettier": "^2.1.2"
   },
   "scripts": {
