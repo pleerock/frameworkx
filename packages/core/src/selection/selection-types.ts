@@ -39,10 +39,11 @@ export type ModelSelectionSchema<Model> = NonNullable<Model> extends Array<
  */
 export type ModelSelection<
   Model,
-  Selection extends ModelSelectionSchema<Model>
+  Selection // extends ModelSelectionSchema<Model>
 > = Model extends Array<infer U>
-  ? ModelSelection<U, ForcedType<Selection, ModelSelectionSchema<U>>>[]
-  : Model extends object
+  ? ModelSelection<U, Selection>[]
+  : // ? ModelSelection<U, ForcedType<Selection, ModelSelectionSchema<U>>>[]
+  Model extends object
   ? {
       [P in keyof ModelSelectionPick<Model, Selection>]: ModelSelection<
         Model[P],

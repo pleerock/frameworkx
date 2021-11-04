@@ -32,7 +32,9 @@ export type InputWithScalars<Input> = NonNullable<Input> extends Array<infer U>
 export type RequestMapItemOptions<
   Declaration extends GraphQLDeclarationItem<any>,
   Selection extends RequestSelection<Declaration>
-> = Parameters<Declaration> extends []
+> = Declaration extends never // this check is needed for AnyRequestMapItemOptions type
+  ? { input?: any; select?: any }
+  : Parameters<Declaration> extends []
   ? ReturnType<Declaration> extends object
     ? {
         select: Selection
@@ -41,7 +43,7 @@ export type RequestMapItemOptions<
   : Declaration extends (input: infer Input) => infer Return
   ? Return extends object
     ? {
-        input?: InputWithScalars<Input>
+        input?: InputWithScalars<Input> // input is optional here in order to allow queries/... with input parameters given later on, e.g. requestFn
         select: Selection
       }
     : {

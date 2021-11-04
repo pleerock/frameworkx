@@ -1,7 +1,7 @@
 import { RequestReturnType } from "@microframework/core"
 import { App } from "../app"
 
-export const PostListRequest = App.request("PostList", {
+export const PostListRequest = App.requestFn("PostList", {
   myPosts: App.query("posts", {
     input: {
       limit: 1,

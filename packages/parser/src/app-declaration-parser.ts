@@ -490,11 +490,17 @@ class Parser {
         const modelSymbol =
           referencedType.aliasTypeArguments[0].aliasSymbol ||
           referencedType.aliasTypeArguments[0].symbol
-        const modelType = modelSymbol ? modelSymbol.declarations[0] : undefined
+        const modelType =
+          modelSymbol && modelSymbol.declarations
+            ? modelSymbol.declarations[0]
+            : undefined
         const argsSymbol =
           referencedType.aliasTypeArguments[1].aliasSymbol ||
           referencedType.aliasTypeArguments[1].symbol
-        const argsType = argsSymbol ? argsSymbol.declarations[0] : undefined
+        const argsType =
+          argsSymbol && argsSymbol.declarations
+            ? argsSymbol.declarations[0]
+            : undefined
         if (!modelType)
           throw Errors.invalidModelSignature(modelName, parentName)
 
@@ -555,7 +561,7 @@ class Parser {
       let resolvedType = undefined
       let description: string = ""
       let deprecated: string | boolean = false
-      if (symbol) {
+      if (symbol && symbol.declarations) {
         resolvedType = symbol.declarations[0]
         description = ParserUtils.getDescription(
           this.context.program.getTypeChecker(),
@@ -630,7 +636,7 @@ class Parser {
       const modelSymbol = this.context.program
         .getTypeChecker()
         .getTypeAtLocation(node.typeArguments[0])
-      if (modelSymbol.symbol) {
+      if (modelSymbol.symbol && modelSymbol.symbol.declarations) {
         modelType = modelSymbol.symbol.declarations[0]
       }
       if (!modelType) throw Errors.importedNodeModelInvalid(parentName)
@@ -641,7 +647,7 @@ class Parser {
         const symbol = this.context.program
           .getTypeChecker()
           .getTypeAtLocation(node.typeArguments[1])
-        if (symbol.aliasSymbol) {
+        if (symbol.aliasSymbol && symbol.aliasSymbol.declarations) {
           argsType = symbol.aliasSymbol.declarations[0]
         }
       }

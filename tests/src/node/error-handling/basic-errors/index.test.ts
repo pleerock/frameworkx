@@ -75,7 +75,7 @@ describe("node > error handling > basic errors", () => {
           }
         }
       `)
-    } catch (err) {
+    } catch (err: any) {
       error = err
     }
 

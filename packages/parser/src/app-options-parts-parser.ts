@@ -19,7 +19,7 @@ export function parseAppOptionParts(
       } else if (ts.isTypeReferenceNode(type)) {
         const referencedType = typeChecker.getTypeAtLocation(type)
         const symbol = referencedType.aliasSymbol || referencedType.symbol
-        if (symbol && symbol.declarations[0]) {
+        if (symbol && symbol.declarations && symbol.declarations[0]) {
           const declaration = symbol.declarations[0]
           if (ts.isTypeLiteralNode(declaration)) {
             appDeclarationParts.push(declaration)

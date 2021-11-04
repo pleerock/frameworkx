@@ -15,6 +15,6 @@
     "clean-hard": "sh scripts/clean.sh --hard",
     "publish-packages": "sh scripts/publish.sh",
     "generate-sandbox-samples": "sh scripts/generate-sandbox-samples.sh",
-    "class-sample": "node samples/complete-sample/_/index.js"
+    "sample": "node samples/complete-sample/_/index.js"
   }
 }

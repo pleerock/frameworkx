@@ -10,13 +10,7 @@ import {
   RequestSelection,
 } from "../request"
 import { AnyModel, Model } from "@microframework/model"
-import {
-  ContextList,
-  DeclarationKeys,
-  GraphQLDeclarationItem,
-  GraphQLDeclarationList,
-  ModelOrigin,
-} from "./application-core-types"
+import { DeclarationKeys, ModelOrigin } from "./application-core-types"
 import {
   AnyValidationRule,
   ValidationRule,
@@ -25,7 +19,6 @@ import {
 import {
   AnyApplication,
   AnyApplicationOptions,
-  ForcedType,
   LiteralOrClass,
 } from "./application-helper-types"
 import {
@@ -72,11 +65,7 @@ export type Application<Options extends AnyApplicationOptions> = {
    */
   query<QueryKey extends keyof Options["queries"]>(
     name: QueryKey,
-  ): RequestMapItem<
-    ForcedType<Options["queries"], GraphQLDeclarationList>,
-    QueryKey,
-    never
-  >
+  ): RequestMapItem<Options["queries"], QueryKey, never>
 
   /**
    * Creates a "request query".
@@ -84,20 +73,11 @@ export type Application<Options extends AnyApplicationOptions> = {
   query<
     QueryKey extends keyof Options["queries"],
     Declaration extends Options["queries"][QueryKey],
-    Selection extends RequestSelection<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>
-    >
+    Selection extends RequestSelection<Declaration>
   >(
     name: QueryKey,
-    options: RequestMapItemOptions<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>,
-      Selection
-    >,
-  ): RequestMapItem<
-    ForcedType<Options["queries"], GraphQLDeclarationList>,
-    QueryKey,
-    Selection
-  >
+    options: RequestMapItemOptions<Declaration, Selection>,
+  ): RequestMapItem<Options["queries"], QueryKey, Selection>
 
   /**
    * Creates a "request query".
@@ -105,28 +85,18 @@ export type Application<Options extends AnyApplicationOptions> = {
   query<
     QueryKey extends keyof Options["queries"],
     Declaration extends Options["queries"][QueryKey],
-    Selection extends RequestSelection<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>
-    >
+    Selection extends RequestSelection<Declaration>
   >(
     name: QueryKey,
     selection: Selection,
-  ): RequestMapItem<
-    ForcedType<Options["queries"], GraphQLDeclarationList>,
-    QueryKey,
-    Selection
-  >
+  ): RequestMapItem<Options["queries"], QueryKey, Selection>
 
   /**
    * Creates a "request mutation".
    */
   mutation<MutationKey extends keyof Options["mutations"]>(
     name: MutationKey,
-  ): RequestMapItem<
-    ForcedType<Options["mutations"], GraphQLDeclarationList>,
-    MutationKey,
-    never
-  >
+  ): RequestMapItem<Options["mutations"], MutationKey, never>
 
   /**
    * Creates a "request mutation".
@@ -134,20 +104,11 @@ export type Application<Options extends AnyApplicationOptions> = {
   mutation<
     MutationKey extends keyof Options["mutations"],
     Declaration extends Options["mutations"][MutationKey],
-    Selection extends RequestSelection<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>
-    >
+    Selection extends RequestSelection<Declaration>
   >(
     name: MutationKey,
-    options: RequestMapItemOptions<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>,
-      Selection
-    >,
-  ): RequestMapItem<
-    ForcedType<Options["mutations"], GraphQLDeclarationList>,
-    MutationKey,
-    Selection
-  >
+    options: RequestMapItemOptions<Declaration, Selection>,
+  ): RequestMapItem<Options["mutations"], MutationKey, Selection>
 
   /**
    * Creates a "request mutation".
@@ -155,48 +116,29 @@ export type Application<Options extends AnyApplicationOptions> = {
   mutation<
     MutationKey extends keyof Options["mutations"],
     Declaration extends Options["mutations"][MutationKey],
-    Selection extends RequestSelection<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>
-    >
+    Selection extends RequestSelection<Declaration>
   >(
     name: MutationKey,
     selection: Selection,
-  ): RequestMapItem<
-    ForcedType<Options["mutations"], GraphQLDeclarationList>,
-    MutationKey,
-    Selection
-  >
+  ): RequestMapItem<Options["mutations"], MutationKey, Selection>
 
   /**
    * Creates a "request subscription".
    */
   subscription<SubscriptionKey extends keyof Options["subscriptions"]>(
     name: SubscriptionKey,
-  ): RequestMapItem<
-    ForcedType<Options["subscriptions"], GraphQLDeclarationList>,
-    SubscriptionKey,
-    never
-  >
+  ): RequestMapItem<Options["subscriptions"], SubscriptionKey, never>
   /**
    * Creates a "request subscription".
    */
   subscription<
     SubscriptionKey extends keyof Options["subscriptions"],
     Declaration extends Options["subscriptions"][SubscriptionKey],
-    Selection extends RequestSelection<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>
-    >
+    Selection extends RequestSelection<Declaration>
   >(
     name: SubscriptionKey,
-    options: RequestMapItemOptions<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>,
-      Selection
-    >,
-  ): RequestMapItem<
-    ForcedType<Options["subscriptions"], GraphQLDeclarationList>,
-    SubscriptionKey,
-    Selection
-  >
+    options: RequestMapItemOptions<Declaration, Selection>,
+  ): RequestMapItem<Options["subscriptions"], SubscriptionKey, Selection>
 
   /**
    * Creates a "request subscription".
@@ -204,17 +146,11 @@ export type Application<Options extends AnyApplicationOptions> = {
   subscription<
     SubscriptionKey extends keyof Options["subscriptions"],
     Declaration extends Options["subscriptions"][SubscriptionKey],
-    Selection extends RequestSelection<
-      ForcedType<Declaration, GraphQLDeclarationItem<any>>
-    >
+    Selection extends RequestSelection<Declaration>
   >(
     name: SubscriptionKey,
     selection: Selection,
-  ): RequestMapItem<
-    ForcedType<Options["subscriptions"], GraphQLDeclarationList>,
-    SubscriptionKey,
-    Selection
-  >
+  ): RequestMapItem<Options["subscriptions"], SubscriptionKey, Selection>
 
   /**
    * Creates a "request action".
@@ -255,28 +191,16 @@ export type Application<Options extends AnyApplicationOptions> = {
    */
   validationRule<Key extends keyof Options["models"]>(
     name: Key,
-    options: ValidationRuleOptions<
-      Options["models"][Key],
-      ForcedType<Options["context"], ContextList>
-    >,
-  ): ValidationRule<
-    Options["models"][Key],
-    ForcedType<Options["context"], ContextList>
-  >
+    options: ValidationRuleOptions<Options["models"][Key], Options["context"]>,
+  ): ValidationRule<Options["models"][Key], Options["context"]>
 
   /**
    * Creates a new validation rule for a given App's input.
    */
   validationRule<Key extends keyof Options["inputs"]>(
     name: Key,
-    options: ValidationRuleOptions<
-      Options["inputs"][Key],
-      ForcedType<Options["context"], ContextList>
-    >,
-  ): ValidationRule<
-    Options["inputs"][Key],
-    ForcedType<Options["context"], ContextList>
-  >
+    options: ValidationRuleOptions<Options["inputs"][Key], Options["context"]>,
+  ): ValidationRule<Options["inputs"][Key], Options["context"]>
 
   /**
    * Creates a new validation rule for a given model.
@@ -357,17 +281,9 @@ export type Application<Options extends AnyApplicationOptions> = {
   resolver<Model extends AnyModel>(
     model: Model,
     resolver:
-      | LiteralOrClass<
-          ModelResolver<
-            Model["type"],
-            ForcedType<Options["context"], ContextList>
-          >
-        >
+      | LiteralOrClass<ModelResolver<Model["type"], Options["context"]>>
       | (() => LiteralOrClass<
-          ModelResolver<
-            Model["type"],
-            ForcedType<Options["context"], ContextList>
-          >
+          ModelResolver<Model["type"], Options["context"]>
         >),
   ): AnyResolver
 
@@ -388,16 +304,10 @@ export type Application<Options extends AnyApplicationOptions> = {
     options: { name: Key; dataLoader: true },
     resolver:
       | LiteralOrClass<
-          ModelDLResolver<
-            Options["models"][Key],
-            ForcedType<Options["context"], ContextList>
-          >
+          ModelDLResolver<Options["models"][Key], Options["context"]>
         >
       | (() => LiteralOrClass<
-          ModelDLResolver<
-            Options["models"][Key],
-            ForcedType<Options["context"], ContextList>
-          >
+          ModelDLResolver<Options["models"][Key], Options["context"]>
         >),
   ): AnyResolver
 
@@ -417,17 +327,9 @@ export type Application<Options extends AnyApplicationOptions> = {
   resolver<Model extends AnyModel>(
     options: { model: Model; dataLoader: true },
     resolver:
-      | LiteralOrClass<
-          ModelDLResolver<
-            Model["type"],
-            ForcedType<Options["context"], ContextList>
-          >
-        >
+      | LiteralOrClass<ModelDLResolver<Model["type"], Options["context"]>>
       | (() => LiteralOrClass<
-          ModelDLResolver<
-            Model["type"],
-            ForcedType<Options["context"], ContextList>
-          >
+          ModelDLResolver<Model["type"], Options["context"]>
         >),
   ): AnyResolver
 
@@ -448,16 +350,10 @@ export type Application<Options extends AnyApplicationOptions> = {
     options: { name: Key; dataLoader?: false },
     resolver:
       | LiteralOrClass<
-          ModelResolver<
-            Options["models"][Key],
-            ForcedType<Options["context"], ContextList>
-          >
+          ModelResolver<Options["models"][Key], Options["context"]>
         >
       | (() => LiteralOrClass<
-          ModelResolver<
-            Options["models"][Key],
-            ForcedType<Options["context"], ContextList>
-          >
+          ModelResolver<Options["models"][Key], Options["context"]>
         >),
   ): AnyResolver
 
@@ -501,8 +397,6 @@ export type Application<Options extends AnyApplicationOptions> = {
    *    })
    */
   contextResolver(
-    resolver: LiteralOrClass<
-      ContextResolver<ForcedType<Options["context"], ContextList>>
-    >,
+    resolver: LiteralOrClass<ContextResolver<Options["context"]>>,
   ): ContextResolverMetadata
 }

@@ -56,6 +56,8 @@ export function getDeprecation(
       deprecated = true
       if (deprecatedJsDocTag.text) {
         deprecated = deprecatedJsDocTag.text
+          .map((text) => text.text)
+          .join("\r\n")
       }
     }
   }
