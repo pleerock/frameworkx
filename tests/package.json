@@ -35,7 +35,7 @@
     "ts-jest": "^26.1.1",
     "typeorm": "^0.3.0-rc.21",
     "typescript": "4.5.1-rc",
-    "ws": "^7.4.1"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",
