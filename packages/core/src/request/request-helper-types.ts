@@ -106,12 +106,16 @@ export type RequestMapItemReturnType<T extends AnyRequestMapItem> = NonNullable<
       ? U[] | null
       : U extends boolean
       ? U[] | null
+      : U extends Date
+      ? string[] | null
       : ModelSelection<U, T["_selection"]>[] | null
     : U extends number
     ? U[]
     : U extends string
     ? U[]
     : U extends boolean
+    ? U[]
+    : U extends Date
     ? U[]
     : ModelSelection<U, T["_selection"]>[]
   : NonNullable<T["_model"]> extends number
@@ -120,6 +124,10 @@ export type RequestMapItemReturnType<T extends AnyRequestMapItem> = NonNullable<
   ? T["_model"]
   : NonNullable<T["_model"]> extends boolean
   ? T["_model"]
+  : NonNullable<T["_model"]> extends Date
+  ? null extends T["_model"]
+    ? string | null
+    : string
   : null extends T["_model"]
   ? ModelSelection<NonNullable<T["_model"]>, T["_selection"]> | null
   : ModelSelection<T["_model"], T["_selection"]>

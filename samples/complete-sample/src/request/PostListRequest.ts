@@ -9,6 +9,7 @@ export const PostListRequest = App.requestFn("PostList", {
     },
     select: {
       id: true,
+      createdAt: true,
     },
   }),
   firstCategory: App.query("category", {
@@ -29,7 +30,4 @@ export const PostListRequest = App.requestFn("PostList", {
   }),
 })
 
-export type PostListType = RequestReturnType<
-  typeof PostListRequest,
-  "firstCategory"
->
+export type PostListType = RequestReturnType<typeof PostListRequest, "myPosts">

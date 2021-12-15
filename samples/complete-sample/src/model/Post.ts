@@ -1,4 +1,4 @@
-import { ModelWithArgs } from "@microframework/core"
+import { DateTime, ModelWithArgs } from "@microframework/core"
 import { PostStatus } from "../enum"
 import { Category } from "./Category"
 import { User } from "./User"
@@ -11,6 +11,11 @@ export interface Post {
    * Unique post id.
    */
   id: number
+
+  /**
+   * Date, when this post was created.
+   */
+  createdAt: DateTime
 
   /**
    * Post title.

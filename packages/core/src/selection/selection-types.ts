@@ -43,7 +43,9 @@ export type ModelSelection<
 > = Model extends Array<infer U>
   ? ModelSelection<U, Selection>[]
   : // ? ModelSelection<U, ForcedType<Selection, ModelSelectionSchema<U>>>[]
-  Model extends object
+  Model extends Date
+  ? string
+  : Model extends object
   ? {
       [P in keyof ModelSelectionPick<Model, Selection>]: ModelSelection<
         Model[P],
