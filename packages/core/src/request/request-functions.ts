@@ -267,10 +267,80 @@ export function requestFn<App extends AnyApplication, Map extends RequestMap>(
 
 /**
  * This function can be used to provide scalar values into GraphQL query.
+ *
+ * @deprecated use Scalars.* instead
  */
 export function scalar<T>(value: T): ScalarInInput<T> {
   return {
     "@type": "ScalarInInput",
     value,
   }
+}
+
+/**
+ * Set of functions to provide scalar values into GraphQL query.
+ */
+export const Scalars = {
+  /**
+   * Provides enum into GraphQL query.
+   */
+  enum<T>(value: T): ScalarInInput<T> {
+    return {
+      "@type": "ScalarInInput",
+      value,
+    }
+  },
+
+  /**
+   * Provides Date scalar into GraphQL query.
+   */
+  date(value: Date | string): ScalarInInput<Date> {
+    if (typeof value === "string") {
+      return {
+        "@type": "ScalarInInput",
+        value: `"${value}"` as any,
+      }
+    } else {
+      const isoDate = value.toISOString()
+      return {
+        "@type": "ScalarInInput",
+        value: `"${isoDate.substring(0, isoDate.indexOf("T"))}"` as any,
+      }
+    }
+  },
+
+  /**
+   * Provides Time scalar into GraphQL query.
+   */
+  time(value: Date): ScalarInInput<Date> {
+    if (typeof value === "string") {
+      return {
+        "@type": "ScalarInInput",
+        value: `"${value}"` as any,
+      }
+    } else {
+      const isoDate = value.toISOString()
+      return {
+        "@type": "ScalarInInput",
+        value: `"${isoDate.substring(isoDate.indexOf("T") + 1)}"` as any,
+      }
+    }
+  },
+
+  /**
+   * Provides DateTime scalar into GraphQL query.
+   */
+  dateTime(value: Date): ScalarInInput<Date> {
+    if (typeof value === "string") {
+      return {
+        "@type": "ScalarInInput",
+        value: `"${value}"` as any,
+      }
+    } else {
+      return {
+        "@type": "ScalarInInput",
+        value: `"${value.toISOString()}"` as any,
+      }
+    }
+  },
 }

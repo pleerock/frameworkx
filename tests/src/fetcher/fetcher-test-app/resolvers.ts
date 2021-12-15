@@ -41,6 +41,15 @@ export const PostResolver = resolver(App, {
   content({ type }) {
     return type
   },
+  contentByDate({ date }) {
+    return date
+  },
+  contentByTime({ date }) {
+    return date
+  },
+  contentByDateTime({ date }) {
+    return date
+  },
   postCreated: {
     triggers: ["POST_CREATED"],
   },

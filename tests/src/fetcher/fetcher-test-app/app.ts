@@ -20,6 +20,9 @@ export const App = createApp<{
     posts(args: PostFilterInput): PostType[]
     postsSearch(args: PostSearchInput): PostType[]
     content(args: { type: ContentType }): ContentType
+    contentByDate(args: { date: Date }): Date
+    contentByTime(args: { date: Time }): Time
+    contentByDateTime(args: { date: DateTime }): DateTime
   }
   mutations: {
     postCreate(args: { title: string }): PostType
