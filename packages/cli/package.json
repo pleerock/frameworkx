@@ -1,6 +1,6 @@
 {
   "name": "@microframework/cli",
-  "version": "0.1.83",
+  "version": "0.1.84",
   "description": "Microframework's CLI tools.",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",

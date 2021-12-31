@@ -129,6 +129,62 @@ export type ResolverReturnValue<T> = IsNullable<T> extends true
   : T | DeepPartial<T> | Promise<T> | Promise<DeepPartial<T>>
 
 /**
+ * Resolver possible return value type.
+ */
+export type ResolverReturnValueArray<T> = IsNullable<T> extends true
+  ? NonNullable<T> extends Array<infer U>
+    ? U extends boolean
+      ?
+          | (boolean[] | null | undefined)[]
+          | Promise<(boolean[] | null | undefined)[]>
+      : U extends number
+      ?
+          | (number[] | null | undefined)[]
+          | Promise<(number[] | null | undefined)[]>
+      : U extends string
+      ?
+          | (string[] | null | undefined)[]
+          | Promise<(string[] | null | undefined)[]>
+      :
+          | (U[] | DeepPartial<U>[] | null | undefined)[]
+          | Promise<(U[] | DeepPartial<U>[] | null | undefined)[]>
+    : NonNullable<T> extends boolean
+    ?
+        | (boolean | null | undefined)[]
+        | Promise<boolean[]>
+        | Promise<(boolean | null | undefined)[]>
+    : NonNullable<T> extends number
+    ?
+        | (number | null | undefined)[]
+        | Promise<number[]>
+        | Promise<(number | null | undefined)[]>
+    : NonNullable<T> extends string
+    ?
+        | (string | null | undefined)[]
+        | Promise<string[]>
+        | Promise<(string | null | undefined)[]>
+    : NonNullable<T> extends Object
+    ?
+        | (T | DeepPartial<T> | null | undefined)[]
+        | Promise<(T | DeepPartial<T> | null | undefined)[]>
+    : unknown
+  : T extends Array<infer U>
+  ? U extends boolean
+    ? boolean[][] | Promise<boolean[][]>
+    : U extends number
+    ? number[][] | Promise<number[][]>
+    : U extends string
+    ? string[][] | Promise<string[][]>
+    : U[][] | DeepPartial<U>[][] | Promise<U[][]> | Promise<DeepPartial<U>[][]>
+  : T extends boolean
+  ? boolean[] | Promise<boolean[]>
+  : T extends number
+  ? number[] | Promise<number[]>
+  : T extends string
+  ? string[] | Promise<string[]>
+  : T[] | DeepPartial<T[]> | Promise<T[]> | Promise<DeepPartial<T>[]>
+
+/**
  * Types or resolvers that can registered in the application.
  */
 export type AppResolverType =

@@ -8,7 +8,12 @@ import {
   GraphQLDeclarationItem,
   ModelType,
 } from "../application"
-import { ActionArgs, DefaultContext, ResolverReturnValue } from "./index"
+import {
+  ActionArgs,
+  DefaultContext,
+  ResolverReturnValue,
+  ResolverReturnValueArray,
+} from "./index"
 
 /**
  * Defines a model resolving strategy.
@@ -38,8 +43,8 @@ export type ModelDLResolver<
         parents: Type[],
         input: any, // input can have a type when ModelWithArgs will be properly implemented
         context: Context & DefaultContext,
-      ) => ResolverReturnValue<Type[P][]>)
-    | ResolverReturnValue<Type[P][]>
+      ) => ResolverReturnValueArray<Type[P]>)
+    | ResolverReturnValueArray<Type[P]>
 }
 
 /**
