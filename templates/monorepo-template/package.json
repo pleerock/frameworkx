@@ -3,7 +3,7 @@
   "private": true,
   "devDependencies": {
     "lerna": "^3.22.1",
-    "typescript": "4.5.1-rc",
+    "typescript": "4.5.4",
     "prettier": "^2.1.2"
   },
   "scripts": {

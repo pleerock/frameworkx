@@ -19,7 +19,7 @@
     "typescript": "^3.7.5"
   },
   "devDependencies": {
-    "typescript": "4.5.1-rc",
+    "typescript": "4.5.4",
     "prettier": "^2.1.2"
   },
   "scripts": {

@@ -8,7 +8,7 @@ import {
   RequestMapOriginType,
   RequestMapReturnType,
 } from "@microframework/core"
-import Observable from "zen-observable-ts"
+import { Observable } from "zen-observable-ts"
 import {
   FetcherMutationBuilder,
   FetcherOptions,

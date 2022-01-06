@@ -22,6 +22,7 @@ declare -a projectDirs=(
 
 if [ "$1" = "--hard" ] || [ "$1" = "hard" ]; then
   echo "Removing root node_modules..."
+  rm -rf package-lock.json
   rm -rf node_modules
 fi
 

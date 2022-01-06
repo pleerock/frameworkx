@@ -1,6 +1,6 @@
 {
   "name": "@microframework/fetcher",
-  "version": "0.1.84",
+  "version": "0.1.87",
   "description": "Fetcher helps to execute network queries.",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -19,14 +19,14 @@
     "reconnecting-websocket": "^4.4.0",
     "node-fetch": "^2.6.1",
     "path-to-regexp": "^6.2.0",
-    "zen-observable-ts": "^0.8.21",
+    "zen-observable-ts": "^1.1.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/uuid": "^8.3.0",
-    "@types/node-fetch": "^2.5.7",
-    "prettier": "^2.2.1",
-    "ts-node": "^9.1.1",
-    "typescript": "4.5.1-rc"
+    "@types/uuid": "^8.3.4",
+    "@types/node-fetch": "^3.0.3",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
+    "typescript": "4.5.4"
   }
 }

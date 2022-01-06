@@ -88,7 +88,7 @@ And put following content inside:
   },
   "devDependencies": {
     "@types/node": "^14.11.1",
-    "typescript": "4.5.1-rc"
+    "typescript": "4.5.4"
   },
   "scripts": {
     "start": "tsc && node ./_/index.js",

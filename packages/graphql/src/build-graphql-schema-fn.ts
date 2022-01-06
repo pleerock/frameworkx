@@ -8,7 +8,7 @@ import type {
   GraphQLObjectType,
   GraphQLUnionType,
 } from "graphql"
-import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date"
+import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-scalars"
 import { GraphQLSchemaBuilderOptions } from "./build-graphql-schema-fn-options"
 import type { GraphQLSchemaConfig } from "graphql/type/schema"
 
