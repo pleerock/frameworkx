@@ -26,7 +26,7 @@
     "graphql-tools": "^6.0.13",
     "ioredis": "^4.17.3",
     "jest": "^26.1.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "openapi-types": "^7.2.3",
     "prettier": "^2.0.5",
     "rate-limiter-flexible": "^2.1.7",
