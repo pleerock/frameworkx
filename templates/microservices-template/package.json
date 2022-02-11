@@ -2,14 +2,19 @@
   "name": "microframework-template-microservices-root",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.22.1",
-    "typescript": "4.5.4",
-    "prettier": "^2.1.2"
+    "typescript": "^4.5.5",
+    "prettier": "^2.5.1"
   },
   "scripts": {
     "bootstrap": "npm i && lerna bootstrap",
     "format": "prettier",
     "watch": "tsc -b -w",
     "start": "docker-compose up"
-  }
+  },
+  "workspaces": [
+    "./packages/gateway",
+    "./packages/category",
+    "./packages/post",
+    "./packages/user"
+  ]
 }

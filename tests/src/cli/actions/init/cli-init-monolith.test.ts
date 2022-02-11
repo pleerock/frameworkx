@@ -22,7 +22,7 @@ describe("cli > actions > init > monolith", () => {
       "_/cli/monolith/app/monolith-test/package.json",
       "_/cli/monolith/app/monolith-test/README.md",
       "_/cli/monolith/app/monolith-test/src/app/App.ts",
-      "_/cli/monolith/app/monolith-test/src/app/AppConnection.ts",
+      "_/cli/monolith/app/monolith-test/src/app/AppDataSource.ts",
       "_/cli/monolith/app/monolith-test/src/app/AppContext.ts",
       "_/cli/monolith/app/monolith-test/src/app/AppPubSub.ts",
       "_/cli/monolith/app/monolith-test/src/app/AppServer.ts",

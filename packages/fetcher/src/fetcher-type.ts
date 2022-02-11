@@ -8,7 +8,7 @@ import {
   RequestMapOriginType,
   RequestMapReturnType,
 } from "@microframework/core"
-import { Observable } from "zen-observable-ts"
+import { Observable } from "zen-observable"
 import {
   FetcherMutationBuilder,
   FetcherOptions,
@@ -90,7 +90,7 @@ export type Fetcher<App extends AnyApplication> = {
    */
   action<
     ActionKey extends keyof App["_options"]["actions"],
-    Action extends App["_options"]["actions"][ActionKey]
+    Action extends App["_options"]["actions"][ActionKey],
   >(
     name: ActionKey,
     ...args: ActionFnParams<Action>

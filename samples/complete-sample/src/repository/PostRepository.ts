@@ -1,9 +1,9 @@
-import { App, AppConnection } from "../app"
+import { App, AppDataSource } from "../app"
 
 /**
  * Used to perform Post-entity database requests.
  */
-export const PostRepository = AppConnection.getRepository(
+export const PostRepository = AppDataSource.getRepository(
   App.model("Post"),
 ).extend({
   findAllPosts(offset: number, limit: number) {

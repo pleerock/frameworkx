@@ -6,8 +6,8 @@
     "@microframework/core": "*"
   },
   "devDependencies": {
-    "typescript": "4.5.4",
-    "prettier": "^2.1.2"
+    "typescript": "^4.5.5",
+    "prettier": "^2.5.1"
   },
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\""

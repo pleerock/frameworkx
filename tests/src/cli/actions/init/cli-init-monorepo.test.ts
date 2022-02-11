@@ -53,7 +53,7 @@ describe("cli > actions > init > monorepo", () => {
       "_/cli/monorepo/app/monorepo-test/packages/common/tsconfig.json",
       "_/cli/monorepo/app/monorepo-test/packages/server/.env",
       "_/cli/monorepo/app/monorepo-test/packages/server/package.json",
-      "_/cli/monorepo/app/monorepo-test/packages/server/src/app/AppConnection.ts",
+      "_/cli/monorepo/app/monorepo-test/packages/server/src/app/AppDataSource.ts",
       "_/cli/monorepo/app/monorepo-test/packages/server/src/app/AppContext.ts",
       "_/cli/monorepo/app/monorepo-test/packages/server/src/app/AppPubSub.ts",
       "_/cli/monorepo/app/monorepo-test/packages/server/src/app/AppServer.ts",

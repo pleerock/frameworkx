@@ -9,7 +9,7 @@ import { CorsOptions } from "cors"
 import { OptionsData } from "express-graphql"
 import { PubSubEngine } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
-import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
+import { DataSource } from "typeorm"
 import { ErrorHandler } from "../error-handler"
 import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
@@ -187,15 +187,7 @@ export type ApplicationServerOptions = {
   /**
    * ORM data source (connection) used in the application.
    */
-  dataSource?:
-    | Connection
-    | ((options: Partial<ConnectionOptions>) => Promise<Connection>)
-
-  /**
-   * List of entities to use in connection.
-   * If this property set, they will be overridden in ORM.
-   */
-  entities?: MixedList<Function | string | EntitySchema>
+  dataSource?: DataSource | (() => Promise<DataSource>)
 
   /**
    * List of resolvers to register in the app server.

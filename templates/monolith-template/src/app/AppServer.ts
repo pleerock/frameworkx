@@ -1,12 +1,11 @@
 import { createApplicationServer } from "@microframework/node"
-import * as entities from "../entity"
 import * as validationRules from "../validator"
 import * as modelResolvers from "../model-resolver"
 import * as rootResolvers from "../root-resolver"
 import { App } from "./App"
-import { AppConnection } from "./AppConnection"
 import { AppContext } from "./AppContext"
 import { AppPubSub } from "./AppPubSub"
+import { AppDataSource } from "./AppDataSource"
 
 /**
  * Application server setup.
@@ -31,8 +30,7 @@ export const AppServer = createApplicationServer(App, {
     ...rootResolvers,
     AppContext: AppContext,
   },
-  entities,
   validationRules,
-  dataSource: (options) => AppConnection.setOptions(options).connect(),
+  dataSource: () => AppDataSource.connect(),
   // generateModelRootQueries: true,
 })

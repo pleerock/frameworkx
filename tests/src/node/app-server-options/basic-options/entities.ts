@@ -1,7 +1,7 @@
-import { entity } from "typeorm"
+import { entity } from "@microframework/node"
 
 export const PostEntity = entity("Post", {
-  projection: {
+  columns: {
     id: {
       type: "int",
       primary: true,

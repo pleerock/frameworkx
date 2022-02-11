@@ -1,9 +1,9 @@
 import { App } from "microframework-template-monorepo-common"
-import { AppConnection } from "../app"
+import { AppDataSource } from "../app"
 
 /**
  * Used to perform Category-entity database queries.
  */
-export const CategoryRepository = AppConnection.getRepository(
+export const CategoryRepository = AppDataSource.getRepository(
   App.model("Category"),
 )

@@ -13,7 +13,7 @@ import { GraphQLFieldResolver } from "graphql/type/definition"
 import { ApplicationServerProperties } from "../application-server"
 import { RateLimitItemOptions } from "../rate-limit"
 import { validateTypeMetadata } from "../util/validation-utils"
-import { Connection } from "typeorm"
+import { DataSource } from "typeorm"
 import { Errors } from "../errors"
 import { LoggerUtils } from "../util/logger-utils"
 
@@ -22,11 +22,11 @@ import { LoggerUtils } from "../util/logger-utils"
  */
 export class ResolverHelper {
   properties: ApplicationServerProperties
-  private dataSource: Connection | undefined
+  private dataSource: DataSource | undefined
 
   constructor(
     properties: ApplicationServerProperties,
-    dataSource: Connection | undefined,
+    dataSource: DataSource | undefined,
   ) {
     this.properties = properties
     this.dataSource = dataSource
@@ -326,55 +326,54 @@ export class ResolverHelper {
         )
 
         if (!context.dataLoaders[modelName][metadata.propertyName!!]) {
-          context.dataLoaders[modelName][
-            metadata.propertyName!!
-          ] = new DataLoader(
-            async (keys) => {
-              try {
-                const entities = keys.map((key) => key.parent)
-                const userContext = await this.buildContext(defaultContext)
+          context.dataLoaders[modelName][metadata.propertyName!!] =
+            new DataLoader(
+              async (keys) => {
+                try {
+                  const entities = keys.map((key) => key.parent)
+                  const userContext = await this.buildContext(defaultContext)
 
-                // validate args
-                if (metadata.args.length)
-                  await this.validate(metadata.args[0], args, userContext)
+                  // validate args
+                  if (metadata.args.length)
+                    await this.validate(metadata.args[0], args, userContext)
 
-                // execute the resolver and get the value it returns
-                let result: any
-                if (resolverFn instanceof Function) {
-                  const resolveArgs = [entities]
-                  if (metadata.args.length) resolveArgs.push(args)
-                  result = await resolverFn(...resolveArgs, userContext)
-                } else {
-                  result = resolverFn
+                  // execute the resolver and get the value it returns
+                  let result: any
+                  if (resolverFn instanceof Function) {
+                    const resolveArgs = [entities]
+                    if (metadata.args.length) resolveArgs.push(args)
+                    result = await resolverFn(...resolveArgs, userContext)
+                  } else {
+                    result = resolverFn
+                  }
+
+                  // perform returning value model validation
+                  // it means data-loader is used, we need to validate each model in the array
+                  await Promise.all(
+                    result.map((item: any) => {
+                      return this.validate(metadata, item, context)
+                    }),
+                  )
+
+                  return result
+                } catch (err) {
+                  // todo: not sure if we should handle it here, need to check
+                  // this.logger.resolveError(err)
+                  // this.errorHandler.resolverError(err)
+                  throw err
                 }
-
-                // perform returning value model validation
-                // it means data-loader is used, we need to validate each model in the array
-                await Promise.all(
-                  result.map((item: any) => {
-                    return this.validate(metadata, item, context)
-                  }),
-                )
-
-                return result
-              } catch (err) {
-                // todo: not sure if we should handle it here, need to check
-                // this.logger.resolveError(err)
-                // this.errorHandler.resolverError(err)
-                throw err
-              }
-            },
-            {
-              cacheKeyFn: (key: {
-                parent: any
-                args: any
-                context: any
-                info: any
-              }) => {
-                return JSON.stringify({ parent: key.parent, args: key.args })
               },
-            },
-          )
+              {
+                cacheKeyFn: (key: {
+                  parent: any
+                  args: any
+                  context: any
+                  info: any
+                }) => {
+                  return JSON.stringify({ parent: key.parent, args: key.args })
+                },
+              },
+            )
         }
 
         const dataLoaderResolver =
@@ -433,55 +432,54 @@ export class ResolverHelper {
         )
 
         if (!context.dataLoaders[modelName][metadata.propertyName!!]) {
-          context.dataLoaders[modelName][
-            metadata.propertyName!!
-          ] = new DataLoader(
-            async (keys) => {
-              try {
-                const entities = keys.map((key) => key.parent)
-                const userContext = await this.buildContext(defaultContext)
+          context.dataLoaders[modelName][metadata.propertyName!!] =
+            new DataLoader(
+              async (keys) => {
+                try {
+                  const entities = keys.map((key) => key.parent)
+                  const userContext = await this.buildContext(defaultContext)
 
-                // validate args
-                if (metadata.args.length)
-                  await this.validate(metadata.args[0], args, userContext)
+                  // validate args
+                  if (metadata.args.length)
+                    await this.validate(metadata.args[0], args, userContext)
 
-                // execute the resolver and get the value it returns
-                let result: any
-                if (resolverFn instanceof Function) {
-                  const resolveArgs = [entities]
-                  if (metadata.args.length) resolveArgs.push(args)
-                  result = await resolverFn(...resolveArgs, userContext)
-                } else {
-                  result = resolverFn
+                  // execute the resolver and get the value it returns
+                  let result: any
+                  if (resolverFn instanceof Function) {
+                    const resolveArgs = [entities]
+                    if (metadata.args.length) resolveArgs.push(args)
+                    result = await resolverFn(...resolveArgs, userContext)
+                  } else {
+                    result = resolverFn
+                  }
+
+                  // perform returning value model validation
+                  // it means data-loader is used, we need to validate each model in the array
+                  await Promise.all(
+                    result.map((item: any) => {
+                      return this.validate(metadata, item, context)
+                    }),
+                  )
+
+                  return result
+                } catch (err) {
+                  // todo: not sure if we should handle it here, need to check
+                  // this.logger.resolveError(args)
+                  // this.errorHandler.resolverError(args)
+                  throw err
                 }
-
-                // perform returning value model validation
-                // it means data-loader is used, we need to validate each model in the array
-                await Promise.all(
-                  result.map((item: any) => {
-                    return this.validate(metadata, item, context)
-                  }),
-                )
-
-                return result
-              } catch (err) {
-                // todo: not sure if we should handle it here, need to check
-                // this.logger.resolveError(args)
-                // this.errorHandler.resolverError(args)
-                throw err
-              }
-            },
-            {
-              cacheKeyFn: (key: {
-                parent: any
-                args: any
-                context: any
-                info: any
-              }) => {
-                return JSON.stringify({ parent: key.parent, args: key.args })
               },
-            },
-          )
+              {
+                cacheKeyFn: (key: {
+                  parent: any
+                  args: any
+                  context: any
+                  info: any
+                }) => {
+                  return JSON.stringify({ parent: key.parent, args: key.args })
+                },
+              },
+            )
         }
 
         const dataLoaderResolver =
@@ -702,9 +700,8 @@ export class ResolverHelper {
         parentTypeName &&
         this.properties.rateLimits["models"]?.[parentTypeName]?.[name]
       ) {
-        rateLimitOptions = this.properties.rateLimits["models"]?.[
-          parentTypeName
-        ]?.[name]
+        rateLimitOptions =
+          this.properties.rateLimits["models"]?.[parentTypeName]?.[name]
       } else if (
         declarationType === "action" &&
         this.properties.rateLimits["actions"]
@@ -713,9 +710,8 @@ export class ResolverHelper {
       }
 
       if (rateLimitOptions) {
-        const rateLimiter = this.properties.rateLimitConstructor(
-          rateLimitOptions,
-        )
+        const rateLimiter =
+          this.properties.rateLimitConstructor(rateLimitOptions)
         return (async (...args: any[]) => {
           // console.log("ip", args[argsParameterIndex].request.ip)
           // await rateLimiter.consume(args[argsParameterIndex].request.ip)

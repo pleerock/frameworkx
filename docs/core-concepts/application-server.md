@@ -281,8 +281,8 @@ Read more about this option [here](#apppath-option).
 
     * `options?: any` - extra [swagger-ui-express options](https://github.com/scottie1984/swagger-ui-express#custom-swagger-options).
 
-* `dataSource?: Connection | ((options: Partial<ConnectionOptions>) => Promise<Connection>)` - 
-    TypeORM's connection used in the application.
+* `dataSource?: DataSource | (() => Promise<DataSource>)` - 
+    TypeORM's DataSource used in the application.
 
 * `entities?: (Function | string | EntitySchema)[]` - list of entities to register in connection.
 

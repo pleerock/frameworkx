@@ -1,7 +1,7 @@
 import { createApplicationServer } from "@microframework/node"
 import * as entities from "../entity"
 import { CategoryApp } from "./CategoryApp"
-import { CategoryDbConnection } from "./CategoryDbConnection"
+import { CategoryDataSource } from "./CategoryDataSource"
 import { CategoryContext } from "./CategoryContext"
 import { CategoryPubSub } from "./CategoryPubSub"
 import * as modelResolvers from "../model-resolver"
@@ -30,7 +30,6 @@ export const CategoryServer = createApplicationServer(CategoryApp, {
     ...rootResolvers,
     CategoryContext: CategoryContext,
   },
-  entities,
-  dataSource: (options) => CategoryDbConnection.setOptions(options).connect(),
+  dataSource: () => CategoryDataSource.connect(),
   // generateModelRootQueries: true,
 })

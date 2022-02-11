@@ -1,10 +1,10 @@
-import { PostApp, PostDbConnection } from "../app"
+import { PostApp, PostDataSource } from "../app"
 
 /**
  * Used to perform Post-entity database queries.
  * This repository contains custom repository methods.
  */
-export const PostRepository = PostDbConnection.getRepository(
+export const PostRepository = PostDataSource.getRepository(
   PostApp.model("Post"),
 ).extend({
   /**

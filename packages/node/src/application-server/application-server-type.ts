@@ -5,7 +5,7 @@ import {
 } from "@microframework/core"
 import { Express } from "express"
 import { Server as HttpServer } from "http"
-import { Connection } from "typeorm"
+import { DataSource } from "typeorm"
 import { Server as WebsocketServer } from "ws"
 import { ApplicationServerProperties } from "./application-server-properties-type"
 
@@ -53,7 +53,7 @@ export interface ApplicationServer<App extends AnyApplication> {
   /**
    * Database source (TypeORM's connection).
    */
-  readonly dataSource?: Connection
+  readonly dataSource?: DataSource
 
   /**
    * Starts application server.

@@ -1,21 +1,14 @@
 import {
   ApplicationTypeMetadata,
   ApplicationUtils,
-  assign,
   MixedList,
-  TypeMetadata,
 } from "@microframework/core"
 import { debugLogger } from "@microframework/logger"
 import { parse } from "@microframework/parser"
 import { defaultValidator } from "@microframework/validator"
 import * as fs from "fs"
 import * as path from "path"
-import {
-  Connection,
-  ConnectionOptions,
-  EntitySchema,
-  MappedEntitySchemaProperty,
-} from "typeorm"
+import { DataSource, DataSourceOptions, EntitySchema } from "typeorm"
 import { DefaultErrorHandler } from "../error-handler"
 import { DefaultNamingStrategy } from "../naming-strategy"
 import { ApplicationServerOptions } from "./application-server-options-type"
@@ -52,7 +45,7 @@ export const ApplicationServerUtils = {
   /**
    * Converts given type metadata models into TypeORM's MappedEntitySchemaProperty objects.
    * Those objects are used by TypeORM to set types to entity properties dynamically.
-   */
+
   modelsToApp(models: TypeMetadata[]): MappedEntitySchemaProperty[] {
     const mappedEntities: MappedEntitySchemaProperty[] = []
     for (let model of models) {
@@ -65,7 +58,7 @@ export const ApplicationServerUtils = {
       }
     }
     return mappedEntities
-  },
+  },*/
 
   /**
    * Converts given ApplicationServerOptions object into ApplicationServerProperties object.
@@ -112,8 +105,6 @@ export const ApplicationServerUtils = {
             options: options.swagger.options,
           }
         : undefined,
-      dataSource: options.dataSource,
-      entities: options.entities,
       namingStrategy: options.namingStrategy || DefaultNamingStrategy,
       errorHandler: options.errorHandler || DefaultErrorHandler,
       resolvers: resolvers,
@@ -130,49 +121,6 @@ export const ApplicationServerUtils = {
       rateLimits: options.rateLimits,
       rateLimitConstructor: options.rateLimitConstructor,
     }
-  },
-
-  /**
-   * Setups a database source (TypeORM's connection).
-   */
-  async loadDataSource(
-    metadata: ApplicationTypeMetadata,
-    dataSource:
-      | Connection
-      | ((options: Partial<ConnectionOptions>) => Promise<Connection>),
-    entities?: MixedList<Function | string | EntitySchema>,
-  ): Promise<Connection> {
-    // as usual, we can't rely on "instanceof", so let's just check if its a Connection object
-    // until we have "@type" property in the next TypeORM version
-    if (
-      (dataSource as Connection)["name"] &&
-      (dataSource as Connection)["options"]
-    ) {
-      if (entities) {
-        throw new Error(
-          `"entities" can only be used when "dataSource" is set to a factory function.`,
-        )
-      }
-      return dataSource as Connection
-    }
-    if (typeof dataSource === "function") {
-      const dataSourceOptions: Partial<ConnectionOptions> = {}
-      if (metadata && metadata.models.length > 0) {
-        assign(dataSourceOptions, {
-          mappedEntitySchemaProperties: ApplicationServerUtils.modelsToApp(
-            metadata.models,
-          ),
-        })
-      }
-      if (entities) {
-        assign(dataSourceOptions, {
-          entities,
-        })
-      }
-      return dataSource(dataSourceOptions)
-    }
-
-    throw new Error(`Invalid "dataSource" value.`)
   },
 
   /**
@@ -211,8 +159,8 @@ export const ApplicationServerUtils = {
     graphqlRoute: string,
     subscriptionsEndpoint: string,
   ) {
-    const expressPlayground = require("graphql-playground-middleware-express")
-      .default
+    const expressPlayground =
+      require("graphql-playground-middleware-express").default
     return expressPlayground({
       endpoint: graphqlRoute,
       subscriptionsEndpoint: subscriptionsEndpoint,

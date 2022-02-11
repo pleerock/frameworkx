@@ -1,5 +1,5 @@
 export * from "./CategoryApp"
-export * from "./CategoryDbConnection"
+export * from "./CategoryDataSource"
 export * from "./CategoryContext"
 export * from "./CategoryPubSub"
 export * from "./CategoryServer"

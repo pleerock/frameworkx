@@ -66,11 +66,10 @@ export function createApplicationServer<App extends AnyApplication>(
 
       // setup a database connection
       if (this.properties.dataSource) {
-        const dataSource = await ApplicationServerUtils.loadDataSource(
-          this.metadata,
-          this.properties.dataSource,
-          this.properties.entities,
-        )
+        const dataSource =
+          typeof this.properties.dataSource === "function"
+            ? await this.properties.dataSource()
+            : this.properties.dataSource
         assign(this, { dataSource })
       }
 
@@ -126,14 +125,15 @@ export function createApplicationServer<App extends AnyApplication>(
           buildGraphQLSchema({
             graphql: GraphQL,
             appMetadata: metadata!,
-            namingStrategy: this.properties.namingStrategy
-              .generatedGraphQLTypes,
+            namingStrategy:
+              this.properties.namingStrategy.generatedGraphQLTypes,
             resolveFactory: resolverHelper.createRootDeclarationResolverFn.bind(
               resolverHelper,
             ) as any,
-            subscribeFactory: resolverHelper.createRootSubscriptionResolver.bind(
-              resolverHelper,
-            ) as any,
+            subscribeFactory:
+              resolverHelper.createRootSubscriptionResolver.bind(
+                resolverHelper,
+              ) as any,
           }),
         )
 

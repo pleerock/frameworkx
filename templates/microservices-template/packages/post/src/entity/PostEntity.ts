@@ -1,11 +1,11 @@
-import { entity } from "typeorm"
+import { entity } from "@microframework/node"
 import { PostApp } from "../app"
 
 /**
  * Database schema for Post model.
  */
 export const PostEntity = entity(PostApp.model("Post"), {
-  projection: {
+  columns: {
     id: {
       type: "int",
       primary: true,

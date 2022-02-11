@@ -1,5 +1,5 @@
 export * from "./App"
-export * from "./AppConnection"
+export * from "./AppDataSource"
 export * from "./AppContext"
 export * from "./AppPubSub"
 export * from "./AppServer"

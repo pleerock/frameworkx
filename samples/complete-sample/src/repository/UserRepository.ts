@@ -1,6 +1,6 @@
-import { App, AppConnection } from "../app"
+import { App, AppDataSource } from "../app"
 
 /**
  * Used to perform User-entity database requests.
  */
-export const UserRepository = AppConnection.getRepository(App.model("User"))
+export const UserRepository = AppDataSource.getRepository(App.model("User"))

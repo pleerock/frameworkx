@@ -1,7 +1,7 @@
 import { createApplicationServer } from "@microframework/node"
 import * as entities from "../entity"
 import { UserApp } from "./UserApp"
-import { UserDbConnection } from "./UserDbConnection"
+import { UserDataSource } from "./UserDataSource"
 import { UserContext } from "./UserContext"
 import { UserPubSub } from "./UserPubSub"
 import * as modelResolvers from "../model-resolver"
@@ -30,7 +30,6 @@ export const UserServer = createApplicationServer(UserApp, {
     ...rootResolvers,
     UserContext: UserContext,
   },
-  entities,
-  dataSource: (options) => UserDbConnection.setOptions(options).connect(),
+  dataSource: () => UserDataSource.connect(),
   // generateModelRootQueries: true,
 })

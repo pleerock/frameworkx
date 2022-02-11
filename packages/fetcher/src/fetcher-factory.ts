@@ -5,7 +5,7 @@ import {
   RequestMapReturnType,
 } from "@microframework/core"
 import ReconnectingWebSocket from "reconnecting-websocket"
-import { Observable } from "zen-observable-ts"
+import { Observable } from "zen-observable"
 import { v4 as uuidv4 } from "uuid"
 import { FetcherOptions } from "./fetcher-options-type"
 import { FetcherError } from "./fetcher-error-classes"

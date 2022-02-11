@@ -9,11 +9,11 @@ import { CorsOptions } from "cors"
 import { OptionsData } from "express-graphql"
 import { PubSubEngine } from "graphql-subscriptions"
 import { ServerOptions } from "subscriptions-transport-ws"
-import { Connection, ConnectionOptions, EntitySchema } from "typeorm"
 import { ErrorHandler } from "../error-handler"
 import { NamingStrategy } from "../naming-strategy"
 import { RateLimitItemOptions, RateLimitOptions } from "../rate-limit"
 import { SwaggerUiOptions } from "swagger-ui-express"
+import { DataSource } from "typeorm"
 
 /**
  * Properties held by ApplicationServer.
@@ -177,15 +177,7 @@ export type ApplicationServerProperties = {
   /**
    * ORM data source (connection) used in the application.
    */
-  readonly dataSource?:
-    | Connection
-    | ((options: Partial<ConnectionOptions>) => Promise<Connection>)
-
-  /**
-   * List of entities to use in connection.
-   * If this property is set, they will be overridden in ORM.
-   */
-  readonly entities?: MixedList<Function | string | EntitySchema>
+  readonly dataSource?: DataSource | (() => Promise<DataSource>)
 
   /**
    * List of registered resolvers.

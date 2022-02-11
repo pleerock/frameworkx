@@ -25,6 +25,7 @@
   "references": [
     { "path": "../../../../packages/core"},
     { "path": "../../../../packages/parser"},
+    { "path": "../../../../packages/fetcher"},
     { "path": "../../../../packages/model"},
     { "path": "../../../../packages/node"},
     { "path": "../../../../packages/logger"},

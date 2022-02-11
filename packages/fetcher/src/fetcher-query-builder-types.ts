@@ -8,14 +8,14 @@ import {
   RequestSelection,
   ReturnTypeOptional,
 } from "@microframework/core"
-import { Observable } from "zen-observable-ts"
+import { Observable } from "zen-observable"
 
 /**
  * Initiates a query building for a GraphQL Query.
  */
 export type FetcherQueryBuilder<
   Queries extends GraphQLDeclarationList,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = {
   /**
    * Add a new entry into GraphQL query.
@@ -30,7 +30,7 @@ export type FetcherQueryBuilder<
  */
 export type FetcherMutationBuilder<
   Mutations extends GraphQLDeclarationList,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = {
   /**
    * Add a new entry into GraphQL query.
@@ -47,7 +47,7 @@ export type FetcherMutationBuilder<
  */
 export type FetcherSubscriptionBuilder<
   Subscriptions extends GraphQLDeclarationList,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = {
   /**
    * Add a new entry into GraphQL query.
@@ -64,7 +64,7 @@ export type FetcherSubscriptionBuilder<
  */
 export type FetcherQueryExecutor<
   Queries extends GraphQLDeclarationList,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = FetcherQueryBuilder<Queries, Map> & {
   /**
    * Executes a query and returns a Response object.
@@ -88,7 +88,7 @@ export type FetcherQueryExecutor<
  */
 export type FetcherMutationExecutor<
   Mutations extends GraphQLDeclarationList,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = FetcherMutationBuilder<Mutations, Map> & {
   /**
    * Executes a query and returns a Response object.
@@ -112,7 +112,7 @@ export type FetcherMutationExecutor<
  */
 export type FetcherSubscriptionExecutor<
   Subscriptions extends GraphQLDeclarationList,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = FetcherSubscriptionBuilder<Subscriptions, Map> & {
   /**
    * Creates an Observable for a given Subscription.
@@ -133,11 +133,11 @@ export type FetcherSubscriptionExecutor<
 export type FetcherQueryMethods<
   Queries extends GraphQLDeclarationList,
   CurrentName extends string,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = {
-  [P in keyof Queries]: (
-    ...args: Parameters<Queries[P]>
-  ) => NonArray<NonNullable<ReturnTypeOptional<Queries[P]>>> extends object
+  [P in keyof Queries]: (...args: Parameters<Queries[P]>) => NonArray<
+    NonNullable<ReturnTypeOptional<Queries[P]>>
+  > extends object
     ? {
         /**
          * Choose what to select from a model returned by a GraphQL root declaration.
@@ -146,18 +146,16 @@ export type FetcherQueryMethods<
           selection: Selection,
         ): FetcherQueryExecutor<
           Queries,
-          Map &
-            {
-              [key in CurrentName]: RequestMapItem<Queries, P, Selection>
-            }
+          Map & {
+            [key in CurrentName]: RequestMapItem<Queries, P, Selection>
+          }
         >
       }
     : FetcherQueryExecutor<
         Queries,
-        Map &
-          {
-            [key in CurrentName]: RequestMapItem<Queries, P, never>
-          }
+        Map & {
+          [key in CurrentName]: RequestMapItem<Queries, P, never>
+        }
       >
 }
 
@@ -168,11 +166,11 @@ export type FetcherQueryMethods<
 export type FetcherMutationMethods<
   Mutations extends GraphQLDeclarationList,
   CurrentName extends string,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = {
-  [P in keyof Mutations]: (
-    ...args: Parameters<Mutations[P]>
-  ) => NonArray<NonNullable<ReturnTypeOptional<Mutations[P]>>> extends object
+  [P in keyof Mutations]: (...args: Parameters<Mutations[P]>) => NonArray<
+    NonNullable<ReturnTypeOptional<Mutations[P]>>
+  > extends object
     ? {
         /**
          * Choose what to select from a model returned by a GraphQL root declaration.
@@ -181,18 +179,16 @@ export type FetcherMutationMethods<
           selection: Selection,
         ): FetcherMutationExecutor<
           Mutations,
-          Map &
-            {
-              [key in CurrentName]: RequestMapItem<Mutations, P, Selection>
-            }
+          Map & {
+            [key in CurrentName]: RequestMapItem<Mutations, P, Selection>
+          }
         >
       }
     : FetcherMutationExecutor<
         Mutations,
-        Map &
-          {
-            [key in CurrentName]: RequestMapItem<Mutations, P, never>
-          }
+        Map & {
+          [key in CurrentName]: RequestMapItem<Mutations, P, never>
+        }
       >
 }
 
@@ -203,7 +199,7 @@ export type FetcherMutationMethods<
 export type FetcherSubscriptionMethods<
   Subscriptions extends GraphQLDeclarationList,
   CurrentName extends string,
-  Map extends RequestMap
+  Map extends RequestMap,
 > = {
   [P in keyof Subscriptions]: (
     ...args: Parameters<Subscriptions[P]>
@@ -218,17 +214,15 @@ export type FetcherSubscriptionMethods<
           selection: Selection,
         ): FetcherSubscriptionExecutor<
           Subscriptions,
-          Map &
-            {
-              [key in CurrentName]: RequestMapItem<Subscriptions, P, Selection>
-            }
+          Map & {
+            [key in CurrentName]: RequestMapItem<Subscriptions, P, Selection>
+          }
         >
       }
     : FetcherSubscriptionExecutor<
         Subscriptions,
-        Map &
-          {
-            [key in CurrentName]: RequestMapItem<Subscriptions, P, never>
-          }
+        Map & {
+          [key in CurrentName]: RequestMapItem<Subscriptions, P, never>
+        }
       >
 }

@@ -1,11 +1,11 @@
-import { entity } from "typeorm"
 import { App } from "../app"
+import { entity } from "@microframework/node"
 
 /**
  * Database schema for Category model.
  */
 export const CategoryEntity = entity(App.model("Category"), {
-  projection: {
+  columns: {
     id: {
       type: "int",
       primary: true,
@@ -14,10 +14,13 @@ export const CategoryEntity = entity(App.model("Category"), {
     name: {
       type: "varchar",
     },
+  },
+  relations: {
     posts: {
-      relation: "many-to-many",
-      owner: false,
-      inverse: "categories",
+      type: "many-to-many",
+      target: App.model("Post").name,
+      joinTable: false,
+      inverseSide: "categories",
     },
   },
 })

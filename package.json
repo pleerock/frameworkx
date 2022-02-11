@@ -1,13 +1,7 @@
 {
   "name": "@microframework/root",
   "private": true,
-  "devDependencies": {
-    "lerna": "^3.22.1",
-    "prettier": "^2.2.1",
-    "typescript": "4.5.4"
-  },
   "scripts": {
-    "bootstrap": "npm i && lerna bootstrap",
     "docker": "docker-compose up",
     "format": "prettier",
     "watch": "tsc -b -w",
@@ -16,5 +10,36 @@
     "publish-packages": "sh scripts/publish.sh",
     "generate-sandbox-samples": "sh scripts/generate-sandbox-samples.sh",
     "sample": "node samples/complete-sample/_/index.js"
-  }
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1",
+    "typescript": "4.5.4"
+  },
+  "peerDependencies": {
+    "graphql": "^15.8.0"
+  },
+  "workspaces": [
+    "./packages/cli",
+    "./packages/core",
+    "./packages/fetcher",
+    "./packages/graphql",
+    "./packages/logger",
+    "./packages/model",
+    "./packages/node",
+    "./packages/parser",
+    "./packages/validator",
+    "./samples/complete-sample",
+    "./sandbox-samples/monolith-sample",
+    "./sandbox-samples/monorepo-sample",
+    "./sandbox-samples/microservices-sample",
+    "./templates/monolith-template",
+    "./templates/monorepo-template/packages/common",
+    "./templates/monorepo-template/packages/client",
+    "./templates/monorepo-template/packages/server",
+    "./templates/microservices-template/packages/gateway",
+    "./templates/microservices-template/packages/category",
+    "./templates/microservices-template/packages/post",
+    "./templates/microservices-template/packages/user",
+    "./tests"
+  ]
 }
