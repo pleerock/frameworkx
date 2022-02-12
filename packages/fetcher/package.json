@@ -1,6 +1,6 @@
 {
   "name": "@microframework/fetcher",
-  "version": "0.1.87",
+  "version": "0.1.91",
   "description": "Fetcher helps to execute network queries.",
   "author": "Umed Khudoiberdiev <pleerock.me@gmail.com>",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "directory": "packages/fetcher"
   },
   "dependencies": {
+    "@types/zen-observable": "^0.8.3",
     "@microframework/core": "*",
     "reconnecting-websocket": "^4.4.0",
     "node-fetch": "^2.6.1",

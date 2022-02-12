@@ -21,8 +21,8 @@ export async function initAction(
     )
   }
 
-  // make sure _templates are inside CLI package
-  if (!existsSync(__dirname + "/../../_templates")) {
+  // make sure templates are inside CLI package
+  if (!existsSync(__dirname + "/../../templates")) {
     throw new Error(
       `Templates are missing in the project, cannot complete operation.`,
     )
@@ -30,7 +30,7 @@ export async function initAction(
 
   // preparation
   // templatePath can be different in published version and local development version
-  const templatesPath = __dirname + "/../../_templates"
+  const templatesPath = __dirname + "/../../templates"
   const source = path.normalize(`${templatesPath}/${scale}-template`)
   const destination = directory
     ? process.cwd() + "/" + directory + "/" + name
