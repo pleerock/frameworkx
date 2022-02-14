@@ -105,6 +105,7 @@ export const ApplicationServerUtils = {
             options: options.swagger.options,
           }
         : undefined,
+      dataSource: options.dataSource,
       namingStrategy: options.namingStrategy || DefaultNamingStrategy,
       errorHandler: options.errorHandler || DefaultErrorHandler,
       resolvers: resolvers,
