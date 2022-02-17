@@ -11,8 +11,8 @@ export const PostDeclarationResolver = App.resolver({
     return PostRepository.findAllPosts(args.offset, args.limit)
   },
 
-  async postRemove(args): Promise<boolean> {
-    const post = await PostRepository.findOneOrFail(args.id)
+  async postRemove({ id }): Promise<boolean> {
+    const post = await PostRepository.findOneByOrFail({ id })
     await PostRepository.remove(post)
     return true
   },

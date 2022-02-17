@@ -11,7 +11,7 @@
     "dotenv": "^16.0.0",
     "graphql-subscriptions": "^2.0.0",
     "sqlite3": "^5.0.2",
-    "typeorm": "0.3.0-rc.28"
+    "typeorm": "0.3.0-rc.32"
   },
   "devDependencies": {
     "@types/node": "^17.0.17",

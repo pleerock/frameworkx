@@ -7,7 +7,7 @@ import { PostRepository } from "../repository"
 export const PostRemoveMutationResolver = PostApp.resolver(
   "postRemove",
   async ({ id }) => {
-    const post = await PostRepository.findOne(id)
+    const post = await PostRepository.findOneBy({ id })
     if (!post) return false
     await PostRepository.remove(post)
     return true

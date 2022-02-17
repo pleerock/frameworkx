@@ -12,13 +12,13 @@ import {
  */
 export const SearchDeclarationResolver = App.resolver({
   async search({ keyword }): Promise<SearchType[]> {
-    const categories = await CategoryRepository.find({
+    const categories = await CategoryRepository.findBy({
       name: Like(`%${keyword}%`),
     })
-    const users = await UserRepository.find({
+    const users = await UserRepository.findBy({
       firstName: Like(`%${keyword}%`),
     })
-    const posts = await PostRepository.find({
+    const posts = await PostRepository.findBy({
       title: Like(`%${keyword}%`),
     })
     return [...categories, ...users, ...posts]

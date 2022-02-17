@@ -15,8 +15,8 @@ export const PostDeclarationResolver = App.resolver({
     return PostRepository.findAllPosts(input.skip, input.take)
   },
 
-  async postRemove(input: { id: number }) {
-    const post = await PostRepository.findOne(input.id)
+  async postRemove({ id }: { id: number }) {
+    const post = await PostRepository.findOneBy({ id })
     if (!post) return false
     await PostRepository.remove(post)
     return true
@@ -30,7 +30,7 @@ export const PostDeclarationResolver = App.resolver({
     })
 
     if (input.categoryIds) {
-      const categories = await CategoryRepository.find({
+      const categories = await CategoryRepository.findBy({
         id: In(input.categoryIds),
       })
       await PostRepository.save({

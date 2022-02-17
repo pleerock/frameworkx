@@ -6,7 +6,7 @@ import { CategoryRepository } from "../repository"
  */
 export const CategoryQueryResolver = CategoryApp.resolver(
   "category",
-  async (input) => {
-    return await CategoryRepository.findOne(input.id)
+  async ({ id }) => {
+    return await CategoryRepository.findOneBy({ id })
   },
 )

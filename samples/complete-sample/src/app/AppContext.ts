@@ -6,7 +6,7 @@ import { App } from "./App"
  */
 export const AppContext = App.contextResolver({
   async currentUser() {
-    const user = await UserRepository.findOne(1)
+    const user = await UserRepository.findOneBy({ id: 1 })
     if (!user) return { id: 0 }
 
     return {

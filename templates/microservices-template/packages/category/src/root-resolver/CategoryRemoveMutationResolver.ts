@@ -6,8 +6,8 @@ import { CategoryRepository } from "../repository"
  */
 export const CategoryRemoveMutationResolver = CategoryApp.resolver(
   "categoryRemove",
-  async (input: { id: number }) => {
-    const category = await CategoryRepository.findOne(input.id)
+  async ({ id }: { id: number }) => {
+    const category = await CategoryRepository.findOneBy({ id })
     if (!category) return false
     await CategoryRepository.remove(category)
     return true

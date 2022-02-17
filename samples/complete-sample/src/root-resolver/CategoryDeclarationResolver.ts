@@ -7,8 +7,8 @@ import { CategoryRepository } from "../repository"
  * Resolver for category declarations.
  */
 export const CategoryDeclarationResolver = App.resolver({
-  async category(args) {
-    return await CategoryRepository.findOne(args.id)
+  async category({ id }) {
+    return await CategoryRepository.findOneBy({ id })
   },
 
   async categorySave(args): Promise<Category> {
@@ -18,8 +18,8 @@ export const CategoryDeclarationResolver = App.resolver({
     })
   },
 
-  async categoryRemove(args): Promise<boolean> {
-    const category = await CategoryRepository.findOneOrFail(args.id)
+  async categoryRemove({ id }): Promise<boolean> {
+    const category = await CategoryRepository.findOneByOrFail({ id })
     await CategoryRepository.remove(category)
     return true
   },

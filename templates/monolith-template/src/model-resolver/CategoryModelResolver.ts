@@ -12,7 +12,7 @@ export const CategoryModelResolver = App.resolver(
       logger.log("I'm resolving a postsCount property using data loader!")
       return Promise.all(
         categories.map((category) => {
-          return PostRepository.count({
+          return PostRepository.countBy({
             categories: {
               id: category.id,
             },
